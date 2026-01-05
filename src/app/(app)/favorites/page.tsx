@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ClipList } from "../../../components/clips/ClipList";
 import { DeleteAllButton } from "../../../components/clips/DeleteAllButton";
 import { EmptyState } from "../../../components/clips/EmptyState";
@@ -17,6 +17,11 @@ const EMPTY_CLIPS: StoredClip[] = [];
 
 export default function FavoritesPage() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [copyToast, setCopyToast] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const copyToastTimerRef = useRef<number | null>(null);
   const lastClipsRawRef = useRef<string | null>(null);
   const lastClipsRef = useRef<StoredClip[]>(EMPTY_CLIPS);
 
@@ -69,15 +74,81 @@ export default function FavoritesPage() {
     (clip) => activeFilter === "all" || clip.type === activeFilter,
   );
 
+  useEffect(() => {
+    return () => {
+      if (copyToastTimerRef.current) {
+        window.clearTimeout(copyToastTimerRef.current);
+      }
+    };
+  }, []);
+
+  const updateClipFavorite = useCallback((clipId: string, isFavorite: boolean) => {
+    const stored = localStorage.getItem(CLIP_STORAGE_KEY);
+    if (!stored) return;
+    let nextMap: Record<string, StoredClip[]> = {};
+    try {
+      nextMap = JSON.parse(stored) as Record<string, StoredClip[]>;
+    } catch {
+      nextMap = {};
+    }
+    Object.keys(nextMap).forEach((folderId) => {
+      nextMap[folderId] = (nextMap[folderId] ?? []).map((clip) =>
+        clip.id === clipId ? { ...clip, isFavorite } : clip,
+      );
+    });
+    localStorage.setItem(CLIP_STORAGE_KEY, JSON.stringify(nextMap));
+    window.dispatchEvent(new Event(CLIP_EVENT));
+  }, []);
+
+
+  const handleCopy = useCallback(
+    async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
+      const { clientX, clientY } = event;
+      setCopyToast({ x: clientX, y: clientY });
+      if (copyToastTimerRef.current) {
+        window.clearTimeout(copyToastTimerRef.current);
+      }
+      copyToastTimerRef.current = window.setTimeout(() => {
+        setCopyToast(null);
+      }, 3000);
+      try {
+        await navigator.clipboard.writeText(clip.content);
+      } catch {
+        // no-op
+      }
+    },
+    [],
+  );
+
+  const handleToggleFavorite = useCallback(
+    (clip: Clip) => {
+      updateClipFavorite(clip.id, !clip.isFavorite);
+    },
+    [updateClipFavorite],
+  );
+
   return (
     <div className="flex h-full flex-col bg-white">
       <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
       {filteredClips.length ? (
-        <ClipList clips={filteredClips} />
+        <ClipList
+          clips={filteredClips}
+          onCopy={handleCopy}
+          onToggleFavorite={handleToggleFavorite}
+        />
       ) : (
         <EmptyState />
       )}
       <DeleteAllButton disabled />
+
+      {copyToast ? (
+        <div
+          className="fixed z-50 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white shadow-md"
+          style={{ left: copyToast.x + 12, top: copyToast.y + 12 }}
+        >
+          COPY!
+        </div>
+      ) : null}
     </div>
   );
 }
