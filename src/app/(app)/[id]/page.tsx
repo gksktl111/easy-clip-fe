@@ -13,14 +13,18 @@ import { ClipList } from "../../../components/clips/ClipList";
 import { DeleteAllButton } from "../../../components/clips/DeleteAllButton";
 import { EmptyState } from "../../../components/clips/EmptyState";
 import { FilterBar, FilterType } from "../../../components/clips/FilterBar";
+import {
+  clearFolderClips,
+  CLIP_EVENT,
+  CLIP_STORAGE_KEY,
+  deleteClip,
+  getFolderClips,
+  recordCopy,
+  StoredClip,
+  updateClip,
+  upsertClip,
+} from "../../../lib/clipStore";
 import { Clip } from "../../../types/clip";
-
-interface StoredClip extends Omit<Clip, "createdAt"> {
-  createdAt: string;
-}
-
-const CLIP_STORAGE_KEY = "easy-clip-folder-clips";
-const CLIP_EVENT = "clips:change";
 const EMPTY_CLIPS: StoredClip[] = [];
 
 export default function FolderPage() {
@@ -52,19 +56,14 @@ export default function FolderPage() {
   const getClipsSnapshot = useCallback(() => {
     if (!folderId) return EMPTY_CLIPS;
     const stored = localStorage.getItem(CLIP_STORAGE_KEY);
-    if (stored === lastClipsRawRef.current && folderId === lastFolderIdRef.current) {
+    if (
+      stored !== null &&
+      stored === lastClipsRawRef.current &&
+      folderId === lastFolderIdRef.current
+    ) {
       return lastClipsRef.current;
     }
-    let nextClips = EMPTY_CLIPS;
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as Record<string, StoredClip[]>;
-        const folderClips = parsed?.[folderId];
-        nextClips = Array.isArray(folderClips) ? folderClips : EMPTY_CLIPS;
-      } catch {
-        nextClips = EMPTY_CLIPS;
-      }
-    }
+    const nextClips = getFolderClips(folderId);
     lastClipsRawRef.current = stored;
     lastFolderIdRef.current = folderId;
     lastClipsRef.current = nextClips;
@@ -87,11 +86,13 @@ export default function FolderPage() {
     () => EMPTY_CLIPS,
   );
 
-  const clips = useMemo(
+  const clips = useMemo<Clip[]>(
     () =>
       storedClips.map((clip) => ({
         ...clip,
         createdAt: new Date(clip.createdAt),
+        updatedAt: clip.updatedAt ? new Date(clip.updatedAt) : undefined,
+        lastCopiedAt: clip.lastCopiedAt ? new Date(clip.lastCopiedAt) : null,
       })),
     [storedClips],
   );
@@ -138,30 +139,11 @@ export default function FolderPage() {
     };
   }, []);
 
-  const persistClips = useCallback(
-    (nextClips: StoredClip[]) => {
-      if (!folderId) return;
-      const stored = localStorage.getItem(CLIP_STORAGE_KEY);
-      let nextMap: Record<string, StoredClip[]> = {};
-      if (stored) {
-        try {
-          nextMap = JSON.parse(stored) as Record<string, StoredClip[]>;
-        } catch {
-          nextMap = {};
-        }
-      }
-      nextMap[folderId] = nextClips;
-      localStorage.setItem(CLIP_STORAGE_KEY, JSON.stringify(nextMap));
-      window.dispatchEvent(new Event(CLIP_EVENT));
-    },
-    [folderId],
-  );
-
-  const appendClip = useCallback(
+  const addClip = useCallback(
     (clip: StoredClip) => {
-      persistClips([...storedClips, clip]);
+      upsertClip(clip);
     },
-    [persistClips, storedClips],
+    [],
   );
 
   const createTextClip = useCallback(
@@ -169,19 +151,24 @@ export default function FolderPage() {
       const trimmed = content.trim();
       if (!trimmed) return;
       const isColor = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(trimmed);
-      appendClip({
+      const now = new Date().toISOString();
+      const nextClip: StoredClip = {
         id:
           typeof crypto !== "undefined" && "randomUUID" in crypto
             ? crypto.randomUUID()
             : `${Date.now()}`,
+        folderId: folderId || null,
         type: isColor ? "color" : "text",
         name: isColor ? "Color Clip" : "Text Clip",
         content: trimmed,
-        createdAt: new Date().toISOString(),
+        createdAt: now,
+        updatedAt: now,
+        lastCopiedAt: now,
         isFavorite: false,
-      });
+      };
+      addClip(nextClip);
     },
-    [appendClip],
+    [addClip, folderId],
   );
 
   const createImageClip = useCallback(
@@ -190,21 +177,26 @@ export default function FolderPage() {
       reader.onload = () => {
         const result = typeof reader.result === "string" ? reader.result : "";
         if (!result) return;
-        appendClip({
+        const now = new Date().toISOString();
+        const nextClip: StoredClip = {
           id:
             typeof crypto !== "undefined" && "randomUUID" in crypto
               ? crypto.randomUUID()
               : `${Date.now()}`,
+          folderId: folderId || null,
           type: "image",
           name: "Image Clip",
           content: result,
-          createdAt: new Date().toISOString(),
+          createdAt: now,
+          updatedAt: now,
+          lastCopiedAt: now,
           isFavorite: false,
-        });
+        };
+        addClip(nextClip);
       };
       reader.readAsDataURL(file);
     },
-    [appendClip],
+    [addClip, folderId],
   );
 
   useEffect(() => {
@@ -246,6 +238,7 @@ export default function FolderPage() {
       } catch {
         // no-op
       }
+      recordCopy(clip.id);
     },
     [],
   );
@@ -256,19 +249,18 @@ export default function FolderPage() {
     } catch {
       // no-op
     }
+    recordCopy(clip.id);
     setContextMenu(null);
   }, []);
 
   const handleToggleFavorite = useCallback(
     (clip: Clip) => {
-      const nextClips = storedClips.map((item) =>
-        item.id === clip.id
-          ? { ...item, isFavorite: !item.isFavorite }
-          : item,
-      );
-      persistClips(nextClips);
+      updateClip(clip.id, {
+        isFavorite: !clip.isFavorite,
+        updatedAt: new Date().toISOString(),
+      });
     },
-    [persistClips, storedClips],
+    [],
   );
 
   const handleOpenContextMenu = useCallback(
@@ -285,11 +277,10 @@ export default function FolderPage() {
 
   const handleDeleteClip = useCallback(
     (clipId: string) => {
-      const nextClips = storedClips.filter((clip) => clip.id !== clipId);
-      persistClips(nextClips);
+      deleteClip(clipId);
       setContextMenu(null);
     },
-    [persistClips, storedClips],
+    [],
   );
 
   const handleOpenRename = useCallback(
@@ -306,19 +297,21 @@ export default function FolderPage() {
     if (!renameFolderId) return;
     const trimmed = renameName.trim();
     if (!trimmed) return;
-    const nextClips = storedClips.map((clip) =>
-      clip.id === renameFolderId ? { ...clip, name: trimmed } : clip,
-    );
-    persistClips(nextClips);
+    updateClip(renameFolderId, {
+      name: trimmed,
+      updatedAt: new Date().toISOString(),
+    });
     setIsRenameOpen(false);
     setRenameFolderId(null);
     setRenameName("");
-  }, [persistClips, renameFolderId, renameName, storedClips]);
+  }, [renameFolderId, renameName]);
 
   const handleDeleteAll = useCallback(() => {
-    persistClips([]);
+    if (folderId) {
+      clearFolderClips(folderId);
+    }
     setIsDeleteAllOpen(false);
-  }, [persistClips]);
+  }, [folderId]);
 
   return (
     <div
@@ -334,6 +327,7 @@ export default function FolderPage() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         isActive={isActive}
+        countLabel={`${filteredClips.length} clips`}
       />
       {!isActive ? (
         <div className="px-6 pt-4">
