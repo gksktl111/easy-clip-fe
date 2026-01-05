@@ -23,6 +23,7 @@ interface FilterBarProps {
   onSearchChange?: (value: string) => void;
   isActive?: boolean;
   showStatus?: boolean;
+  countLabel?: string;
 }
 
 export function FilterBar({
@@ -32,6 +33,7 @@ export function FilterBar({
   onSearchChange,
   isActive = false,
   showStatus = true,
+  countLabel,
 }: FilterBarProps) {
   const filters: FilterOption[] = [
     { id: "all", label: "All" },
@@ -82,6 +84,11 @@ export function FilterBar({
             />
             <span>{isActive ? "Ready to paste" : "Not active"}</span>
           </div>
+        ) : null}
+        {countLabel ? (
+          <span className="rounded-full bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white">
+            {countLabel}
+          </span>
         ) : null}
         <div className="relative">
           <input
