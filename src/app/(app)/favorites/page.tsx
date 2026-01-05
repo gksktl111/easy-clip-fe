@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ClipList } from "../../../components/clips/ClipList";
-import { DeleteAllButton } from "../../../components/clips/DeleteAllButton";
 import { EmptyState } from "../../../components/clips/EmptyState";
 import { FilterBar, FilterType } from "../../../components/clips/FilterBar";
 import { Clip } from "../../../types/clip";
@@ -129,7 +128,11 @@ export default function FavoritesPage() {
 
   return (
     <div className="flex h-full flex-col bg-white">
-      <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+      <FilterBar
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        showStatus={false}
+      />
       {filteredClips.length ? (
         <ClipList
           clips={filteredClips}
@@ -139,7 +142,6 @@ export default function FavoritesPage() {
       ) : (
         <EmptyState />
       )}
-      <DeleteAllButton disabled />
 
       {copyToast ? (
         <div
