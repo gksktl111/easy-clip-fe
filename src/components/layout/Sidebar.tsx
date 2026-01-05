@@ -273,12 +273,6 @@ export function Sidebar({ onOpenSettings }: ISidebarProps) {
         <h1 className="text-xl font-semibold text-gray-900">
           Clipboard Studio
         </h1>
-<<<<<<< HEAD
-        <p className="mt-1 text-xs text-gray-500">
-          클립을 모아두는 개인 라이브러리
-        </p>
-=======
->>>>>>> e03275ab2c981883ddfc35b314dc2aa78e55ca26
       </div>
 
       <nav className="flex-1 py-4">
