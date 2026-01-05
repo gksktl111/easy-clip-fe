@@ -15,6 +15,7 @@ export default function RecentPage() {
       {
         id: "1",
         type: "text",
+        name: "Text Clip",
         content: "Hello, Clipboard Studio!",
         createdAt: new Date(now),
         isFavorite: false,
@@ -22,6 +23,7 @@ export default function RecentPage() {
       {
         id: "2",
         type: "color",
+        name: "Sky Blue",
         content: "#0EA5E9",
         createdAt: new Date(now - 1000 * 60 * 20),
         isFavorite: true,
@@ -29,6 +31,7 @@ export default function RecentPage() {
       {
         id: "3",
         type: "image",
+        name: "Screenshot",
         content: "Screenshot_2024.png",
         createdAt: new Date(now - 1000 * 60 * 60),
         isFavorite: false,
