@@ -37,7 +37,7 @@ export default function RecentPage() {
 
   const getRecentSnapshot = useCallback(() => {
     const stored = localStorage.getItem(CLIP_STORAGE_KEY);
-    if (stored === lastRawRef.current) {
+    if (stored !== null && stored === lastRawRef.current) {
       return lastClipsRef.current;
     }
     const next = getRecentClips();

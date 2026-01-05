@@ -35,7 +35,7 @@ export default function FavoritesPage() {
 
   const getFavoritesSnapshot = useCallback(() => {
     const stored = localStorage.getItem(CLIP_STORAGE_KEY);
-    if (stored === lastClipsRawRef.current) {
+    if (stored !== null && stored === lastClipsRawRef.current) {
       return lastClipsRef.current;
     }
     const nextClips = getFavoriteClips();
