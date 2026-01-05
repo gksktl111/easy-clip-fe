@@ -56,7 +56,11 @@ export default function FolderPage() {
   const getClipsSnapshot = useCallback(() => {
     if (!folderId) return EMPTY_CLIPS;
     const stored = localStorage.getItem(CLIP_STORAGE_KEY);
-    if (stored === lastClipsRawRef.current && folderId === lastFolderIdRef.current) {
+    if (
+      stored !== null &&
+      stored === lastClipsRawRef.current &&
+      folderId === lastFolderIdRef.current
+    ) {
       return lastClipsRef.current;
     }
     const nextClips = getFolderClips(folderId);
