@@ -21,8 +21,12 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
   return (
     <aside className="flex h-full w-64 flex-col border-r border-gray-200 bg-white">
       <div className="border-b border-gray-200 p-5">
-        <h1 className="text-xl font-semibold text-gray-900">Clipboard Studio</h1>
-        <p className="mt-1 text-xs text-gray-500">클립을 모아두는 개인 라이브러리</p>
+        <h1 className="text-xl font-semibold text-gray-900">
+          Clipboard Studio
+        </h1>
+        <p className="mt-1 text-xs text-gray-500">
+          클립을 모아두는 개인 라이브러리
+        </p>
       </div>
 
       <nav className="flex-1 px-4 py-4">
