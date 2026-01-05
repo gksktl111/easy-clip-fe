@@ -22,6 +22,7 @@ interface FilterBarProps {
   searchQuery?: string;
   onSearchChange?: (value: string) => void;
   isActive?: boolean;
+  showStatus?: boolean;
 }
 
 export function FilterBar({
@@ -30,6 +31,7 @@ export function FilterBar({
   searchQuery = "",
   onSearchChange,
   isActive = false,
+  showStatus = true,
 }: FilterBarProps) {
   const filters: FilterOption[] = [
     { id: "all", label: "All" },
@@ -70,15 +72,17 @@ export function FilterBar({
         ))}
       </div>
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <span
-            className={`h-2 w-2 rounded-full ${
-              isActive ? "bg-green-500" : "bg-red-500"
-            }`}
-            aria-hidden
-          />
-          <span>{isActive ? "Ready to paste" : "Not active"}</span>
-        </div>
+        {showStatus ? (
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <span
+              className={`h-2 w-2 rounded-full ${
+                isActive ? "bg-green-500" : "bg-red-500"
+              }`}
+              aria-hidden
+            />
+            <span>{isActive ? "Ready to paste" : "Not active"}</span>
+          </div>
+        ) : null}
         <div className="relative">
           <input
             type="text"
