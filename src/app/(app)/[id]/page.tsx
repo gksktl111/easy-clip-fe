@@ -139,12 +139,9 @@ export default function FolderPage() {
     };
   }, []);
 
-  const addClip = useCallback(
-    (clip: StoredClip) => {
-      upsertClip(clip);
-    },
-    [],
-  );
+  const addClip = useCallback((clip: StoredClip) => {
+    upsertClip(clip);
+  }, []);
 
   const createTextClip = useCallback(
     (content: string) => {
@@ -253,15 +250,12 @@ export default function FolderPage() {
     setContextMenu(null);
   }, []);
 
-  const handleToggleFavorite = useCallback(
-    (clip: Clip) => {
-      updateClip(clip.id, {
-        isFavorite: !clip.isFavorite,
-        updatedAt: new Date().toISOString(),
-      });
-    },
-    [],
-  );
+  const handleToggleFavorite = useCallback((clip: Clip) => {
+    updateClip(clip.id, {
+      isFavorite: !clip.isFavorite,
+      updatedAt: new Date().toISOString(),
+    });
+  }, []);
 
   const handleOpenContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => {
@@ -275,23 +269,17 @@ export default function FolderPage() {
     [],
   );
 
-  const handleDeleteClip = useCallback(
-    (clipId: string) => {
-      deleteClip(clipId);
-      setContextMenu(null);
-    },
-    [],
-  );
+  const handleDeleteClip = useCallback((clipId: string) => {
+    deleteClip(clipId);
+    setContextMenu(null);
+  }, []);
 
-  const handleOpenRename = useCallback(
-    (clipId: string, name: string) => {
-      setContextMenu(null);
-      setRenameFolderId(clipId);
-      setRenameName(name);
-      setIsRenameOpen(true);
-    },
-    [],
-  );
+  const handleOpenRename = useCallback((clipId: string, name: string) => {
+    setContextMenu(null);
+    setRenameFolderId(clipId);
+    setRenameName(name);
+    setIsRenameOpen(true);
+  }, []);
 
   const handleRenameClip = useCallback(() => {
     if (!renameFolderId) return;
@@ -396,7 +384,7 @@ export default function FolderPage() {
 
       {copyToast ? (
         <div
-          className="fixed z-50 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white shadow-md"
+          className="fixed z-50 rounded-full bg-(--chip) px-3 py-1.5 text-xs font-semibold text-(--chip-text) shadow-md"
           style={{ left: copyToast.x + 12, top: copyToast.y + 12 }}
         >
           COPY!
