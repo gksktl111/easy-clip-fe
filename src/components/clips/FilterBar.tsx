@@ -55,7 +55,7 @@ export function FilterBar({
   ];
 
   return (
-    <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+    <div className="flex items-center justify-between border-b border-(--border) px-6 py-4">
       <div className="flex gap-2">
         {filters.map((filter) => (
           <button
@@ -64,8 +64,8 @@ export function FilterBar({
             onClick={() => onFilterChange(filter.id)}
             className={`flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               activeFilter === filter.id
-                ? "bg-gray-900 text-white"
-                : "bg-white text-gray-600 hover:bg-gray-50"
+                ? "bg-(--chip) text-(--chip-text)"
+                : "bg-(--surface) text-(--muted) hover:bg-(--surface-muted)"
             }`}
           >
             {filter.icon}
@@ -75,7 +75,7 @@ export function FilterBar({
       </div>
       <div className="flex items-center gap-3">
         {showStatus ? (
-          <div className="flex items-center gap-2 text-xs text-gray-500">
+          <div className="flex items-center gap-2 text-xs text-(--muted)">
             <span
               className={`h-2 w-2 rounded-full ${
                 isActive ? "bg-green-500" : "bg-red-500"
@@ -86,7 +86,7 @@ export function FilterBar({
           </div>
         ) : null}
         {countLabel ? (
-          <span className="rounded-full bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white">
+          <span className="rounded-full bg-(--chip) px-2.5 py-1 text-xs font-semibold text-(--chip-text)">
             {countLabel}
           </span>
         ) : null}
@@ -96,10 +96,10 @@ export function FilterBar({
             placeholder="Search clips..."
             value={searchQuery}
             onChange={(event) => onSearchChange?.(event.target.value)}
-            className="h-9 w-64 rounded-lg border border-gray-300 bg-gray-50 pr-4 pl-10 text-sm placeholder:text-gray-400 focus:border-gray-400 focus:ring-1 focus:ring-gray-400 focus:outline-none"
+            className="text-foreground h-9 w-64 rounded-lg border border-(--border) bg-(--input) pr-4 pl-10 text-sm placeholder:text-(--muted) focus:border-gray-400 focus:ring-1 focus:ring-gray-400 focus:outline-none"
           />
           <HiOutlineSearch
-            className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
+            className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-(--muted)"
             aria-hidden
           />
         </div>
