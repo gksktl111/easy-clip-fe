@@ -40,7 +40,7 @@ export function ClipItem({
     if (clip.type === "color") {
       return (
         <div
-          className="h-full w-full rounded-xl border border-gray-200"
+          className="h-full w-full rounded-xl border border-(--border)"
           style={{ backgroundColor: clip.content }}
           aria-hidden
         />
@@ -49,7 +49,7 @@ export function ClipItem({
 
     if (clip.type === "image") {
       return (
-        <div className="relative h-full w-full rounded-xl">
+        <div className="relative h-full w-full rounded-xl bg-(--surface-muted)">
           <Image
             src={clip.content}
             alt={clip.name}
@@ -62,7 +62,7 @@ export function ClipItem({
     }
 
     return (
-      <p className="line-clamp-4 text-sm leading-relaxed text-gray-700">
+      <p className="text-foreground line-clamp-4 text-sm leading-relaxed">
         {clip.content}
       </p>
     );
@@ -70,7 +70,7 @@ export function ClipItem({
 
   return (
     <div
-      className="group relative flex h-52 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+      className="group relative flex h-52 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md"
       onClick={(event) => onCopy?.(clip, event)}
       onContextMenu={(event) => onContextMenu?.(event, clip)}
       role="button"
@@ -82,21 +82,25 @@ export function ClipItem({
           event.stopPropagation();
           onToggleFavorite?.(clip);
         }}
-        className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-white/90 p-1 text-gray-400 shadow-sm transition hover:text-amber-500"
+        className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-(--favorite-btn-bg-hover)"
+        style={{ boxShadow: "var(--favorite-btn-shadow)" }}
         aria-label="Toggle favorite"
       >
         {clip.isFavorite ? (
           <HiStar className="h-4 w-4 text-amber-400" aria-hidden />
         ) : (
-          <HiOutlineStar className="h-4 w-4" aria-hidden />
+          <HiOutlineStar
+            className="h-4 w-4 text-(--favorite-icon-muted)"
+            aria-hidden
+          />
         )}
       </button>
       <div className="flex-1 overflow-hidden px-4 py-3">{renderContent()}</div>
-      <div className="flex items-center gap-2 border-t border-gray-100 px-4 py-2.5 text-xs text-gray-500">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-gray-500">
+      <div className="flex items-center gap-2 border-t border-(--border) px-4 py-2.5 text-xs text-(--muted)">
+        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-(--icon-chip) text-(--icon-chip-text)">
           {getIcon()}
         </span>
-        <span className="truncate font-medium text-gray-700">
+        <span className="text-foreground truncate font-medium">
           {clip.type === "color" ? clip.content : clip.name}
         </span>
       </div>

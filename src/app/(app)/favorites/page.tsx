@@ -18,7 +18,7 @@ import {
   recordCopy,
   StoredClip,
   updateClip,
-} from "../../../lib/clipStore";
+} from "../../../store/clipStore";
 import { Clip } from "../../../types/clip";
 
 const EMPTY_CLIPS: StoredClip[] = [];
@@ -118,7 +118,7 @@ export default function FavoritesPage() {
   }, []);
 
   return (
-    <div className="flex h-full flex-col bg-white">
+    <div className="flex h-full flex-col bg-[var(--background)]">
       <FilterBar
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}

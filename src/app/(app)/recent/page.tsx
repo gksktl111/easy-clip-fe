@@ -19,7 +19,7 @@ import {
   getRecentClips,
   recordCopy,
   StoredClip,
-} from "../../../lib/clipStore";
+} from "../../../store/clipStore";
 import { Clip } from "../../../types/clip";
 
 const EMPTY_RECENTS: StoredClip[] = [];
@@ -112,7 +112,7 @@ export default function RecentPage() {
   );
 
   return (
-    <div className="flex h-full flex-col bg-white">
+    <div className="flex h-full flex-col bg-[var(--background)]">
       <FilterBar
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}

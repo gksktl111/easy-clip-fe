@@ -23,7 +23,7 @@ import {
   StoredClip,
   updateClip,
   upsertClip,
-} from "../../../lib/clipStore";
+} from "../../../store/clipStore";
 import { Clip } from "../../../types/clip";
 const EMPTY_CLIPS: StoredClip[] = [];
 
@@ -315,7 +315,7 @@ export default function FolderPage() {
 
   return (
     <div
-      className="flex h-full flex-col overflow-hidden bg-white"
+      className="flex h-full flex-col overflow-hidden bg-[var(--background)]"
       onClick={() => {
         setIsActive(true);
         setContextMenu(null);
@@ -331,7 +331,7 @@ export default function FolderPage() {
       />
       {!isActive ? (
         <div className="px-6 pt-4">
-          <div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-center text-xs text-gray-500">
+          <div className="rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-4 py-3 text-center text-xs text-[var(--muted)]">
             Click anywhere and press Ctrl+V to capture a new clip
           </div>
         </div>
@@ -353,7 +353,7 @@ export default function FolderPage() {
 
       {contextMenu ? (
         <div
-          className="fixed z-50 w-36 rounded-lg border border-gray-200 bg-white p-1 text-xs text-gray-600 shadow-lg"
+          className="fixed z-50 w-36 rounded-lg border border-[color:var(--border)] bg-[var(--surface)] p-1 text-xs text-[var(--muted)] shadow-lg"
           style={{ left: contextMenu.x, top: contextMenu.y }}
           data-clip-menu
         >
@@ -365,7 +365,7 @@ export default function FolderPage() {
                 handleCopyFromMenu(target);
               }
             }}
-            className="flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            className="flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)]"
             data-clip-menu
           >
             복사
@@ -378,7 +378,7 @@ export default function FolderPage() {
                 handleOpenRename(target.id, target.name);
               }
             }}
-            className="flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            className="flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)]"
             data-clip-menu
           >
             이름 변경
@@ -405,12 +405,12 @@ export default function FolderPage() {
 
       {isDeleteAllOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-xl bg-white shadow-xl">
-            <div className="border-b border-gray-200 px-5 py-4">
-              <p className="text-sm font-semibold text-gray-900">
+          <div className="w-full max-w-sm rounded-xl bg-[var(--surface)] shadow-xl">
+            <div className="border-b border-[color:var(--border)] px-5 py-4">
+              <p className="text-sm font-semibold text-[var(--foreground)]">
                 모든 클립 삭제
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-[var(--muted)]">
                 정말 모든 클립을 삭제하시겠습니까?
               </p>
             </div>
@@ -418,7 +418,7 @@ export default function FolderPage() {
               <button
                 type="button"
                 onClick={() => setIsDeleteAllOpen(false)}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-500 transition hover:text-gray-700"
+                className="rounded-lg border border-[color:var(--border)] px-4 py-2 text-sm font-medium text-[var(--muted)] transition hover:text-[var(--foreground)]"
               >
                 취소
               </button>
@@ -436,34 +436,34 @@ export default function FolderPage() {
 
       {isRenameOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-xl bg-white shadow-xl">
-            <div className="border-b border-gray-200 px-5 py-4">
-              <p className="text-sm font-semibold text-gray-900">이름 변경</p>
+          <div className="w-full max-w-sm rounded-xl bg-[var(--surface)] shadow-xl">
+            <div className="border-b border-[color:var(--border)] px-5 py-4">
+              <p className="text-sm font-semibold text-[var(--foreground)]">이름 변경</p>
             </div>
             <div className="px-5 py-4">
-              <label className="block text-xs font-semibold text-gray-500">
+              <label className="block text-xs font-semibold text-[var(--muted)]">
                 클립 이름
               </label>
               <input
                 ref={renameInputRef}
                 value={renameName}
                 onChange={(event) => setRenameName(event.target.value)}
-                className="mt-2 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-[color:var(--border)] bg-[var(--input)] px-3 py-2 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus:border-gray-400 focus:outline-none"
                 placeholder="예: 클립"
               />
             </div>
-            <div className="flex justify-end gap-2 border-t border-gray-200 px-5 py-4">
+            <div className="flex justify-end gap-2 border-t border-[color:var(--border)] px-5 py-4">
               <button
                 type="button"
                 onClick={() => setIsRenameOpen(false)}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-500 transition hover:text-gray-700"
+                className="rounded-lg border border-[color:var(--border)] px-4 py-2 text-sm font-medium text-[var(--muted)] transition hover:text-[var(--foreground)]"
               >
                 취소
               </button>
               <button
                 type="button"
                 onClick={handleRenameClip}
-                className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+                className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--primary-foreground)] transition hover:bg-[var(--primary-hover)]"
               >
                 변경
               </button>
