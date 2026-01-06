@@ -112,7 +112,7 @@ export default function RecentPage() {
   );
 
   return (
-    <div className="flex h-full flex-col bg-[var(--background)]">
+    <div className="bg-background flex h-full flex-col">
       <FilterBar
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}

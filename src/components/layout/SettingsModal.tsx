@@ -190,7 +190,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="bg-primary text-primary-foreground hover:bg-primary-hover rounded-lg px-5 py-2 text-sm font-semibold transition"
+            className="cursor-pointer rounded-lg bg-(--primary) px-5 py-2 text-sm font-semibold text-(--primary-foreground) transition hover:bg-(--primary-hover)"
           >
             Close
           </button>
