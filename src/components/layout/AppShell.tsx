@@ -18,12 +18,10 @@ export function AppShell({ children }: AppShellProps) {
   }, [language, theme]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[var(--background)] text-[var(--foreground)]">
+    <div className="bg-background text-foreground flex h-screen flex-col overflow-hidden">
       <div className="flex flex-1 overflow-hidden">
         <Sidebar onOpenSettings={() => setIsSettingsOpen(true)} />
-        <main className="flex-1 overflow-hidden bg-[var(--background)]">
-          {children}
-        </main>
+        <main className="bg-background flex-1 overflow-hidden">{children}</main>
       </div>
       {isSettingsOpen ? (
         <SettingsModal onClose={() => setIsSettingsOpen(false)} />

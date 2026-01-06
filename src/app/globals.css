@@ -8,7 +8,7 @@
   --border: #e2e8f0;
   --muted: #64748b;
   --input: #f8fafc;
-  --chip: #111827;
+  --chip-bg: #111827;
   --chip-text: #ffffff;
   --icon-chip: #e5e7eb;
   --icon-chip-text: #111827;
@@ -18,14 +18,14 @@
 }
 
 [data-theme="dark"] {
-  --background: #1e1e1f;
+  --background: #353535;
   --foreground: #f3f4f6;
   --surface: #1e1e1f;
   --surface-muted: #2a2a2b;
   --border: rgba(255, 255, 255, 0.08);
   --muted: #9ca3af;
   --input: #2a2a2b;
-  --chip: #2563eb;
+  --chip-bg: #2563eb;
   --chip-text: #f8fafc;
   --icon-chip: #2563eb;
   --icon-chip-text: #f8fafc;
