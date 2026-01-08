@@ -37,7 +37,8 @@ export default function RecentPage() {
 
   const getRecentSnapshot = useCallback(() => {
     const stored = localStorage.getItem(CLIP_STORAGE_KEY);
-    if (stored !== null && stored === lastRawRef.current) {
+    // stored가 null이어도 캐싱이 작동하도록 조건 수정
+    if (stored === lastRawRef.current) {
       return lastClipsRef.current;
     }
     const next = getRecentClips();

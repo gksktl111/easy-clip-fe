@@ -56,8 +56,8 @@ export default function FolderPage() {
   const getClipsSnapshot = useCallback(() => {
     if (!folderId) return EMPTY_CLIPS;
     const stored = localStorage.getItem(CLIP_STORAGE_KEY);
+    // stored가 null이어도 캐싱이 작동하도록 조건 수정
     if (
-      stored !== null &&
       stored === lastClipsRawRef.current &&
       folderId === lastFolderIdRef.current
     ) {

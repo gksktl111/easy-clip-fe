@@ -37,7 +37,7 @@ This guide keeps contributors aligned on structure, tooling, and review expectat
   Example: `chore(css): apply Tailwind v4`
 - Commit messages must be written in **Korean**.
 - Allowed scopes:  
-  `favorites`, `recent`, `folder`, `settings`, `clips`, `css`, `sidebar`, `filter`, `search`
+  `favorites`, `recent`, `folder`, `settings`, `clips`, `css`, `sidebar`, `filter`, `search`, `landing`
 - Allowed commit types:
   - **chore**: Non-code changes such as package updates, tsconfig edits, `.github` configs, build/test settings, etc.
     - Branch names follow the pattern: `chore/1`, `chore/2`, ... increasing with each new chore PR.
@@ -73,10 +73,9 @@ This guide keeps contributors aligned on structure, tooling, and review expectat
    ```bash
    git push -u origin <branch>
    ```
-4. Prepare `pr.md` using `.github/PULL_REQUEST_TEMPLATE.md`; answer every prompt in Korean (summary, reasons, tests, UI Before/After, related issues, checklist, notes).
-5. Create a PR targeting `dev` via GitHub CLI, keeping the PR title/body in Korean:
+4. Create a PR targeting `dev` via GitHub CLI, keeping the PR title/body in Korean:
    ```bash
-   gh pr create --base dev --title "<한글 제목>" --body-file pr.md
+   gh pr create --base dev --title "<한글 제목>" --body "<한글 PR 본문>"
    ```
 
 ### Branch Cleanup Shortcut
