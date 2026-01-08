@@ -108,7 +108,7 @@ git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -D
 - Issues must be created using GitHub CLI (`gh issue create`).
 - Issue titles and bodies must be written in **Korean**, even though these rules are documented in English.
 - Do not set labels; rely on title prefixes only (`[bug]`, `[feature]`, `[improvement]`).
-- Before creating an issue, ensure `issue-temp.md` is up to date with the latest requirements; if needed, update it and use `--body-file issue-temp.md`.
+- Do not create separate `.md` files for issue bodies; use `--body` with inline content.
 - When the maintainer provides a natural-language instruction (e.g., “create an issue with this content”), the AI must:
   1. Interpret the user's description.
   2. Determine the correct issue type (bug, feature, improvement).
@@ -204,35 +204,16 @@ When the maintainer requests an issue to be created:
 3. **Issue Body Generation**  
    AI formats the user's input into the exact YAML-driven structure of the selected template.
 
-4. **Local Issue File Creation (optional)**  
-   AI can generate `issue.md` if needed:
-
-   ```md
-   # [feature] 폴더 드래그 정렬 기능 추가
-
-   ## 어떤 기능을 구현하나요?
-
-   ...
-
-   ## 어떻게 구현할 예정인가요?
-
-   ...
-
-   ## 추가로 공유할 내용이 있나요?
-
-   ...
-   ```
-
-5. **Issue Creation via GitHub CLI**  
+4. **Issue Creation via GitHub CLI**  
    Example:
 
    ```bash
    gh issue create \
      --title "[feature] 새로운 폴더 드래그 정렬 기능" \
-     --body-file issue.md
+     --body $'## 어떤 기능을 구현하나요?\n\n...\n\n## 어떻게 구현할 예정인가요?\n\n...\n\n## 추가로 공유할 내용이 있나요?\n\n...'
    ```
 
-6. **Report Back**  
+5. **Report Back**  
    After creating the issue, AI must return:
    - Issue number (e.g., #42)
    - Issue URL (e.g., `https://github.com/<owner>/<repo>/issues/42`)
