@@ -94,7 +94,7 @@ export default function Home() {
 
             {/* 시작하기 버튼 */}
             <Link
-              href="/favorites"
+              href="/login"
               className="rounded-xl bg-[#334155] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1e293b]"
             >
               시작하기
@@ -126,7 +126,7 @@ export default function Home() {
           {/* CTA 버튼들 */}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/favorites"
+              href="/login"
               className="flex items-center gap-2 rounded-xl bg-[#334155] px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[#1e293b]"
             >
               무료로 시작하기
@@ -402,7 +402,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex flex-col items-center text-center">
             <Link
-              href="/favorites"
+              href="/login"
               className="rounded-2xl bg-[#334155] px-10 py-5 text-lg font-semibold text-white transition-all hover:bg-[#1e293b] hover:shadow-xl"
             >
               무료로 동기화 시작하기
