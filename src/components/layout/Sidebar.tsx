@@ -14,6 +14,7 @@ import {
   HiOutlineCog,
   HiOutlineDotsVertical,
   HiOutlineFolder,
+  HiOutlineLogout,
   HiOutlineMenuAlt4,
   HiOutlinePaperClip,
   HiOutlinePencil,
@@ -384,6 +385,32 @@ export function Sidebar({ onOpenSettings }: ISidebarProps) {
       </nav>
 
       <div className="border-t border-(--border) px-4 py-4">
+        {/* TODO: 실제 인증 시스템 연동 시 user 상태로 교체 */}
+        {/* 로그인 정보 - 임시 하드코딩 */}
+        <div className="mb-3 flex items-center justify-between rounded-lg bg-(--surface) px-3 py-2">
+          <div className="flex items-center gap-2 truncate">
+            <img
+              src="https://avatars.githubusercontent.com/u/0?v=4"
+              alt="프로필"
+              className="h-6 w-6 rounded-full"
+            />
+            <span className="text-foreground truncate text-sm font-medium">
+              user@example.com
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              // TODO: NestJS 백엔드 로그아웃 API 호출
+              window.location.href = "/login";
+            }}
+            className="text-muted hover:text-foreground cursor-pointer rounded p-1 transition-colors"
+            aria-label="로그아웃"
+          >
+            <HiOutlineLogout className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
+
         <button
           type="button"
           onClick={onOpenSettings}
