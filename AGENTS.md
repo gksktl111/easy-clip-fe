@@ -37,7 +37,7 @@ This guide keeps contributors aligned on structure, tooling, and review expectat
   Example: `chore(css): apply Tailwind v4`
 - Commit messages must be written in **Korean**.
 - Allowed scopes:  
-  `favorites`, `recent`, `folder`, `settings`, `clips`, `css`, `sidebar`, `filter`, `search`
+  `favorites`, `recent`, `folder`, `settings`, `clips`, `css`, `sidebar`, `filter`, `search`, `landing`
 - Allowed commit types:
   - **chore**: Non-code changes such as package updates, tsconfig edits, `.github` configs, build/test settings, etc.
     - Branch names follow the pattern: `chore/1`, `chore/2`, ... increasing with each new chore PR.
