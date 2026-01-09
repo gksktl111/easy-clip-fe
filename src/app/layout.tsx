@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clipboard Studio",
-  description: "Web UI for the easy-clip desktop experience",
+  title: "EasyClip",
+  description:
+    "EasyClip is a clipboard manager that allows you to sync your clipboard across all your devices.",
 };
 
 export default function RootLayout({
