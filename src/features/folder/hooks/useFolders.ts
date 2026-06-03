@@ -8,7 +8,7 @@ import {
   persistFolders,
   readFolders,
   subscribeToFolders,
-} from "@/features/folder/model/folderStorage";
+} from "@/features/folder/service/folderStorage";
 
 export const useFolders = () => {
   const lastRawRef = useRef<string | null>(null);

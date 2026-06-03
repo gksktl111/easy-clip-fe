@@ -1,5 +1,5 @@
 import { Clip } from "@/features/clip/model/clip";
-import { StoredClip } from "@/features/clip/model/clipStorage";
+import { StoredClip } from "@/features/clip/service/clipStorage";
 
 export const mapStoredClipDates = (clip: StoredClip): Clip => ({
   ...clip,

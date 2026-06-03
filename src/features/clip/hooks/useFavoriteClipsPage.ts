@@ -7,7 +7,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { subscribeToClipStore } from "@/features/clip/services/clipStoreSubscription";
+import { subscribeToClipStore } from "@/features/clip/service/clipStoreSubscription";
 import { Clip } from "@/features/clip/model/clip";
 import {
   CLIP_STORAGE_KEY,
@@ -15,8 +15,8 @@ import {
   recordCopy,
   StoredClip,
   updateClip,
-} from "@/features/clip/model/clipStorage";
-import { mapStoredClipDates } from "@/features/clip/utils/mapStoredClipDates";
+} from "@/features/clip/service/clipStorage";
+import { mapStoredClipDates } from "@/features/clip/service/mapStoredClipDates";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import { FilterType } from "@/features/clip/ui/FilterBar";
 
