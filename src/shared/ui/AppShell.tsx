@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/features/folder/ui/Sidebar";
 import { applySettings, useSettingsStore } from "@/shared/store/settingsStore";
-import { SettingsModal } from "@/features/settings/ui/SettingsModal";
+import { SettingsModal } from "@/shared/ui/SettingsModal";
 
 interface AppShellProps {
   children: React.ReactNode;
