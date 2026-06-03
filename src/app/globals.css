@@ -1,42 +1,7 @@
 @import "tailwindcss";
 
+/* Foundation: typography */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --surface: #ffffff;
-  --surface-muted: #f1f5f9;
-  --border: #e2e8f0;
-  --muted: #64748b;
-  --input: #f8fafc;
-  --chip-bg: #111827;
-  --chip-text: #ffffff;
-  --icon-chip: #e5e7eb;
-  --icon-chip-text: #111827;
-  --primary: #111827;
-  --primary-hover: #1f2937;
-  --primary-foreground: #ffffff;
-}
-
-[data-theme="dark"] {
-  --background: #353535;
-  --foreground: #f3f4f6;
-  --surface: #1e1e1f;
-  --surface-muted: #2a2a2b;
-  --border: rgba(255, 255, 255, 0.08);
-  --muted: #9ca3af;
-  --input: #2a2a2b;
-  --chip-bg: #2563eb;
-  --chip-text: #f8fafc;
-  --icon-chip: #2563eb;
-  --icon-chip-text: #f8fafc;
-  --primary: #2563eb;
-  --primary-hover: #3b82f6;
-  --primary-foreground: #f8fafc;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans:
     "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic",
     system-ui, sans-serif;
@@ -44,6 +9,98 @@
     "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
+/* Theme tokens: light */
+:root {
+  /* Background and surface */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
+  --surface-elevated: #ffffff;
+
+  /* Text and border */
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --input: #f8fafc;
+
+  /* Interactive */
+  --primary: #111827;
+  --primary-hover: #1f2937;
+  --primary-foreground: #ffffff;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --danger-foreground: #ffffff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --overlay: rgba(15, 23, 42, 0.4);
+  --overlay-strong: rgba(0, 0, 0, 0.7);
+  --focus-ring: #9ca3af;
+
+  /* Component tokens */
+  --chip-bg: #111827;
+  --chip-text: #ffffff;
+  --icon-chip: #e5e7eb;
+  --icon-chip-text: #111827;
+  --favorite-btn-bg: rgba(255, 255, 255, 0.88);
+  --favorite-btn-bg-hover: rgba(255, 255, 255, 1);
+  --favorite-btn-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+  --favorite-icon-muted: #94a3b8;
+  --modal-section-bg: #f8fafc;
+  --modal-icon-bg: #e5e7eb;
+  --modal-icon-fg: #4b5563;
+}
+
+/* Theme tokens: dark */
+[data-theme="dark"] {
+  --background: #353535;
+  --foreground: #f3f4f6;
+  --surface: #1e1e1f;
+  --surface-muted: #2a2a2b;
+  --surface-elevated: #242426;
+  --border: rgba(255, 255, 255, 0.08);
+  --muted: #9ca3af;
+  --input: #2a2a2b;
+  --primary: #2563eb;
+  --primary-hover: #3b82f6;
+  --primary-foreground: #f8fafc;
+  --danger: #f87171;
+  --danger-hover: #ef4444;
+  --danger-foreground: #ffffff;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --overlay: rgba(0, 0, 0, 0.4);
+  --overlay-strong: rgba(0, 0, 0, 0.7);
+  --focus-ring: #94a3b8;
+  --chip-bg: #2563eb;
+  --chip-text: #f8fafc;
+  --icon-chip: #2563eb;
+  --icon-chip-text: #f8fafc;
+  --favorite-btn-bg: rgba(30, 30, 31, 0.88);
+  --favorite-btn-bg-hover: rgba(42, 42, 43, 0.96);
+  --favorite-btn-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
+  --favorite-icon-muted: #cbd5e1;
+  --modal-section-bg: rgba(255, 255, 255, 0.05);
+  --modal-icon-bg: rgba(255, 255, 255, 0.1);
+  --modal-icon-fg: #e5e7eb;
+}
+
+/* Tailwind bridge */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+/* Foundation: base */
 html,
 body {
   background: var(--background);
@@ -58,6 +115,7 @@ a {
   text-decoration: none;
 }
 
+/* Foundation: motion */
 @keyframes fade-up {
   from {
     opacity: 0;
