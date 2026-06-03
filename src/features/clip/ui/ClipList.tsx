@@ -1,7 +1,7 @@
 "use client";
 
-import { ClipItem } from "@/domains/clips/ui/ClipItem";
-import { Clip } from "@/domains/clips/model/clip";
+import { ClipItem } from "@/features/clip/ui/ClipItem";
+import { Clip } from "@/features/clip/model/clip";
 
 interface ClipListProps {
   clips: Clip[];

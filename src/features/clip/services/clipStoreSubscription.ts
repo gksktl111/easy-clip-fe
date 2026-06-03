@@ -1,6 +1,6 @@
 "use client";
 
-import { CLIP_EVENT } from "@/domains/clips/model/clipStorage";
+import { CLIP_EVENT } from "@/features/clip/model/clipStorage";
 
 export const subscribeToClipStore = (callback: () => void) => {
   const handler = () => callback();

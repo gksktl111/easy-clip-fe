@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback, useRef, useSyncExternalStore } from "react";
-import { FolderItem } from "@/domains/folders/model/folder";
+import { FolderItem } from "@/features/folder/model/folder";
 import {
   EMPTY_FOLDERS,
   FOLDER_STORAGE_KEY,
   persistFolders,
   readFolders,
   subscribeToFolders,
-} from "@/domains/folders/model/folderStorage";
+} from "@/features/folder/model/folderStorage";
 
 export const useFolders = () => {
   const lastRawRef = useRef<string | null>(null);

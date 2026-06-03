@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Sidebar } from "@/domains/folders/ui/Sidebar";
+import { Sidebar } from "@/features/folder/ui/Sidebar";
 import { applySettings, useSettingsStore } from "@/shared/store/settingsStore";
-import { SettingsModal } from "@/domains/settings/ui/SettingsModal";
+import { SettingsModal } from "@/features/settings/ui/SettingsModal";
 
 interface AppShellProps {
   children: React.ReactNode;

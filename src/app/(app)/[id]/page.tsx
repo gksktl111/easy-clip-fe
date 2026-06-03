@@ -1,4 +1,4 @@
-import { FolderClipsPage } from "@/domains/clips/ui/FolderClipsPage";
+import { FolderClipsPage } from "@/features/clip/ui/FolderClipsPage";
 
 export default function Folder() {
   return <FolderClipsPage />;

@@ -1,10 +1,10 @@
 "use client";
 
-import { useFolderClipsPage } from "@/domains/clips/hooks/useFolderClipsPage";
-import { ClipList } from "@/domains/clips/ui/ClipList";
-import { DeleteAllButton } from "@/domains/clips/ui/DeleteAllButton";
-import { EmptyState } from "@/domains/clips/ui/EmptyState";
-import { FilterBar } from "@/domains/clips/ui/FilterBar";
+import { useFolderClipsPage } from "@/features/clip/hooks/useFolderClipsPage";
+import { ClipList } from "@/features/clip/ui/ClipList";
+import { DeleteAllButton } from "@/features/clip/ui/DeleteAllButton";
+import { EmptyState } from "@/features/clip/ui/EmptyState";
+import { FilterBar } from "@/features/clip/ui/FilterBar";
 
 export function FolderClipsPage() {
   const {
