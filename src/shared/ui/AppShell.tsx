@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/domains/folders/ui/Sidebar";
+import { applySettings, useSettingsStore } from "@/shared/store/settingsStore";
 import { SettingsModal } from "@/domains/settings/ui/SettingsModal";
-import { applySettings, useSettingsStore } from "@/store/settingsStore";
 
 interface AppShellProps {
   children: React.ReactNode;

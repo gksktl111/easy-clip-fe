@@ -21,9 +21,9 @@ import {
   StoredClip,
   updateClip,
   upsertClip,
-} from "@/store/clipStore";
+} from "@/domains/clips/model/clipStorage";
 import { FilterType } from "@/domains/clips/ui/FilterBar";
-import { Clip } from "@/types/clip";
+import { Clip } from "@/domains/clips/model/clip";
 
 const EMPTY_CLIPS: StoredClip[] = [];
 

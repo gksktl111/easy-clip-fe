@@ -6,7 +6,7 @@ import {
   HiOutlineTranslate,
   HiOutlineX,
 } from "react-icons/hi";
-import { applySettings, useSettingsStore } from "@/store/settingsStore";
+import { applySettings, useSettingsStore } from "@/shared/store/settingsStore";
 
 interface SettingsModalProps {
   onClose: () => void;

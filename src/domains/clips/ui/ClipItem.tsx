@@ -8,7 +8,7 @@ import {
   HiOutlineStar,
   HiStar,
 } from "react-icons/hi";
-import { Clip } from "@/types/clip";
+import { Clip } from "@/domains/clips/model/clip";
 
 interface ClipItemProps {
   clip: Clip;

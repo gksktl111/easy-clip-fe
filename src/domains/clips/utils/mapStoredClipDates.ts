@@ -1,5 +1,5 @@
-import { StoredClip } from "@/store/clipStore";
-import { Clip } from "@/types/clip";
+import { Clip } from "@/domains/clips/model/clip";
+import { StoredClip } from "@/domains/clips/model/clipStorage";
 
 export const mapStoredClipDates = (clip: StoredClip): Clip => ({
   ...clip,
