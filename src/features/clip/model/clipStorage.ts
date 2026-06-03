@@ -1,6 +1,6 @@
 "use client";
 
-import { Clip } from "@/domains/clips/model/clip";
+import { Clip } from "@/features/clip/model/clip";
 
 export interface StoredClip extends Omit<
   Clip,

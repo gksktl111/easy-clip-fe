@@ -7,18 +7,18 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { subscribeToClipStore } from "@/domains/clips/services/clipStoreSubscription";
-import { Clip } from "@/domains/clips/model/clip";
+import { subscribeToClipStore } from "@/features/clip/services/clipStoreSubscription";
+import { Clip } from "@/features/clip/model/clip";
 import {
   CLIP_STORAGE_KEY,
   getFavoriteClips,
   recordCopy,
   StoredClip,
   updateClip,
-} from "@/domains/clips/model/clipStorage";
-import { mapStoredClipDates } from "@/domains/clips/utils/mapStoredClipDates";
-import { useCopyToast } from "@/domains/clips/hooks/useCopyToast";
-import { FilterType } from "@/domains/clips/ui/FilterBar";
+} from "@/features/clip/model/clipStorage";
+import { mapStoredClipDates } from "@/features/clip/utils/mapStoredClipDates";
+import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
+import { FilterType } from "@/features/clip/ui/FilterBar";
 
 const EMPTY_CLIPS: StoredClip[] = [];
 

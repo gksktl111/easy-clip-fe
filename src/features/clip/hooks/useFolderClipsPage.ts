@@ -9,9 +9,9 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { subscribeToClipStore } from "@/domains/clips/services/clipStoreSubscription";
-import { mapStoredClipDates } from "@/domains/clips/utils/mapStoredClipDates";
-import { useCopyToast } from "@/domains/clips/hooks/useCopyToast";
+import { subscribeToClipStore } from "@/features/clip/services/clipStoreSubscription";
+import { mapStoredClipDates } from "@/features/clip/utils/mapStoredClipDates";
+import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import {
   clearFolderClips,
   CLIP_STORAGE_KEY,
@@ -21,9 +21,9 @@ import {
   StoredClip,
   updateClip,
   upsertClip,
-} from "@/domains/clips/model/clipStorage";
-import { FilterType } from "@/domains/clips/ui/FilterBar";
-import { Clip } from "@/domains/clips/model/clip";
+} from "@/features/clip/model/clipStorage";
+import { FilterType } from "@/features/clip/ui/FilterBar";
+import { Clip } from "@/features/clip/model/clip";
 
 const EMPTY_CLIPS: StoredClip[] = [];
 

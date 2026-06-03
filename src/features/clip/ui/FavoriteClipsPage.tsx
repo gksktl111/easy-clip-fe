@@ -1,40 +1,37 @@
 "use client";
 
-import { useRecentClipsPage } from "@/domains/clips/hooks/useRecentClipsPage";
-import { ClipList } from "@/domains/clips/ui/ClipList";
-import { DeleteAllButton } from "@/domains/clips/ui/DeleteAllButton";
-import { EmptyState } from "@/domains/clips/ui/EmptyState";
-import { FilterBar } from "@/domains/clips/ui/FilterBar";
+import { useFavoriteClipsPage } from "@/features/clip/hooks/useFavoriteClipsPage";
+import { ClipList } from "@/features/clip/ui/ClipList";
+import { EmptyState } from "@/features/clip/ui/EmptyState";
+import { FilterBar } from "@/features/clip/ui/FilterBar";
 
-export function RecentClipsPage() {
+export function FavoriteClipsPage() {
   const {
     activeFilter,
-    clearAll,
     copyToast,
     filteredClips,
     handleCopy,
-    hasClips,
-    searchQuery,
+    handleToggleFavorite,
     setActiveFilter,
-    setSearchQuery,
-  } = useRecentClipsPage();
+  } = useFavoriteClipsPage();
 
   return (
     <div className="bg-background flex h-full flex-col">
       <FilterBar
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
         showStatus={false}
         countLabel={`${filteredClips.length} clips`}
       />
       {filteredClips.length ? (
-        <ClipList clips={filteredClips} onCopy={handleCopy} />
+        <ClipList
+          clips={filteredClips}
+          onCopy={handleCopy}
+          onToggleFavorite={handleToggleFavorite}
+        />
       ) : (
         <EmptyState />
       )}
-      <DeleteAllButton disabled={!hasClips} onClick={clearAll} />
 
       {copyToast ? (
         <div

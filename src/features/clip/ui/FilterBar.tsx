@@ -6,7 +6,7 @@ import {
   HiOutlinePhotograph,
   HiOutlineSearch,
 } from "react-icons/hi";
-import { ClipType } from "@/domains/clips/model/clip";
+import { ClipType } from "@/features/clip/model/clip";
 
 export type FilterType = ClipType | "all";
 
