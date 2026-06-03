@@ -110,7 +110,7 @@ export function FolderClipsPage() {
           <button
             type="button"
             onClick={() => handleDeleteClip(contextMenu.id)}
-            className="flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-red-500 hover:bg-red-50"
+            className="flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--danger) hover:bg-(--surface-muted)"
             data-clip-menu
           >
             삭제
