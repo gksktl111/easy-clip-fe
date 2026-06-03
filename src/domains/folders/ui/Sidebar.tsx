@@ -17,7 +17,7 @@ import {
   HiOutlineTrash,
   HiX,
 } from "react-icons/hi";
-import { useFolders } from "@/domains/folders/hooks/useFolders";
+import { useFolders } from "@/domains/folders/model/useFolders";
 
 interface SidebarProps {
   onOpenSettings: () => void;

@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderItem } from "@/domains/folders/types/folder";
+import { FolderItem } from "@/domains/folders/model/folder";
 
 export const FOLDER_STORAGE_KEY = "easy-clip-folders";
 export const FOLDER_EVENT = "folders:change";

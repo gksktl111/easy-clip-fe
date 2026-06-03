@@ -8,17 +8,17 @@ import {
   useSyncExternalStore,
 } from "react";
 import { subscribeToClipStore } from "@/domains/clips/services/clipStoreSubscription";
-import { mapStoredClipDates } from "@/domains/clips/utils/mapStoredClipDates";
-import { useCopyToast } from "@/domains/clips/hooks/useCopyToast";
+import { Clip } from "@/domains/clips/model/clip";
 import {
   CLIP_STORAGE_KEY,
   getFavoriteClips,
   recordCopy,
   StoredClip,
   updateClip,
-} from "@/store/clipStore";
+} from "@/domains/clips/model/clipStorage";
+import { mapStoredClipDates } from "@/domains/clips/utils/mapStoredClipDates";
+import { useCopyToast } from "@/domains/clips/hooks/useCopyToast";
 import { FilterType } from "@/domains/clips/ui/FilterBar";
-import { Clip } from "@/types/clip";
 
 const EMPTY_CLIPS: StoredClip[] = [];
 

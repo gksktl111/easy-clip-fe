@@ -16,9 +16,9 @@ import {
   getRecentClips,
   recordCopy,
   StoredClip,
-} from "@/store/clipStore";
+} from "@/domains/clips/model/clipStorage";
 import { FilterType } from "@/domains/clips/ui/FilterBar";
-import { Clip } from "@/types/clip";
+import { Clip } from "@/domains/clips/model/clip";
 
 const EMPTY_RECENTS: StoredClip[] = [];
 
