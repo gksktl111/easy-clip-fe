@@ -72,7 +72,7 @@ export function FilterBar({
           <div className="flex items-center gap-2 text-xs text-(--muted)">
             <span
               className={`h-2 w-2 rounded-full ${
-                isActive ? "bg-green-500" : "bg-red-500"
+                isActive ? "bg-(--success)" : "bg-(--danger)"
               }`}
               aria-hidden
             />
@@ -90,7 +90,7 @@ export function FilterBar({
             placeholder="Search clips..."
             value={searchQuery}
             onChange={(event) => onSearchChange?.(event.target.value)}
-            className="text-foreground h-9 w-64 rounded-lg border border-(--border) bg-(--input) pr-4 pl-10 text-sm placeholder:text-(--muted) focus:border-gray-400 focus:ring-1 focus:ring-gray-400 focus:outline-none"
+            className="text-foreground h-9 w-64 rounded-lg border border-(--border) bg-(--input) pr-4 pl-10 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:ring-1 focus:ring-(--focus-ring) focus:outline-none"
           />
           <HiOutlineSearch
             className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-(--muted)"

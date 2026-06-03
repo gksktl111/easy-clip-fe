@@ -87,7 +87,7 @@ export function ClipItem({
         aria-label="Toggle favorite"
       >
         {clip.isFavorite ? (
-          <HiStar className="h-4 w-4 text-amber-400" aria-hidden />
+          <HiStar className="h-4 w-4 text-(--warning)" aria-hidden />
         ) : (
           <HiOutlineStar
             className="h-4 w-4 text-(--favorite-icon-muted)"

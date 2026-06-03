@@ -18,7 +18,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay-strong) px-4"
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
@@ -26,25 +26,11 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
       }}
     >
       <div
-        className={`relative w-full max-w-2xl rounded-2xl border shadow-xl ${
-          isDark
-            ? "border-white/10 bg-[#1e1e1f] text-slate-100"
-            : "border-gray-200 bg-white text-gray-900"
-        }`}
+        className="text-foreground relative w-full max-w-2xl rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-xl"
       >
-        <div
-          className={`flex items-center justify-between border-b px-6 py-4 ${
-            isDark ? "border-white/10" : "border-gray-200"
-          }`}
-        >
+        <div className="flex items-center justify-between border-b border-(--border) px-6 py-4">
           <div className="flex items-center gap-3 text-base font-semibold">
-            <span
-              className={`flex h-9 w-9 items-center justify-center rounded-xl ${
-                isDark
-                  ? "bg-white/10 text-slate-100"
-                  : "bg-gray-100 text-gray-600"
-              }`}
-            >
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--modal-icon-bg) text-(--modal-icon-fg)">
               <HiOutlineCog className="h-5 w-5" aria-hidden />
             </span>
             Settings
@@ -52,41 +38,24 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition ${
-              isDark ? "hover:bg-white/10" : "hover:bg-gray-100"
-            }`}
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition hover:bg-(--surface-muted)"
             aria-label="Close settings"
           >
-            <HiOutlineX
-              className={`h-5 w-5 ${isDark ? "text-gray-300" : "text-gray-600"}`}
-              aria-hidden
-            />
+            <HiOutlineX className="h-5 w-5 text-(--muted)" aria-hidden />
           </button>
         </div>
 
         <div className="space-y-6 px-6 py-6">
           <div>
-            <p className="text-sm font-semibold text-gray-400">Appearance</p>
-            <div
-              className={`mt-3 flex items-center justify-between rounded-xl border px-4 py-3 ${
-                isDark
-                  ? "border-white/10 bg-white/5"
-                  : "border-gray-200 bg-gray-50"
-              }`}
-            >
+            <p className="text-sm font-semibold text-(--muted)">Appearance</p>
+            <div className="mt-3 flex items-center justify-between rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
               <div className="flex items-center gap-3">
-                <div
-                  className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                    isDark
-                      ? "bg-white/10 text-gray-200"
-                      : "bg-gray-200 text-gray-600"
-                  }`}
-                >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--modal-icon-bg) text-(--modal-icon-fg)">
                   <HiOutlineMoon className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
                   <p className="text-sm font-semibold">Dark Mode</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-(--muted)">
                     Switch between light and dark theme
                   </p>
                 </div>
@@ -98,7 +67,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                   applySettings(theme === "dark" ? "light" : "dark", language);
                 }}
                 className={`relative h-7 w-12 cursor-pointer rounded-full transition ${
-                  isDark ? "bg-blue-600" : "bg-gray-300"
+                  isDark ? "bg-(--primary)" : "bg-(--border)"
                 }`}
                 aria-label="Toggle dark mode"
               >
@@ -112,27 +81,15 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-400">General</p>
-            <div
-              className={`mt-3 flex items-center justify-between rounded-xl border px-4 py-3 ${
-                isDark
-                  ? "border-white/10 bg-white/5"
-                  : "border-gray-200 bg-gray-50"
-              }`}
-            >
+            <p className="text-sm font-semibold text-(--muted)">General</p>
+            <div className="mt-3 flex items-center justify-between rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
               <div className="flex items-center gap-3">
-                <div
-                  className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                    isDark
-                      ? "bg-white/10 text-gray-200"
-                      : "bg-gray-200 text-gray-600"
-                  }`}
-                >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--modal-icon-bg) text-(--modal-icon-fg)">
                   <HiOutlineTranslate className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
                   <p className="text-sm font-semibold">Language</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-(--muted)">
                     Select your preferred language
                   </p>
                 </div>
@@ -145,11 +102,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                   setLanguage(nextLanguage);
                   applySettings(theme, nextLanguage);
                 }}
-                className={`cursor-pointer rounded-lg border px-3 py-2 text-sm focus:outline-none ${
-                  isDark
-                    ? "border-white/10 bg-[#2a2a2b] text-gray-200"
-                    : "border-gray-300 bg-white text-gray-700"
-                }`}
+                className="cursor-pointer rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm text-(--foreground) focus:border-(--focus-ring) focus:outline-none"
               >
                 <option value="en">English</option>
                 <option value="ko">한국어</option>
@@ -158,27 +111,17 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-400">About</p>
-            <div
-              className={`mt-3 rounded-xl border px-4 py-3 ${
-                isDark
-                  ? "border-white/10 bg-white/5"
-                  : "border-gray-200 bg-gray-50"
-              }`}
-            >
+            <p className="text-sm font-semibold text-(--muted)">About</p>
+            <div className="mt-3 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
               <p className="text-sm font-semibold">Clipboard Studio v1.0.0</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-(--muted)">
                 A modern clipboard manager for designers and developers
               </p>
             </div>
           </div>
         </div>
 
-        <div
-          className={`flex items-center justify-end border-t px-6 py-4 ${
-            isDark ? "border-white/10" : "border-gray-200"
-          }`}
-        >
+        <div className="flex items-center justify-end border-t border-(--border) px-6 py-4">
           <button
             type="button"
             onClick={onClose}

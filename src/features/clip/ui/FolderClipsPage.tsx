@@ -128,8 +128,8 @@ export function FolderClipsPage() {
       ) : null}
 
       {isDeleteAllOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-xl bg-(--surface) shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay) px-4">
+          <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
             <div className="border-b border-(--border) px-5 py-4">
               <p className="text-foreground text-sm font-semibold">
                 모든 클립 삭제
@@ -149,7 +149,7 @@ export function FolderClipsPage() {
               <button
                 type="button"
                 onClick={handleDeleteAll}
-                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600"
+                className="rounded-lg bg-(--danger) px-4 py-2 text-sm font-medium text-(--danger-foreground) transition hover:bg-(--danger-hover)"
               >
                 삭제
               </button>
@@ -159,8 +159,8 @@ export function FolderClipsPage() {
       ) : null}
 
       {isRenameOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-xl bg-(--surface) shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay) px-4">
+          <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
             <div className="border-b border-(--border) px-5 py-4">
               <p className="text-foreground text-sm font-semibold">이름 변경</p>
             </div>
@@ -172,7 +172,7 @@ export function FolderClipsPage() {
                 ref={renameInputRef}
                 value={renameName}
                 onChange={(event) => setRenameName(event.target.value)}
-                className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-gray-400 focus:outline-none"
+                className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:outline-none"
                 placeholder="예: 클립"
               />
             </div>

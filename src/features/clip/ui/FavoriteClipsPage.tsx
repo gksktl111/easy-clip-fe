@@ -35,7 +35,7 @@ export function FavoriteClipsPage() {
 
       {copyToast ? (
         <div
-          className="fixed z-50 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white shadow-md"
+          className="fixed z-50 rounded-full bg-(--chip-bg) px-3 py-1.5 text-xs font-semibold text-(--chip-text) shadow-md"
           style={{ left: copyToast.x + 12, top: copyToast.y + 12 }}
         >
           COPY!

@@ -48,13 +48,13 @@ function SocialButton({ provider, onClick, isLoading }: SocialButtonProps) {
       label: "Google로 계속하기",
       icon: <GoogleIcon />,
       className:
-        "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--surface-muted)]",
+        "border border-(--border) bg-(--surface) text-(--foreground) hover:bg-(--surface-muted)",
     },
     github: {
       label: "GitHub로 계속하기",
       icon: <GithubIcon />,
       className:
-        "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--surface-muted)]",
+        "border border-(--border) bg-(--surface) text-(--foreground) hover:bg-(--surface-muted)",
     },
   };
 
@@ -88,16 +88,16 @@ export function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[var(--background)] px-4">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-(--background) px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary)]">
-            <HiOutlineClipboardCopy className="h-6 w-6 text-[var(--primary-foreground)]" />
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-(--primary)">
+            <HiOutlineClipboardCopy className="h-6 w-6 text-(--primary-foreground)" />
           </div>
-          <h1 className="text-xl font-semibold text-[var(--foreground)]">
+          <h1 className="text-xl font-semibold text-(--foreground)">
             EasyClip에 로그인
           </h1>
-          <p className="mt-2 text-center text-sm text-[var(--muted)]">
+          <p className="mt-2 text-center text-sm text-(--muted)">
             어디서든 복사하고, 어디서나 붙여넣기
           </p>
         </div>
@@ -116,7 +116,7 @@ export function LoginPage() {
         </div>
 
         {isLoading ? (
-          <div className="mt-6 flex items-center justify-center gap-2 text-sm text-[var(--muted)]">
+          <div className="mt-6 flex items-center justify-center gap-2 text-sm text-(--muted)">
             <svg
               className="h-4 w-4 animate-spin"
               fill="none"
@@ -141,25 +141,25 @@ export function LoginPage() {
         ) : null}
 
         <div className="my-8 flex items-center gap-4">
-          <div className="h-px flex-1 bg-[var(--border)]" />
-          <span className="text-xs text-[var(--muted)]">또는</span>
-          <div className="h-px flex-1 bg-[var(--border)]" />
+          <div className="h-px flex-1 bg-(--border)" />
+          <span className="text-xs text-(--muted)">또는</span>
+          <div className="h-px flex-1 bg-(--border)" />
         </div>
 
         <Link
           href="/"
-          className="flex w-full items-center justify-center rounded-lg border border-[var(--border)] bg-transparent px-4 py-3 text-sm font-medium text-[var(--muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)]"
+          className="flex w-full items-center justify-center rounded-lg border border-(--border) bg-transparent px-4 py-3 text-sm font-medium text-(--muted) transition-colors hover:bg-(--surface-muted) hover:text-(--foreground)"
         >
           홈으로 돌아가기
         </Link>
 
-        <p className="mt-8 text-center text-xs text-[var(--muted)]">
+        <p className="mt-8 text-center text-xs text-(--muted)">
           계속하면{" "}
-          <a href="#" className="underline hover:text-[var(--foreground)]">
+          <a href="#" className="underline hover:text-(--foreground)">
             이용약관
           </a>{" "}
           및{" "}
-          <a href="#" className="underline hover:text-[var(--foreground)]">
+          <a href="#" className="underline hover:text-(--foreground)">
             개인정보처리방침
           </a>
           에 동의하게 됩니다.
