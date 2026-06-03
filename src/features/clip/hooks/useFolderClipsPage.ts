@@ -14,9 +14,9 @@ import { mapStoredClipDates } from "@/features/clip/service/mapStoredClipDates";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import {
   clearFolderClips,
-  CLIP_STORAGE_KEY,
   deleteClip,
   getFolderClips,
+  readClipStorageRaw,
   recordCopy,
   StoredClip,
   updateClip,
@@ -53,7 +53,7 @@ export const useFolderClipsPage = () => {
       return EMPTY_CLIPS;
     }
 
-    const stored = localStorage.getItem(CLIP_STORAGE_KEY);
+    const stored = readClipStorageRaw();
     if (
       stored === lastClipsRawRef.current &&
       folderId === lastFolderIdRef.current

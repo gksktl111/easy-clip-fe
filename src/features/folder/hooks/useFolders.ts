@@ -4,8 +4,8 @@ import { useCallback, useRef, useSyncExternalStore } from "react";
 import { FolderItem } from "@/features/folder/model/folder";
 import {
   EMPTY_FOLDERS,
-  FOLDER_STORAGE_KEY,
   persistFolders,
+  readFolderStorageRaw,
   readFolders,
   subscribeToFolders,
 } from "@/features/folder/service/folderStorage";
@@ -15,7 +15,7 @@ export const useFolders = () => {
   const lastFoldersRef = useRef<FolderItem[]>(EMPTY_FOLDERS);
 
   const getFoldersSnapshot = useCallback(() => {
-    const stored = localStorage.getItem(FOLDER_STORAGE_KEY);
+    const stored = readFolderStorageRaw();
     if (stored === lastRawRef.current) {
       return lastFoldersRef.current;
     }

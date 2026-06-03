@@ -10,8 +10,8 @@ import {
 import { subscribeToClipStore } from "@/features/clip/service/clipStoreSubscription";
 import { Clip } from "@/features/clip/model/clip";
 import {
-  CLIP_STORAGE_KEY,
   getFavoriteClips,
+  readClipStorageRaw,
   recordCopy,
   StoredClip,
   updateClip,
@@ -29,7 +29,7 @@ export const useFavoriteClipsPage = () => {
   const lastClipsRef = useRef<StoredClip[]>(EMPTY_CLIPS);
 
   const getFavoritesSnapshot = useCallback(() => {
-    const stored = localStorage.getItem(CLIP_STORAGE_KEY);
+    const stored = readClipStorageRaw();
     if (stored === lastRawRef.current) {
       return lastClipsRef.current;
     }
