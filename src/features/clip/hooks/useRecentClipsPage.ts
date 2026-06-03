@@ -12,8 +12,8 @@ import { mapStoredClipDates } from "@/features/clip/service/mapStoredClipDates";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import {
   clearRecentClips,
-  CLIP_STORAGE_KEY,
   getRecentClips,
+  readClipStorageRaw,
   recordCopy,
   StoredClip,
 } from "@/features/clip/service/clipStorage";
@@ -30,7 +30,7 @@ export const useRecentClipsPage = () => {
   const lastClipsRef = useRef<StoredClip[]>(EMPTY_RECENTS);
 
   const getRecentSnapshot = useCallback(() => {
-    const stored = localStorage.getItem(CLIP_STORAGE_KEY);
+    const stored = readClipStorageRaw();
     if (stored === lastRawRef.current) {
       return lastClipsRef.current;
     }

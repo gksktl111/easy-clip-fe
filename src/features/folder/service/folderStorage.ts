@@ -6,8 +6,10 @@ export const FOLDER_STORAGE_KEY = "easy-clip-folders";
 export const FOLDER_EVENT = "folders:change";
 export const EMPTY_FOLDERS: FolderItem[] = [];
 
+export const readFolderStorageRaw = () => localStorage.getItem(FOLDER_STORAGE_KEY);
+
 export const readFolders = (): FolderItem[] => {
-  const stored = localStorage.getItem(FOLDER_STORAGE_KEY);
+  const stored = readFolderStorageRaw();
   if (!stored) {
     return EMPTY_FOLDERS;
   }

@@ -18,6 +18,8 @@ export const MAX_RECENT_CLIPS = 50;
 const LEGACY_FOLDER_KEY = "easy-clip-folder-clips";
 const LEGACY_RECENT_KEY = "easy-clip-recent-clips";
 
+export const readClipStorageRaw = () => localStorage.getItem(CLIP_STORAGE_KEY);
+
 const parseStoredClips = (stored: string | null): StoredClip[] => {
   if (!stored) return [];
   try {
@@ -106,7 +108,7 @@ const migrateLegacy = (): StoredClip[] => {
 };
 
 export const readStoredClips = (): StoredClip[] => {
-  const stored = localStorage.getItem(CLIP_STORAGE_KEY);
+  const stored = readClipStorageRaw();
   if (stored) return parseStoredClips(stored);
   const migrated = migrateLegacy();
   if (migrated.length) {
