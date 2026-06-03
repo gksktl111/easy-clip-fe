@@ -92,7 +92,7 @@ export function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-(--primary)">
-            <HiOutlineClipboardCopy className="h-6 w-6 text-(--primary-foreground)" />
+            <HiOutlineClipboardCopy className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="text-xl font-semibold text-(--foreground)">
             EasyClip에 로그인

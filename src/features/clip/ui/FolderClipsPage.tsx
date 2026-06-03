@@ -149,7 +149,7 @@ export function FolderClipsPage() {
               <button
                 type="button"
                 onClick={handleDeleteAll}
-                className="rounded-lg bg-(--danger) px-4 py-2 text-sm font-medium text-(--danger-foreground) transition hover:bg-(--danger-hover)"
+                className="rounded-lg bg-(--danger) px-4 py-2 text-sm font-medium text-danger-foreground transition hover:bg-(--danger-hover)"
               >
                 삭제
               </button>
@@ -187,7 +187,7 @@ export function FolderClipsPage() {
               <button
                 type="button"
                 onClick={handleRenameClip}
-                className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-(--primary-foreground) transition hover:bg-(--primary-hover)"
+                className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-(--primary-hover)"
               >
                 변경
               </button>

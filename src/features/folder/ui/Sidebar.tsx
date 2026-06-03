@@ -367,7 +367,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
               <button
                 type="button"
                 onClick={handleCreateFolder}
-                className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-(--primary-foreground) transition hover:bg-(--primary-hover)"
+                className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-(--primary-hover)"
               >
                 생성
               </button>
@@ -422,7 +422,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
               <button
                 type="button"
                 onClick={handleRenameFolder}
-                className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-(--primary-foreground) transition hover:bg-(--primary-hover)"
+                className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-(--primary-hover)"
               >
                 변경
               </button>

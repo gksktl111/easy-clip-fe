@@ -40,6 +40,7 @@ export function LandingPage() {
 
   return (
     <main
+      data-theme={isDarkMode ? "dark" : "light"}
       className={`relative h-screen overflow-y-auto transition-colors duration-300 ${
         isDarkMode ? "bg-[#0f172a] text-[#f1f5f9]" : "bg-white text-[#1e293b]"
       }`}
@@ -80,9 +81,9 @@ export function LandingPage() {
 
             <Link
               href="/login"
-              className="rounded-xl bg-[#334155] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1e293b]"
+              className="rounded-xl bg-(--primary) px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-(--primary-hover)"
             >
-              시작하기
+              <span className="text-primary-foreground">시작하기</span>
             </Link>
           </div>
         </div>
@@ -108,21 +109,16 @@ export function LandingPage() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/login"
-              className="flex items-center gap-2 rounded-xl bg-[#334155] px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[#1e293b]"
+              className="flex items-center gap-2 rounded-xl bg-(--primary) px-7 py-3.5 text-sm font-semibold transition-colors hover:bg-(--primary-hover)"
             >
-              무료로 시작하기
-              <span aria-hidden>→</span>
+              <span className="text-primary-foreground">무료로 시작하기</span>
             </Link>
             <Link
               href="/favorites"
-              className={`flex items-center gap-2 rounded-xl border px-7 py-3.5 text-sm font-semibold transition-colors ${
-                isDarkMode
-                  ? "border-white/20 text-white hover:bg-white/10"
-                  : "border-[#e2e8f0] text-[#334155] hover:bg-[#f8fafc]"
-              }`}
+              className="flex items-center gap-2 rounded-xl border border-(--border) px-7 py-3.5 text-sm font-semibold transition-colors hover:bg-(--surface-muted)"
             >
               <span aria-hidden>▷</span>
-              데모 보기
+              <span className="text-(--foreground)">데모 보기</span>
             </Link>
           </div>
         </div>
