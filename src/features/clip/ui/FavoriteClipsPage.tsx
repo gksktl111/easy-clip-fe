@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useFavoriteClipsPage } from "@/features/clip/hooks/useFavoriteClipsPage";
 import { ClipList } from "@/features/clip/ui/ClipList";
 import { EmptyState } from "@/features/clip/ui/EmptyState";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 
 export function FavoriteClipsPage() {
+  const t = useTranslations("clips");
   const {
     activeFilter,
     copyToast,
@@ -21,7 +23,7 @@ export function FavoriteClipsPage() {
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
         showStatus={false}
-        countLabel={`${filteredClips.length} clips`}
+        countLabel={t("count", { count: filteredClips.length })}
       />
       {filteredClips.length ? (
         <ClipList
@@ -38,7 +40,7 @@ export function FavoriteClipsPage() {
           className="fixed z-50 rounded-full bg-(--chip-bg) px-3 py-1.5 text-xs font-semibold text-(--chip-text) shadow-md"
           style={{ left: copyToast.x + 12, top: copyToast.y + 12 }}
         >
-          COPY!
+          {t("copyToast")}
         </div>
       ) : null}
     </div>

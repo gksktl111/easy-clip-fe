@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HiOutlineClipboardCopy } from "react-icons/hi";
@@ -43,15 +44,16 @@ const GithubIcon = () => (
 );
 
 function SocialButton({ provider, onClick, isLoading }: SocialButtonProps) {
+  const t = useTranslations("login");
   const config = {
     google: {
-      label: "Google로 계속하기",
+      label: t("continueWithGoogle"),
       icon: <GoogleIcon />,
       className:
         "border border-(--border) bg-(--surface) text-(--foreground) hover:bg-(--surface-muted)",
     },
     github: {
-      label: "GitHub로 계속하기",
+      label: t("continueWithGithub"),
       icon: <GithubIcon />,
       className:
         "border border-(--border) bg-(--surface) text-(--foreground) hover:bg-(--surface-muted)",
@@ -74,6 +76,7 @@ function SocialButton({ provider, onClick, isLoading }: SocialButtonProps) {
 }
 
 export function LoginPage() {
+  const t = useTranslations("login");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<
@@ -94,11 +97,9 @@ export function LoginPage() {
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-(--primary)">
             <HiOutlineClipboardCopy className="h-6 w-6 text-primary-foreground" />
           </div>
-          <h1 className="text-xl font-semibold text-(--foreground)">
-            EasyClip에 로그인
-          </h1>
+          <h1 className="text-xl font-semibold text-(--foreground)">{t("title")}</h1>
           <p className="mt-2 text-center text-sm text-(--muted)">
-            어디서든 복사하고, 어디서나 붙여넣기
+            {t("subtitle")}
           </p>
         </div>
 
@@ -136,13 +137,13 @@ export function LoginPage() {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <span>로그인 중...</span>
+            <span>{t("loading")}</span>
           </div>
         ) : null}
 
         <div className="my-8 flex items-center gap-4">
           <div className="h-px flex-1 bg-(--border)" />
-          <span className="text-xs text-(--muted)">또는</span>
+          <span className="text-xs text-(--muted)">{t("or")}</span>
           <div className="h-px flex-1 bg-(--border)" />
         </div>
 
@@ -150,19 +151,19 @@ export function LoginPage() {
           href="/"
           className="flex w-full items-center justify-center rounded-lg border border-(--border) bg-transparent px-4 py-3 text-sm font-medium text-(--muted) transition-colors hover:bg-(--surface-muted) hover:text-(--foreground)"
         >
-          홈으로 돌아가기
+          {t("backHome")}
         </Link>
 
         <p className="mt-8 text-center text-xs text-(--muted)">
-          계속하면{" "}
+          {t("agreementPrefix")}{" "}
           <a href="#" className="underline hover:text-(--foreground)">
-            이용약관
+            {t("terms")}
           </a>{" "}
-          및{" "}
+          {t("agreementMiddle")}{" "}
           <a href="#" className="underline hover:text-(--foreground)">
-            개인정보처리방침
+            {t("privacy")}
           </a>
-          에 동의하게 됩니다.
+          {t("agreementSuffix")}
         </p>
       </div>
     </main>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useFolderClipsPage } from "@/features/clip/hooks/useFolderClipsPage";
 import { ClipList } from "@/features/clip/ui/ClipList";
 import { DeleteAllButton } from "@/features/clip/ui/DeleteAllButton";
@@ -7,6 +8,7 @@ import { EmptyState } from "@/features/clip/ui/EmptyState";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 
 export function FolderClipsPage() {
+  const t = useTranslations("clips");
   const {
     activeFilter,
     clips,
@@ -51,12 +53,12 @@ export function FolderClipsPage() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         isActive={isActive}
-        countLabel={`${filteredClips.length} clips`}
+        countLabel={t("count", { count: filteredClips.length })}
       />
       {!isActive ? (
         <div className="px-6 pt-4">
           <div className="rounded-2xl border border-(--border) bg-(--surface) px-4 py-3 text-center text-xs text-(--muted)">
-            Click anywhere and press Ctrl+V to capture a new clip
+            {t("captureHint")}
           </div>
         </div>
       ) : null}
@@ -92,7 +94,7 @@ export function FolderClipsPage() {
             className="hover:text-foreground flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--muted) hover:bg-(--surface-muted)"
             data-clip-menu
           >
-            복사
+            {t("actions.copy")}
           </button>
           <button
             type="button"
@@ -105,7 +107,7 @@ export function FolderClipsPage() {
             className="hover:text-foreground flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--muted) hover:bg-(--surface-muted)"
             data-clip-menu
           >
-            이름 변경
+            {t("actions.rename")}
           </button>
           <button
             type="button"
@@ -113,7 +115,7 @@ export function FolderClipsPage() {
             className="flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--danger) hover:bg-(--surface-muted)"
             data-clip-menu
           >
-            삭제
+            {t("actions.delete")}
           </button>
         </div>
       ) : null}
@@ -123,7 +125,7 @@ export function FolderClipsPage() {
           className="fixed z-50 rounded-full bg-(--chip-bg) px-3 py-1.5 text-xs font-semibold text-(--chip-text) shadow-md"
           style={{ left: copyToast.x + 12, top: copyToast.y + 12 }}
         >
-          COPY!
+          {t("copyToast")}
         </div>
       ) : null}
 
@@ -132,10 +134,10 @@ export function FolderClipsPage() {
           <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
             <div className="border-b border-(--border) px-5 py-4">
               <p className="text-foreground text-sm font-semibold">
-                모든 클립 삭제
+                {t("deleteModal.title")}
               </p>
               <p className="text-muted mt-1 text-xs">
-                정말 모든 클립을 삭제하시겠습니까?
+                {t("deleteModal.description")}
               </p>
             </div>
             <div className="flex justify-end gap-2 px-5 py-4">
@@ -144,14 +146,14 @@ export function FolderClipsPage() {
                 onClick={() => setIsDeleteAllOpen(false)}
                 className="hover:text-foreground rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
               >
-                취소
+                {t("actions.cancel")}
               </button>
               <button
                 type="button"
                 onClick={handleDeleteAll}
                 className="rounded-lg bg-(--danger) px-4 py-2 text-sm font-medium text-danger-foreground transition hover:bg-(--danger-hover)"
               >
-                삭제
+                {t("actions.delete")}
               </button>
             </div>
           </div>
@@ -162,18 +164,20 @@ export function FolderClipsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay) px-4">
           <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
             <div className="border-b border-(--border) px-5 py-4">
-              <p className="text-foreground text-sm font-semibold">이름 변경</p>
+              <p className="text-foreground text-sm font-semibold">
+                {t("renameModal.title")}
+              </p>
             </div>
             <div className="px-5 py-4">
               <label className="block text-xs font-semibold text-(--muted)">
-                클립 이름
+                {t("renameModal.label")}
               </label>
               <input
                 ref={renameInputRef}
                 value={renameName}
                 onChange={(event) => setRenameName(event.target.value)}
                 className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:outline-none"
-                placeholder="예: 클립"
+                placeholder={t("renameModal.placeholder")}
               />
             </div>
             <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
@@ -182,14 +186,14 @@ export function FolderClipsPage() {
                 onClick={() => setIsRenameOpen(false)}
                 className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
               >
-                취소
+                {t("actions.cancel")}
               </button>
               <button
                 type="button"
                 onClick={handleRenameClip}
                 className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-(--primary-hover)"
               >
-                변경
+                {t("actions.change")}
               </button>
             </div>
           </div>

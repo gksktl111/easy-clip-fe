@@ -12,31 +12,36 @@ import {
   HiOutlineSun,
 } from "react-icons/hi";
 
-const FEATURES = [
-  {
-    icon: HiOutlineLightningBolt,
-    title: "즉시 동기화",
-    description: "복사하는 순간 모든 기기에 실시간으로 반영됩니다.",
-  },
-  {
-    icon: HiOutlineFolder,
-    title: "폴더 정리",
-    description: "프로젝트별로 클립을 묶어 체계적으로 관리하세요.",
-  },
-  {
-    icon: HiOutlineStar,
-    title: "즐겨찾기",
-    description: "자주 쓰는 문구는 즐겨찾기로 빠르게 접근하세요.",
-  },
-  {
-    icon: HiOutlineSearch,
-    title: "빠른 검색",
-    description: "키워드를 입력하면 즉시 원하는 클립을 찾아냅니다.",
-  },
-];
-
 export function LandingPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const features = [
+    {
+      key: "sync",
+      title: "즉시 동기화",
+      description: "복사하는 순간 모든 기기에 실시간으로 반영됩니다.",
+      icon: HiOutlineLightningBolt,
+    },
+    {
+      key: "folder",
+      title: "폴더 정리",
+      description: "프로젝트별로 클립을 묶어 체계적으로 관리하세요.",
+      icon: HiOutlineFolder,
+    },
+    {
+      key: "favorite",
+      title: "즐겨찾기",
+      description: "자주 쓰는 문구는 즐겨찾기로 빠르게 접근하세요.",
+      icon: HiOutlineStar,
+    },
+    {
+      key: "search",
+      title: "빠른 검색",
+      description: "키워드를 입력하면 즉시 원하는 클립을 찾아냅니다.",
+      icon: HiOutlineSearch,
+    },
+  ] as const;
+  const demoItems = ["디자인 가이드라인", "API 엔드포인트", "회의 노트"];
+  const mobileDemoItems = ["디자인 가이드", "API 엔드포인트"];
 
   return (
     <main
@@ -153,20 +158,18 @@ export function LandingPage() {
 
               <div className="flex-1 p-4">
                 <div className="space-y-3">
-                  {["디자인 가이드라인", "API 엔드포인트", "회의 노트"].map(
-                    (item, index) => (
-                      <div
-                        key={item}
-                        className={`flex items-center gap-3 rounded-xl p-3 ${
-                          isDarkMode ? "bg-white/5" : "bg-white"
-                        }`}
-                        style={{ animationDelay: `${index * 100}ms` }}
-                      >
-                        <div className="h-2 w-2 rounded-full bg-[#3b82f6]" />
-                        <span className="text-sm font-medium">{item}</span>
-                      </div>
-                    ),
-                  )}
+                  {demoItems.map((item, index) => (
+                    <div
+                      key={item}
+                      className={`flex items-center gap-3 rounded-xl p-3 ${
+                        isDarkMode ? "bg-white/5" : "bg-white"
+                      }`}
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <div className="h-2 w-2 rounded-full bg-[#3b82f6]" />
+                      <span className="text-sm font-medium">{item}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -218,7 +221,7 @@ export function LandingPage() {
 
               <div className="flex-1 p-3">
                 <div className="space-y-2">
-                  {["디자인 가이드", "API 엔드포인트"].map((item) => (
+                  {mobileDemoItems.map((item) => (
                     <div
                       key={item}
                       className={`flex items-center gap-2 rounded-lg p-2 ${
@@ -256,12 +259,12 @@ export function LandingPage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((feature) => {
+            {features.map((feature) => {
               const Icon = feature.icon;
 
               return (
                 <div
-                  key={feature.title}
+                  key={feature.key}
                   className={`rounded-2xl border p-6 transition-transform hover:-translate-y-1 ${
                     isDarkMode
                       ? "border-white/10 bg-white/5"
