@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Sidebar } from "@/features/folder/ui/Sidebar";
-import { applySettings, useSettingsStore } from "@/shared/store/settingsStore";
 import { SettingsModal } from "@/shared/ui/SettingsModal";
 
 interface AppShellProps {
@@ -11,11 +10,6 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { language, theme } = useSettingsStore();
-
-  useEffect(() => {
-    applySettings(theme, language);
-  }, [language, theme]);
 
   return (
     <div className="bg-background text-foreground flex h-screen flex-col overflow-hidden">

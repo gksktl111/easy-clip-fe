@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   HiOutlineColorSwatch,
   HiOutlineDocumentText,
@@ -29,21 +30,22 @@ export function FilterBar({
   showStatus = true,
   countLabel,
 }: FilterBarProps) {
+  const t = useTranslations("clips.filter");
   const filters = [
-    { id: "all" as const, label: "All" },
+    { id: "all" as const, label: t("all") },
     {
       id: "text" as const,
-      label: "Text",
+      label: t("text"),
       icon: <HiOutlineDocumentText className="h-4 w-4" aria-hidden />,
     },
     {
       id: "color" as const,
-      label: "Color",
+      label: t("color"),
       icon: <HiOutlineColorSwatch className="h-4 w-4" aria-hidden />,
     },
     {
       id: "image" as const,
-      label: "Image",
+      label: t("image"),
       icon: <HiOutlinePhotograph className="h-4 w-4" aria-hidden />,
     },
   ];
@@ -72,11 +74,11 @@ export function FilterBar({
           <div className="flex items-center gap-2 text-xs text-(--muted)">
             <span
               className={`h-2 w-2 rounded-full ${
-                isActive ? "bg-green-500" : "bg-red-500"
+                isActive ? "bg-(--success)" : "bg-(--danger)"
               }`}
               aria-hidden
             />
-            <span>{isActive ? "Ready to paste" : "Not active"}</span>
+            <span>{isActive ? t("readyToPaste") : t("notActive")}</span>
           </div>
         ) : null}
         {countLabel ? (
@@ -87,10 +89,10 @@ export function FilterBar({
         <div className="relative">
           <input
             type="text"
-            placeholder="Search clips..."
+            placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(event) => onSearchChange?.(event.target.value)}
-            className="text-foreground h-9 w-64 rounded-lg border border-(--border) bg-(--input) pr-4 pl-10 text-sm placeholder:text-(--muted) focus:border-gray-400 focus:ring-1 focus:ring-gray-400 focus:outline-none"
+            className="text-foreground h-9 w-64 rounded-lg border border-(--border) bg-(--input) pr-4 pl-10 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:ring-1 focus:ring-(--focus-ring) focus:outline-none"
           />
           <HiOutlineSearch
             className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-(--muted)"
