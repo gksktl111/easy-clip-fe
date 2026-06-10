@@ -1,0 +1,125 @@
+{
+  "landing": {
+    "themeToggle": "다크 모드 전환",
+    "start": "시작하기",
+    "heroTitleLine1": "어디서든 복사하고.",
+    "heroTitleLine2": "어디서나 붙여넣기.",
+    "heroDescription": "모든 기기에서 클립보드를 완벽하게 동기화하세요. 빠르게 움직이는 개발자, 디자이너, 크리에이티브 팀을 위해 설계되었습니다.",
+    "startFree": "무료로 시작하기",
+    "viewDemo": "데모 보기",
+    "demoWindowTitle": "Easy Clip - 클립보드 관리",
+    "demoDeviceTitle": "Easy Clip",
+    "demoItem1": "디자인 가이드라인",
+    "demoItem2": "API 엔드포인트",
+    "demoItem3": "회의 노트",
+    "demoMobileItem1": "디자인 가이드",
+    "demoMobileItem2": "API 엔드포인트",
+    "sectionTitle": "일의 흐름을 끊지 않는 클립보드",
+    "sectionDescription": "복사, 정리, 재사용까지 한 번에 관리하세요.",
+    "features": {
+      "sync": {
+        "title": "즉시 동기화",
+        "description": "복사하는 순간 모든 기기에 실시간으로 반영됩니다."
+      },
+      "folder": {
+        "title": "폴더 정리",
+        "description": "프로젝트별로 클립을 묶어 체계적으로 관리하세요."
+      },
+      "favorite": {
+        "title": "즐겨찾기",
+        "description": "자주 쓰는 문구는 즐겨찾기로 빠르게 접근하세요."
+      },
+      "search": {
+        "title": "빠른 검색",
+        "description": "키워드를 입력하면 즉시 원하는 클립을 찾아냅니다."
+      }
+    }
+  },
+  "login": {
+    "title": "EasyClip에 로그인",
+    "subtitle": "어디서든 복사하고, 어디서나 붙여넣기",
+    "continueWithGoogle": "Google로 계속하기",
+    "continueWithGithub": "GitHub로 계속하기",
+    "loading": "로그인 중...",
+    "or": "또는",
+    "backHome": "홈으로 돌아가기",
+    "agreementPrefix": "계속하면",
+    "agreementMiddle": "및",
+    "terms": "이용약관",
+    "privacy": "개인정보처리방침",
+    "agreementSuffix": "에 동의하게 됩니다."
+  },
+  "sidebar": {
+    "favorites": "즐겨찾기",
+    "recent": "최근 항목",
+    "addFolder": "폴더 추가",
+    "reorderFolder": "폴더 순서 변경",
+    "openFolderOptions": "폴더 옵션 열기",
+    "rename": "이름 변경",
+    "delete": "삭제",
+    "logout": "로그아웃",
+    "settings": "설정",
+    "closeCreateFolder": "폴더 생성 닫기",
+    "createFolder": "새 폴더 생성",
+    "folderName": "폴더 이름",
+    "folderNamePlaceholder": "예: 프로젝트",
+    "cancel": "취소",
+    "create": "생성",
+    "closeRenameFolder": "폴더 이름 변경 닫기",
+    "renameFolder": "폴더 이름 변경",
+    "change": "변경"
+  },
+  "settings": {
+    "title": "설정",
+    "close": "설정 닫기",
+    "appearance": "화면 설정",
+    "darkMode": "다크 모드",
+    "darkModeDescription": "라이트 모드와 다크 모드를 전환합니다.",
+    "toggleDarkMode": "다크 모드 전환",
+    "general": "일반",
+    "language": "언어",
+    "languageDescription": "선호하는 언어를 선택하세요.",
+    "about": "정보",
+    "aboutTitle": "Clipboard Studio v1.0.0",
+    "aboutDescription": "디자이너와 개발자를 위한 현대적인 클립보드 매니저",
+    "closeButton": "닫기"
+  },
+  "clips": {
+    "count": "{count, plural, =0 {0개 클립} other {#개 클립}}",
+    "copyToast": "복사됨!",
+    "captureHint": "아무 곳이나 클릭한 뒤 Ctrl+V를 눌러 새 클립을 저장하세요.",
+    "filter": {
+      "all": "전체",
+      "text": "텍스트",
+      "color": "색상",
+      "image": "이미지",
+      "readyToPaste": "붙여넣기 준비됨",
+      "notActive": "비활성 상태",
+      "searchPlaceholder": "클립 검색..."
+    },
+    "emptyState": {
+      "title": "아직 저장된 클립이 없습니다",
+      "description": "새 클립을 복사하거나 폴더에서 붙여넣기를 시작하면 이곳에 표시됩니다."
+    },
+    "item": {
+      "toggleFavorite": "즐겨찾기 전환"
+    },
+    "actions": {
+      "copy": "복사",
+      "rename": "이름 변경",
+      "delete": "삭제",
+      "deleteAll": "전체 삭제",
+      "cancel": "취소",
+      "change": "변경"
+    },
+    "deleteModal": {
+      "title": "모든 클립 삭제",
+      "description": "정말 모든 클립을 삭제하시겠습니까?"
+    },
+    "renameModal": {
+      "title": "이름 변경",
+      "label": "클립 이름",
+      "placeholder": "예: 클립"
+    }
+  }
+}
