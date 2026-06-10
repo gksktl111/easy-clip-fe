@@ -1,0 +1,125 @@
+{
+  "landing": {
+    "themeToggle": "Toggle dark mode",
+    "start": "Get Started",
+    "heroTitleLine1": "Copy anywhere.",
+    "heroTitleLine2": "Paste everywhere.",
+    "heroDescription": "Keep your clipboard perfectly synced across every device. Built for fast-moving developers, designers, and creative teams.",
+    "startFree": "Start for free",
+    "viewDemo": "View demo",
+    "demoWindowTitle": "Easy Clip - Clipboard Manager",
+    "demoDeviceTitle": "Easy Clip",
+    "demoItem1": "Design guidelines",
+    "demoItem2": "API endpoints",
+    "demoItem3": "Meeting notes",
+    "demoMobileItem1": "Design guide",
+    "demoMobileItem2": "API endpoints",
+    "sectionTitle": "A clipboard that keeps your flow moving",
+    "sectionDescription": "Manage copying, organizing, and reusing in one place.",
+    "features": {
+      "sync": {
+        "title": "Instant sync",
+        "description": "Everything you copy is reflected across your devices in real time."
+      },
+      "folder": {
+        "title": "Folder organization",
+        "description": "Group clips by project and keep your workspace structured."
+      },
+      "favorite": {
+        "title": "Favorites",
+        "description": "Pin your most-used snippets for quick access."
+      },
+      "search": {
+        "title": "Fast search",
+        "description": "Find the clip you need the moment you type a keyword."
+      }
+    }
+  },
+  "login": {
+    "title": "Sign in to EasyClip",
+    "subtitle": "Copy anywhere, paste everywhere",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGithub": "Continue with GitHub",
+    "loading": "Signing in...",
+    "or": "or",
+    "backHome": "Back to home",
+    "agreementPrefix": "By continuing, you agree to the",
+    "agreementMiddle": "and",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "agreementSuffix": "."
+  },
+  "sidebar": {
+    "favorites": "Favorites",
+    "recent": "Recent",
+    "addFolder": "Add Folder",
+    "reorderFolder": "Reorder folder",
+    "openFolderOptions": "Open folder options",
+    "rename": "Rename",
+    "delete": "Delete",
+    "logout": "Log out",
+    "settings": "Settings",
+    "closeCreateFolder": "Close create folder",
+    "createFolder": "Create folder",
+    "folderName": "Folder name",
+    "folderNamePlaceholder": "e.g. Project",
+    "cancel": "Cancel",
+    "create": "Create",
+    "closeRenameFolder": "Close rename folder",
+    "renameFolder": "Rename folder",
+    "change": "Save"
+  },
+  "settings": {
+    "title": "Settings",
+    "close": "Close settings",
+    "appearance": "Appearance",
+    "darkMode": "Dark Mode",
+    "darkModeDescription": "Switch between light and dark themes.",
+    "toggleDarkMode": "Toggle dark mode",
+    "general": "General",
+    "language": "Language",
+    "languageDescription": "Select your preferred language.",
+    "about": "About",
+    "aboutTitle": "Clipboard Studio v1.0.0",
+    "aboutDescription": "A modern clipboard manager for designers and developers",
+    "closeButton": "Close"
+  },
+  "clips": {
+    "count": "{count, plural, =0 {0 clips} one {# clip} other {# clips}}",
+    "copyToast": "Copied!",
+    "captureHint": "Click anywhere and press Ctrl+V to capture a new clip.",
+    "filter": {
+      "all": "All",
+      "text": "Text",
+      "color": "Color",
+      "image": "Image",
+      "readyToPaste": "Ready to paste",
+      "notActive": "Not active",
+      "searchPlaceholder": "Search clips..."
+    },
+    "emptyState": {
+      "title": "No saved clips yet",
+      "description": "Copied clips or new pasted items from a folder will appear here."
+    },
+    "item": {
+      "toggleFavorite": "Toggle favorite"
+    },
+    "actions": {
+      "copy": "Copy",
+      "rename": "Rename",
+      "delete": "Delete",
+      "deleteAll": "Delete All",
+      "cancel": "Cancel",
+      "change": "Save"
+    },
+    "deleteModal": {
+      "title": "Delete all clips",
+      "description": "Are you sure you want to delete every clip?"
+    },
+    "renameModal": {
+      "title": "Rename",
+      "label": "Clip name",
+      "placeholder": "e.g. Clip"
+    }
+  }
+}

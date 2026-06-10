@@ -1,18 +1,21 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   HiOutlineCog,
   HiOutlineMoon,
   HiOutlineTranslate,
   HiOutlineX,
 } from "react-icons/hi";
-import { applySettings, useSettingsStore } from "@/shared/store/settingsStore";
+import { LOCALE_LABELS, type AppLocale } from "@/shared/config/locale";
+import { useSettingsStore } from "@/shared/store/settingsStore";
 
 interface SettingsModalProps {
   onClose: () => void;
 }
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
+  const t = useTranslations("settings");
   const { theme, language, setLanguage, toggleTheme } = useSettingsStore();
   const isDark = theme === "dark";
 
@@ -33,13 +36,13 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--modal-icon-bg) text-(--modal-icon-fg)">
               <HiOutlineCog className="h-5 w-5" aria-hidden />
             </span>
-            Settings
+            {t("title")}
           </div>
           <button
             type="button"
             onClick={onClose}
             className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition hover:bg-(--surface-muted)"
-            aria-label="Close settings"
+            aria-label={t("close")}
           >
             <HiOutlineX className="h-5 w-5 text-(--muted)" aria-hidden />
           </button>
@@ -47,29 +50,28 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
         <div className="space-y-6 px-6 py-6">
           <div>
-            <p className="text-sm font-semibold text-(--muted)">Appearance</p>
+            <p className="text-sm font-semibold text-(--muted)">
+              {t("appearance")}
+            </p>
             <div className="mt-3 flex items-center justify-between rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--modal-icon-bg) text-(--modal-icon-fg)">
                   <HiOutlineMoon className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold">Dark Mode</p>
+                  <p className="text-sm font-semibold">{t("darkMode")}</p>
                   <p className="text-xs text-(--muted)">
-                    Switch between light and dark theme
+                    {t("darkModeDescription")}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  toggleTheme();
-                  applySettings(theme === "dark" ? "light" : "dark", language);
-                }}
+                onClick={toggleTheme}
                 className={`relative h-7 w-12 cursor-pointer rounded-full transition ${
                   isDark ? "bg-(--primary)" : "bg-(--border)"
                 }`}
-                aria-label="Toggle dark mode"
+                aria-label={t("toggleDarkMode")}
               >
                 <span
                   className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition ${
@@ -81,42 +83,44 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-(--muted)">General</p>
+            <p className="text-sm font-semibold text-(--muted)">
+              {t("general")}
+            </p>
             <div className="mt-3 flex items-center justify-between rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--modal-icon-bg) text-(--modal-icon-fg)">
                   <HiOutlineTranslate className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold">Language</p>
+                  <p className="text-sm font-semibold">{t("language")}</p>
                   <p className="text-xs text-(--muted)">
-                    Select your preferred language
+                    {t("languageDescription")}
                   </p>
                 </div>
               </div>
               <select
                 value={language}
                 onChange={(event) => {
-                  const nextLanguage =
-                    event.target.value === "ko" ? "ko" : "en";
-                  setLanguage(nextLanguage);
-                  applySettings(theme, nextLanguage);
+                  setLanguage(event.target.value as AppLocale);
                 }}
                 className="cursor-pointer rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm text-(--foreground) focus:border-(--focus-ring) focus:outline-none"
               >
-                <option value="en">English</option>
-                <option value="ko">한국어</option>
+                {Object.entries(LOCALE_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-(--muted)">About</p>
+            <p className="text-sm font-semibold text-(--muted)">
+              {t("about")}
+            </p>
             <div className="mt-3 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
-              <p className="text-sm font-semibold">Clipboard Studio v1.0.0</p>
-              <p className="text-xs text-(--muted)">
-                A modern clipboard manager for designers and developers
-              </p>
+              <p className="text-sm font-semibold">{t("aboutTitle")}</p>
+              <p className="text-xs text-(--muted)">{t("aboutDescription")}</p>
             </div>
           </div>
         </div>
@@ -127,7 +131,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             onClick={onClose}
             className="cursor-pointer rounded-lg bg-(--primary) px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-(--primary-hover)"
           >
-            Close
+            {t("closeButton")}
           </button>
         </div>
       </div>
