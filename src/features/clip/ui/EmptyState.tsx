@@ -1,8 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { HiOutlineClipboardCopy } from "react-icons/hi";
 
 export function EmptyState() {
+  const t = useTranslations("clips.emptyState");
+
   return (
     <div className="flex flex-1 items-center justify-center px-6 py-10">
       <div className="flex max-w-sm flex-col items-center rounded-3xl border border-dashed border-(--border) bg-(--surface) px-8 py-10 text-center">
@@ -10,10 +13,10 @@ export function EmptyState() {
           <HiOutlineClipboardCopy className="h-7 w-7" aria-hidden />
         </div>
         <p className="text-foreground mt-5 text-base font-semibold">
-          아직 저장된 클립이 없습니다
+          {t("title")}
         </p>
         <p className="text-muted mt-2 text-sm leading-relaxed">
-          새 클립을 복사하거나 폴더에서 붙여넣기를 시작하면 이곳에 표시됩니다.
+          {t("description")}
         </p>
       </div>
     </div>

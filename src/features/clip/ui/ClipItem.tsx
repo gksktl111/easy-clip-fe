@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import {
   HiOutlineColorSwatch,
   HiOutlineDocumentText,
@@ -23,6 +24,8 @@ export function ClipItem({
   onToggleFavorite,
   onContextMenu,
 }: ClipItemProps) {
+  const t = useTranslations("clips.item");
+
   const getIcon = () => {
     switch (clip.type) {
       case "text":
@@ -84,7 +87,7 @@ export function ClipItem({
         }}
         className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-(--favorite-btn-bg-hover)"
         style={{ boxShadow: "var(--favorite-btn-shadow)" }}
-        aria-label="Toggle favorite"
+        aria-label={t("toggleFavorite")}
       >
         {clip.isFavorite ? (
           <HiStar className="h-4 w-4 text-(--warning)" aria-hidden />

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -24,6 +25,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ onOpenSettings }: SidebarProps) {
+  const t = useTranslations("sidebar");
   const pathname = usePathname();
   const { folders, persistFolders } = useFolders();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
@@ -41,12 +43,12 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
   const topNavs = [
     {
       href: "/favorites",
-      label: "Favorites",
+      label: t("favorites"),
       icon: <HiOutlineStar className="h-5 w-5" aria-hidden />,
     },
     {
       href: "/recent",
-      label: "Recent",
+      label: t("recent"),
       icon: <HiOutlineClock className="h-5 w-5" aria-hidden />,
     },
   ];
@@ -184,7 +186,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
               className="hover:text-foreground flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium text-(--muted) transition-colors hover:bg-(--surface)"
             >
               <HiOutlinePlus className="h-5 w-5" aria-hidden />
-              Add Folder
+              {t("addFolder")}
             </button>
             <ul className="space-y-1 px-2">
               {folders.map((folder) => (
@@ -219,7 +221,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                       }}
                       onDragEnd={() => setDraggingFolderId(null)}
                       className="text-muted hover:text-foreground cursor-grab rounded p-1"
-                      aria-label="폴더 순서 변경"
+                      aria-label={t("reorderFolder")}
                     >
                       <HiOutlineMenuAlt4 className="h-4 w-4" aria-hidden />
                     </button>
@@ -238,7 +240,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                         )
                       }
                       className="text-muted hover:text-foreground cursor-pointer rounded p-1 transition"
-                      aria-label="폴더 옵션 열기"
+                      aria-label={t("openFolderOptions")}
                       data-folder-options
                     >
                       <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />
@@ -261,7 +263,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                           className="text-foreground flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm hover:bg-(--surface-muted)"
                         >
                           <HiOutlinePencil className="h-4 w-4" aria-hidden />
-                          이름 변경
+                          {t("rename")}
                         </button>
                         <button
                           type="button"
@@ -277,7 +279,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                           className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-(--danger) hover:bg-(--surface-muted)"
                         >
                           <HiOutlineTrash className="h-4 w-4" aria-hidden />
-                          삭제
+                          {t("delete")}
                         </button>
                       </div>
                     </div>
@@ -305,7 +307,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
               window.location.href = "/login";
             }}
             className="text-muted hover:text-foreground cursor-pointer rounded p-1 transition-colors"
-            aria-label="로그아웃"
+            aria-label={t("logout")}
           >
             <HiOutlineLogout className="h-4 w-4" aria-hidden />
           </button>
@@ -317,7 +319,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
           className="hover:text-foreground flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-(--muted) transition-colors hover:bg-(--surface)"
         >
           <HiOutlineCog className="h-5 w-5" aria-hidden />
-          Settings
+          {t("settings")}
         </button>
       </div>
 
@@ -329,17 +331,17 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                 type="button"
                 onClick={closeCreateModal}
                 className="text-muted hover:text-foreground cursor-pointer rounded-full p-1 transition"
-                aria-label="Close create folder"
+                aria-label={t("closeCreateFolder")}
               >
                 <HiX className="h-5 w-5" aria-hidden />
               </button>
               <p className="text-foreground ml-auto text-sm font-semibold">
-                새 폴더 생성
+                {t("createFolder")}
               </p>
             </div>
             <div className="px-5 py-4">
               <label className="text-muted block text-xs font-semibold">
-                폴더 이름
+                {t("folderName")}
               </label>
               <input
                 ref={inputRef}
@@ -353,7 +355,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                   }
                 }}
                 className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:outline-none"
-                placeholder="예: 프로젝트"
+                placeholder={t("folderNamePlaceholder")}
               />
             </div>
             <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
@@ -362,14 +364,14 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                 onClick={closeCreateModal}
                 className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
               >
-                취소
+                {t("cancel")}
               </button>
               <button
                 type="button"
                 onClick={handleCreateFolder}
                 className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-(--primary-hover)"
               >
-                생성
+                {t("create")}
               </button>
             </div>
           </div>
@@ -384,17 +386,17 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                 type="button"
                 onClick={closeRenameModal}
                 className="hover:text-foreground cursor-pointer rounded-full p-1 text-(--muted) transition"
-                aria-label="Close rename folder"
+                aria-label={t("closeRenameFolder")}
               >
                 <HiX className="h-5 w-5" aria-hidden />
               </button>
               <p className="text-foreground ml-auto text-sm font-semibold">
-                폴더 이름 변경
+                {t("renameFolder")}
               </p>
             </div>
             <div className="px-5 py-4">
               <label className="block text-xs font-semibold text-(--muted)">
-                폴더 이름
+                {t("folderName")}
               </label>
               <input
                 ref={renameInputRef}
@@ -408,7 +410,7 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                   }
                 }}
                 className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:outline-none"
-                placeholder="예: 프로젝트"
+                placeholder={t("folderNamePlaceholder")}
               />
             </div>
             <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
@@ -417,14 +419,14 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
                 onClick={closeRenameModal}
                 className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
               >
-                취소
+                {t("cancel")}
               </button>
               <button
                 type="button"
                 onClick={handleRenameFolder}
                 className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-(--primary-hover)"
               >
-                변경
+                {t("change")}
               </button>
             </div>
           </div>
