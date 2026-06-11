@@ -9,6 +9,7 @@ import {
 } from "react-icons/hi";
 import { LOCALE_LABELS, type AppLocale } from "@/shared/config/locale";
 import { useSettingsStore } from "@/shared/store/settingsStore";
+import { StyledSelect } from "@/shared/ui/StyledSelect";
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -98,19 +99,17 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                   </p>
                 </div>
               </div>
-              <select
+              <StyledSelect
                 value={language}
-                onChange={(event) => {
-                  setLanguage(event.target.value as AppLocale);
+                onChange={(value) => {
+                  setLanguage(value as AppLocale);
                 }}
-                className="cursor-pointer rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm text-(--foreground) focus:border-(--focus-ring) focus:outline-none"
-              >
-                {Object.entries(LOCALE_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+                options={Object.entries(LOCALE_LABELS).map(([value, label]) => ({
+                  value,
+                  label,
+                }))}
+                className="min-w-36"
+              />
             </div>
           </div>
 

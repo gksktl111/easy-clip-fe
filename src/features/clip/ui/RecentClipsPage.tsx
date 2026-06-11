@@ -22,7 +22,7 @@ export function RecentClipsPage() {
   } = useRecentClipsPage();
 
   return (
-    <div className="bg-background flex h-full flex-col">
+    <div className="bg-background relative flex h-full flex-col">
       <FilterBar
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}

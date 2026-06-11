@@ -16,7 +16,7 @@ export function DeleteAllButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="absolute right-6 bottom-6 rounded-full bg-(--danger) px-4 py-2 text-sm font-semibold text-danger-foreground shadow-lg transition hover:bg-(--danger-hover) disabled:cursor-not-allowed disabled:opacity-50"
+      className="absolute right-4 bottom-4 rounded-full bg-(--danger) px-4 py-2 text-sm font-semibold text-danger-foreground shadow-lg transition hover:bg-(--danger-hover) disabled:cursor-not-allowed disabled:opacity-50 md:right-6 md:bottom-6"
     >
       {t("deleteAll")}
     </button>
