@@ -1,42 +1,7 @@
 @import "tailwindcss";
 
+/* Foundation: typography */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --surface: #ffffff;
-  --surface-muted: #f1f5f9;
-  --border: #e2e8f0;
-  --muted: #64748b;
-  --input: #f8fafc;
-  --chip-bg: #111827;
-  --chip-text: #ffffff;
-  --icon-chip: #e5e7eb;
-  --icon-chip-text: #111827;
-  --primary: #111827;
-  --primary-hover: #1f2937;
-  --primary-foreground: #ffffff;
-}
-
-[data-theme="dark"] {
-  --background: #353535;
-  --foreground: #f3f4f6;
-  --surface: #1e1e1f;
-  --surface-muted: #2a2a2b;
-  --border: rgba(255, 255, 255, 0.08);
-  --muted: #9ca3af;
-  --input: #2a2a2b;
-  --chip-bg: #2563eb;
-  --chip-text: #f8fafc;
-  --icon-chip: #2563eb;
-  --icon-chip-text: #f8fafc;
-  --primary: #2563eb;
-  --primary-hover: #3b82f6;
-  --primary-foreground: #f8fafc;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans:
     "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic",
     system-ui, sans-serif;
@@ -44,13 +9,188 @@
     "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
-html,
+/* Theme tokens: light */
+:root {
+  /* Background and surface */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
+  --surface-elevated: #ffffff;
+
+  /* Text and border */
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --input: #f8fafc;
+
+  /* Interactive */
+  --primary: #111827;
+  --primary-hover: #1f2937;
+  --primary-foreground: #ffffff;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --danger-foreground: #ffffff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --overlay: rgba(15, 23, 42, 0.4);
+  --overlay-strong: rgba(0, 0, 0, 0.7);
+  --focus-ring: #9ca3af;
+
+  /* Component tokens */
+  --chip-bg: #111827;
+  --chip-text: #ffffff;
+  --icon-chip: #e5e7eb;
+  --icon-chip-text: #111827;
+  --favorite-btn-bg: rgba(255, 255, 255, 0.88);
+  --favorite-btn-bg-hover: rgba(255, 255, 255, 1);
+  --favorite-btn-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+  --favorite-icon-muted: #94a3b8;
+  --clip-scrollbar-track: rgba(226, 232, 240, 0.72);
+  --clip-scrollbar-thumb: rgba(100, 116, 139, 0.52);
+  --clip-scrollbar-thumb-hover: rgba(51, 65, 85, 0.72);
+  --modal-section-bg: #f8fafc;
+  --modal-icon-bg: #e5e7eb;
+  --modal-icon-fg: #4b5563;
+  --landing-header-bg: rgba(255, 255, 255, 0.9);
+  --landing-brand-bg: #334155;
+  --landing-brand-fg: #ffffff;
+  --landing-demo-surface: #f8fafc;
+  --landing-demo-card: #ffffff;
+  --landing-float-bg: #ffffff;
+  --landing-float-fg: #334155;
+  --landing-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
+  --landing-brand-muted: rgba(255, 255, 255, 0.72);
+  --landing-brand-soft: rgba(255, 255, 255, 0.78);
+  --pricing-hero-glow: radial-gradient(
+    circle at top,
+    rgba(79, 70, 229, 0.16),
+    transparent 58%
+  );
+  --pricing-hero-fade: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.06),
+    transparent
+  );
+  --pricing-chip-bg: rgba(255, 255, 255, 0.78);
+  --pricing-chip-border: rgba(226, 232, 240, 0.95);
+  --pricing-card-shadow: 0 24px 80px rgba(15, 23, 42, 0.12);
+  --pricing-compare-shadow: 0 18px 60px rgba(15, 23, 42, 0.08);
+  --pricing-featured-bg: linear-gradient(145deg, #111827, #312e81);
+  --pricing-featured-muted: #c7d2fe;
+  --pricing-featured-text: #e2e8f0;
+  --pricing-featured-badge: rgba(255, 255, 255, 0.12);
+  --pricing-check-bg: #0f172a;
+  --pricing-check-fg: #ffffff;
+  --pricing-accent: #4f46e5;
+  --pricing-button-bg: #111827;
+  --pricing-button-bg-hover: #1f2937;
+  --pricing-button-fg: #ffffff;
+  --pricing-button-featured-bg: #ffffff;
+  --pricing-button-featured-bg-hover: #e2e8f0;
+  --pricing-button-featured-fg: #0f172a;
+}
+
+/* Theme tokens: dark */
+[data-theme="dark"] {
+  --background: #353535;
+  --foreground: #f3f4f6;
+  --surface: #1e1e1f;
+  --surface-muted: #2a2a2b;
+  --surface-elevated: #242426;
+  --border: rgba(255, 255, 255, 0.08);
+  --muted: #9ca3af;
+  --input: #2a2a2b;
+  --primary: #4f46e5;
+  --primary-hover: #6366f1;
+  --primary-foreground: #f8fafc;
+  --danger: #f87171;
+  --danger-hover: #ef4444;
+  --danger-foreground: #ffffff;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --overlay: rgba(0, 0, 0, 0.4);
+  --overlay-strong: rgba(0, 0, 0, 0.7);
+  --focus-ring: #94a3b8;
+  --chip-bg: #4f46e5;
+  --chip-text: #f8fafc;
+  --icon-chip: #4f46e5;
+  --icon-chip-text: #f8fafc;
+  --favorite-btn-bg: rgba(30, 30, 31, 0.88);
+  --favorite-btn-bg-hover: rgba(42, 42, 43, 0.96);
+  --favorite-btn-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
+  --favorite-icon-muted: #cbd5e1;
+  --clip-scrollbar-track: rgba(255, 255, 255, 0.06);
+  --clip-scrollbar-thumb: rgba(148, 163, 184, 0.4);
+  --clip-scrollbar-thumb-hover: rgba(203, 213, 225, 0.58);
+  --modal-section-bg: rgba(255, 255, 255, 0.05);
+  --modal-icon-bg: rgba(255, 255, 255, 0.1);
+  --modal-icon-fg: #e5e7eb;
+  --landing-header-bg: rgba(30, 30, 31, 0.9);
+  --landing-brand-bg: #4f46e5;
+  --landing-brand-fg: #f8fafc;
+  --landing-demo-surface: #1e1e1f;
+  --landing-demo-card: rgba(255, 255, 255, 0.05);
+  --landing-float-bg: #334155;
+  --landing-float-fg: #ffffff;
+  --landing-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+  --landing-brand-muted: rgba(248, 250, 252, 0.72);
+  --landing-brand-soft: rgba(248, 250, 252, 0.78);
+  --pricing-hero-glow: radial-gradient(
+    circle at top,
+    rgba(99, 102, 241, 0.28),
+    transparent 58%
+  );
+  --pricing-hero-fade: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    transparent
+  );
+  --pricing-chip-bg: rgba(36, 36, 38, 0.92);
+  --pricing-chip-border: rgba(255, 255, 255, 0.08);
+  --pricing-card-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  --pricing-compare-shadow: 0 18px 60px rgba(0, 0, 0, 0.24);
+  --pricing-featured-bg: linear-gradient(145deg, #111827, #4338ca);
+  --pricing-featured-muted: #c7d2fe;
+  --pricing-featured-text: #cbd5e1;
+  --pricing-featured-badge: rgba(255, 255, 255, 0.1);
+  --pricing-check-bg: #f8fafc;
+  --pricing-check-fg: #0f172a;
+  --pricing-accent: #a5b4fc;
+  --pricing-button-bg: #6366f1;
+  --pricing-button-bg-hover: #818cf8;
+  --pricing-button-fg: #f8fafc;
+  --pricing-button-featured-bg: #f8fafc;
+  --pricing-button-featured-bg-hover: #e2e8f0;
+  --pricing-button-featured-fg: #111827;
+}
+
+/* Tailwind bridge */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+/* Foundation: base */
+html {
+  min-height: 100%;
+}
+
 body {
+  min-height: 100%;
+  overflow-x: hidden;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  height: 100%;
-  overflow: hidden;
 }
 
 a {
@@ -58,6 +198,7 @@ a {
   text-decoration: none;
 }
 
+/* Foundation: motion */
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -77,4 +218,41 @@ a {
   50% {
     transform: translateY(-10px);
   }
+}
+
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - (var(--marquee-gap, 0px) / 2)));
+  }
+}
+
+.clip-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--clip-scrollbar-thumb) var(--clip-scrollbar-track);
+}
+
+.clip-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.clip-scrollbar::-webkit-scrollbar-track {
+  background: var(--clip-scrollbar-track);
+  border-radius: 999px;
+}
+
+.clip-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--clip-scrollbar-thumb);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+.clip-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--clip-scrollbar-thumb-hover);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }

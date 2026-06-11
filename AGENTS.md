@@ -92,6 +92,7 @@ git checkout dev
 
 ```bash
 git fetch -p
+git pull
 ```
 
 3. Delete all local branches marked as `[gone]`
@@ -187,7 +188,6 @@ When the maintainer requests an issue to be created:
 
 1. **Interpretation**  
    AI reads the user's request and extracts:
-
    - The core goal of the issue or feature request
    - Any cause or background context
    - Implementation plan or improvement ideas (if provided)
@@ -195,7 +195,6 @@ When the maintainer requests an issue to be created:
 
 2. **Classification**  
    AI determines the appropriate issue type:
-
    - Bug → bug_report.yml
    - Feature → feature_implementation.yml
    - Improvement → improvement.yml

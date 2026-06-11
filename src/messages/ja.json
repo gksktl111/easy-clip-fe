@@ -1,0 +1,125 @@
+{
+  "landing": {
+    "themeToggle": "ダークモードを切り替え",
+    "start": "はじめる",
+    "heroTitleLine1": "どこでもコピー。",
+    "heroTitleLine2": "どこでも貼り付け。",
+    "heroDescription": "すべてのデバイスでクリップボードを完全に同期します。素早く動く開発者、デザイナー、クリエイティブチームのために設計されています。",
+    "startFree": "無料で始める",
+    "viewDemo": "デモを見る",
+    "demoWindowTitle": "Easy Clip - クリップボード管理",
+    "demoDeviceTitle": "Easy Clip",
+    "demoItem1": "デザインガイドライン",
+    "demoItem2": "API エンドポイント",
+    "demoItem3": "会議メモ",
+    "demoMobileItem1": "デザインガイド",
+    "demoMobileItem2": "API エンドポイント",
+    "sectionTitle": "作業の流れを止めないクリップボード",
+    "sectionDescription": "コピー、整理、再利用までを一か所で管理します。",
+    "features": {
+      "sync": {
+        "title": "即時同期",
+        "description": "コピーした内容がすぐにすべてのデバイスへリアルタイムで反映されます。"
+      },
+      "folder": {
+        "title": "フォルダ整理",
+        "description": "プロジェクトごとにクリップをまとめて、すっきり管理できます。"
+      },
+      "favorite": {
+        "title": "お気に入り",
+        "description": "よく使う文言はお気に入りにしてすぐにアクセスできます。"
+      },
+      "search": {
+        "title": "高速検索",
+        "description": "キーワードを入力すると必要なクリップをすぐに見つけられます。"
+      }
+    }
+  },
+  "login": {
+    "title": "EasyClip にログイン",
+    "subtitle": "どこでもコピーして、どこでも貼り付け",
+    "continueWithGoogle": "Google で続行",
+    "continueWithGithub": "GitHub で続行",
+    "loading": "ログイン中...",
+    "or": "または",
+    "backHome": "ホームに戻る",
+    "agreementPrefix": "続行すると、",
+    "agreementMiddle": "および",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "agreementSuffix": "に同意したものとみなされます。"
+  },
+  "sidebar": {
+    "favorites": "お気に入り",
+    "recent": "最近",
+    "addFolder": "フォルダ追加",
+    "reorderFolder": "フォルダの並び替え",
+    "openFolderOptions": "フォルダオプションを開く",
+    "rename": "名前を変更",
+    "delete": "削除",
+    "logout": "ログアウト",
+    "settings": "設定",
+    "closeCreateFolder": "フォルダ作成を閉じる",
+    "createFolder": "新しいフォルダを作成",
+    "folderName": "フォルダ名",
+    "folderNamePlaceholder": "例: プロジェクト",
+    "cancel": "キャンセル",
+    "create": "作成",
+    "closeRenameFolder": "フォルダ名変更を閉じる",
+    "renameFolder": "フォルダ名を変更",
+    "change": "変更"
+  },
+  "settings": {
+    "title": "設定",
+    "close": "設定を閉じる",
+    "appearance": "表示",
+    "darkMode": "ダークモード",
+    "darkModeDescription": "ライトモードとダークモードを切り替えます。",
+    "toggleDarkMode": "ダークモードを切り替え",
+    "general": "一般",
+    "language": "言語",
+    "languageDescription": "希望する言語を選択してください。",
+    "about": "情報",
+    "aboutTitle": "Clipboard Studio v1.0.0",
+    "aboutDescription": "デザイナーと開発者のためのモダンなクリップボードマネージャー",
+    "closeButton": "閉じる"
+  },
+  "clips": {
+    "count": "{count, plural, =0 {0 件のクリップ} other {# 件のクリップ}}",
+    "copyToast": "コピーしました！",
+    "captureHint": "どこかをクリックしてから Ctrl+V を押すと新しいクリップを保存できます。",
+    "filter": {
+      "all": "すべて",
+      "text": "テキスト",
+      "color": "カラー",
+      "image": "画像",
+      "readyToPaste": "貼り付け準備完了",
+      "notActive": "非アクティブ",
+      "searchPlaceholder": "クリップを検索..."
+    },
+    "emptyState": {
+      "title": "保存されたクリップはまだありません",
+      "description": "新しいクリップをコピーするか、フォルダで貼り付けを始めるとここに表示されます。"
+    },
+    "item": {
+      "toggleFavorite": "お気に入りを切り替え"
+    },
+    "actions": {
+      "copy": "コピー",
+      "rename": "名前を変更",
+      "delete": "削除",
+      "deleteAll": "すべて削除",
+      "cancel": "キャンセル",
+      "change": "変更"
+    },
+    "deleteModal": {
+      "title": "すべてのクリップを削除",
+      "description": "本当にすべてのクリップを削除しますか？"
+    },
+    "renameModal": {
+      "title": "名前を変更",
+      "label": "クリップ名",
+      "placeholder": "例: クリップ"
+    }
+  }
+}

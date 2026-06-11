@@ -1,0 +1,125 @@
+{
+  "landing": {
+    "themeToggle": "切换深色模式",
+    "start": "开始使用",
+    "heroTitleLine1": "随处复制。",
+    "heroTitleLine2": "随处粘贴。",
+    "heroDescription": "在所有设备上保持剪贴板完美同步。为高效率的开发者、设计师和创意团队而打造。",
+    "startFree": "免费开始",
+    "viewDemo": "查看演示",
+    "demoWindowTitle": "Easy Clip - 剪贴板管理",
+    "demoDeviceTitle": "Easy Clip",
+    "demoItem1": "设计规范",
+    "demoItem2": "API 接口",
+    "demoItem3": "会议记录",
+    "demoMobileItem1": "设计指南",
+    "demoMobileItem2": "API 接口",
+    "sectionTitle": "不中断工作流的剪贴板",
+    "sectionDescription": "把复制、整理和复用集中到一个地方管理。",
+    "features": {
+      "sync": {
+        "title": "即时同步",
+        "description": "复制的内容会立即实时同步到所有设备。"
+      },
+      "folder": {
+        "title": "文件夹整理",
+        "description": "按项目归类剪贴内容，让工作区更有条理。"
+      },
+      "favorite": {
+        "title": "收藏",
+        "description": "把常用内容加入收藏，随时快速访问。"
+      },
+      "search": {
+        "title": "快速搜索",
+        "description": "输入关键词即可立即找到需要的剪贴内容。"
+      }
+    }
+  },
+  "login": {
+    "title": "登录 EasyClip",
+    "subtitle": "随处复制，随处粘贴",
+    "continueWithGoogle": "使用 Google 继续",
+    "continueWithGithub": "使用 GitHub 继续",
+    "loading": "登录中...",
+    "or": "或",
+    "backHome": "返回首页",
+    "agreementPrefix": "继续即表示你同意",
+    "agreementMiddle": "以及",
+    "terms": "服务条款",
+    "privacy": "隐私政策",
+    "agreementSuffix": "。"
+  },
+  "sidebar": {
+    "favorites": "收藏",
+    "recent": "最近",
+    "addFolder": "添加文件夹",
+    "reorderFolder": "调整文件夹顺序",
+    "openFolderOptions": "打开文件夹选项",
+    "rename": "重命名",
+    "delete": "删除",
+    "logout": "退出登录",
+    "settings": "设置",
+    "closeCreateFolder": "关闭新建文件夹",
+    "createFolder": "新建文件夹",
+    "folderName": "文件夹名称",
+    "folderNamePlaceholder": "例如：项目",
+    "cancel": "取消",
+    "create": "创建",
+    "closeRenameFolder": "关闭重命名文件夹",
+    "renameFolder": "重命名文件夹",
+    "change": "保存"
+  },
+  "settings": {
+    "title": "设置",
+    "close": "关闭设置",
+    "appearance": "外观",
+    "darkMode": "深色模式",
+    "darkModeDescription": "在浅色和深色主题之间切换。",
+    "toggleDarkMode": "切换深色模式",
+    "general": "通用",
+    "language": "语言",
+    "languageDescription": "选择你偏好的语言。",
+    "about": "关于",
+    "aboutTitle": "Clipboard Studio v1.0.0",
+    "aboutDescription": "面向设计师和开发者的现代剪贴板管理器",
+    "closeButton": "关闭"
+  },
+  "clips": {
+    "count": "{count, plural, =0 {0 个剪贴项} other {# 个剪贴项}}",
+    "copyToast": "已复制！",
+    "captureHint": "点击任意位置后按 Ctrl+V，即可保存新的剪贴内容。",
+    "filter": {
+      "all": "全部",
+      "text": "文本",
+      "color": "颜色",
+      "image": "图片",
+      "readyToPaste": "可粘贴",
+      "notActive": "未激活",
+      "searchPlaceholder": "搜索剪贴内容..."
+    },
+    "emptyState": {
+      "title": "还没有保存的剪贴内容",
+      "description": "复制新的内容，或在文件夹中开始粘贴后，这里就会显示内容。"
+    },
+    "item": {
+      "toggleFavorite": "切换收藏"
+    },
+    "actions": {
+      "copy": "复制",
+      "rename": "重命名",
+      "delete": "删除",
+      "deleteAll": "全部删除",
+      "cancel": "取消",
+      "change": "保存"
+    },
+    "deleteModal": {
+      "title": "删除所有剪贴内容",
+      "description": "确定要删除全部剪贴内容吗？"
+    },
+    "renameModal": {
+      "title": "重命名",
+      "label": "剪贴名称",
+      "placeholder": "例如：剪贴"
+    }
+  }
+}

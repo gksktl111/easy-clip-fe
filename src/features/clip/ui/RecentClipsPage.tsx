@@ -1,12 +1,14 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
+import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { useRecentClipsPage } from "@/features/clip/hooks/useRecentClipsPage";
-import { ClipList } from "@/features/clip/ui/ClipList";
 import { DeleteAllButton } from "@/features/clip/ui/DeleteAllButton";
-import { EmptyState } from "@/features/clip/ui/EmptyState";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 
 export function RecentClipsPage() {
+  const t = useTranslations("clips");
   const {
     activeFilter,
     clearAll,
@@ -20,30 +22,18 @@ export function RecentClipsPage() {
   } = useRecentClipsPage();
 
   return (
-    <div className="bg-background flex h-full flex-col">
+    <div className="bg-background relative flex h-full flex-col">
       <FilterBar
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         showStatus={false}
-        countLabel={`${filteredClips.length} clips`}
+        countLabel={t("count", { count: filteredClips.length })}
       />
-      {filteredClips.length ? (
-        <ClipList clips={filteredClips} onCopy={handleCopy} />
-      ) : (
-        <EmptyState />
-      )}
+      <ClipResultsSection clips={filteredClips} onCopy={handleCopy} />
       <DeleteAllButton disabled={!hasClips} onClick={clearAll} />
-
-      {copyToast ? (
-        <div
-          className="fixed z-50 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white shadow-md"
-          style={{ left: copyToast.x + 12, top: copyToast.y + 12 }}
-        >
-          COPY!
-        </div>
-      ) : null}
+      <ClipCopyToast label={t("copyToast")} position={copyToast} />
     </div>
   );
 }

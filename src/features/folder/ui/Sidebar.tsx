@@ -1,29 +1,31 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   HiOutlineClock,
-  HiOutlineCog,
-  HiOutlineDotsVertical,
-  HiOutlineFolder,
-  HiOutlineLogout,
-  HiOutlineMenuAlt4,
-  HiOutlinePaperClip,
-  HiOutlinePencil,
-  HiOutlinePlus,
   HiOutlineStar,
-  HiOutlineTrash,
-  HiX,
 } from "react-icons/hi";
 import { useFolders } from "@/features/folder/hooks/useFolders";
+import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
+import { FolderSidebarFooter } from "@/features/folder/ui/FolderSidebarFooter";
+import { FolderSidebarHeader } from "@/features/folder/ui/FolderSidebarHeader";
+import { FolderSidebarSection } from "@/features/folder/ui/FolderSidebarSection";
+import { SidebarPrimaryNav } from "@/features/folder/ui/SidebarPrimaryNav";
 
 interface SidebarProps {
   onOpenSettings: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export function Sidebar({ onOpenSettings }: SidebarProps) {
+export function Sidebar({
+  onOpenSettings,
+  isMobileOpen = false,
+  onCloseMobile,
+}: SidebarProps) {
+  const t = useTranslations("sidebar");
   const pathname = usePathname();
   const { folders, persistFolders } = useFolders();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
@@ -41,12 +43,12 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
   const topNavs = [
     {
       href: "/favorites",
-      label: "Favorites",
+      label: t("favorites"),
       icon: <HiOutlineStar className="h-5 w-5" aria-hidden />,
     },
     {
       href: "/recent",
-      label: "Recent",
+      label: t("recent"),
       icon: <HiOutlineClock className="h-5 w-5" aria-hidden />,
     },
   ];
@@ -80,6 +82,10 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
     window.addEventListener("pointerdown", handlePointerDown);
     return () => window.removeEventListener("pointerdown", handlePointerDown);
   }, [openOptionsFolderId]);
+
+  useEffect(() => {
+    onCloseMobile?.();
+  }, [onCloseMobile, pathname]);
 
   const reorderFolders = useCallback(
     (sourceId: string, targetId: string) => {
@@ -146,290 +152,133 @@ export function Sidebar({ onOpenSettings }: SidebarProps) {
   }, [folders, persistFolders, renameFolderId, renameFolderName]);
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-(--border) bg-(--surface-muted)">
-      <div className="border-b border-(--border) px-4 py-5">
-        <div className="flex items-center gap-2">
-          <HiOutlinePaperClip className="h-5 w-5" aria-hidden />
-          <h1 className="text-foreground text-xl font-semibold">Easy Clip</h1>
-        </div>
-      </div>
+    <>
+      {isMobileOpen ? (
+        <button
+          type="button"
+          onClick={onCloseMobile}
+          className="fixed inset-0 z-30 bg-(--overlay) md:hidden"
+          aria-label="사이드바 닫기"
+        />
+      ) : null}
 
-      <nav className="flex-1 py-4">
-        <div className="space-y-6">
-          <ul className="space-y-2 px-2">
-            {topNavs.map((nav) => (
-              <li key={nav.href}>
-                <Link
-                  href={nav.href}
-                  className={`flex items-center gap-3 rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
-                    pathname === nav.href
-                      ? "text-foreground bg-(--surface)"
-                      : "text-muted hover:text-foreground hover:bg-(--surface)"
-                  }`}
-                >
-                  {nav.icon}
-                  {nav.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex h-screen w-72 max-w-[86vw] flex-col border-r border-(--border) bg-(--surface-muted) transition-transform duration-300 md:static md:z-auto md:w-64 md:max-w-none ${
+          isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
+        <FolderSidebarHeader onCloseMobile={onCloseMobile} />
 
-          <div className="space-y-2 border-t border-(--border) pt-4">
-            <button
-              type="button"
-              onClick={() => {
+        <nav className="flex-1 py-4">
+          <div className="space-y-6">
+            <SidebarPrimaryNav
+              items={topNavs}
+              pathname={pathname}
+              onNavigate={onCloseMobile}
+            />
+
+            <FolderSidebarSection
+              folders={folders}
+              pathname={pathname}
+              addFolderLabel={t("addFolder")}
+              reorderFolderLabel={t("reorderFolder")}
+              openFolderOptionsLabel={t("openFolderOptions")}
+              renameLabel={t("rename")}
+              deleteLabel={t("delete")}
+              openOptionsFolderId={openOptionsFolderId}
+              draggingFolderId={draggingFolderId}
+              onAddFolder={() => {
                 setNewFolderName("");
                 setIsCreateFolderModalOpen(true);
               }}
-              className="hover:text-foreground flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-2 text-sm font-medium text-(--muted) transition-colors hover:bg-(--surface)"
-            >
-              <HiOutlinePlus className="h-5 w-5" aria-hidden />
-              Add Folder
-            </button>
-            <ul className="space-y-1 px-2">
-              {folders.map((folder) => (
-                <li
-                  key={folder.id}
-                  onDragOver={(event) => {
-                    event.preventDefault();
-                    event.dataTransfer.dropEffect = "move";
-                    if (!draggingFolderId || draggingFolderId === folder.id) {
-                      return;
-                    }
-                    reorderFolders(draggingFolderId, folder.id);
-                  }}
-                  className={`relative rounded-lg ${
-                    draggingFolderId === folder.id ? "opacity-50" : ""
-                  }`}
-                >
-                  <div
-                    className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
-                      pathname === `/${folder.id}`
-                        ? "text-foreground bg-(--surface)"
-                        : "text-muted hover:text-foreground hover:bg-(--surface)"
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      draggable
-                      onDragStart={(event) => {
-                        setDraggingFolderId(folder.id);
-                        event.dataTransfer.effectAllowed = "move";
-                        event.dataTransfer.setData("text/plain", folder.id);
-                      }}
-                      onDragEnd={() => setDraggingFolderId(null)}
-                      className="text-muted hover:text-foreground cursor-grab rounded p-1"
-                      aria-label="폴더 순서 변경"
-                    >
-                      <HiOutlineMenuAlt4 className="h-4 w-4" aria-hidden />
-                    </button>
-                    <Link
-                      href={`/${folder.id}`}
-                      className="flex flex-1 items-center gap-2 truncate"
-                    >
-                      <HiOutlineFolder className="h-5 w-5" aria-hidden />
-                      <span className="truncate">{folder.name}</span>
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setOpenOptionsFolderId((previous) =>
-                          previous === folder.id ? null : folder.id,
-                        )
-                      }
-                      className="text-muted hover:text-foreground cursor-pointer rounded p-1 transition"
-                      aria-label="폴더 옵션 열기"
-                      data-folder-options
-                    >
-                      <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />
-                    </button>
-                  </div>
-                  {openOptionsFolderId === folder.id ? (
-                    <div className="relative">
-                      <div
-                        className="absolute right-0 z-20 w-32 overflow-hidden rounded-lg border border-(--border) bg-(--surface) shadow-lg"
-                        data-folder-options
-                      >
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setOpenOptionsFolderId(null);
-                            setRenameFolderId(folder.id);
-                            setRenameFolderName(folder.name);
-                            setIsRenameFolderModalOpen(true);
-                          }}
-                          className="text-foreground flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm hover:bg-(--surface-muted)"
-                        >
-                          <HiOutlinePencil className="h-4 w-4" aria-hidden />
-                          이름 변경
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            persistFolders(
-                              folders.filter(
-                                (currentFolder) =>
-                                  currentFolder.id !== folder.id,
-                              ),
-                            );
-                            setOpenOptionsFolderId(null);
-                          }}
-                          className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50"
-                        >
-                          <HiOutlineTrash className="h-4 w-4" aria-hidden />
-                          삭제
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </nav>
+              onNavigate={onCloseMobile}
+              onDragStart={(folderId, event) => {
+                setDraggingFolderId(folderId);
+                event.dataTransfer.effectAllowed = "move";
+                event.dataTransfer.setData("text/plain", folderId);
+              }}
+              onDragEnd={() => setDraggingFolderId(null)}
+              onDragOver={(folderId, event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+                if (!draggingFolderId || draggingFolderId === folderId) {
+                  return;
+                }
 
-      <div className="border-t border-(--border) px-4 py-4">
-        <div className="mb-3 flex items-center justify-between rounded-lg bg-(--surface) px-3 py-2">
-          <div className="flex items-center gap-2 truncate">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-(--icon-chip) text-[10px] font-semibold text-(--icon-chip-text)">
-              EC
-            </div>
-            <span className="text-foreground truncate text-sm font-medium">
-              user@example.com
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              window.location.href = "/login";
-            }}
-            className="text-muted hover:text-foreground cursor-pointer rounded p-1 transition-colors"
-            aria-label="로그아웃"
-          >
-            <HiOutlineLogout className="h-4 w-4" aria-hidden />
-          </button>
-        </div>
+                reorderFolders(draggingFolderId, folderId);
+              }}
+              onToggleOptions={(folderId) =>
+                setOpenOptionsFolderId((previous) =>
+                  previous === folderId ? null : folderId,
+                )
+              }
+              onRenameFolder={(folderId) => {
+                const targetFolder = folders.find((folder) => folder.id === folderId);
+                if (!targetFolder) {
+                  return;
+                }
 
-        <button
-          type="button"
-          onClick={onOpenSettings}
-          className="hover:text-foreground flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-(--muted) transition-colors hover:bg-(--surface)"
-        >
-          <HiOutlineCog className="h-5 w-5" aria-hidden />
-          Settings
-        </button>
-      </div>
+                setOpenOptionsFolderId(null);
+                setRenameFolderId(folderId);
+                setRenameFolderName(targetFolder.name);
+                setIsRenameFolderModalOpen(true);
+              }}
+              onDeleteFolder={(folderId) => {
+                persistFolders(
+                  folders.filter((currentFolder) => currentFolder.id !== folderId),
+                );
+                setOpenOptionsFolderId(null);
+              }}
+            />
+          </div>
+        </nav>
+
+        <FolderSidebarFooter
+          email="user@example.com"
+          settingsLabel={t("settings")}
+          logoutLabel={t("logout")}
+          onOpenSettings={() => {
+            onCloseMobile?.();
+            onOpenSettings();
+          }}
+          onLogout={() => {
+            onCloseMobile?.();
+            window.location.href = "/login";
+          }}
+        />
+      </aside>
 
       {isCreateFolderModalOpen ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-xl bg-(--surface) shadow-xl">
-            <div className="flex items-center border-b border-(--border) px-5 py-4">
-              <button
-                type="button"
-                onClick={closeCreateModal}
-                className="text-muted hover:text-foreground cursor-pointer rounded-full p-1 transition"
-                aria-label="Close create folder"
-              >
-                <HiX className="h-5 w-5" aria-hidden />
-              </button>
-              <p className="text-foreground ml-auto text-sm font-semibold">
-                새 폴더 생성
-              </p>
-            </div>
-            <div className="px-5 py-4">
-              <label className="text-muted block text-xs font-semibold">
-                폴더 이름
-              </label>
-              <input
-                ref={inputRef}
-                value={newFolderName}
-                onChange={(event) => setNewFolderName(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    handleCreateFolder();
-                  } else if (event.key === "Escape") {
-                    closeCreateModal();
-                  }
-                }}
-                className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-gray-400 focus:outline-none"
-                placeholder="예: 프로젝트"
-              />
-            </div>
-            <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
-              <button
-                type="button"
-                onClick={closeCreateModal}
-                className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={handleCreateFolder}
-                className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-(--primary-foreground) transition hover:bg-(--primary-hover)"
-              >
-                생성
-              </button>
-            </div>
-          </div>
-        </div>
+        <FolderNameModal
+          title={t("createFolder")}
+          closeLabel={t("closeCreateFolder")}
+          fieldLabel={t("folderName")}
+          placeholder={t("folderNamePlaceholder")}
+          confirmLabel={t("create")}
+          cancelLabel={t("cancel")}
+          value={newFolderName}
+          inputRef={inputRef}
+          onChange={setNewFolderName}
+          onClose={closeCreateModal}
+          onConfirm={handleCreateFolder}
+        />
       ) : null}
 
       {isRenameFolderModalOpen ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-xl bg-(--surface) shadow-xl">
-            <div className="flex items-center border-b border-(--border) px-5 py-4">
-              <button
-                type="button"
-                onClick={closeRenameModal}
-                className="hover:text-foreground cursor-pointer rounded-full p-1 text-(--muted) transition"
-                aria-label="Close rename folder"
-              >
-                <HiX className="h-5 w-5" aria-hidden />
-              </button>
-              <p className="text-foreground ml-auto text-sm font-semibold">
-                폴더 이름 변경
-              </p>
-            </div>
-            <div className="px-5 py-4">
-              <label className="block text-xs font-semibold text-(--muted)">
-                폴더 이름
-              </label>
-              <input
-                ref={renameInputRef}
-                value={renameFolderName}
-                onChange={(event) => setRenameFolderName(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    handleRenameFolder();
-                  } else if (event.key === "Escape") {
-                    closeRenameModal();
-                  }
-                }}
-                className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-gray-400 focus:outline-none"
-                placeholder="예: 프로젝트"
-              />
-            </div>
-            <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
-              <button
-                type="button"
-                onClick={closeRenameModal}
-                className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={handleRenameFolder}
-                className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-(--primary-foreground) transition hover:bg-(--primary-hover)"
-              >
-                변경
-              </button>
-            </div>
-          </div>
-        </div>
+        <FolderNameModal
+          title={t("renameFolder")}
+          closeLabel={t("closeRenameFolder")}
+          fieldLabel={t("folderName")}
+          placeholder={t("folderNamePlaceholder")}
+          confirmLabel={t("change")}
+          cancelLabel={t("cancel")}
+          value={renameFolderName}
+          inputRef={renameInputRef}
+          onChange={setRenameFolderName}
+          onClose={closeRenameModal}
+          onConfirm={handleRenameFolder}
+        />
       ) : null}
-    </aside>
+    </>
   );
 }
