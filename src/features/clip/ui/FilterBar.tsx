@@ -58,7 +58,7 @@ export function FilterBar({
         placeholder={t("searchPlaceholder")}
         value={searchQuery}
         onChange={(event) => onSearchChange?.(event.target.value)}
-        className="text-foreground h-11 w-full rounded-xl border border-(--border) bg-(--input) pr-4 pl-10 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:ring-1 focus:ring-(--focus-ring) focus:outline-none md:h-9 md:w-64 md:rounded-lg"
+        className="text-foreground h-11 w-full rounded-xl border border-(--border) bg-(--input) pr-4 pl-10 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:ring-1 focus:ring-(--focus-ring) focus:outline-none min-[1200px]:h-9 min-[1200px]:w-64 min-[1200px]:rounded-lg"
       />
       <HiOutlineSearch
         className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-(--muted)"
@@ -68,7 +68,7 @@ export function FilterBar({
   );
 
   const statusGroup = (
-    <div className="flex w-full flex-wrap items-center justify-end gap-3 md:w-auto">
+    <div className="flex w-full flex-wrap items-center justify-end gap-3 min-[1200px]:w-auto">
       {showStatus ? (
         <div className="flex items-center gap-2 text-xs text-(--muted)">
           <span
@@ -89,9 +89,9 @@ export function FilterBar({
   );
 
   return (
-    <div className="border-b border-(--border) px-4 py-4 md:px-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="md:hidden">
+    <div className="border-b border-(--border) px-4 py-4 min-[1200px]:px-6">
+      <div className="flex flex-col gap-3 min-[1200px]:flex-row min-[1200px]:items-center min-[1200px]:justify-between">
+        <div className="min-[1200px]:hidden">
           <StyledSelect
             value={activeFilter}
             onChange={(value) => onFilterChange(value as FilterType)}
@@ -102,7 +102,7 @@ export function FilterBar({
           />
         </div>
 
-        <div className="hidden gap-2 md:flex">
+        <div className="hidden gap-2 min-[1200px]:flex">
           {filters.map((filter) => (
             <button
               key={filter.id}
@@ -120,11 +120,11 @@ export function FilterBar({
           ))}
         </div>
 
-        <div className="order-2 md:hidden">{searchField}</div>
+        <div className="order-2 min-[1200px]:hidden">{searchField}</div>
 
-        <div className="order-3 md:hidden">{statusGroup}</div>
+        <div className="order-3 min-[1200px]:hidden">{statusGroup}</div>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 min-[1200px]:flex">
           {statusGroup}
           {searchField}
         </div>
