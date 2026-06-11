@@ -94,3 +94,24 @@ export const LANDING_REVIEWS = [
     avatar: "김",
   },
 ] as const;
+
+export const LANDING_WORKFLOW_STEPS = [
+  {
+    step: "capture",
+    title: "복사하면 바로 저장",
+    description:
+      "코드, 링크, 문구를 복사하는 즉시 EasyClip에 쌓입니다. 따로 메모앱을 열거나 나에게 보내둘 필요가 없습니다.",
+  },
+  {
+    step: "organize",
+    title: "프로젝트별로 분류",
+    description:
+      "클립을 폴더와 즐겨찾기로 정리해서 작업 맥락을 유지합니다. 찾는 시간이 줄고 팀 공통 문구 관리도 쉬워집니다.",
+  },
+  {
+    step: "reuse",
+    title: "어디서든 다시 붙여넣기",
+    description:
+      "모바일과 데스크탑을 오가면서 필요한 클립을 즉시 꺼내 재사용합니다. 반복 입력과 전송 과정이 자연스럽게 사라집니다.",
+  },
+] as const;
