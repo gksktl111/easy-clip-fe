@@ -1,9 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
+import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { useFavoriteClipsPage } from "@/features/clip/hooks/useFavoriteClipsPage";
-import { ClipList } from "@/features/clip/ui/ClipList";
-import { EmptyState } from "@/features/clip/ui/EmptyState";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 
 export function FavoriteClipsPage() {
@@ -25,24 +25,12 @@ export function FavoriteClipsPage() {
         showStatus={false}
         countLabel={t("count", { count: filteredClips.length })}
       />
-      {filteredClips.length ? (
-        <ClipList
-          clips={filteredClips}
-          onCopy={handleCopy}
-          onToggleFavorite={handleToggleFavorite}
-        />
-      ) : (
-        <EmptyState />
-      )}
-
-      {copyToast ? (
-        <div
-          className="fixed z-50 rounded-full bg-(--chip-bg) px-3 py-1.5 text-xs font-semibold text-(--chip-text) shadow-md"
-          style={{ left: copyToast.x + 12, top: copyToast.y + 12 }}
-        >
-          {t("copyToast")}
-        </div>
-      ) : null}
+      <ClipResultsSection
+        clips={filteredClips}
+        onCopy={handleCopy}
+        onToggleFavorite={handleToggleFavorite}
+      />
+      <ClipCopyToast label={t("copyToast")} position={copyToast} />
     </div>
   );
 }
