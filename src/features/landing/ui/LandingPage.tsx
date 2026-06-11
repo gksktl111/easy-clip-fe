@@ -2,12 +2,10 @@
 
 import { LandingFeaturesSection } from "@/features/landing/ui/LandingFeaturesSection";
 import { LandingFinalCtaSection } from "@/features/landing/ui/LandingFinalCtaSection";
-import { LandingFooter } from "@/features/landing/ui/LandingFooter";
-import { LandingHeader } from "@/features/landing/ui/LandingHeader";
 import { LandingHeroSection } from "@/features/landing/ui/LandingHeroSection";
+import { MarketingShell } from "@/features/landing/ui/MarketingShell";
 import { LandingReviewsBanner } from "@/features/landing/ui/LandingReviewsBanner";
 import { LandingWorkflowSection } from "@/features/landing/ui/LandingWorkflowSection";
-import { useSettingsStore } from "@/shared/store/settingsStore";
 import {
   LANDING_DEMO_ITEMS,
   LANDING_FEATURES,
@@ -17,14 +15,8 @@ import {
 } from "../const/landingContent";
 
 export function LandingPage() {
-  const theme = useSettingsStore((state) => state.theme);
-  const toggleTheme = useSettingsStore((state) => state.toggleTheme);
-  const isDarkMode = theme === "dark";
-  const currentYear = new Date().getFullYear();
-
   return (
-    <main className="relative min-h-screen bg-(--background) text-(--foreground) transition-colors duration-300">
-      <LandingHeader isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
+    <MarketingShell activeTab="home">
       <LandingHeroSection
         demoItems={LANDING_DEMO_ITEMS}
         mobileDemoItems={LANDING_MOBILE_DEMO_ITEMS}
@@ -33,7 +25,6 @@ export function LandingPage() {
       <LandingFeaturesSection features={LANDING_FEATURES} />
       <LandingReviewsBanner reviews={LANDING_REVIEWS} />
       <LandingFinalCtaSection />
-      <LandingFooter currentYear={currentYear} />
-    </main>
+    </MarketingShell>
   );
 }
