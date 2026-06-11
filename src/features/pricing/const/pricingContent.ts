@@ -38,6 +38,7 @@ export const PRICING_PLANS: readonly PricingPlan[] = [
       "무제한 프로젝트 생성 가능",
       "각 프로젝트당 최대 500개의 클립 생성 가능",
       "태그 기능 사용 가능",
+      "AI 기능 추가 예정",
     ],
   },
 ] as const;
