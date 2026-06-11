@@ -8,6 +8,7 @@ import {
   HiOutlineSearch,
 } from "react-icons/hi";
 import { ClipType } from "@/features/clip/model/clip";
+import { StyledSelect } from "@/shared/ui/StyledSelect";
 
 export type FilterType = ClipType | "all";
 
@@ -91,17 +92,14 @@ export function FilterBar({
     <div className="border-b border-(--border) px-4 py-4 md:px-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="md:hidden">
-          <select
+          <StyledSelect
             value={activeFilter}
-            onChange={(event) => onFilterChange(event.target.value as FilterType)}
-            className="h-11 w-full rounded-xl border border-(--border) bg-(--surface) px-4 text-sm font-medium text-(--foreground) focus:border-(--focus-ring) focus:ring-1 focus:ring-(--focus-ring) focus:outline-none"
-          >
-            {filters.map((filter) => (
-              <option key={filter.id} value={filter.id}>
-                {filter.label}
-              </option>
-            ))}
-          </select>
+            onChange={(value) => onFilterChange(value as FilterType)}
+            options={filters.map((filter) => ({
+              value: filter.id,
+              label: filter.label,
+            }))}
+          />
         </div>
 
         <div className="hidden gap-2 md:flex">
