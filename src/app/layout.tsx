@@ -19,9 +19,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body className="bg-slate-50 antialiased">
-        <IntlProvider initialLocale={locale}>
-          {children}
-        </IntlProvider>
+        <IntlProvider initialLocale={locale}>{children}</IntlProvider>
       </body>
     </html>
   );

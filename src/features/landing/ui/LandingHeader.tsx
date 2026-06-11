@@ -23,7 +23,9 @@ export function LandingHeader({
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
         <Link href="/" className="flex items-center gap-2">
           <HiOutlinePaperClip className="h-5 w-5" aria-hidden />
-          <span className="text-foreground text-xl font-semibold">Easy Clip</span>
+          <span className="text-foreground text-xl font-semibold">
+            Easy Clip
+          </span>
         </Link>
 
         <nav
@@ -32,13 +34,17 @@ export function LandingHeader({
         >
           <Link
             href="/pricing"
-            className={`inline-flex items-center border-b-2 px-1 py-2 text-sm font-medium transition-colors ${
-              activeTab === "pricing"
-                ? "border-(--foreground) text-(--foreground)"
-                : "border-transparent text-(--muted) hover:text-(--foreground)"
-            }`}
+            className={`inline-flex items-center px-1 py-2 text-sm font-medium transition-colors`}
           >
-            요금제
+            <span
+              className={`${
+                activeTab === "pricing"
+                  ? "border-(--foreground) text-(--foreground)"
+                  : "border-transparent text-(--muted) hover:text-(--foreground)"
+              }`}
+            >
+              요금제
+            </span>
           </Link>
         </nav>
 

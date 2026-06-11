@@ -1,7 +1,10 @@
 "use client";
 
 import { LandingFooter } from "@/features/landing/ui/LandingFooter";
-import { LandingHeader, type LandingHeaderTab } from "@/features/landing/ui/LandingHeader";
+import {
+  LandingHeader,
+  type LandingHeaderTab,
+} from "@/features/landing/ui/LandingHeader";
 import { useSettingsStore } from "@/shared/store/settingsStore";
 
 interface MarketingShellProps {
@@ -20,7 +23,11 @@ export function MarketingShell({
 
   return (
     <main className="relative min-h-screen bg-(--background) text-(--foreground) transition-colors duration-300">
-      <LandingHeader isDarkMode={isDarkMode} onToggleTheme={toggleTheme} activeTab={activeTab} />
+      <LandingHeader
+        isDarkMode={isDarkMode}
+        onToggleTheme={toggleTheme}
+        activeTab={activeTab}
+      />
       {children}
       <LandingFooter currentYear={currentYear} />
     </main>
