@@ -368,116 +368,117 @@ export function Sidebar({
           </button>
         </div>
 
-        {isCreateFolderModalOpen ? (
-          <div className="fixed inset-0 z-40 flex items-center justify-center bg-(--overlay) px-4">
-            <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
-              <div className="flex items-center border-b border-(--border) px-5 py-4">
-                <button
-                  type="button"
-                  onClick={closeCreateModal}
-                  className="text-muted hover:text-foreground cursor-pointer rounded-full p-1 transition"
-                  aria-label={t("closeCreateFolder")}
-                >
-                  <HiX className="h-5 w-5" aria-hidden />
-                </button>
-                <p className="text-foreground ml-auto text-sm font-semibold">
-                  {t("createFolder")}
-                </p>
-              </div>
-              <div className="px-5 py-4">
-                <label className="text-muted block text-xs font-semibold">
-                  {t("folderName")}
-                </label>
-                <input
-                  ref={inputRef}
-                  value={newFolderName}
-                  onChange={(event) => setNewFolderName(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      handleCreateFolder();
-                    } else if (event.key === "Escape") {
-                      closeCreateModal();
-                    }
-                  }}
-                  className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:outline-none"
-                  placeholder={t("folderNamePlaceholder")}
-                />
-              </div>
-              <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
-                <button
-                  type="button"
-                  onClick={closeCreateModal}
-                  className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
-                >
-                  {t("cancel")}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCreateFolder}
-                  className="text-primary-foreground cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium transition hover:bg-(--primary-hover)"
-                >
-                  {t("create")}
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {isRenameFolderModalOpen ? (
-          <div className="fixed inset-0 z-40 flex items-center justify-center bg-(--overlay) px-4">
-            <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
-              <div className="flex items-center border-b border-(--border) px-5 py-4">
-                <button
-                  type="button"
-                  onClick={closeRenameModal}
-                  className="hover:text-foreground cursor-pointer rounded-full p-1 text-(--muted) transition"
-                  aria-label={t("closeRenameFolder")}
-                >
-                  <HiX className="h-5 w-5" aria-hidden />
-                </button>
-                <p className="text-foreground ml-auto text-sm font-semibold">
-                  {t("renameFolder")}
-                </p>
-              </div>
-              <div className="px-5 py-4">
-                <label className="block text-xs font-semibold text-(--muted)">
-                  {t("folderName")}
-                </label>
-                <input
-                  ref={renameInputRef}
-                  value={renameFolderName}
-                  onChange={(event) => setRenameFolderName(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      handleRenameFolder();
-                    } else if (event.key === "Escape") {
-                      closeRenameModal();
-                    }
-                  }}
-                  className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:outline-none"
-                  placeholder={t("folderNamePlaceholder")}
-                />
-              </div>
-              <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
-                <button
-                  type="button"
-                  onClick={closeRenameModal}
-                  className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
-                >
-                  {t("cancel")}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRenameFolder}
-                  className="text-primary-foreground cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium transition hover:bg-(--primary-hover)"
-                >
-                  {t("change")}
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : null}
       </aside>
+
+      {isCreateFolderModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay) px-4">
+          <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
+            <div className="flex items-center border-b border-(--border) px-5 py-4">
+              <button
+                type="button"
+                onClick={closeCreateModal}
+                className="text-muted hover:text-foreground cursor-pointer rounded-full p-1 transition"
+                aria-label={t("closeCreateFolder")}
+              >
+                <HiX className="h-5 w-5" aria-hidden />
+              </button>
+              <p className="text-foreground ml-auto text-sm font-semibold">
+                {t("createFolder")}
+              </p>
+            </div>
+            <div className="px-5 py-4">
+              <label className="text-muted block text-xs font-semibold">
+                {t("folderName")}
+              </label>
+              <input
+                ref={inputRef}
+                value={newFolderName}
+                onChange={(event) => setNewFolderName(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    handleCreateFolder();
+                  } else if (event.key === "Escape") {
+                    closeCreateModal();
+                  }
+                }}
+                className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:outline-none"
+                placeholder={t("folderNamePlaceholder")}
+              />
+            </div>
+            <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
+              <button
+                type="button"
+                onClick={closeCreateModal}
+                className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateFolder}
+                className="text-primary-foreground cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium transition hover:bg-(--primary-hover)"
+              >
+                {t("create")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {isRenameFolderModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay) px-4">
+          <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
+            <div className="flex items-center border-b border-(--border) px-5 py-4">
+              <button
+                type="button"
+                onClick={closeRenameModal}
+                className="hover:text-foreground cursor-pointer rounded-full p-1 text-(--muted) transition"
+                aria-label={t("closeRenameFolder")}
+              >
+                <HiX className="h-5 w-5" aria-hidden />
+              </button>
+              <p className="text-foreground ml-auto text-sm font-semibold">
+                {t("renameFolder")}
+              </p>
+            </div>
+            <div className="px-5 py-4">
+              <label className="block text-xs font-semibold text-(--muted)">
+                {t("folderName")}
+              </label>
+              <input
+                ref={renameInputRef}
+                value={renameFolderName}
+                onChange={(event) => setRenameFolderName(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    handleRenameFolder();
+                  } else if (event.key === "Escape") {
+                    closeRenameModal();
+                  }
+                }}
+                className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:outline-none"
+                placeholder={t("folderNamePlaceholder")}
+              />
+            </div>
+            <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
+              <button
+                type="button"
+                onClick={closeRenameModal}
+                className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={handleRenameFolder}
+                className="text-primary-foreground cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium transition hover:bg-(--primary-hover)"
+              >
+                {t("change")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
