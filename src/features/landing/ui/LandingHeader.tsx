@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  HiOutlineClipboardCopy,
   HiOutlineMoon,
   HiOutlineSun,
 } from "react-icons/hi";

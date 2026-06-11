@@ -5,12 +5,14 @@ import { LandingFooter } from "@/features/landing/ui/LandingFooter";
 import { LandingHeader } from "@/features/landing/ui/LandingHeader";
 import { LandingHeroSection } from "@/features/landing/ui/LandingHeroSection";
 import { LandingReviewsBanner } from "@/features/landing/ui/LandingReviewsBanner";
+import { LandingWorkflowSection } from "@/features/landing/ui/LandingWorkflowSection";
 import { useSettingsStore } from "@/shared/store/settingsStore";
 import {
   LANDING_DEMO_ITEMS,
   LANDING_FEATURES,
   LANDING_MOBILE_DEMO_ITEMS,
   LANDING_REVIEWS,
+  LANDING_WORKFLOW_STEPS,
 } from "../const/landingContent";
 
 export function LandingPage() {
@@ -26,6 +28,7 @@ export function LandingPage() {
         demoItems={LANDING_DEMO_ITEMS}
         mobileDemoItems={LANDING_MOBILE_DEMO_ITEMS}
       />
+      <LandingWorkflowSection steps={LANDING_WORKFLOW_STEPS} />
       <LandingFeaturesSection features={LANDING_FEATURES} />
       <LandingReviewsBanner reviews={LANDING_REVIEWS} />
       <LandingFooter currentYear={currentYear} />
