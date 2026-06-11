@@ -56,7 +56,7 @@ export function FolderClipsPage() {
         countLabel={t("count", { count: filteredClips.length })}
       />
       {!isActive ? (
-        <div className="px-6 pt-4">
+        <div className="px-4 pt-4 md:px-6">
           <div className="rounded-2xl border border-(--border) bg-(--surface) px-4 py-3 text-center text-xs text-(--muted)">
             {t("captureHint")}
           </div>
