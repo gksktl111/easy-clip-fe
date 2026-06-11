@@ -10,6 +10,12 @@ export interface PricingPlan {
   features: readonly string[];
 }
 
+export interface PricingComparisonPoint {
+  label: string;
+  freeValue: string;
+  proValue: string;
+}
+
 export const PRICING_PLANS: readonly PricingPlan[] = [
   {
     name: "Free",
@@ -45,7 +51,7 @@ export const PRICING_PLANS: readonly PricingPlan[] = [
   },
 ] as const;
 
-export const PRICING_COMPARISON_POINTS = [
+export const PRICING_COMPARISON_POINTS: readonly PricingComparisonPoint[] = [
   {
     label: "프로젝트 수",
     freeValue: "1개",
@@ -57,8 +63,18 @@ export const PRICING_COMPARISON_POINTS = [
     proValue: "프로젝트당 최대 500개",
   },
   {
+    label: "기기 연동",
+    freeValue: "데스크톱 1개 + 모바일 1개",
+    proValue: "무제한 기기 연동",
+  },
+  {
     label: "정리 방식",
     freeValue: "검색",
     proValue: "검색 + 태그",
+  },
+  {
+    label: "AI 기능",
+    freeValue: "미지원",
+    proValue: "추가 예정",
   },
 ] as const;
