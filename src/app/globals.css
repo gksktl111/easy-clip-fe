@@ -79,6 +79,12 @@
   --pricing-check-bg: #0f172a;
   --pricing-check-fg: #ffffff;
   --pricing-accent: #4f46e5;
+  --pricing-button-bg: #111827;
+  --pricing-button-bg-hover: #1f2937;
+  --pricing-button-fg: #ffffff;
+  --pricing-button-featured-bg: #ffffff;
+  --pricing-button-featured-bg-hover: #e2e8f0;
+  --pricing-button-featured-fg: #0f172a;
 }
 
 /* Theme tokens: dark */
@@ -144,6 +150,12 @@
   --pricing-check-bg: #f8fafc;
   --pricing-check-fg: #0f172a;
   --pricing-accent: #a5b4fc;
+  --pricing-button-bg: #6366f1;
+  --pricing-button-bg-hover: #818cf8;
+  --pricing-button-fg: #f8fafc;
+  --pricing-button-featured-bg: #f8fafc;
+  --pricing-button-featured-bg-hover: #e2e8f0;
+  --pricing-button-featured-fg: #111827;
 }
 
 /* Tailwind bridge */

@@ -59,7 +59,7 @@ export function LandingHeader({
             href="/login"
             className="rounded-xl bg-(--primary) px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-(--primary-hover)"
           >
-            <span className="text-primary-foreground">시작하기</span>
+            <span className="text-(--primary-foreground)">시작하기</span>
           </Link>
         </div>
       </div>

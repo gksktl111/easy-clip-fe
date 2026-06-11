@@ -11,8 +11,7 @@ export function PricingPage() {
       <div
         className="absolute inset-x-0 top-0 -z-10 h-[28rem]"
         style={{
-          backgroundImage:
-            "var(--pricing-hero-glow), var(--pricing-hero-fade)",
+          backgroundImage: "var(--pricing-hero-glow), var(--pricing-hero-fade)",
         }}
       />
 
@@ -34,12 +33,6 @@ export function PricingPage() {
             <br />
             EasyClip 플랜을 선택하세요.
           </h1>
-
-          <p className="mt-6 text-lg leading-8 text-(--muted)">
-            OpenAI의 요금제 페이지처럼 정보 계층이 분명한 카드 레이아웃을
-            참고해, 빠르게 비교하고 바로 선택할 수 있는 첫 버전으로
-            구성했습니다.
-          </p>
         </div>
 
         <div className="mt-16 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
@@ -96,7 +89,9 @@ export function PricingPage() {
               </p>
 
               <div className="mt-8 flex items-end gap-2">
-                <span className="text-5xl font-semibold tracking-tight">{plan.price}</span>
+                <span className="text-5xl font-semibold tracking-tight">
+                  {plan.price}
+                </span>
                 {plan.priceSuffix ? (
                   <span
                     className={`pb-1 text-sm ${
@@ -122,13 +117,25 @@ export function PricingPage() {
 
               <Link
                 href="/login"
-                className={`mt-8 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition-colors ${
-                  plan.highlight
-                    ? "bg-white text-slate-950 hover:bg-slate-100"
-                    : "bg-(--primary) text-primary-foreground hover:bg-(--primary-hover)"
-                }`}
+                className="mt-8 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition-[opacity,transform] duration-200 hover:opacity-90"
+                style={{
+                  backgroundColor: plan.highlight
+                    ? "var(--pricing-button-featured-bg)"
+                    : "var(--pricing-button-bg)",
+                  color: plan.highlight
+                    ? "var(--pricing-button-featured-fg)"
+                    : "var(--pricing-button-fg)",
+                }}
               >
-                {plan.ctaLabel}
+                <span
+                  style={{
+                    color: plan.highlight
+                      ? "var(--pricing-button-featured-fg)"
+                      : "var(--pricing-button-fg)",
+                  }}
+                >
+                  {plan.ctaLabel}
+                </span>
               </Link>
 
               <ul className="mt-8 space-y-4">
@@ -136,9 +143,7 @@ export function PricingPage() {
                   <li key={feature} className="flex items-start gap-3">
                     <span
                       className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-                        plan.highlight
-                          ? "bg-white/12 text-white"
-                          : ""
+                        plan.highlight ? "bg-white/12 text-white" : ""
                       }`}
                       style={
                         plan.highlight
@@ -171,7 +176,9 @@ export function PricingPage() {
         >
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-sm font-medium text-(--muted)">Quick comparison</p>
+              <p className="text-sm font-medium text-(--muted)">
+                Quick comparison
+              </p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight">
                 핵심 차이만 먼저 비교할 수 있도록 정리했습니다.
               </h2>
@@ -188,13 +195,17 @@ export function PricingPage() {
                 key={point.label}
                 className="rounded-3xl border border-(--border) bg-[var(--landing-demo-surface)] p-5"
               >
-                <p className="text-sm font-medium text-(--muted)">{point.label}</p>
+                <p className="text-sm font-medium text-(--muted)">
+                  {point.label}
+                </p>
                 <div className="mt-5 space-y-4">
                   <div>
                     <p className="text-xs font-semibold tracking-[0.18em] text-(--muted) uppercase">
                       Free
                     </p>
-                    <p className="mt-1 text-lg font-semibold">{point.freeValue}</p>
+                    <p className="mt-1 text-lg font-semibold">
+                      {point.freeValue}
+                    </p>
                   </div>
                   <div>
                     <p className="text-xs font-semibold tracking-[0.18em] text-(--muted) uppercase">
