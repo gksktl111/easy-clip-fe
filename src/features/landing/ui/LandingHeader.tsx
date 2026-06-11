@@ -25,27 +25,14 @@ export function LandingHeader({
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleTheme}
-            className={`relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full transition-all duration-500 ${
-              isDarkMode
-                ? "bg-amber-500/12 shadow-[inset_0_0_0_1px_rgba(251,191,36,0.22)] hover:bg-amber-500/18"
-                : "bg-sky-500/10 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.18)] hover:bg-sky-500/16"
-            }`}
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-(--muted) transition-colors hover:bg-(--surface-muted) hover:text-(--foreground)"
             aria-label="다크 모드 전환"
           >
-            <HiOutlineSun
-              className={`absolute h-5 w-5 transition-all duration-500 ${
-                isDarkMode
-                  ? "scale-100 rotate-0 text-amber-300 opacity-100"
-                  : "scale-50 -rotate-90 text-amber-200 opacity-0"
-              }`}
-            />
-            <HiOutlineMoon
-              className={`absolute h-5 w-5 transition-all duration-500 ${
-                isDarkMode
-                  ? "scale-50 rotate-90 text-sky-200 opacity-0"
-                  : "scale-100 rotate-0 text-sky-500 opacity-100"
-              }`}
-            />
+            {isDarkMode ? (
+              <HiOutlineSun className="h-5 w-5" />
+            ) : (
+              <HiOutlineMoon className="h-5 w-5" />
+            )}
           </button>
 
           <Link
