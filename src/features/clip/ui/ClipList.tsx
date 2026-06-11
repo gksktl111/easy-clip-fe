@@ -21,8 +21,8 @@ export function ClipList({
   }
 
   return (
-    <div className="flex-1 overflow-auto px-6 py-4">
-      <div className="grid grid-cols-1 gap-4 min-[401px]:grid-cols-2 min-[1200px]:grid-cols-5 md:grid-cols-3 lg:grid-cols-4">
+    <div className="clip-scrollbar flex-1 overflow-auto px-4 py-4 md:px-6">
+      <div className="grid grid-cols-1 gap-4 min-[800px]:grid-cols-2 min-[1200px]:grid-cols-3 min-[1440px]:grid-cols-4">
         {clips.map((clip) => (
           <ClipItem
             key={clip.id}
