@@ -2,10 +2,14 @@
 
 import { useTranslations } from "next-intl";
 import { useFolderClipsPage } from "@/features/clip/hooks/useFolderClipsPage";
-import { ClipList } from "@/features/clip/ui/ClipList";
+import { ClipContextMenu } from "@/features/clip/ui/ClipContextMenu";
+import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
+import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { DeleteAllButton } from "@/features/clip/ui/DeleteAllButton";
-import { EmptyState } from "@/features/clip/ui/EmptyState";
+import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
+import { FolderClipCaptureHint } from "@/features/clip/ui/FolderClipCaptureHint";
+import { RenameClipModal } from "@/features/clip/ui/RenameClipModal";
 
 export function FolderClipsPage() {
   const t = useTranslations("clips");
@@ -56,149 +60,52 @@ export function FolderClipsPage() {
         countLabel={t("count", { count: filteredClips.length })}
       />
       {!isActive ? (
-        <div className="px-4 pt-4 md:px-6">
-          <div className="rounded-2xl border border-(--border) bg-(--surface) px-4 py-3 text-center text-xs text-(--muted)">
-            {t("captureHint")}
-          </div>
-        </div>
+        <FolderClipCaptureHint message={t("captureHint")} />
       ) : null}
-      {filteredClips.length ? (
-        <ClipList
-          clips={filteredClips}
-          onCopy={handleCopy}
-          onToggleFavorite={handleToggleFavorite}
-          onContextMenu={handleOpenContextMenu}
-        />
-      ) : (
-        <EmptyState />
-      )}
+      <ClipResultsSection
+        clips={filteredClips}
+        onCopy={handleCopy}
+        onToggleFavorite={handleToggleFavorite}
+        onContextMenu={handleOpenContextMenu}
+      />
       <DeleteAllButton
         disabled={!hasClips}
         onClick={() => setIsDeleteAllOpen(true)}
       />
 
-      {contextMenu ? (
-        <div
-          className="fixed z-50 w-36 rounded-lg border border-(--border) bg-(--surface) p-1 text-xs text-(--muted) shadow-lg"
-          style={{ left: contextMenu.x, top: contextMenu.y }}
-          data-clip-menu
-        >
-          <button
-            type="button"
-            onClick={() => {
-              const target = clips.find((clip) => clip.id === contextMenu.id);
-              if (target) {
-                handleCopyFromMenu(target);
-              }
-            }}
-            className="hover:text-foreground flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--muted) hover:bg-(--surface-muted)"
-            data-clip-menu
-          >
-            {t("actions.copy")}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              const target = clips.find((clip) => clip.id === contextMenu.id);
-              if (target) {
-                handleOpenRename(target.id, target.name);
-              }
-            }}
-            className="hover:text-foreground flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--muted) hover:bg-(--surface-muted)"
-            data-clip-menu
-          >
-            {t("actions.rename")}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDeleteClip(contextMenu.id)}
-            className="flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--danger) hover:bg-(--surface-muted)"
-            data-clip-menu
-          >
-            {t("actions.delete")}
-          </button>
-        </div>
-      ) : null}
-
-      {copyToast ? (
-        <div
-          className="fixed z-50 rounded-full bg-(--chip-bg) px-3 py-1.5 text-xs font-semibold text-(--chip-text) shadow-md"
-          style={{ left: copyToast.x + 12, top: copyToast.y + 12 }}
-        >
-          {t("copyToast")}
-        </div>
-      ) : null}
-
-      {isDeleteAllOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay) px-4">
-          <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
-            <div className="border-b border-(--border) px-5 py-4">
-              <p className="text-foreground text-sm font-semibold">
-                {t("deleteModal.title")}
-              </p>
-              <p className="text-muted mt-1 text-xs">
-                {t("deleteModal.description")}
-              </p>
-            </div>
-            <div className="flex justify-end gap-2 px-5 py-4">
-              <button
-                type="button"
-                onClick={() => setIsDeleteAllOpen(false)}
-                className="hover:text-foreground rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
-              >
-                {t("actions.cancel")}
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteAll}
-                className="rounded-lg bg-(--danger) px-4 py-2 text-sm font-medium text-danger-foreground transition hover:bg-(--danger-hover)"
-              >
-                {t("actions.delete")}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {isRenameOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay) px-4">
-          <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
-            <div className="border-b border-(--border) px-5 py-4">
-              <p className="text-foreground text-sm font-semibold">
-                {t("renameModal.title")}
-              </p>
-            </div>
-            <div className="px-5 py-4">
-              <label className="block text-xs font-semibold text-(--muted)">
-                {t("renameModal.label")}
-              </label>
-              <input
-                ref={renameInputRef}
-                value={renameName}
-                onChange={(event) => setRenameName(event.target.value)}
-                className="text-foreground mt-2 w-full rounded-lg border border-(--border) bg-(--input) px-3 py-2 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:outline-none"
-                placeholder={t("renameModal.placeholder")}
-              />
-            </div>
-            <div className="flex justify-end gap-2 border-t border-(--border) px-5 py-4">
-              <button
-                type="button"
-                onClick={() => setIsRenameOpen(false)}
-                className="hover:text-foreground cursor-pointer rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
-              >
-                {t("actions.cancel")}
-              </button>
-              <button
-                type="button"
-                onClick={handleRenameClip}
-                className="cursor-pointer rounded-lg bg-(--primary) px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-(--primary-hover)"
-              >
-                {t("actions.change")}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <ClipContextMenu
+        clips={clips}
+        contextMenu={contextMenu}
+        copyLabel={t("actions.copy")}
+        renameLabel={t("actions.rename")}
+        deleteLabel={t("actions.delete")}
+        onCopy={handleCopyFromMenu}
+        onRename={(clip) => handleOpenRename(clip.id, clip.name)}
+        onDelete={handleDeleteClip}
+      />
+      <ClipCopyToast label={t("copyToast")} position={copyToast} />
+      <DeleteAllClipsModal
+        isOpen={isDeleteAllOpen}
+        title={t("deleteModal.title")}
+        description={t("deleteModal.description")}
+        cancelLabel={t("actions.cancel")}
+        confirmLabel={t("actions.delete")}
+        onCancel={() => setIsDeleteAllOpen(false)}
+        onConfirm={handleDeleteAll}
+      />
+      <RenameClipModal
+        isOpen={isRenameOpen}
+        title={t("renameModal.title")}
+        label={t("renameModal.label")}
+        placeholder={t("renameModal.placeholder")}
+        cancelLabel={t("actions.cancel")}
+        confirmLabel={t("actions.change")}
+        inputRef={renameInputRef}
+        value={renameName}
+        onChange={setRenameName}
+        onCancel={() => setIsRenameOpen(false)}
+        onConfirm={handleRenameClip}
+      />
     </div>
   );
 }

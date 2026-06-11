@@ -1,10 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
+import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { useRecentClipsPage } from "@/features/clip/hooks/useRecentClipsPage";
-import { ClipList } from "@/features/clip/ui/ClipList";
 import { DeleteAllButton } from "@/features/clip/ui/DeleteAllButton";
-import { EmptyState } from "@/features/clip/ui/EmptyState";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 
 export function RecentClipsPage() {
@@ -31,21 +31,9 @@ export function RecentClipsPage() {
         showStatus={false}
         countLabel={t("count", { count: filteredClips.length })}
       />
-      {filteredClips.length ? (
-        <ClipList clips={filteredClips} onCopy={handleCopy} />
-      ) : (
-        <EmptyState />
-      )}
+      <ClipResultsSection clips={filteredClips} onCopy={handleCopy} />
       <DeleteAllButton disabled={!hasClips} onClick={clearAll} />
-
-      {copyToast ? (
-        <div
-          className="fixed z-50 rounded-full bg-(--chip-bg) px-3 py-1.5 text-xs font-semibold text-(--chip-text) shadow-md"
-          style={{ left: copyToast.x + 12, top: copyToast.y + 12 }}
-        >
-          {t("copyToast")}
-        </div>
-      ) : null}
+      <ClipCopyToast label={t("copyToast")} position={copyToast} />
     </div>
   );
 }
