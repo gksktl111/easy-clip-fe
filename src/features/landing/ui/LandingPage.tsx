@@ -1,6 +1,7 @@
 "use client";
 
 import { LandingFeaturesSection } from "@/features/landing/ui/LandingFeaturesSection";
+import { LandingFinalCtaSection } from "@/features/landing/ui/LandingFinalCtaSection";
 import { LandingFooter } from "@/features/landing/ui/LandingFooter";
 import { LandingHeader } from "@/features/landing/ui/LandingHeader";
 import { LandingHeroSection } from "@/features/landing/ui/LandingHeroSection";
@@ -31,6 +32,7 @@ export function LandingPage() {
       <LandingWorkflowSection steps={LANDING_WORKFLOW_STEPS} />
       <LandingFeaturesSection features={LANDING_FEATURES} />
       <LandingReviewsBanner reviews={LANDING_REVIEWS} />
+      <LandingFinalCtaSection />
       <LandingFooter currentYear={currentYear} />
     </main>
   );
