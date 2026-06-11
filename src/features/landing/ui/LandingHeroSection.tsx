@@ -71,9 +71,9 @@ export function LandingHeroSection({
           </div>
         </div>
 
-        <div className="absolute top-1/2 left-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--landing-float-bg)] shadow-[var(--landing-shadow)] md:static md:translate-x-0 md:translate-y-0">
+        <div className="absolute top-1/2 left-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--landing-brand-bg)] shadow-[var(--landing-shadow)] md:static md:translate-x-0 md:translate-y-0">
           <svg
-            className="h-6 w-6 text-[var(--landing-float-fg)]"
+            className="h-6 w-6 text-[var(--landing-brand-fg)]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

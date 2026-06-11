@@ -23,7 +23,7 @@ export function LandingPage() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <main className="relative min-h-screen overflow-y-auto bg-(--background) text-(--foreground) transition-colors duration-300">
+    <main className="relative min-h-screen bg-(--background) text-(--foreground) transition-colors duration-300">
       <LandingHeader isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
       <LandingHeroSection
         demoItems={LANDING_DEMO_ITEMS}
