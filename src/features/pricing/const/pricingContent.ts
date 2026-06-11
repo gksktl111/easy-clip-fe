@@ -23,6 +23,7 @@ export const PRICING_PLANS: readonly PricingPlan[] = [
     features: [
       "하나의 프로젝트 사용 가능",
       "최대 50개의 클립 생성 가능",
+      "데스크톱 1개, 모바일 1개 연동 가능",
       "검색 기능 사용 가능",
     ],
   },
@@ -37,6 +38,7 @@ export const PRICING_PLANS: readonly PricingPlan[] = [
     features: [
       "무제한 프로젝트 생성 가능",
       "각 프로젝트당 최대 500개의 클립 생성 가능",
+      "무제한 기기 연동",
       "태그 기능 사용 가능",
       "AI 기능 추가 예정",
     ],
