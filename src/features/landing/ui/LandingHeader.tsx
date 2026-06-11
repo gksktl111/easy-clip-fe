@@ -32,10 +32,10 @@ export function LandingHeader({
         >
           <Link
             href="/pricing"
-            className={`inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+            className={`inline-flex items-center border-b-2 px-1 py-2 text-sm font-medium transition-colors ${
               activeTab === "pricing"
-                ? "border-transparent bg-(--foreground) text-(--background)"
-                : "border-(--border) bg-(--surface) text-(--muted) hover:text-(--foreground)"
+                ? "border-(--foreground) text-(--foreground)"
+                : "border-transparent text-(--muted) hover:text-(--foreground)"
             }`}
           >
             요금제

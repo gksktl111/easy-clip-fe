@@ -8,11 +8,23 @@ import {
 export function PricingPage() {
   return (
     <section className="relative overflow-hidden">
-      <div className="absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.2),_transparent_58%),linear-gradient(180deg,_rgba(15,23,42,0.06),_transparent)]" />
+      <div
+        className="absolute inset-x-0 top-0 -z-10 h-[28rem]"
+        style={{
+          backgroundImage:
+            "var(--pricing-hero-glow), var(--pricing-hero-fade)",
+        }}
+      />
 
       <div className="mx-auto flex max-w-6xl flex-col px-6 pt-20 pb-24">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-(--border) bg-[color:rgba(255,255,255,0.6)] px-4 py-2 text-sm text-(--muted) backdrop-blur-sm">
+          <div
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-(--muted) backdrop-blur-sm"
+            style={{
+              backgroundColor: "var(--pricing-chip-bg)",
+              border: "1px solid var(--pricing-chip-border)",
+            }}
+          >
             <HiOutlineSparkles className="h-4 w-4" />
             <span>Simple plans for focused teams</span>
           </div>
@@ -34,11 +46,17 @@ export function PricingPage() {
           {PRICING_PLANS.map((plan) => (
             <article
               key={plan.name}
-              className={`relative overflow-hidden rounded-[2rem] border px-8 py-8 shadow-[0_24px_80px_rgba(15,23,42,0.12)] transition-transform duration-300 hover:-translate-y-1 ${
+              className={`relative overflow-hidden rounded-[2rem] border px-8 py-8 transition-transform duration-300 hover:-translate-y-1 ${
                 plan.highlight
-                  ? "border-transparent bg-[linear-gradient(145deg,#111827,#312e81)] text-white"
+                  ? "border-transparent text-white"
                   : "border-(--border) bg-(--surface)"
               }`}
+              style={{
+                boxShadow: "var(--pricing-card-shadow)",
+                background: plan.highlight
+                  ? "var(--pricing-featured-bg)"
+                  : undefined,
+              }}
             >
               {plan.highlight ? (
                 <div className="absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,0.92),rgba(255,255,255,0))]" />
@@ -48,7 +66,9 @@ export function PricingPage() {
                 <div>
                   <p
                     className={`text-sm font-medium ${
-                      plan.highlight ? "text-indigo-200" : "text-(--muted)"
+                      plan.highlight
+                        ? "text-[var(--pricing-featured-muted)]"
+                        : "text-(--muted)"
                     }`}
                   >
                     {plan.badge}
@@ -56,7 +76,10 @@ export function PricingPage() {
                   <h2 className="mt-3 text-3xl font-semibold">{plan.name}</h2>
                 </div>
                 {plan.highlight ? (
-                  <span className="rounded-full bg-white/12 px-3 py-1 text-xs font-semibold text-white">
+                  <span
+                    className="rounded-full px-3 py-1 text-xs font-semibold text-white"
+                    style={{ backgroundColor: "var(--pricing-featured-badge)" }}
+                  >
                     Recommended
                   </span>
                 ) : null}
@@ -64,7 +87,9 @@ export function PricingPage() {
 
               <p
                 className={`mt-5 text-base leading-7 ${
-                  plan.highlight ? "text-slate-200" : "text-(--muted)"
+                  plan.highlight
+                    ? "text-[var(--pricing-featured-text)]"
+                    : "text-(--muted)"
                 }`}
               >
                 {plan.description}
@@ -75,7 +100,9 @@ export function PricingPage() {
                 {plan.priceSuffix ? (
                   <span
                     className={`pb-1 text-sm ${
-                      plan.highlight ? "text-slate-300" : "text-(--muted)"
+                      plan.highlight
+                        ? "text-[var(--pricing-featured-text)]"
+                        : "text-(--muted)"
                     }`}
                   >
                     {plan.priceSuffix}
@@ -85,7 +112,9 @@ export function PricingPage() {
 
               <p
                 className={`mt-2 text-sm ${
-                  plan.highlight ? "text-slate-300" : "text-(--muted)"
+                  plan.highlight
+                    ? "text-[var(--pricing-featured-text)]"
+                    : "text-(--muted)"
                 }`}
               >
                 {plan.billingNote}
@@ -109,14 +138,22 @@ export function PricingPage() {
                       className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                         plan.highlight
                           ? "bg-white/12 text-white"
-                          : "bg-slate-900 text-white"
+                          : ""
                       }`}
+                      style={
+                        plan.highlight
+                          ? { backgroundColor: "var(--pricing-featured-badge)" }
+                          : {
+                              backgroundColor: "var(--pricing-check-bg)",
+                              color: "var(--pricing-check-fg)",
+                            }
+                      }
                     >
                       <HiCheck className="h-4 w-4" />
                     </span>
                     <span
                       className={`text-sm leading-6 ${
-                        plan.highlight ? "text-slate-100" : "text-(--foreground)"
+                        plan.highlight ? "text-white" : "text-(--foreground)"
                       }`}
                     >
                       {feature}
@@ -128,7 +165,10 @@ export function PricingPage() {
           ))}
         </div>
 
-        <section className="mt-8 rounded-[2rem] border border-(--border) bg-(--surface) p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+        <section
+          className="mt-8 rounded-[2rem] border border-(--border) bg-(--surface) p-6"
+          style={{ boxShadow: "var(--pricing-compare-shadow)" }}
+        >
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-sm font-medium text-(--muted)">Quick comparison</p>
@@ -160,7 +200,10 @@ export function PricingPage() {
                     <p className="text-xs font-semibold tracking-[0.18em] text-(--muted) uppercase">
                       Pro
                     </p>
-                    <p className="mt-1 text-lg font-semibold text-indigo-500">
+                    <p
+                      className="mt-1 text-lg font-semibold"
+                      style={{ color: "var(--pricing-accent)" }}
+                    >
                       {point.proValue}
                     </p>
                   </div>

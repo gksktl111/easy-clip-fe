@@ -58,6 +58,27 @@
   --landing-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
   --landing-brand-muted: rgba(255, 255, 255, 0.72);
   --landing-brand-soft: rgba(255, 255, 255, 0.78);
+  --pricing-hero-glow: radial-gradient(
+    circle at top,
+    rgba(79, 70, 229, 0.16),
+    transparent 58%
+  );
+  --pricing-hero-fade: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.06),
+    transparent
+  );
+  --pricing-chip-bg: rgba(255, 255, 255, 0.78);
+  --pricing-chip-border: rgba(226, 232, 240, 0.95);
+  --pricing-card-shadow: 0 24px 80px rgba(15, 23, 42, 0.12);
+  --pricing-compare-shadow: 0 18px 60px rgba(15, 23, 42, 0.08);
+  --pricing-featured-bg: linear-gradient(145deg, #111827, #312e81);
+  --pricing-featured-muted: #c7d2fe;
+  --pricing-featured-text: #e2e8f0;
+  --pricing-featured-badge: rgba(255, 255, 255, 0.12);
+  --pricing-check-bg: #0f172a;
+  --pricing-check-fg: #ffffff;
+  --pricing-accent: #4f46e5;
 }
 
 /* Theme tokens: dark */
@@ -102,6 +123,27 @@
   --landing-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
   --landing-brand-muted: rgba(248, 250, 252, 0.72);
   --landing-brand-soft: rgba(248, 250, 252, 0.78);
+  --pricing-hero-glow: radial-gradient(
+    circle at top,
+    rgba(99, 102, 241, 0.28),
+    transparent 58%
+  );
+  --pricing-hero-fade: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    transparent
+  );
+  --pricing-chip-bg: rgba(36, 36, 38, 0.92);
+  --pricing-chip-border: rgba(255, 255, 255, 0.08);
+  --pricing-card-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  --pricing-compare-shadow: 0 18px 60px rgba(0, 0, 0, 0.24);
+  --pricing-featured-bg: linear-gradient(145deg, #111827, #4338ca);
+  --pricing-featured-muted: #c7d2fe;
+  --pricing-featured-text: #cbd5e1;
+  --pricing-featured-badge: rgba(255, 255, 255, 0.1);
+  --pricing-check-bg: #f8fafc;
+  --pricing-check-fg: #0f172a;
+  --pricing-accent: #a5b4fc;
 }
 
 /* Tailwind bridge */
@@ -121,13 +163,16 @@
 }
 
 /* Foundation: base */
-html,
+html {
+  min-height: 100%;
+}
+
 body {
+  min-height: 100%;
+  overflow-x: hidden;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  height: 100%;
-  overflow-x: hidden;
 }
 
 a {
