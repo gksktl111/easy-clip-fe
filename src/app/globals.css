@@ -48,16 +48,6 @@
   --modal-section-bg: #f8fafc;
   --modal-icon-bg: #e5e7eb;
   --modal-icon-fg: #4b5563;
-  --landing-header-bg: rgba(255, 255, 255, 0.9);
-  --landing-brand-bg: #334155;
-  --landing-brand-fg: #ffffff;
-  --landing-demo-surface: #f8fafc;
-  --landing-demo-card: #ffffff;
-  --landing-float-bg: #ffffff;
-  --landing-float-fg: #334155;
-  --landing-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
-  --landing-brand-muted: rgba(255, 255, 255, 0.72);
-  --landing-brand-soft: rgba(255, 255, 255, 0.78);
 }
 
 /* Theme tokens: dark */
@@ -70,8 +60,8 @@
   --border: rgba(255, 255, 255, 0.08);
   --muted: #9ca3af;
   --input: #2a2a2b;
-  --primary: #4f46e5;
-  --primary-hover: #6366f1;
+  --primary: #2563eb;
+  --primary-hover: #3b82f6;
   --primary-foreground: #f8fafc;
   --danger: #f87171;
   --danger-hover: #ef4444;
@@ -81,9 +71,9 @@
   --overlay: rgba(0, 0, 0, 0.4);
   --overlay-strong: rgba(0, 0, 0, 0.7);
   --focus-ring: #94a3b8;
-  --chip-bg: #4f46e5;
+  --chip-bg: #2563eb;
   --chip-text: #f8fafc;
-  --icon-chip: #4f46e5;
+  --icon-chip: #2563eb;
   --icon-chip-text: #f8fafc;
   --favorite-btn-bg: rgba(30, 30, 31, 0.88);
   --favorite-btn-bg-hover: rgba(42, 42, 43, 0.96);
@@ -92,16 +82,6 @@
   --modal-section-bg: rgba(255, 255, 255, 0.05);
   --modal-icon-bg: rgba(255, 255, 255, 0.1);
   --modal-icon-fg: #e5e7eb;
-  --landing-header-bg: rgba(30, 30, 31, 0.9);
-  --landing-brand-bg: #4f46e5;
-  --landing-brand-fg: #f8fafc;
-  --landing-demo-surface: #1e1e1f;
-  --landing-demo-card: rgba(255, 255, 255, 0.05);
-  --landing-float-bg: #334155;
-  --landing-float-fg: #ffffff;
-  --landing-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
-  --landing-brand-muted: rgba(248, 250, 252, 0.72);
-  --landing-brand-soft: rgba(248, 250, 252, 0.78);
 }
 
 /* Tailwind bridge */
@@ -127,7 +107,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   height: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 a {
@@ -154,14 +134,5 @@ a {
   }
   50% {
     transform: translateY(-10px);
-  }
-}
-
-@keyframes marquee-x {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-50% - (var(--marquee-gap, 0px) / 2)));
   }
 }

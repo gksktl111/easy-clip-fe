@@ -18,10 +18,6 @@ interface SettingsState {
   toggleTheme: () => void;
   setLanguage: (language: LanguageCode) => void;
   syncLanguage: (language: LanguageCode) => void;
-  hydrateFromServer: (settings: {
-    theme?: ThemeMode;
-    language?: LanguageCode;
-  }) => void;
 }
 
 const noopStorage: StateStorage = {
@@ -39,11 +35,6 @@ export const useSettingsStore = create<SettingsState>()(
         set({ theme: get().theme === "dark" ? "light" : "dark" }),
       setLanguage: (language) => set({ language }),
       syncLanguage: (language) => set({ language }),
-      hydrateFromServer: ({ theme, language }) =>
-        set((state) => ({
-          theme: theme ?? state.theme,
-          language: language ?? state.language,
-        })),
     }),
     {
       name: "easy-clip-settings",
