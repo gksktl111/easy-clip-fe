@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { getAuthStartUrl } from "@/features/auth/service/authApi";
+import { persistAuthSession } from "@/features/auth/service/authSession";
+import { buildApiUrl } from "@/shared/config/env";
 import { LoginAgreementNotice } from "@/features/auth/ui/LoginAgreementNotice";
 import { LoginBrandPanel } from "@/features/auth/ui/LoginBrandPanel";
 import { LoginLoadingState } from "@/features/auth/ui/LoginLoadingState";
@@ -12,16 +15,48 @@ import { LoginSocialActions } from "@/features/auth/ui/LoginSocialActions";
 export function LoginPage() {
   const t = useTranslations("login");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<
     "google" | "github" | null
   >(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const redirectedSession = useMemo(() => {
+    const accessToken = searchParams.get("access_token");
+    const refreshToken = searchParams.get("refresh_token");
+
+    if (!accessToken || !refreshToken) {
+      return null;
+    }
+
+    return {
+      accessToken,
+      refreshToken,
+      user: null,
+    };
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!redirectedSession) {
+      return;
+    }
+
+    persistAuthSession(redirectedSession);
+    router.replace("/favorites");
+  }, [redirectedSession, router]);
 
   const handleLogin = async (provider: "google" | "github") => {
-    setIsLoading(true);
-    setLoadingProvider(provider);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    router.push("/favorites");
+    try {
+      setErrorMessage(null);
+      setIsLoading(true);
+      setLoadingProvider(provider);
+      window.location.assign(buildApiUrl(getAuthStartUrl(provider)));
+    } catch {
+      setIsLoading(false);
+      setLoadingProvider(null);
+      setErrorMessage(t("configError"));
+    }
   };
 
   return (
@@ -36,6 +71,11 @@ export function LoginPage() {
         />
 
         <LoginLoadingState label={t("loading")} isVisible={isLoading} />
+        {errorMessage ? (
+          <p className="mt-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+            {errorMessage}
+          </p>
+        ) : null}
 
         <div className="my-8 flex items-center gap-4">
           <div className="h-px flex-1 bg-(--border)" />

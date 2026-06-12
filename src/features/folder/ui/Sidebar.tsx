@@ -7,6 +7,10 @@ import {
   HiOutlineClock,
   HiOutlineStar,
 } from "react-icons/hi";
+import { useRouter } from "next/navigation";
+import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { logout } from "@/features/auth/service/authApi";
+import { clearAuthSession } from "@/features/auth/service/authSession";
 import { useFolders } from "@/features/folder/hooks/useFolders";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
 import { FolderSidebarFooter } from "@/features/folder/ui/FolderSidebarFooter";
@@ -27,6 +31,8 @@ export function Sidebar({
 }: SidebarProps) {
   const t = useTranslations("sidebar");
   const pathname = usePathname();
+  const router = useRouter();
+  const session = useAuthSession();
   const { folders, persistFolders } = useFolders();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -151,6 +157,27 @@ export function Sidebar({
     closeRenameModal();
   }, [folders, persistFolders, renameFolderId, renameFolderName]);
 
+  const userLabel =
+    session?.user?.authAccounts?.[0]?.email ??
+    session?.user?.displayName ??
+    t("guest");
+
+  const handleLogout = useCallback(async () => {
+    onCloseMobile?.();
+
+    try {
+      if (session?.accessToken) {
+        await logout(session.accessToken);
+      }
+    } catch {
+      // clear client session even when the server session is already invalid
+    } finally {
+      clearAuthSession();
+      router.push("/login");
+      router.refresh();
+    }
+  }, [onCloseMobile, router, session?.accessToken]);
+
   return (
     <>
       {isMobileOpen ? (
@@ -234,17 +261,14 @@ export function Sidebar({
         </nav>
 
         <FolderSidebarFooter
-          email="user@example.com"
+          userLabel={userLabel}
           settingsLabel={t("settings")}
           logoutLabel={t("logout")}
           onOpenSettings={() => {
             onCloseMobile?.();
             onOpenSettings();
           }}
-          onLogout={() => {
-            onCloseMobile?.();
-            window.location.href = "/login";
-          }}
+          onLogout={handleLogout}
         />
       </aside>
 

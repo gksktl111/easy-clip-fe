@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { AuthBootstrap } from "@/features/auth/ui/AuthBootstrap";
 import { HiOutlineMenuAlt4, HiOutlinePaperClip } from "react-icons/hi";
 import { Sidebar } from "@/features/folder/ui/Sidebar";
 import { SettingsModal } from "@/shared/ui/SettingsModal";
@@ -19,6 +20,7 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="bg-background text-foreground flex h-screen flex-col overflow-hidden">
+      <AuthBootstrap />
       <header className="bg-background border-b border-(--border) md:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <button
