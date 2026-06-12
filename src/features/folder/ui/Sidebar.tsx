@@ -46,15 +46,22 @@ export function Sidebar({
   const [draggingFolderId, setDraggingFolderId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const pathnameFolderId = pathSegments[0] ?? null;
+  const reservedPathnames = new Set(["favorites", "recent", "login", "pricing"]);
+  const currentFolderId =
+    pathnameFolderId && !reservedPathnames.has(pathnameFolderId)
+      ? pathnameFolderId
+      : (folders[0]?.id ?? null);
 
   const topNavs = [
     {
-      href: "/favorites",
+      href: currentFolderId ? `/${currentFolderId}/favorites` : "/favorites",
       label: t("favorites"),
       icon: <HiOutlineStar className="h-5 w-5" aria-hidden />,
     },
     {
-      href: "/recent",
+      href: currentFolderId ? `/${currentFolderId}/recent` : "/recent",
       label: t("recent"),
       icon: <HiOutlineClock className="h-5 w-5" aria-hidden />,
     },
