@@ -9,7 +9,6 @@ import { DeleteAllButton } from "@/features/clip/ui/DeleteAllButton";
 import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 import { FolderClipCaptureHint } from "@/features/clip/ui/FolderClipCaptureHint";
-import { RenameClipModal } from "@/features/clip/ui/RenameClipModal";
 
 export function FolderClipsPage() {
   const t = useTranslations("clips");
@@ -24,22 +23,15 @@ export function FolderClipsPage() {
     handleDeleteAll,
     handleDeleteClip,
     handleOpenContextMenu,
-    handleOpenRename,
-    handleRenameClip,
     handleToggleFavorite,
     hasClips,
     isActive,
     isDeleteAllOpen,
-    isRenameOpen,
-    renameInputRef,
-    renameName,
     searchQuery,
     setActiveFilter,
     setContextMenu,
     setIsActive,
     setIsDeleteAllOpen,
-    setIsRenameOpen,
-    setRenameName,
     setSearchQuery,
   } = useFolderClipsPage();
 
@@ -77,10 +69,8 @@ export function FolderClipsPage() {
         clips={clips}
         contextMenu={contextMenu}
         copyLabel={t("actions.copy")}
-        renameLabel={t("actions.rename")}
         deleteLabel={t("actions.delete")}
         onCopy={handleCopyFromMenu}
-        onRename={(clip) => handleOpenRename(clip.id, clip.name)}
         onDelete={handleDeleteClip}
       />
       <ClipCopyToast label={t("copyToast")} position={copyToast} />
@@ -92,19 +82,6 @@ export function FolderClipsPage() {
         confirmLabel={t("actions.delete")}
         onCancel={() => setIsDeleteAllOpen(false)}
         onConfirm={handleDeleteAll}
-      />
-      <RenameClipModal
-        isOpen={isRenameOpen}
-        title={t("renameModal.title")}
-        label={t("renameModal.label")}
-        placeholder={t("renameModal.placeholder")}
-        cancelLabel={t("actions.cancel")}
-        confirmLabel={t("actions.change")}
-        inputRef={renameInputRef}
-        value={renameName}
-        onChange={setRenameName}
-        onCancel={() => setIsRenameOpen(false)}
-        onConfirm={handleRenameClip}
       />
     </div>
   );
