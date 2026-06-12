@@ -2,6 +2,10 @@ const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
 const getRequiredPublicEnv = (name: "NEXT_PUBLIC_API_BASE_URL") => {
   const value = process.env[name];
+  if (!value && process.env.NODE_ENV !== "production") {
+    return "http://localhost:3000";
+  }
+
   if (!value) {
     throw new Error(`${name} is not configured.`);
   }
