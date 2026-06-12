@@ -2,15 +2,17 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import { FolderItem } from "@/features/folder/model/folder";
 import {
   createFolder as createFolderRequest,
   deleteFolder as deleteFolderRequest,
   fetchFolders,
-  FolderResponseDto,
   reorderFolder as reorderFolderRequest,
   updateFolder as updateFolderRequest,
-} from "@/features/folder/service/folderApi";
+} from "@/features/folder/api/folderApi";
+import { FolderItem } from "@/features/folder/model/folder";
+import {
+  FolderResponseDto,
+} from "@/features/folder/model/folder.dto";
 
 const sortFolders = (folders: FolderItem[]) =>
   [...folders].sort((left, right) => left.order - right.order);
@@ -57,7 +59,7 @@ export const useFolders = () => {
         throw createAuthRequiredError();
       }
 
-      const createdFolder = await createFolderRequest(accessToken, name);
+      const createdFolder = await createFolderRequest(accessToken, { name });
       setFolders((currentFolders) =>
         sortFolders([...currentFolders, mapFolder(createdFolder)]),
       );
@@ -71,7 +73,9 @@ export const useFolders = () => {
         throw createAuthRequiredError();
       }
 
-      const updatedFolder = await updateFolderRequest(accessToken, folderId, name);
+      const updatedFolder = await updateFolderRequest(accessToken, folderId, {
+        name,
+      });
       setFolders((currentFolders) =>
         sortFolders(
           currentFolders.map((folder) =>

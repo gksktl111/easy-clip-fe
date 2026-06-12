@@ -2,12 +2,12 @@
 
 import { startTransition, useCallback, useEffect, useMemo, useState } from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
-import { Clip } from "@/features/clip/model/clip";
 import {
   fetchClips,
   recordClipView,
-} from "@/features/clip/service/clipApi";
+} from "@/features/clip/api/clipApi";
+import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
+import { Clip } from "@/features/clip/model/clip";
 import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
 import { FilterType } from "@/features/clip/ui/FilterBar";
 

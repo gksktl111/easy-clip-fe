@@ -2,11 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { ApiError } from "@/shared/lib/apiClient";
 import {
   clearSessionOnUnauthorized,
   syncSessionProfile,
-} from "@/features/auth/service/authApi";
-import { ApiError } from "@/shared/lib/apiClient";
+} from "@/features/auth/service/authService";
 
 export function AuthBootstrap() {
   const session = useAuthSession();

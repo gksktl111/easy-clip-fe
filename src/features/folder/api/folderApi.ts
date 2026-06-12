@@ -1,14 +1,10 @@
+import {
+  CreateFolderRequestDto,
+  FolderResponseDto,
+  ReorderFolderRequestDto,
+  UpdateFolderRequestDto,
+} from "@/features/folder/model/folder.dto";
 import { apiRequest } from "@/shared/lib/apiClient";
-
-export interface FolderResponseDto {
-  id: string;
-  name: string;
-  order: number;
-  workspaceId: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-}
 
 export const fetchFolders = (accessToken: string) =>
   apiRequest<FolderResponseDto[]>("/folders", {
@@ -16,20 +12,23 @@ export const fetchFolders = (accessToken: string) =>
     cache: "no-store",
   });
 
-export const createFolder = (accessToken: string, name: string) =>
+export const createFolder = (
+  accessToken: string,
+  payload: CreateFolderRequestDto,
+) =>
   apiRequest<FolderResponseDto>("/folders", {
     method: "POST",
     accessToken,
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify(payload),
   });
 
 export const updateFolder = (
   accessToken: string,
   folderId: string,
-  name: string,
+  payload: UpdateFolderRequestDto,
 ) =>
   apiRequest<FolderResponseDto>(`/folders/${folderId}`, {
     method: "PATCH",
@@ -37,7 +36,7 @@ export const updateFolder = (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify(payload),
   });
 
 export const deleteFolder = (accessToken: string, folderId: string) =>
@@ -48,11 +47,7 @@ export const deleteFolder = (accessToken: string, folderId: string) =>
 
 export const reorderFolder = (
   accessToken: string,
-  payload: {
-    targetId: string;
-    beforeId?: string;
-    afterId?: string;
-  },
+  payload: ReorderFolderRequestDto,
 ) =>
   apiRequest<FolderResponseDto>("/folders/reorder", {
     method: "PATCH",

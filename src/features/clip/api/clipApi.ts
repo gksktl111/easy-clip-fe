@@ -1,38 +1,16 @@
+import {
+  ClipCursorPageResponseDto,
+  ClipResponseDto,
+  CreateImageClipRequestDto,
+  CreateTextClipRequestDto,
+  FetchClipsQueryDto,
+  LikeClipResponseDto,
+} from "@/features/clip/model/clip.dto";
 import { apiRequest } from "@/shared/lib/apiClient";
-
-export type ApiClipType = "TEXT" | "COLOR" | "IMAGE";
-
-export interface ClipListItemResponseDto {
-  id: string;
-  type: ApiClipType;
-  title: string;
-  textContent: string | null;
-  colorHex: string | null;
-  imageUrl: string | null;
-  workspaceId: string;
-  folderId: string | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  likeByMe: boolean;
-  tags: { id: string; name: string }[];
-}
-
-interface ClipCursorPageResponseDto {
-  items: ClipListItemResponseDto[];
-  hasMore: boolean;
-  nextCursor: string | null;
-}
 
 export const fetchClips = async (
   accessToken: string,
-  options: {
-    folderId?: string;
-    favorite?: boolean;
-    recent?: boolean;
-    type?: "TEXT" | "COLOR" | "IMAGE" | "ALL";
-    q?: string;
-  } = {},
+  options: FetchClipsQueryDto = {},
 ) => {
   const searchParams = new URLSearchParams();
   searchParams.set("type", options.type ?? "ALL");
@@ -66,13 +44,13 @@ export const fetchClips = async (
 
 export const createTextClip = (
   accessToken: string,
-  payload: { folderId: string; text: string },
+  payload: CreateTextClipRequestDto,
 ) => {
   const formData = new FormData();
   formData.set("folderId", payload.folderId);
   formData.set("text", payload.text);
 
-  return apiRequest("/clips", {
+  return apiRequest<ClipResponseDto>("/clips", {
     method: "POST",
     accessToken,
     body: formData,
@@ -81,13 +59,13 @@ export const createTextClip = (
 
 export const createImageClip = (
   accessToken: string,
-  payload: { folderId: string; file: File },
+  payload: CreateImageClipRequestDto,
 ) => {
   const formData = new FormData();
   formData.set("folderId", payload.folderId);
   formData.set("file", payload.file);
 
-  return apiRequest("/clips", {
+  return apiRequest<ClipResponseDto>("/clips", {
     method: "POST",
     accessToken,
     body: formData,
@@ -95,19 +73,19 @@ export const createImageClip = (
 };
 
 export const removeClip = (accessToken: string, clipId: string) =>
-  apiRequest(`/clips/${clipId}`, {
+  apiRequest<ClipResponseDto>(`/clips/${clipId}`, {
     method: "DELETE",
     accessToken,
   });
 
 export const likeClip = (accessToken: string, clipId: string) =>
-  apiRequest<{ likeByMe: boolean }>(`/clips/${clipId}/likes`, {
+  apiRequest<LikeClipResponseDto>(`/clips/${clipId}/likes`, {
     method: "POST",
     accessToken,
   });
 
 export const unlikeClip = (accessToken: string, clipId: string) =>
-  apiRequest<{ likeByMe: boolean }>(`/clips/${clipId}/likes`, {
+  apiRequest<LikeClipResponseDto>(`/clips/${clipId}/likes`, {
     method: "DELETE",
     accessToken,
   });

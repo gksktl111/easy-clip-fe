@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { getAuthStartUrl } from "@/features/auth/service/authApi";
+import { getAuthStartPath } from "@/features/auth/api/authApi";
 import { persistAuthSession } from "@/features/auth/service/authSession";
 import { buildApiUrl } from "@/shared/config/env";
 import { LoginAgreementNotice } from "@/features/auth/ui/LoginAgreementNotice";
@@ -51,7 +51,7 @@ export function LoginPage() {
       setErrorMessage(null);
       setIsLoading(true);
       setLoadingProvider(provider);
-      window.location.assign(buildApiUrl(getAuthStartUrl(provider)));
+      window.location.assign(buildApiUrl(getAuthStartPath(provider)));
     } catch {
       setIsLoading(false);
       setLoadingProvider(null);

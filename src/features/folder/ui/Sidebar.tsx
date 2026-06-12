@@ -8,8 +8,8 @@ import {
   HiOutlineStar,
 } from "react-icons/hi";
 import { useRouter } from "next/navigation";
+import { logout } from "@/features/auth/api/authApi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import { logout } from "@/features/auth/service/authApi";
 import { clearAuthSession } from "@/features/auth/service/authSession";
 import { useFolders } from "@/features/folder/hooks/useFolders";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
@@ -253,7 +253,9 @@ export function Sidebar({
                 )
               }
               onRenameFolder={(folderId) => {
-                const targetFolder = folders.find((folder) => folder.id === folderId);
+                const targetFolder = folders.find(
+                  (folder) => folder.id === folderId,
+                );
                 if (!targetFolder) {
                   return;
                 }

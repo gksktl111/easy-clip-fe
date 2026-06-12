@@ -1,5 +1,5 @@
 import { Clip, ClipType } from "@/features/clip/model/clip";
-import { ClipListItemResponseDto } from "@/features/clip/service/clipApi";
+import { ClipListItemResponseDto } from "@/features/clip/model/clip.dto";
 
 const clipTypeMap: Record<ClipListItemResponseDto["type"], ClipType> = {
   TEXT: "text",
