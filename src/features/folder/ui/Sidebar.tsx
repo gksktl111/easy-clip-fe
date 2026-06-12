@@ -33,7 +33,8 @@ export function Sidebar({
   const pathname = usePathname();
   const router = useRouter();
   const session = useAuthSession();
-  const { folders, persistFolders } = useFolders();
+  const { createFolder, folders, removeFolder, renameFolder, reorderFolders } =
+    useFolders();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [openOptionsFolderId, setOpenOptionsFolderId] = useState<string | null>(
@@ -93,24 +94,31 @@ export function Sidebar({
     onCloseMobile?.();
   }, [onCloseMobile, pathname]);
 
-  const reorderFolders = useCallback(
+  const ensureAuthenticated = useCallback(() => {
+    if (session?.accessToken) {
+      return true;
+    }
+
+    onCloseMobile?.();
+    router.push("/login");
+    return false;
+  }, [onCloseMobile, router, session?.accessToken]);
+
+  const handleReorderFolders = useCallback(
     (sourceId: string, targetId: string) => {
+      if (!ensureAuthenticated()) {
+        return;
+      }
+
       if (sourceId === targetId) {
         return;
       }
 
-      const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
-      const targetIndex = folders.findIndex((folder) => folder.id === targetId);
-      if (sourceIndex === -1 || targetIndex === -1) {
-        return;
-      }
-
-      const nextFolders = [...folders];
-      const [moved] = nextFolders.splice(sourceIndex, 1);
-      nextFolders.splice(targetIndex, 0, moved);
-      persistFolders(nextFolders);
+      void reorderFolders(sourceId, targetId).catch(() => {
+        // keep the current order when the request fails
+      });
     },
-    [folders, persistFolders],
+    [ensureAuthenticated, reorderFolders],
   );
 
   const closeCreateModal = () => {
@@ -130,14 +138,16 @@ export function Sidebar({
       return;
     }
 
-    const id =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}`;
+    if (!ensureAuthenticated()) {
+      return;
+    }
 
-    persistFolders([...folders, { id, name: trimmedName }]);
-    closeCreateModal();
-  }, [folders, newFolderName, persistFolders]);
+    void createFolder(trimmedName)
+      .then(() => closeCreateModal())
+      .catch(() => {
+        // keep the modal open when the request fails
+      });
+  }, [createFolder, ensureAuthenticated, newFolderName]);
 
   const handleRenameFolder = useCallback(() => {
     if (!renameFolderId) {
@@ -149,13 +159,16 @@ export function Sidebar({
       return;
     }
 
-    const nextFolders = folders.map((folder) =>
-      folder.id === renameFolderId ? { ...folder, name: trimmedName } : folder,
-    );
+    if (!ensureAuthenticated()) {
+      return;
+    }
 
-    persistFolders(nextFolders);
-    closeRenameModal();
-  }, [folders, persistFolders, renameFolderId, renameFolderName]);
+    void renameFolder(renameFolderId, trimmedName)
+      .then(() => closeRenameModal())
+      .catch(() => {
+        // keep the modal open when the request fails
+      });
+  }, [ensureAuthenticated, renameFolder, renameFolderId, renameFolderName]);
 
   const userLabel =
     session?.user?.authAccounts?.[0]?.email ??
@@ -232,7 +245,7 @@ export function Sidebar({
                   return;
                 }
 
-                reorderFolders(draggingFolderId, folderId);
+                handleReorderFolders(draggingFolderId, folderId);
               }}
               onToggleOptions={(folderId) =>
                 setOpenOptionsFolderId((previous) =>
@@ -251,10 +264,17 @@ export function Sidebar({
                 setIsRenameFolderModalOpen(true);
               }}
               onDeleteFolder={(folderId) => {
-                persistFolders(
-                  folders.filter((currentFolder) => currentFolder.id !== folderId),
-                );
-                setOpenOptionsFolderId(null);
+                if (!ensureAuthenticated()) {
+                  return;
+                }
+
+                void removeFolder(folderId)
+                  .then(() => {
+                    setOpenOptionsFolderId(null);
+                  })
+                  .catch(() => {
+                    // keep the menu open when the request fails
+                  });
               }}
             />
           </div>
