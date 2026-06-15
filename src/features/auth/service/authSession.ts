@@ -4,6 +4,8 @@ import { AuthSession } from "@/features/auth/model/auth";
 
 const AUTH_SESSION_STORAGE_KEY = "easy-clip-auth-session";
 const AUTH_SESSION_EVENT = "auth-session:change";
+let cachedSessionRaw: string | null | undefined;
+let cachedSession: AuthSession | null = null;
 
 const dispatchSessionChange = () => {
   window.dispatchEvent(new Event(AUTH_SESSION_EVENT));
@@ -15,23 +17,38 @@ export const readAuthSession = (): AuthSession | null => {
       ? null
       : localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
 
+  if (stored === cachedSessionRaw) {
+    return cachedSession;
+  }
+
   if (!stored) {
+    cachedSessionRaw = null;
+    cachedSession = null;
     return null;
   }
 
   try {
-    return JSON.parse(stored) as AuthSession;
+    cachedSessionRaw = stored;
+    cachedSession = JSON.parse(stored) as AuthSession;
+    return cachedSession;
   } catch {
+    cachedSessionRaw = null;
+    cachedSession = null;
     return null;
   }
 };
 
 export const persistAuthSession = (session: AuthSession) => {
-  localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(session));
+  const serializedSession = JSON.stringify(session);
+  cachedSessionRaw = serializedSession;
+  cachedSession = session;
+  localStorage.setItem(AUTH_SESSION_STORAGE_KEY, serializedSession);
   dispatchSessionChange();
 };
 
 export const clearAuthSession = () => {
+  cachedSessionRaw = null;
+  cachedSession = null;
   localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
   dispatchSessionChange();
 };
