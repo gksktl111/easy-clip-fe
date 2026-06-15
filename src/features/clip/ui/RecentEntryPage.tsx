@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useFolders } from "@/features/folder/hooks/useFolders";
 import { RecentClipsPage } from "@/features/clip/ui/RecentClipsPage";
+import { ClipListSkeleton } from "@/features/clip/ui/ClipListSkeleton";
 
 export function RecentEntryPage() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export function RecentEntryPage() {
   }, [folders, router]);
 
   if (isLoading) {
-    return null;
+    return <ClipListSkeleton />;
   }
 
   if (!folders.length) {

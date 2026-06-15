@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import {
   createFolder as createFolderRequest,
@@ -13,6 +13,7 @@ import { FolderItem } from "@/features/folder/model/folder";
 import {
   FolderResponseDto,
 } from "@/features/folder/model/folder.dto";
+import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 const sortFolders = (folders: FolderItem[]) =>
   [...folders].sort((left, right) => left.order - right.order);
@@ -30,10 +31,21 @@ export const useFolders = () => {
   const accessToken = session?.accessToken ?? null;
   const [folders, setFolders] = useState<FolderItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const requestSerialRef = useRef(0);
 
   const refreshFolders = useCallback(async () => {
+    const requestId = requestSerialRef.current + 1;
+    requestSerialRef.current = requestId;
+    const loadingStartedAt = Date.now();
+
     if (!accessToken) {
+      await waitForMinimumLoading(loadingStartedAt);
+      if (requestId !== requestSerialRef.current) {
+        return [];
+      }
+
       setFolders([]);
+      setIsLoading(false);
       return [];
     }
 
@@ -42,10 +54,17 @@ export const useFolders = () => {
     try {
       const response = await fetchFolders(accessToken);
       const nextFolders = sortFolders(response.map(mapFolder));
+      if (requestId !== requestSerialRef.current) {
+        return nextFolders;
+      }
+
       setFolders(nextFolders);
       return nextFolders;
     } finally {
-      setIsLoading(false);
+      await waitForMinimumLoading(loadingStartedAt);
+      if (requestId === requestSerialRef.current) {
+        setIsLoading(false);
+      }
     }
   }, [accessToken]);
 

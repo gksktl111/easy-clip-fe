@@ -16,6 +16,7 @@ export function RecentClipsPage() {
     filteredClips,
     handleCopy,
     hasClips,
+    isLoading,
     searchQuery,
     setActiveFilter,
     setSearchQuery,
@@ -31,7 +32,11 @@ export function RecentClipsPage() {
         showStatus={false}
         countLabel={t("count", { count: filteredClips.length })}
       />
-      <ClipResultsSection clips={filteredClips} onCopy={handleCopy} />
+      <ClipResultsSection
+        clips={filteredClips}
+        isLoading={isLoading}
+        onCopy={handleCopy}
+      />
       <DeleteAllButton disabled={!hasClips} onClick={clearAll} />
       <ClipCopyToast label={t("copyToast")} position={copyToast} />
     </div>

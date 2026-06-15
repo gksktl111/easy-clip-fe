@@ -27,6 +27,7 @@ export function FolderClipsPage() {
     hasClips,
     isActive,
     isDeleteAllOpen,
+    isLoading,
     searchQuery,
     setActiveFilter,
     setContextMenu,
@@ -56,6 +57,7 @@ export function FolderClipsPage() {
       ) : null}
       <ClipResultsSection
         clips={filteredClips}
+        isLoading={isLoading}
         onCopy={handleCopy}
         onToggleFavorite={handleToggleFavorite}
         onContextMenu={handleOpenContextMenu}

@@ -1,6 +1,13 @@
 "use client";
 
-import { startTransition, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import {
   fetchClips,
@@ -12,29 +19,71 @@ import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import { Clip } from "@/features/clip/model/clip";
 import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
 import { FilterType } from "@/features/clip/ui/FilterBar";
+import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 export const useFavoriteClipsPage = () => {
   const session = useAuthSession();
   const accessToken = session?.accessToken ?? null;
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [isLoading, setIsLoading] = useState(true);
   const [clips, setClips] = useState<Clip[]>([]);
   const { copyToast, showCopyToast } = useCopyToast();
+  const requestSerialRef = useRef(0);
+  const hasLoadedOnceRef = useRef(false);
 
   const loadFavoriteClips = useCallback(async () => {
+    const requestId = requestSerialRef.current + 1;
+    requestSerialRef.current = requestId;
+    const shouldShowSkeleton = !hasLoadedOnceRef.current;
+    const loadingStartedAt = Date.now();
+
     if (!accessToken) {
+      if (shouldShowSkeleton) {
+        await waitForMinimumLoading(loadingStartedAt);
+      }
+
+      if (requestId !== requestSerialRef.current) {
+        return;
+      }
+
       startTransition(() => {
         setClips([]);
+        hasLoadedOnceRef.current = true;
+        setIsLoading(false);
       });
       return;
     }
 
-    const response = await fetchClips(accessToken, {
-      favorite: true,
-    });
+    if (shouldShowSkeleton) {
+      setIsLoading(true);
+    }
 
-    startTransition(() => {
-      setClips(response.map(mapClipResponse));
-    });
+    try {
+      const response = await fetchClips(accessToken, {
+        favorite: true,
+      });
+
+      if (requestId !== requestSerialRef.current) {
+        return;
+      }
+
+      startTransition(() => {
+        setClips(response.map(mapClipResponse));
+        hasLoadedOnceRef.current = true;
+      });
+    } finally {
+      if (shouldShowSkeleton) {
+        await waitForMinimumLoading(loadingStartedAt);
+      }
+      if (requestId === requestSerialRef.current) {
+        setIsLoading(false);
+      }
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    hasLoadedOnceRef.current = false;
+    setIsLoading(true);
   }, [accessToken]);
 
   useEffect(() => {
@@ -87,6 +136,7 @@ export const useFavoriteClipsPage = () => {
     activeFilter,
     copyToast,
     filteredClips,
+    isLoading,
     setActiveFilter,
     handleCopy,
     handleToggleFavorite,
