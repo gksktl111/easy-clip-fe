@@ -53,6 +53,7 @@
   "sidebar": {
     "favorites": "Favorites",
     "recent": "Recent",
+    "trash": "Trash",
     "addFolder": "Add Folder",
     "reorderFolder": "Reorder folder",
     "openFolderOptions": "Open folder options",
@@ -86,6 +87,48 @@
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "A modern clipboard manager for designers and developers",
     "closeButton": "Close"
+  },
+  "trash": {
+    "title": "Trash",
+    "retentionNotice": "Kept for up to 30 days",
+    "description": "Review deleted clips and folders, then restore or permanently remove them.",
+    "refresh": "Refresh",
+    "clearAll": "Empty trash",
+    "cancel": "Cancel",
+    "loading": "Loading trash items.",
+    "error": "Failed to load trash data. Please try again shortly.",
+    "emptyTitle": "Trash is empty",
+    "emptyDescription": "Deleted clips or folders will appear here.",
+    "listTitle": "Deleted items",
+    "totalCount": "{count, plural, =0 {0 items} one {# item} other {# items}}",
+    "folderType": "Folder",
+    "fileType": "File",
+    "parentFolder": "Parent folder",
+    "unknownParentFolder": "Unknown folder",
+    "clipKinds": {
+      "text": "Text",
+      "color": "Color",
+      "image": "Image"
+    },
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "deletedAt": "Deleted at",
+      "actions": "Actions"
+    },
+    "clearAllModal": {
+      "title": "Empty trash",
+      "description": "Are you sure you want to permanently delete every item in trash?"
+    },
+    "clipsTitle": "Deleted clips",
+    "clipsCount": "{count, plural, =0 {0 clips} one {# clip} other {# clips}}",
+    "clipsEmpty": "No deleted clips.",
+    "foldersTitle": "Deleted folders",
+    "foldersCount": "{count, plural, =0 {0 folders} one {# folder} other {# folders}}",
+    "foldersEmpty": "No deleted folders.",
+    "deletedAt": "Deleted at",
+    "restore": "Restore",
+    "deleteForever": "Delete forever"
   },
   "clips": {
     "count": "{count, plural, =0 {0 clips} one {# clip} other {# clips}}",

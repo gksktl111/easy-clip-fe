@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { getAuthStartPath, testAdminLogin } from "@/features/auth/api/authApi";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { getAuthStartPath } from "@/features/auth/api/authApi";
+import { restoreSessionFromRefreshCookie } from "@/features/auth/service/authService";
 import { persistAuthSession } from "@/features/auth/service/authSession";
-import { buildApiUrl, isLocalApiBaseUrl } from "@/shared/config/env";
+import { buildApiUrl } from "@/shared/config/env";
 import { LoginAgreementNotice } from "@/features/auth/ui/LoginAgreementNotice";
 import { LoginBrandPanel } from "@/features/auth/ui/LoginBrandPanel";
 import { LoginLoadingState } from "@/features/auth/ui/LoginLoadingState";
@@ -21,6 +22,7 @@ export function LoginPage() {
     "google" | "github" | null
   >(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const hasTriedCookieRestoreRef = useRef(false);
 
   const redirectedSession = useMemo(() => {
     const accessToken = searchParams.get("access_token");
@@ -46,23 +48,25 @@ export function LoginPage() {
     router.replace("/favorites");
   }, [redirectedSession, router]);
 
+  useEffect(() => {
+    if (redirectedSession || hasTriedCookieRestoreRef.current) {
+      return;
+    }
+
+    hasTriedCookieRestoreRef.current = true;
+
+    void restoreSessionFromRefreshCookie()
+      .then(() => router.replace("/favorites"))
+      .catch(() => {
+        // Stay on the login page when there is no active OAuth cookie session.
+      });
+  }, [redirectedSession, router]);
+
   const handleLogin = async (provider: "google" | "github") => {
     try {
       setErrorMessage(null);
       setIsLoading(true);
       setLoadingProvider(provider);
-
-      if (isLocalApiBaseUrl()) {
-        const session = await testAdminLogin();
-        persistAuthSession({
-          accessToken: session.access_token,
-          refreshToken: session.refresh_token,
-          user: session.user,
-        });
-        router.replace("/favorites");
-        return;
-      }
-
       window.location.assign(buildApiUrl(getAuthStartPath(provider)));
     } catch {
       setIsLoading(false);

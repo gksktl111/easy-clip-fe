@@ -16,6 +16,10 @@ export interface AuthSignInResponseDto {
   user: AuthUserResponseDto;
 }
 
+export interface RefreshAccessTokenResponseDto {
+  access_token: string;
+}
+
 export interface UserProfileResponseDto {
   id: string;
   displayName: string;

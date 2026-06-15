@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HiOutlineClock, HiOutlineStar } from "react-icons/hi";
+import { HiOutlineClock, HiOutlineStar, HiOutlineTrash } from "react-icons/hi";
 import { useRouter } from "next/navigation";
 import { logout } from "@/features/auth/api/authApi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
@@ -50,6 +50,7 @@ export function Sidebar({
   const reservedPathnames = new Set([
     "favorites",
     "recent",
+    "trash",
     "login",
     "pricing",
   ]);
@@ -68,6 +69,11 @@ export function Sidebar({
       href: currentFolderId ? `/${currentFolderId}/recent` : "/recent",
       label: t("recent"),
       icon: <HiOutlineClock className="h-5 w-5" aria-hidden />,
+    },
+    {
+      href: "/trash",
+      label: t("trash"),
+      icon: <HiOutlineTrash className="h-5 w-5" aria-hidden />,
     },
   ];
 
