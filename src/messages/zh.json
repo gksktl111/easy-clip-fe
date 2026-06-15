@@ -53,6 +53,7 @@
   "sidebar": {
     "favorites": "收藏",
     "recent": "最近",
+    "trash": "回收站",
     "addFolder": "添加文件夹",
     "reorderFolder": "调整文件夹顺序",
     "openFolderOptions": "打开文件夹选项",
@@ -86,6 +87,47 @@
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "面向设计师和开发者的现代剪贴板管理器",
     "closeButton": "关闭"
+  },
+  "trash": {
+    "title": "回收站",
+    "description": "查看已删除的剪贴内容和文件夹，并可执行恢复或永久删除。",
+    "refresh": "刷新",
+    "clearAll": "清空回收站",
+    "cancel": "取消",
+    "loading": "正在加载回收站内容。",
+    "error": "无法加载回收站数据。请稍后再试。",
+    "emptyTitle": "回收站为空",
+    "emptyDescription": "删除的剪贴内容或文件夹会显示在这里。",
+    "listTitle": "已删除项目",
+    "totalCount": "{count, plural, =0 {0 个项目} other {# 个项目}}",
+    "folderType": "文件夹",
+    "fileType": "文件",
+    "parentFolder": "父级文件夹",
+    "unknownParentFolder": "未知文件夹",
+    "clipKinds": {
+      "text": "文本",
+      "color": "颜色",
+      "image": "图片"
+    },
+    "columns": {
+      "name": "名称",
+      "type": "类型",
+      "deletedAt": "删除时间",
+      "actions": "操作"
+    },
+    "clearAllModal": {
+      "title": "清空回收站",
+      "description": "确定要永久删除回收站中的全部项目吗？"
+    },
+    "clipsTitle": "已删除剪贴内容",
+    "clipsCount": "{count, plural, =0 {0 个剪贴项} other {# 个剪贴项}}",
+    "clipsEmpty": "没有已删除的剪贴内容。",
+    "foldersTitle": "已删除文件夹",
+    "foldersCount": "{count, plural, =0 {0 个文件夹} other {# 个文件夹}}",
+    "foldersEmpty": "没有已删除的文件夹。",
+    "deletedAt": "删除时间",
+    "restore": "恢复",
+    "deleteForever": "永久删除"
   },
   "clips": {
     "count": "{count, plural, =0 {0 个剪贴项} other {# 个剪贴项}}",
