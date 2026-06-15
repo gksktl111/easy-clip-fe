@@ -238,7 +238,7 @@ a {
   }
 }
 
-.trash-skeleton {
+.skeleton-shimmer {
   background-image: linear-gradient(
     90deg,
     var(--surface-muted) 0%,

@@ -121,18 +121,18 @@ function TrashListSkeletonRow() {
     >
       <div className="flex flex-col gap-3 min-[1200px]:grid min-[1200px]:grid-cols-[minmax(0,1.5fr)_180px_220px_220px] min-[1200px]:items-center min-[1200px]:gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="trash-skeleton h-10 w-10 shrink-0 rounded-xl" />
+          <div className="skeleton-shimmer h-10 w-10 shrink-0 rounded-xl" />
           <div className="min-w-0 flex-1 space-y-2">
-            <div className="trash-skeleton h-4 w-2/3 rounded-md" />
-            <div className="trash-skeleton h-3 w-1/2 rounded-md" />
+            <div className="skeleton-shimmer h-4 w-2/3 rounded-md" />
+            <div className="skeleton-shimmer h-3 w-1/2 rounded-md" />
           </div>
         </div>
 
-        <div className="trash-skeleton h-7 w-24 rounded-full" />
-        <div className="trash-skeleton h-4 w-32 rounded-md" />
+        <div className="skeleton-shimmer h-7 w-24 rounded-full" />
+        <div className="skeleton-shimmer h-4 w-32 rounded-md" />
         <div className="flex flex-wrap justify-end gap-2 min-[1200px]:justify-start">
-          <div className="trash-skeleton h-8 w-16 rounded-lg" />
-          <div className="trash-skeleton h-8 w-20 rounded-lg" />
+          <div className="skeleton-shimmer h-8 w-16 rounded-lg" />
+          <div className="skeleton-shimmer h-8 w-20 rounded-lg" />
         </div>
       </div>
     </article>

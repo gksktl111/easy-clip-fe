@@ -14,6 +14,7 @@ export function FavoriteClipsPage() {
     filteredClips,
     handleCopy,
     handleToggleFavorite,
+    isLoading,
     setActiveFilter,
   } = useFavoriteClipsPage();
 
@@ -27,6 +28,7 @@ export function FavoriteClipsPage() {
       />
       <ClipResultsSection
         clips={filteredClips}
+        isLoading={isLoading}
         onCopy={handleCopy}
         onToggleFavorite={handleToggleFavorite}
       />
