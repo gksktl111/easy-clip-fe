@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { getAuthStartPath } from "@/features/auth/api/authApi";
+import { getAuthStartPath, testAdminLogin } from "@/features/auth/api/authApi";
 import { persistAuthSession } from "@/features/auth/service/authSession";
-import { buildApiUrl } from "@/shared/config/env";
+import { buildApiUrl, isLocalApiBaseUrl } from "@/shared/config/env";
 import { LoginAgreementNotice } from "@/features/auth/ui/LoginAgreementNotice";
 import { LoginBrandPanel } from "@/features/auth/ui/LoginBrandPanel";
 import { LoginLoadingState } from "@/features/auth/ui/LoginLoadingState";
@@ -51,6 +51,18 @@ export function LoginPage() {
       setErrorMessage(null);
       setIsLoading(true);
       setLoadingProvider(provider);
+
+      if (isLocalApiBaseUrl()) {
+        const session = await testAdminLogin();
+        persistAuthSession({
+          accessToken: session.access_token,
+          refreshToken: session.refresh_token,
+          user: session.user,
+        });
+        router.replace("/favorites");
+        return;
+      }
+
       window.location.assign(buildApiUrl(getAuthStartPath(provider)));
     } catch {
       setIsLoading(false);

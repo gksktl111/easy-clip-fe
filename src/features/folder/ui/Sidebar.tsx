@@ -3,10 +3,7 @@
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  HiOutlineClock,
-  HiOutlineStar,
-} from "react-icons/hi";
+import { HiOutlineClock, HiOutlineStar } from "react-icons/hi";
 import { useRouter } from "next/navigation";
 import { logout } from "@/features/auth/api/authApi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
@@ -17,6 +14,8 @@ import { FolderSidebarFooter } from "@/features/folder/ui/FolderSidebarFooter";
 import { FolderSidebarHeader } from "@/features/folder/ui/FolderSidebarHeader";
 import { FolderSidebarSection } from "@/features/folder/ui/FolderSidebarSection";
 import { SidebarPrimaryNav } from "@/features/folder/ui/SidebarPrimaryNav";
+
+//TODO : 클립 도메인으로 합병
 
 interface SidebarProps {
   onOpenSettings: () => void;
@@ -48,7 +47,12 @@ export function Sidebar({
   const renameInputRef = useRef<HTMLInputElement>(null);
   const pathSegments = pathname.split("/").filter(Boolean);
   const pathnameFolderId = pathSegments[0] ?? null;
-  const reservedPathnames = new Set(["favorites", "recent", "login", "pricing"]);
+  const reservedPathnames = new Set([
+    "favorites",
+    "recent",
+    "login",
+    "pricing",
+  ]);
   const currentFolderId =
     pathnameFolderId && !reservedPathnames.has(pathnameFolderId)
       ? pathnameFolderId

@@ -8,6 +8,7 @@ import {
 } from "@/features/clip/model/clip.dto";
 import { apiRequest } from "@/shared/lib/apiClient";
 
+//? 이거 뭔지 확인
 export const fetchClips = async (
   accessToken: string,
   options: FetchClipsQueryDto = {},
