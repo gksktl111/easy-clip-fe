@@ -1,4 +1,7 @@
-import { fetchMyProfile } from "@/features/auth/api/authApi";
+import {
+  fetchMyProfile,
+  refreshAccessToken,
+} from "@/features/auth/api/authApi";
 import { AuthSession } from "@/features/auth/model/auth";
 import {
   clearAuthSession,
@@ -14,6 +17,17 @@ export const syncSessionProfile = async (session: AuthSession) => {
 
   persistAuthSession(nextSession);
   return nextSession;
+};
+
+export const restoreSessionFromRefreshCookie = async () => {
+  const token = await refreshAccessToken();
+  const session = await syncSessionProfile({
+    accessToken: token.access_token,
+    refreshToken: null,
+    user: null,
+  });
+
+  return session;
 };
 
 export const clearSessionOnUnauthorized = () => {

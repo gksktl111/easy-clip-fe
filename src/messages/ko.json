@@ -53,6 +53,7 @@
   "sidebar": {
     "favorites": "즐겨찾기",
     "recent": "최근 항목",
+    "trash": "휴지통",
     "addFolder": "폴더 추가",
     "reorderFolder": "폴더 순서 변경",
     "openFolderOptions": "폴더 옵션 열기",
@@ -86,6 +87,48 @@
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "디자이너와 개발자를 위한 현대적인 클립보드 매니저",
     "closeButton": "닫기"
+  },
+  "trash": {
+    "title": "휴지통",
+    "retentionNotice": "최대 30일까지 보관됩니다",
+    "description": "삭제된 클립과 폴더를 확인하고 복구하거나 영구 삭제할 수 있습니다.",
+    "refresh": "새로고침",
+    "clearAll": "비우기",
+    "cancel": "취소",
+    "loading": "휴지통을 불러오는 중입니다.",
+    "error": "휴지통 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
+    "emptyTitle": "휴지통이 비어 있습니다",
+    "emptyDescription": "삭제된 클립이나 폴더가 생기면 이곳에 표시됩니다.",
+    "listTitle": "삭제 항목",
+    "totalCount": "{count, plural, =0 {항목 0개} other {항목 #개}}",
+    "folderType": "폴더",
+    "fileType": "파일",
+    "parentFolder": "부모 폴더",
+    "unknownParentFolder": "알 수 없는 폴더",
+    "clipKinds": {
+      "text": "텍스트",
+      "color": "색상",
+      "image": "이미지"
+    },
+    "columns": {
+      "name": "이름",
+      "type": "유형",
+      "deletedAt": "삭제 시각",
+      "actions": "작업"
+    },
+    "clearAllModal": {
+      "title": "휴지통 비우기",
+      "description": "정말 휴지통의 모든 항목을 영구 삭제하시겠습니까?"
+    },
+    "clipsTitle": "삭제된 클립",
+    "clipsCount": "{count, plural, =0 {클립 0개} other {클립 #개}}",
+    "clipsEmpty": "삭제된 클립이 없습니다.",
+    "foldersTitle": "삭제된 폴더",
+    "foldersCount": "{count, plural, =0 {폴더 0개} other {폴더 #개}}",
+    "foldersEmpty": "삭제된 폴더가 없습니다.",
+    "deletedAt": "삭제 시각",
+    "restore": "복구",
+    "deleteForever": "영구 삭제"
   },
   "clips": {
     "count": "{count, plural, =0 {0개 클립} other {#개 클립}}",

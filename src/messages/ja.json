@@ -53,6 +53,7 @@
   "sidebar": {
     "favorites": "お気に入り",
     "recent": "最近",
+    "trash": "ゴミ箱",
     "addFolder": "フォルダ追加",
     "reorderFolder": "フォルダの並び替え",
     "openFolderOptions": "フォルダオプションを開く",
@@ -86,6 +87,48 @@
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "デザイナーと開発者のためのモダンなクリップボードマネージャー",
     "closeButton": "閉じる"
+  },
+  "trash": {
+    "title": "ゴミ箱",
+    "retentionNotice": "最大30日間保管されます",
+    "description": "削除したクリップとフォルダを確認し、復元または完全削除できます。",
+    "refresh": "再読み込み",
+    "clearAll": "ゴミ箱を空にする",
+    "cancel": "キャンセル",
+    "loading": "ゴミ箱を読み込んでいます。",
+    "error": "ゴミ箱データを読み込めませんでした。しばらくしてから再試行してください。",
+    "emptyTitle": "ゴミ箱は空です",
+    "emptyDescription": "削除されたクリップやフォルダがここに表示されます。",
+    "listTitle": "削除済みアイテム",
+    "totalCount": "{count, plural, =0 {0件} other {#件}}",
+    "folderType": "フォルダ",
+    "fileType": "ファイル",
+    "parentFolder": "親フォルダ",
+    "unknownParentFolder": "不明なフォルダ",
+    "clipKinds": {
+      "text": "テキスト",
+      "color": "カラー",
+      "image": "画像"
+    },
+    "columns": {
+      "name": "名前",
+      "type": "種類",
+      "deletedAt": "削除日時",
+      "actions": "操作"
+    },
+    "clearAllModal": {
+      "title": "ゴミ箱を空にする",
+      "description": "本当にゴミ箱内のすべての項目を完全削除しますか？"
+    },
+    "clipsTitle": "削除済みクリップ",
+    "clipsCount": "{count, plural, =0 {クリップ 0件} other {クリップ #件}}",
+    "clipsEmpty": "削除済みクリップはありません。",
+    "foldersTitle": "削除済みフォルダ",
+    "foldersCount": "{count, plural, =0 {フォルダ 0件} other {フォルダ #件}}",
+    "foldersEmpty": "削除済みフォルダはありません。",
+    "deletedAt": "削除日時",
+    "restore": "復元",
+    "deleteForever": "完全削除"
   },
   "clips": {
     "count": "{count, plural, =0 {0 件のクリップ} other {# 件のクリップ}}",

@@ -229,6 +229,26 @@ a {
   }
 }
 
+@keyframes shimmer-x {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.trash-skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-muted) 0%,
+    var(--surface-elevated) 50%,
+    var(--surface-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-x 1.15s ease-in-out infinite;
+}
+
 .clip-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: var(--clip-scrollbar-thumb) var(--clip-scrollbar-track);
