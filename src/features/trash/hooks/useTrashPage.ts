@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useCallback, useEffect, useState } from "react";
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { fetchFolders } from "@/features/folder/api/folderApi";
 import { FolderResponseDto } from "@/features/folder/model/folder.dto";
@@ -38,12 +38,20 @@ export const useTrashPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
+  const loadRequestIdRef = useRef(0);
 
   const loadTrash = useCallback(async () => {
+    const requestId = loadRequestIdRef.current + 1;
+    loadRequestIdRef.current = requestId;
     const loadingStartedAt = Date.now();
+    const isLatestRequest = () => loadRequestIdRef.current === requestId;
 
     if (!accessToken) {
       await waitForMinimumLoading(loadingStartedAt);
+
+      if (!isLatestRequest()) {
+        return;
+      }
 
       startTransition(() => {
         setClips([]);
@@ -65,15 +73,25 @@ export const useTrashPage = () => {
       ]);
 
       startTransition(() => {
+        if (!isLatestRequest()) {
+          return;
+        }
+
         setClips(trashClips.items);
         setFolders(trashFolders.items);
         setActiveFolders(currentFolders);
       });
     } catch {
+      if (!isLatestRequest()) {
+        return;
+      }
+
       setError("load");
     } finally {
       await waitForMinimumLoading(loadingStartedAt);
-      setIsLoading(false);
+      if (isLatestRequest()) {
+        setIsLoading(false);
+      }
     }
   }, [accessToken]);
 
