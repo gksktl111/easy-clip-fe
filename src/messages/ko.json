@@ -81,6 +81,7 @@
     "general": "일반",
     "language": "언어",
     "languageDescription": "선호하는 언어를 선택하세요.",
+    "saveError": "설정을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.",
     "about": "정보",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "디자이너와 개발자를 위한 현대적인 클립보드 매니저",

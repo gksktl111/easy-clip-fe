@@ -81,6 +81,7 @@
     "general": "通用",
     "language": "语言",
     "languageDescription": "选择你偏好的语言。",
+    "saveError": "无法保存设置。请稍后再试。",
     "about": "关于",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "面向设计师和开发者的现代剪贴板管理器",

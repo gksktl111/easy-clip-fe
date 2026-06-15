@@ -81,6 +81,7 @@
     "general": "General",
     "language": "Language",
     "languageDescription": "Select your preferred language.",
+    "saveError": "Failed to save settings. Please try again shortly.",
     "about": "About",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "A modern clipboard manager for designers and developers",

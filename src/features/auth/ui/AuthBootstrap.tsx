@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { syncUserSettings } from "@/features/settings/service/settingsService";
 import { ApiError } from "@/shared/lib/apiClient";
 import {
   clearSessionOnUnauthorized,
@@ -18,13 +19,21 @@ export function AuthBootstrap() {
       return;
     }
 
-    if (lastTokenRef.current === session.accessToken && session.user) {
+    const currentSession = session;
+    const accessToken = currentSession.accessToken;
+
+    if (lastTokenRef.current === accessToken) {
       return;
     }
 
-    lastTokenRef.current = session.accessToken;
+    lastTokenRef.current = accessToken;
 
-    void syncSessionProfile(session).catch((error: unknown) => {
+    void Promise.all([
+      currentSession.user
+        ? Promise.resolve(currentSession)
+        : syncSessionProfile(currentSession),
+      syncUserSettings(accessToken),
+    ]).catch((error: unknown) => {
       if (error instanceof ApiError && error.status === 401) {
         clearSessionOnUnauthorized();
       }

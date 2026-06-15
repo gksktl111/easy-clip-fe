@@ -81,6 +81,7 @@
     "general": "一般",
     "language": "言語",
     "languageDescription": "希望する言語を選択してください。",
+    "saveError": "設定を保存できませんでした。しばらくしてからもう一度お試しください。",
     "about": "情報",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "デザイナーと開発者のためのモダンなクリップボードマネージャー",
