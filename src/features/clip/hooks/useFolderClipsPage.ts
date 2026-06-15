@@ -1,83 +1,75 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
+  startTransition,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
 } from "react";
-import { subscribeToClipStore } from "@/features/clip/service/clipStoreSubscription";
-import { mapStoredClipDates } from "@/features/clip/service/mapStoredClipDates";
-import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
+import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import {
-  clearFolderClips,
-  deleteClip,
-  getFolderClips,
-  readClipStorageRaw,
-  recordCopy,
-  StoredClip,
-  updateClip,
-  upsertClip,
-} from "@/features/clip/service/clipStorage";
-import { FilterType } from "@/features/clip/ui/FilterBar";
+  createImageClip,
+  createTextClip,
+  fetchClips,
+  likeClip,
+  recordClipView,
+  removeClip,
+  unlikeClip,
+} from "@/features/clip/api/clipApi";
+import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import { Clip } from "@/features/clip/model/clip";
-
-const EMPTY_CLIPS: StoredClip[] = [];
+import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
+import { FilterType } from "@/features/clip/ui/FilterBar";
 
 export const useFolderClipsPage = () => {
   const params = useParams<{ id?: string }>();
+  const router = useRouter();
   const folderId = params?.id ?? "";
+  const session = useAuthSession();
+  const accessToken = session?.accessToken ?? null;
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isActive, setIsActive] = useState(false);
+  const [clips, setClips] = useState<Clip[]>([]);
   const [contextMenu, setContextMenu] = useState<{
     id: string;
     x: number;
     y: number;
   } | null>(null);
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
-  const [isRenameOpen, setIsRenameOpen] = useState(false);
-  const [renameClipId, setRenameClipId] = useState<string | null>(null);
-  const [renameName, setRenameName] = useState("");
-  const renameInputRef = useRef<HTMLInputElement>(null);
   const { copyToast, showCopyToast } = useCopyToast();
-  const lastClipsRawRef = useRef<string | null>(null);
-  const lastFolderIdRef = useRef("");
-  const lastClipsRef = useRef<StoredClip[]>(EMPTY_CLIPS);
+  const requestSerialRef = useRef(0);
 
-  const getClipsSnapshot = useCallback(() => {
-    if (!folderId) {
-      return EMPTY_CLIPS;
+  const loadFolderClips = useCallback(async () => {
+    if (!accessToken || !folderId) {
+      startTransition(() => {
+        setClips([]);
+      });
+      return;
     }
 
-    const stored = readClipStorageRaw();
-    if (
-      stored === lastClipsRawRef.current &&
-      folderId === lastFolderIdRef.current
-    ) {
-      return lastClipsRef.current;
+    const requestId = requestSerialRef.current + 1;
+    requestSerialRef.current = requestId;
+
+    const response = await fetchClips(accessToken, {
+      folderId,
+    });
+
+    if (requestId !== requestSerialRef.current) {
+      return;
     }
 
-    const nextClips = getFolderClips(folderId);
-    lastClipsRawRef.current = stored;
-    lastFolderIdRef.current = folderId;
-    lastClipsRef.current = nextClips;
-    return nextClips;
-  }, [folderId]);
+    startTransition(() => {
+      setClips(response.map(mapClipResponse));
+    });
+  }, [accessToken, folderId]);
 
-  const storedClips = useSyncExternalStore(
-    subscribeToClipStore,
-    getClipsSnapshot,
-    () => EMPTY_CLIPS,
-  );
-
-  const clips = useMemo<Clip[]>(
-    () => storedClips.map(mapStoredClipDates),
-    [storedClips],
-  );
+  useEffect(() => {
+    void loadFolderClips();
+  }, [loadFolderClips]);
 
   const filteredClips = useMemo(() => {
     const clipsByType =
@@ -102,12 +94,6 @@ export const useFolderClipsPage = () => {
   }, []);
 
   useEffect(() => {
-    if (isRenameOpen && renameInputRef.current) {
-      renameInputRef.current.focus();
-    }
-  }, [isRenameOpen]);
-
-  useEffect(() => {
     if (!contextMenu) {
       return;
     }
@@ -125,70 +111,49 @@ export const useFolderClipsPage = () => {
     return () => window.removeEventListener("pointerdown", handlePointerDown);
   }, [contextMenu]);
 
-  const addClip = useCallback((clip: StoredClip) => {
-    upsertClip(clip);
-  }, []);
+  const ensureAuthenticated = useCallback(() => {
+    if (accessToken) {
+      return true;
+    }
 
-  const createTextClip = useCallback(
-    (content: string) => {
+    router.push("/login");
+    return false;
+  }, [accessToken, router]);
+
+  const createTextClipFromPaste = useCallback(
+    async (content: string) => {
       const trimmed = content.trim();
-      if (!trimmed) {
+      if (!trimmed || !folderId || !accessToken) {
         return;
       }
 
-      const now = new Date().toISOString();
-      const isColor = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(trimmed);
-      addClip({
-        id:
-          typeof crypto !== "undefined" && "randomUUID" in crypto
-            ? crypto.randomUUID()
-            : `${Date.now()}`,
-        folderId: folderId || null,
-        type: isColor ? "color" : "text",
-        name: isColor ? "Color Clip" : "Text Clip",
-        content: trimmed,
-        createdAt: now,
-        updatedAt: now,
-        lastCopiedAt: now,
-        isFavorite: false,
+      await createTextClip(accessToken, {
+        folderId,
+        text: trimmed,
       });
+      await loadFolderClips();
     },
-    [addClip, folderId],
+    [accessToken, folderId, loadFolderClips],
   );
 
-  const createImageClip = useCallback(
-    (file: File) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = typeof reader.result === "string" ? reader.result : "";
-        if (!result) {
-          return;
-        }
+  const createImageClipFromPaste = useCallback(
+    async (file: File) => {
+      if (!folderId || !accessToken) {
+        return;
+      }
 
-        const now = new Date().toISOString();
-        addClip({
-          id:
-            typeof crypto !== "undefined" && "randomUUID" in crypto
-              ? crypto.randomUUID()
-              : `${Date.now()}`,
-          folderId: folderId || null,
-          type: "image",
-          name: "Image Clip",
-          content: result,
-          createdAt: now,
-          updatedAt: now,
-          lastCopiedAt: now,
-          isFavorite: false,
-        });
-      };
-      reader.readAsDataURL(file);
+      await createImageClip(accessToken, {
+        folderId,
+        file,
+      });
+      await loadFolderClips();
     },
-    [addClip, folderId],
+    [accessToken, folderId, loadFolderClips],
   );
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
-      if (!isActive || !folderId) {
+      if (!isActive || !folderId || !ensureAuthenticated()) {
         return;
       }
 
@@ -202,20 +167,26 @@ export const useFolderClipsPage = () => {
       if (imageItem) {
         const file = imageItem.getAsFile();
         if (file) {
-          createImageClip(file);
+          void createImageClipFromPaste(file);
           return;
         }
       }
 
       const text = clipboard.getData("text");
       if (text) {
-        createTextClip(text);
+        void createTextClipFromPaste(text);
       }
     };
 
     window.addEventListener("paste", handlePaste);
     return () => window.removeEventListener("paste", handlePaste);
-  }, [createImageClip, createTextClip, folderId, isActive]);
+  }, [
+    createImageClipFromPaste,
+    createTextClipFromPaste,
+    ensureAuthenticated,
+    folderId,
+    isActive,
+  ]);
 
   const handleCopy = useCallback(
     async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
@@ -227,28 +198,46 @@ export const useFolderClipsPage = () => {
         // no-op
       }
 
-      recordCopy(clip.id);
+      if (accessToken) {
+        await recordClipView(accessToken, clip.id);
+      }
     },
-    [showCopyToast],
+    [accessToken, showCopyToast],
   );
 
-  const handleCopyFromMenu = useCallback(async (clip: Clip) => {
-    try {
-      await navigator.clipboard.writeText(clip.content);
-    } catch {
-      // no-op
-    }
+  const handleCopyFromMenu = useCallback(
+    async (clip: Clip) => {
+      try {
+        await navigator.clipboard.writeText(clip.content);
+      } catch {
+        // no-op
+      }
 
-    recordCopy(clip.id);
-    setContextMenu(null);
-  }, []);
+      if (accessToken) {
+        await recordClipView(accessToken, clip.id);
+      }
 
-  const handleToggleFavorite = useCallback((clip: Clip) => {
-    updateClip(clip.id, {
-      isFavorite: !clip.isFavorite,
-      updatedAt: new Date().toISOString(),
-    });
-  }, []);
+      setContextMenu(null);
+    },
+    [accessToken],
+  );
+
+  const handleToggleFavorite = useCallback(
+    async (clip: Clip) => {
+      if (!accessToken) {
+        return;
+      }
+
+      if (clip.isFavorite) {
+        await unlikeClip(accessToken, clip.id);
+      } else {
+        await likeClip(accessToken, clip.id);
+      }
+
+      await loadFolderClips();
+    },
+    [accessToken, loadFolderClips],
+  );
 
   const handleOpenContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => {
@@ -262,43 +251,28 @@ export const useFolderClipsPage = () => {
     [],
   );
 
-  const handleDeleteClip = useCallback((clipId: string) => {
-    deleteClip(clipId);
-    setContextMenu(null);
-  }, []);
+  const handleDeleteClip = useCallback(
+    async (clipId: string) => {
+      if (!accessToken) {
+        return;
+      }
 
-  const handleOpenRename = useCallback((clipId: string, name: string) => {
-    setContextMenu(null);
-    setRenameClipId(clipId);
-    setRenameName(name);
-    setIsRenameOpen(true);
-  }, []);
+      await removeClip(accessToken, clipId);
+      setContextMenu(null);
+      await loadFolderClips();
+    },
+    [accessToken, loadFolderClips],
+  );
 
-  const handleRenameClip = useCallback(() => {
-    if (!renameClipId) {
+  const handleDeleteAll = useCallback(async () => {
+    if (!accessToken) {
       return;
     }
 
-    const trimmed = renameName.trim();
-    if (!trimmed) {
-      return;
-    }
-
-    updateClip(renameClipId, {
-      name: trimmed,
-      updatedAt: new Date().toISOString(),
-    });
-    setIsRenameOpen(false);
-    setRenameClipId(null);
-    setRenameName("");
-  }, [renameClipId, renameName]);
-
-  const handleDeleteAll = useCallback(() => {
-    if (folderId) {
-      clearFolderClips(folderId);
-    }
+    await Promise.all(clips.map((clip) => removeClip(accessToken, clip.id)));
     setIsDeleteAllOpen(false);
-  }, [folderId]);
+    await loadFolderClips();
+  }, [accessToken, clips, loadFolderClips]);
 
   return {
     activeFilter,
@@ -306,27 +280,20 @@ export const useFolderClipsPage = () => {
     contextMenu,
     copyToast,
     filteredClips,
-    hasClips: storedClips.length > 0,
+    hasClips: clips.length > 0,
     isActive,
     isDeleteAllOpen,
-    isRenameOpen,
-    renameInputRef,
-    renameName,
     searchQuery,
     setActiveFilter,
     setContextMenu,
     setIsActive,
     setIsDeleteAllOpen,
-    setIsRenameOpen,
-    setRenameName,
     setSearchQuery,
     handleCopy,
     handleCopyFromMenu,
     handleDeleteAll,
     handleDeleteClip,
     handleOpenContextMenu,
-    handleOpenRename,
-    handleRenameClip,
     handleToggleFavorite,
   };
 };

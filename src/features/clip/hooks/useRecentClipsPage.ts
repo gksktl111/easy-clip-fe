@@ -1,62 +1,50 @@
 "use client";
 
+import { startTransition, useCallback, useEffect, useMemo, useState } from "react";
+import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { subscribeToClipStore } from "@/features/clip/service/clipStoreSubscription";
-import { mapStoredClipDates } from "@/features/clip/service/mapStoredClipDates";
+  fetchClips,
+  recordClipView,
+} from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
-import {
-  clearRecentClips,
-  getRecentClips,
-  readClipStorageRaw,
-  recordCopy,
-  StoredClip,
-} from "@/features/clip/service/clipStorage";
-import { FilterType } from "@/features/clip/ui/FilterBar";
 import { Clip } from "@/features/clip/model/clip";
-
-const EMPTY_RECENTS: StoredClip[] = [];
+import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
+import { FilterType } from "@/features/clip/ui/FilterBar";
 
 export const useRecentClipsPage = () => {
+  const session = useAuthSession();
+  const accessToken = session?.accessToken ?? null;
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [clips, setClips] = useState<Clip[]>([]);
   const { copyToast, showCopyToast } = useCopyToast();
-  const lastRawRef = useRef<string | null>(null);
-  const lastClipsRef = useRef<StoredClip[]>(EMPTY_RECENTS);
 
-  const getRecentSnapshot = useCallback(() => {
-    const stored = readClipStorageRaw();
-    if (stored === lastRawRef.current) {
-      return lastClipsRef.current;
+  const loadRecentClips = useCallback(async () => {
+    if (!accessToken) {
+      startTransition(() => {
+        setClips([]);
+      });
+      return;
     }
 
-    const nextClips = getRecentClips();
-    lastRawRef.current = stored;
-    lastClipsRef.current = nextClips;
-    return nextClips;
-  }, []);
+    const response = await fetchClips(accessToken, {
+      recent: true,
+    });
 
-  const storedClips = useSyncExternalStore(
-    subscribeToClipStore,
-    getRecentSnapshot,
-    () => EMPTY_RECENTS,
-  );
+    startTransition(() => {
+      setClips(response.map(mapClipResponse));
+    });
+  }, [accessToken]);
 
-  const recentClips = useMemo<Clip[]>(
-    () => storedClips.map(mapStoredClipDates),
-    [storedClips],
-  );
+  useEffect(() => {
+    void loadRecentClips();
+  }, [loadRecentClips]);
 
   const filteredClips = useMemo(() => {
     const clipsByType =
       activeFilter === "all"
-        ? recentClips
-        : recentClips.filter((clip) => clip.type === activeFilter);
+        ? clips
+        : clips.filter((clip) => clip.type === activeFilter);
 
     if (!searchQuery.trim()) {
       return clipsByType;
@@ -66,7 +54,7 @@ export const useRecentClipsPage = () => {
     return clipsByType.filter((clip) =>
       clip.name.toLowerCase().includes(loweredQuery),
     );
-  }, [activeFilter, recentClips, searchQuery]);
+  }, [activeFilter, clips, searchQuery]);
 
   const handleCopy = useCallback(
     async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
@@ -78,9 +66,12 @@ export const useRecentClipsPage = () => {
         // no-op
       }
 
-      recordCopy(clip.id);
+      if (accessToken) {
+        await recordClipView(accessToken, clip.id);
+        await loadRecentClips();
+      }
     },
-    [showCopyToast],
+    [accessToken, loadRecentClips, showCopyToast],
   );
 
   return {
@@ -88,10 +79,10 @@ export const useRecentClipsPage = () => {
     copyToast,
     filteredClips,
     searchQuery,
-    hasClips: storedClips.length > 0,
+    hasClips: false,
     setActiveFilter,
     setSearchQuery,
-    clearAll: clearRecentClips,
+    clearAll: () => undefined,
     handleCopy,
   };
 };

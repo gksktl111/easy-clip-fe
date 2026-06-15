@@ -13,6 +13,7 @@ interface StyledSelectProps {
   onChange: (value: string) => void;
   options: readonly StyledSelectOption[];
   className?: string;
+  disabled?: boolean;
 }
 
 export function StyledSelect({
@@ -20,6 +21,7 @@ export function StyledSelect({
   onChange,
   options,
   className = "",
+  disabled = false,
 }: StyledSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,7 @@ export function StyledSelect({
     <div ref={rootRef} className={`relative ${className}`}>
       <button
         type="button"
+        disabled={disabled}
         onClick={() => setIsOpen((previous) => !previous)}
         className="text-foreground flex h-11 w-full items-center justify-between rounded-xl border border-(--border) bg-(--surface) px-4 text-sm font-medium transition-colors hover:bg-(--surface-muted)"
         aria-haspopup="listbox"
@@ -82,6 +85,7 @@ export function StyledSelect({
                 <li key={option.value}>
                   <button
                     type="button"
+                    disabled={disabled}
                     onClick={() => {
                       onChange(option.value);
                       setIsOpen(false);

@@ -1,5 +1,5 @@
-import { FavoriteClipsPage } from "@/features/clip/ui/FavoriteClipsPage";
+import { FavoritesEntryPage } from "@/features/clip/ui/FavoritesEntryPage";
 
 export default function Favorites() {
-  return <FavoriteClipsPage />;
+  return <FavoritesEntryPage />;
 }

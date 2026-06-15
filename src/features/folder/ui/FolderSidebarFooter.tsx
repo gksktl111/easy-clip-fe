@@ -3,7 +3,7 @@
 import { HiOutlineCog, HiOutlineLogout } from "react-icons/hi";
 
 interface FolderSidebarFooterProps {
-  email: string;
+  userLabel: string;
   settingsLabel: string;
   logoutLabel: string;
   onOpenSettings: () => void;
@@ -11,21 +11,23 @@ interface FolderSidebarFooterProps {
 }
 
 export function FolderSidebarFooter({
-  email,
+  userLabel,
   settingsLabel,
   logoutLabel,
   onOpenSettings,
   onLogout,
 }: FolderSidebarFooterProps) {
+  const initials = userLabel.slice(0, 2).toUpperCase();
+
   return (
     <div className="border-t border-(--border) px-4 py-4">
       <div className="mb-3 flex items-center justify-between rounded-lg bg-(--surface) px-3 py-2">
         <div className="flex items-center gap-2 truncate">
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-(--icon-chip) text-[10px] font-semibold text-(--icon-chip-text)">
-            EC
+            {initials}
           </div>
           <span className="text-foreground truncate text-sm font-medium">
-            {email}
+            {userLabel}
           </span>
         </div>
         <button

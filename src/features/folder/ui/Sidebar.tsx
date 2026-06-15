@@ -3,16 +3,19 @@
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  HiOutlineClock,
-  HiOutlineStar,
-} from "react-icons/hi";
+import { HiOutlineClock, HiOutlineStar } from "react-icons/hi";
+import { useRouter } from "next/navigation";
+import { logout } from "@/features/auth/api/authApi";
+import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { clearAuthSession } from "@/features/auth/service/authSession";
 import { useFolders } from "@/features/folder/hooks/useFolders";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
 import { FolderSidebarFooter } from "@/features/folder/ui/FolderSidebarFooter";
 import { FolderSidebarHeader } from "@/features/folder/ui/FolderSidebarHeader";
 import { FolderSidebarSection } from "@/features/folder/ui/FolderSidebarSection";
 import { SidebarPrimaryNav } from "@/features/folder/ui/SidebarPrimaryNav";
+
+//TODO : 클립 도메인으로 합병
 
 interface SidebarProps {
   onOpenSettings: () => void;
@@ -27,7 +30,10 @@ export function Sidebar({
 }: SidebarProps) {
   const t = useTranslations("sidebar");
   const pathname = usePathname();
-  const { folders, persistFolders } = useFolders();
+  const router = useRouter();
+  const session = useAuthSession();
+  const { createFolder, folders, removeFolder, renameFolder, reorderFolders } =
+    useFolders();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [openOptionsFolderId, setOpenOptionsFolderId] = useState<string | null>(
@@ -39,15 +45,27 @@ export function Sidebar({
   const [draggingFolderId, setDraggingFolderId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const pathnameFolderId = pathSegments[0] ?? null;
+  const reservedPathnames = new Set([
+    "favorites",
+    "recent",
+    "login",
+    "pricing",
+  ]);
+  const currentFolderId =
+    pathnameFolderId && !reservedPathnames.has(pathnameFolderId)
+      ? pathnameFolderId
+      : (folders[0]?.id ?? null);
 
   const topNavs = [
     {
-      href: "/favorites",
+      href: currentFolderId ? `/${currentFolderId}/favorites` : "/favorites",
       label: t("favorites"),
       icon: <HiOutlineStar className="h-5 w-5" aria-hidden />,
     },
     {
-      href: "/recent",
+      href: currentFolderId ? `/${currentFolderId}/recent` : "/recent",
       label: t("recent"),
       icon: <HiOutlineClock className="h-5 w-5" aria-hidden />,
     },
@@ -87,24 +105,31 @@ export function Sidebar({
     onCloseMobile?.();
   }, [onCloseMobile, pathname]);
 
-  const reorderFolders = useCallback(
+  const ensureAuthenticated = useCallback(() => {
+    if (session?.accessToken) {
+      return true;
+    }
+
+    onCloseMobile?.();
+    router.push("/login");
+    return false;
+  }, [onCloseMobile, router, session?.accessToken]);
+
+  const handleReorderFolders = useCallback(
     (sourceId: string, targetId: string) => {
+      if (!ensureAuthenticated()) {
+        return;
+      }
+
       if (sourceId === targetId) {
         return;
       }
 
-      const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
-      const targetIndex = folders.findIndex((folder) => folder.id === targetId);
-      if (sourceIndex === -1 || targetIndex === -1) {
-        return;
-      }
-
-      const nextFolders = [...folders];
-      const [moved] = nextFolders.splice(sourceIndex, 1);
-      nextFolders.splice(targetIndex, 0, moved);
-      persistFolders(nextFolders);
+      void reorderFolders(sourceId, targetId).catch(() => {
+        // keep the current order when the request fails
+      });
     },
-    [folders, persistFolders],
+    [ensureAuthenticated, reorderFolders],
   );
 
   const closeCreateModal = () => {
@@ -124,14 +149,16 @@ export function Sidebar({
       return;
     }
 
-    const id =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}`;
+    if (!ensureAuthenticated()) {
+      return;
+    }
 
-    persistFolders([...folders, { id, name: trimmedName }]);
-    closeCreateModal();
-  }, [folders, newFolderName, persistFolders]);
+    void createFolder(trimmedName)
+      .then(() => closeCreateModal())
+      .catch(() => {
+        // keep the modal open when the request fails
+      });
+  }, [createFolder, ensureAuthenticated, newFolderName]);
 
   const handleRenameFolder = useCallback(() => {
     if (!renameFolderId) {
@@ -143,13 +170,37 @@ export function Sidebar({
       return;
     }
 
-    const nextFolders = folders.map((folder) =>
-      folder.id === renameFolderId ? { ...folder, name: trimmedName } : folder,
-    );
+    if (!ensureAuthenticated()) {
+      return;
+    }
 
-    persistFolders(nextFolders);
-    closeRenameModal();
-  }, [folders, persistFolders, renameFolderId, renameFolderName]);
+    void renameFolder(renameFolderId, trimmedName)
+      .then(() => closeRenameModal())
+      .catch(() => {
+        // keep the modal open when the request fails
+      });
+  }, [ensureAuthenticated, renameFolder, renameFolderId, renameFolderName]);
+
+  const userLabel =
+    session?.user?.authAccounts?.[0]?.email ??
+    session?.user?.displayName ??
+    t("guest");
+
+  const handleLogout = useCallback(async () => {
+    onCloseMobile?.();
+
+    try {
+      if (session?.accessToken) {
+        await logout(session.accessToken);
+      }
+    } catch {
+      // clear client session even when the server session is already invalid
+    } finally {
+      clearAuthSession();
+      router.push("/login");
+      router.refresh();
+    }
+  }, [onCloseMobile, router, session?.accessToken]);
 
   return (
     <>
@@ -205,7 +256,7 @@ export function Sidebar({
                   return;
                 }
 
-                reorderFolders(draggingFolderId, folderId);
+                handleReorderFolders(draggingFolderId, folderId);
               }}
               onToggleOptions={(folderId) =>
                 setOpenOptionsFolderId((previous) =>
@@ -213,7 +264,9 @@ export function Sidebar({
                 )
               }
               onRenameFolder={(folderId) => {
-                const targetFolder = folders.find((folder) => folder.id === folderId);
+                const targetFolder = folders.find(
+                  (folder) => folder.id === folderId,
+                );
                 if (!targetFolder) {
                   return;
                 }
@@ -224,27 +277,31 @@ export function Sidebar({
                 setIsRenameFolderModalOpen(true);
               }}
               onDeleteFolder={(folderId) => {
-                persistFolders(
-                  folders.filter((currentFolder) => currentFolder.id !== folderId),
-                );
-                setOpenOptionsFolderId(null);
+                if (!ensureAuthenticated()) {
+                  return;
+                }
+
+                void removeFolder(folderId)
+                  .then(() => {
+                    setOpenOptionsFolderId(null);
+                  })
+                  .catch(() => {
+                    // keep the menu open when the request fails
+                  });
               }}
             />
           </div>
         </nav>
 
         <FolderSidebarFooter
-          email="user@example.com"
+          userLabel={userLabel}
           settingsLabel={t("settings")}
           logoutLabel={t("logout")}
           onOpenSettings={() => {
             onCloseMobile?.();
             onOpenSettings();
           }}
-          onLogout={() => {
-            onCloseMobile?.();
-            window.location.href = "/login";
-          }}
+          onLogout={handleLogout}
         />
       </aside>
 
