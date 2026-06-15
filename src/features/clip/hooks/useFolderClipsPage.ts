@@ -23,6 +23,7 @@ import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import { Clip } from "@/features/clip/model/clip";
 import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
 import { FilterType } from "@/features/clip/ui/FilterBar";
+import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 export const useFolderClipsPage = () => {
   const params = useParams<{ id?: string }>();
@@ -33,6 +34,7 @@ export const useFolderClipsPage = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isActive, setIsActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [clips, setClips] = useState<Clip[]>([]);
   const [contextMenu, setContextMenu] = useState<{
     id: string;
@@ -42,29 +44,61 @@ export const useFolderClipsPage = () => {
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
   const { copyToast, showCopyToast } = useCopyToast();
   const requestSerialRef = useRef(0);
+  const hasLoadedOnceRef = useRef(false);
 
   const loadFolderClips = useCallback(async () => {
+    const requestId = requestSerialRef.current + 1;
+    requestSerialRef.current = requestId;
+    const shouldShowSkeleton = !hasLoadedOnceRef.current;
+    const loadingStartedAt = Date.now();
+
     if (!accessToken || !folderId) {
+      if (shouldShowSkeleton) {
+        await waitForMinimumLoading(loadingStartedAt);
+      }
+
+      if (requestId !== requestSerialRef.current) {
+        return;
+      }
+
       startTransition(() => {
         setClips([]);
+        hasLoadedOnceRef.current = true;
+        setIsLoading(false);
       });
       return;
     }
 
-    const requestId = requestSerialRef.current + 1;
-    requestSerialRef.current = requestId;
-
-    const response = await fetchClips(accessToken, {
-      folderId,
-    });
-
-    if (requestId !== requestSerialRef.current) {
-      return;
+    if (shouldShowSkeleton) {
+      setIsLoading(true);
     }
 
-    startTransition(() => {
-      setClips(response.map(mapClipResponse));
-    });
+    try {
+      const response = await fetchClips(accessToken, {
+        folderId,
+      });
+
+      if (requestId !== requestSerialRef.current) {
+        return;
+      }
+
+      startTransition(() => {
+        setClips(response.map(mapClipResponse));
+        hasLoadedOnceRef.current = true;
+      });
+    } finally {
+      if (shouldShowSkeleton) {
+        await waitForMinimumLoading(loadingStartedAt);
+      }
+      if (requestId === requestSerialRef.current) {
+        setIsLoading(false);
+      }
+    }
+  }, [accessToken, folderId]);
+
+  useEffect(() => {
+    hasLoadedOnceRef.current = false;
+    setIsLoading(true);
   }, [accessToken, folderId]);
 
   useEffect(() => {
@@ -283,6 +317,7 @@ export const useFolderClipsPage = () => {
     hasClips: clips.length > 0,
     isActive,
     isDeleteAllOpen,
+    isLoading,
     searchQuery,
     setActiveFilter,
     setContextMenu,

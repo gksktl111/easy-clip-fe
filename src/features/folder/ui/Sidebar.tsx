@@ -32,8 +32,14 @@ export function Sidebar({
   const pathname = usePathname();
   const router = useRouter();
   const session = useAuthSession();
-  const { createFolder, folders, removeFolder, renameFolder, reorderFolders } =
-    useFolders();
+  const {
+    createFolder,
+    folders,
+    isLoading: isFoldersLoading,
+    removeFolder,
+    renameFolder,
+    reorderFolders,
+  } = useFolders();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [openOptionsFolderId, setOpenOptionsFolderId] = useState<string | null>(
@@ -236,6 +242,7 @@ export function Sidebar({
 
             <FolderSidebarSection
               folders={folders}
+              isLoading={isFoldersLoading}
               pathname={pathname}
               addFolderLabel={t("addFolder")}
               reorderFolderLabel={t("reorderFolder")}
