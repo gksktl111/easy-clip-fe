@@ -1,57 +1,52 @@
 "use client";
 
+import { startTransition, useCallback, useEffect, useMemo, useState } from "react";
+import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { subscribeToClipStore } from "@/features/clip/service/clipStoreSubscription";
-import { Clip } from "@/features/clip/model/clip";
-import {
-  getFavoriteClips,
-  readClipStorageRaw,
-  recordCopy,
-  StoredClip,
-  updateClip,
-} from "@/features/clip/service/clipStorage";
-import { mapStoredClipDates } from "@/features/clip/service/mapStoredClipDates";
+  fetchClips,
+  likeClip,
+  recordClipView,
+  unlikeClip,
+} from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
+import { Clip } from "@/features/clip/model/clip";
+import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
 import { FilterType } from "@/features/clip/ui/FilterBar";
 
-const EMPTY_CLIPS: StoredClip[] = [];
-
 export const useFavoriteClipsPage = () => {
+  const session = useAuthSession();
+  const accessToken = session?.accessToken ?? null;
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [clips, setClips] = useState<Clip[]>([]);
   const { copyToast, showCopyToast } = useCopyToast();
-  const lastRawRef = useRef<string | null>(null);
-  const lastClipsRef = useRef<StoredClip[]>(EMPTY_CLIPS);
 
-  const getFavoritesSnapshot = useCallback(() => {
-    const stored = readClipStorageRaw();
-    if (stored === lastRawRef.current) {
-      return lastClipsRef.current;
+  const loadFavoriteClips = useCallback(async () => {
+    if (!accessToken) {
+      startTransition(() => {
+        setClips([]);
+      });
+      return;
     }
 
-    const nextClips = getFavoriteClips();
-    lastRawRef.current = stored;
-    lastClipsRef.current = nextClips;
-    return nextClips;
-  }, []);
+    const response = await fetchClips(accessToken, {
+      favorite: true,
+    });
 
-  const storedClips = useSyncExternalStore(
-    subscribeToClipStore,
-    getFavoritesSnapshot,
-    () => EMPTY_CLIPS,
-  );
+    startTransition(() => {
+      setClips(response.map(mapClipResponse));
+    });
+  }, [accessToken]);
+
+  useEffect(() => {
+    void loadFavoriteClips();
+  }, [loadFavoriteClips]);
 
   const filteredClips = useMemo(
     () =>
-      storedClips
-        .map(mapStoredClipDates)
-        .filter((clip) => activeFilter === "all" || clip.type === activeFilter),
-    [activeFilter, storedClips],
+      clips.filter(
+        (clip) => activeFilter === "all" || clip.type === activeFilter,
+      ),
+    [activeFilter, clips],
   );
 
   const handleCopy = useCallback(
@@ -64,17 +59,29 @@ export const useFavoriteClipsPage = () => {
         // no-op
       }
 
-      recordCopy(clip.id);
+      if (accessToken) {
+        await recordClipView(accessToken, clip.id);
+      }
     },
-    [showCopyToast],
+    [accessToken, showCopyToast],
   );
 
-  const handleToggleFavorite = useCallback((clip: Clip) => {
-    updateClip(clip.id, {
-      isFavorite: !clip.isFavorite,
-      updatedAt: new Date().toISOString(),
-    });
-  }, []);
+  const handleToggleFavorite = useCallback(
+    async (clip: Clip) => {
+      if (!accessToken) {
+        return;
+      }
+
+      if (clip.isFavorite) {
+        await unlikeClip(accessToken, clip.id);
+      } else {
+        await likeClip(accessToken, clip.id);
+      }
+
+      await loadFavoriteClips();
+    },
+    [accessToken, loadFavoriteClips],
+  );
 
   return {
     activeFilter,

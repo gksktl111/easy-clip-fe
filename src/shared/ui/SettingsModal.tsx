@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   HiOutlineCog,
@@ -7,6 +8,8 @@ import {
   HiOutlineTranslate,
   HiOutlineX,
 } from "react-icons/hi";
+import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { persistUserSettings } from "@/features/settings/service/settingsService";
 import { LOCALE_LABELS, type AppLocale } from "@/shared/config/locale";
 import { useSettingsStore } from "@/shared/store/settingsStore";
 import { StyledSelect } from "@/shared/ui/StyledSelect";
@@ -17,8 +20,58 @@ interface SettingsModalProps {
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
   const t = useTranslations("settings");
-  const { theme, language, setLanguage, toggleTheme } = useSettingsStore();
+  const session = useAuthSession();
+  const { theme, language, setLanguage, setTheme } = useSettingsStore();
+  const [savingField, setSavingField] = useState<"theme" | "language" | null>(
+    null,
+  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const isDark = theme === "dark";
+
+  const handleThemeToggle = async () => {
+    const previousTheme = theme;
+    const nextTheme = isDark ? "light" : "dark";
+
+    setErrorMessage(null);
+    setTheme(nextTheme);
+
+    if (!session?.accessToken) {
+      return;
+    }
+
+    setSavingField("theme");
+
+    try {
+      await persistUserSettings(session.accessToken, { theme: nextTheme });
+    } catch {
+      setTheme(previousTheme);
+      setErrorMessage(t("saveError"));
+    } finally {
+      setSavingField(null);
+    }
+  };
+
+  const handleLanguageChange = async (nextLanguage: AppLocale) => {
+    const previousLanguage = language;
+
+    setErrorMessage(null);
+    setLanguage(nextLanguage);
+
+    if (!session?.accessToken) {
+      return;
+    }
+
+    setSavingField("language");
+
+    try {
+      await persistUserSettings(session.accessToken, { language: nextLanguage });
+    } catch {
+      setLanguage(previousLanguage);
+      setErrorMessage(t("saveError"));
+    } finally {
+      setSavingField(null);
+    }
+  };
 
   return (
     <div
@@ -68,7 +121,10 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
               </div>
               <button
                 type="button"
-                onClick={toggleTheme}
+                onClick={() => {
+                  void handleThemeToggle();
+                }}
+                disabled={savingField === "theme"}
                 className={`relative h-7 w-12 cursor-pointer rounded-full transition ${
                   isDark ? "bg-(--primary)" : "bg-(--border)"
                 }`}
@@ -102,8 +158,9 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
               <StyledSelect
                 value={language}
                 onChange={(value) => {
-                  setLanguage(value as AppLocale);
+                  void handleLanguageChange(value as AppLocale);
                 }}
+                disabled={savingField === "language"}
                 options={Object.entries(LOCALE_LABELS).map(([value, label]) => ({
                   value,
                   label,
@@ -112,6 +169,12 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
               />
             </div>
           </div>
+
+          {errorMessage ? (
+            <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              {errorMessage}
+            </p>
+          ) : null}
 
           <div>
             <p className="text-sm font-semibold text-(--muted)">
