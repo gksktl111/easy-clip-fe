@@ -90,6 +90,7 @@
   },
   "trash": {
     "title": "回收站",
+    "retentionNotice": "最多保留 30 天",
     "description": "查看已删除的剪贴内容和文件夹，并可执行恢复或永久删除。",
     "refresh": "刷新",
     "clearAll": "清空回收站",

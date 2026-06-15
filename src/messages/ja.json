@@ -90,6 +90,7 @@
   },
   "trash": {
     "title": "ゴミ箱",
+    "retentionNotice": "最大30日間保管されます",
     "description": "削除したクリップとフォルダを確認し、復元または完全削除できます。",
     "refresh": "再読み込み",
     "clearAll": "ゴミ箱を空にする",

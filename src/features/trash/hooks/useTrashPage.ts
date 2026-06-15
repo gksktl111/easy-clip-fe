@@ -17,6 +17,18 @@ import {
   TrashFolderResponseDto,
 } from "@/features/trash/model/trash.dto";
 
+const MIN_LOADING_MS = 300;
+
+const waitForMinimumLoading = async (startedAt: number) => {
+  const remainingMs = MIN_LOADING_MS - (Date.now() - startedAt);
+
+  if (remainingMs <= 0) {
+    return;
+  }
+
+  await new Promise((resolve) => setTimeout(resolve, remainingMs));
+};
+
 export const useTrashPage = () => {
   const session = useAuthSession();
   const accessToken = session?.accessToken ?? null;
@@ -28,7 +40,11 @@ export const useTrashPage = () => {
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
 
   const loadTrash = useCallback(async () => {
+    const loadingStartedAt = Date.now();
+
     if (!accessToken) {
+      await waitForMinimumLoading(loadingStartedAt);
+
       startTransition(() => {
         setClips([]);
         setFolders([]);
@@ -56,6 +72,7 @@ export const useTrashPage = () => {
     } catch {
       setError("load");
     } finally {
+      await waitForMinimumLoading(loadingStartedAt);
       setIsLoading(false);
     }
   }, [accessToken]);

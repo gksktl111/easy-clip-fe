@@ -82,20 +82,15 @@ export function TrashPage() {
         </div>
       ) : null}
 
-      {isLoading ? (
-        <div className="flex flex-1 items-center justify-center px-6 py-12">
-          <p className="text-sm text-(--muted)">{t("loading")}</p>
-        </div>
-      ) : null}
-
       {!isLoading && !hasItems ? (
         <TrashPageEmptyState />
       ) : null}
 
-      {!isLoading && hasItems ? (
+      {isLoading || hasItems ? (
         <div className="flex min-h-0 flex-1 flex-col px-4 py-4 min-[1200px]:px-6">
           <TrashListSection
             rows={rows}
+            isLoading={isLoading}
             pendingActionKey={pendingActionKey}
             onReload={() => {
               void reload();

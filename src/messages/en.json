@@ -90,6 +90,7 @@
   },
   "trash": {
     "title": "Trash",
+    "retentionNotice": "Kept for up to 30 days",
     "description": "Review deleted clips and folders, then restore or permanently remove them.",
     "refresh": "Refresh",
     "clearAll": "Empty trash",
