@@ -11,9 +11,12 @@ export function FavoriteClipsPage() {
   const {
     activeFilter,
     copyToast,
+    fetchNextPage,
     filteredClips,
     handleCopy,
     handleToggleFavorite,
+    hasNextPage,
+    isFetchingNextPage,
     isLoading,
     setActiveFilter,
   } = useFavoriteClipsPage();
@@ -28,7 +31,12 @@ export function FavoriteClipsPage() {
       />
       <ClipResultsSection
         clips={filteredClips}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
+        onFetchNextPage={() => {
+          void fetchNextPage();
+        }}
         onCopy={handleCopy}
         onToggleFavorite={handleToggleFavorite}
       />

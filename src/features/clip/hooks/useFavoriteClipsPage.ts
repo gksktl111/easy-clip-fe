@@ -1,101 +1,39 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
 import {
-  startTransition,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import {
-  fetchClips,
   likeClip,
   recordClipView,
   unlikeClip,
 } from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
+import {
+  CLIP_QUERY_KEY,
+  useInfiniteClips,
+} from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
-import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
 import { FilterType } from "@/features/clip/ui/FilterBar";
-import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 export const useFavoriteClipsPage = () => {
-  const session = useAuthSession();
-  const accessToken = session?.accessToken ?? null;
+  const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
-  const [isLoading, setIsLoading] = useState(true);
-  const [clips, setClips] = useState<Clip[]>([]);
   const { copyToast, showCopyToast } = useCopyToast();
-  const requestSerialRef = useRef(0);
-  const hasLoadedOnceRef = useRef(false);
+  const {
+    accessToken,
+    clips,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+  } = useInfiniteClips({
+    favorite: true,
+    filter: activeFilter,
+  });
 
-  const loadFavoriteClips = useCallback(async () => {
-    const requestId = requestSerialRef.current + 1;
-    requestSerialRef.current = requestId;
-    const shouldShowSkeleton = !hasLoadedOnceRef.current;
-    const loadingStartedAt = Date.now();
-
-    if (!accessToken) {
-      if (shouldShowSkeleton) {
-        await waitForMinimumLoading(loadingStartedAt);
-      }
-
-      if (requestId !== requestSerialRef.current) {
-        return;
-      }
-
-      startTransition(() => {
-        setClips([]);
-        hasLoadedOnceRef.current = true;
-        setIsLoading(false);
-      });
-      return;
-    }
-
-    if (shouldShowSkeleton) {
-      setIsLoading(true);
-    }
-
-    try {
-      const response = await fetchClips(accessToken, {
-        favorite: true,
-      });
-
-      if (requestId !== requestSerialRef.current) {
-        return;
-      }
-
-      startTransition(() => {
-        setClips(response.map(mapClipResponse));
-        hasLoadedOnceRef.current = true;
-      });
-    } finally {
-      if (shouldShowSkeleton) {
-        await waitForMinimumLoading(loadingStartedAt);
-      }
-      if (requestId === requestSerialRef.current) {
-        setIsLoading(false);
-      }
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
-    hasLoadedOnceRef.current = false;
-    setIsLoading(true);
-  }, [accessToken]);
-
-  useEffect(() => {
-    void loadFavoriteClips();
-  }, [loadFavoriteClips]);
-
-  const filteredClips = useMemo(
-    () =>
-      clips.filter(
-        (clip) => activeFilter === "all" || clip.type === activeFilter,
-      ),
-    [activeFilter, clips],
+  const refreshClipQueries = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: [CLIP_QUERY_KEY] }),
+    [queryClient],
   );
 
   const handleCopy = useCallback(
@@ -127,16 +65,19 @@ export const useFavoriteClipsPage = () => {
         await likeClip(accessToken, clip.id);
       }
 
-      await loadFavoriteClips();
+      await refreshClipQueries();
     },
-    [accessToken, loadFavoriteClips],
+    [accessToken, refreshClipQueries],
   );
 
   return {
     activeFilter,
     copyToast,
-    filteredClips,
-    isLoading,
+    fetchNextPage,
+    filteredClips: clips,
+    hasNextPage: Boolean(hasNextPage),
+    isFetchingNextPage,
+    isLoading: isPending,
     setActiveFilter,
     handleCopy,
     handleToggleFavorite,

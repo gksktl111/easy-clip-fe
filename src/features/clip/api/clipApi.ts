@@ -8,7 +8,6 @@ import {
 } from "@/features/clip/model/clip.dto";
 import { apiRequest } from "@/shared/lib/apiClient";
 
-//? 이거 뭔지 확인
 export const fetchClips = async (
   accessToken: string,
   options: FetchClipsQueryDto = {},
@@ -32,15 +31,14 @@ export const fetchClips = async (
     searchParams.set("q", options.q.trim());
   }
 
-  const response = await apiRequest<ClipCursorPageResponseDto>(
-    `/clips?${searchParams.toString()}`,
-    {
-      accessToken,
-      cache: "no-store",
-    },
-  );
+  if (options.cursor) {
+    searchParams.set("cursor", options.cursor);
+  }
 
-  return response.items;
+  return apiRequest<ClipCursorPageResponseDto>(`/clips?${searchParams}`, {
+    accessToken,
+    cache: "no-store",
+  });
 };
 
 export const createTextClip = (

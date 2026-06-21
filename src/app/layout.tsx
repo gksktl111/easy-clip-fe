@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getInitialLocale } from "@/shared/server/getUserLocale";
 import { IntlProvider } from "@/shared/ui/IntlProvider";
+import { QueryProvider } from "@/shared/ui/QueryProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,7 +20,9 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body className="bg-slate-50 antialiased">
-        <IntlProvider initialLocale={locale}>{children}</IntlProvider>
+        <QueryProvider>
+          <IntlProvider initialLocale={locale}>{children}</IntlProvider>
+        </QueryProvider>
       </body>
     </html>
   );
