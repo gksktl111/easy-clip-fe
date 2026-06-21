@@ -8,11 +8,9 @@ import {
   unlikeClip,
 } from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
-import {
-  CLIP_QUERY_KEY,
-  useInfiniteClips,
-} from "@/features/clip/hooks/useInfiniteClips";
+import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
+import { updateClipFavoriteCache } from "@/features/clip/service/clipQueryCache";
 import { FilterType } from "@/features/clip/ui/FilterBar";
 
 export const useFavoriteClipsPage = () => {
@@ -30,11 +28,6 @@ export const useFavoriteClipsPage = () => {
     favorite: true,
     filter: activeFilter,
   });
-
-  const refreshClipQueries = useCallback(
-    () => queryClient.invalidateQueries({ queryKey: [CLIP_QUERY_KEY] }),
-    [queryClient],
-  );
 
   const handleCopy = useCallback(
     async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
@@ -59,15 +52,24 @@ export const useFavoriteClipsPage = () => {
         return;
       }
 
-      if (clip.isFavorite) {
-        await unlikeClip(accessToken, clip.id);
-      } else {
-        await likeClip(accessToken, clip.id);
-      }
+      const nextFavorite = !clip.isFavorite;
+      const rollbackFavorite = updateClipFavoriteCache(
+        queryClient,
+        clip.id,
+        nextFavorite,
+      );
 
-      await refreshClipQueries();
+      try {
+        if (nextFavorite) {
+          await likeClip(accessToken, clip.id);
+        } else {
+          await unlikeClip(accessToken, clip.id);
+        }
+      } catch {
+        rollbackFavorite();
+      }
     },
-    [accessToken, refreshClipQueries],
+    [accessToken, queryClient],
   );
 
   return {

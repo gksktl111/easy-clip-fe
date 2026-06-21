@@ -4,11 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { recordClipView } from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
-import {
-  CLIP_QUERY_KEY,
-  useInfiniteClips,
-} from "@/features/clip/hooks/useInfiniteClips";
+import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
+import { invalidateClipQueries } from "@/features/clip/service/clipQueryCache";
 import { FilterType } from "@/features/clip/ui/FilterBar";
 
 export const useRecentClipsPage = () => {
@@ -30,7 +28,7 @@ export const useRecentClipsPage = () => {
   });
 
   const refreshClipQueries = useCallback(
-    () => queryClient.invalidateQueries({ queryKey: [CLIP_QUERY_KEY] }),
+    () => invalidateClipQueries(queryClient),
     [queryClient],
   );
 
