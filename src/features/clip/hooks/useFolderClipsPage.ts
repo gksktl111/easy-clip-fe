@@ -17,10 +17,13 @@ import {
 } from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import {
-  CLIP_QUERY_KEY,
   useInfiniteClips,
 } from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
+import {
+  invalidateClipQueries,
+  updateClipFavoriteCache,
+} from "@/features/clip/service/clipQueryCache";
 import { FilterType } from "@/features/clip/ui/FilterBar";
 
 export const useFolderClipsPage = () => {
@@ -45,7 +48,6 @@ export const useFolderClipsPage = () => {
     hasNextPage,
     isFetchingNextPage,
     isPending,
-    queryKey,
   } = useInfiniteClips({
     folderId,
     filter: activeFilter,
@@ -54,7 +56,7 @@ export const useFolderClipsPage = () => {
   });
 
   const refreshClipQueries = useCallback(
-    () => queryClient.invalidateQueries({ queryKey: [CLIP_QUERY_KEY] }),
+    () => invalidateClipQueries(queryClient),
     [queryClient],
   );
 
@@ -199,15 +201,24 @@ export const useFolderClipsPage = () => {
         return;
       }
 
-      if (clip.isFavorite) {
-        await unlikeClip(accessToken, clip.id);
-      } else {
-        await likeClip(accessToken, clip.id);
-      }
+      const nextFavorite = !clip.isFavorite;
+      const rollbackFavorite = updateClipFavoriteCache(
+        queryClient,
+        clip.id,
+        nextFavorite,
+      );
 
-      await refreshClipQueries();
+      try {
+        if (nextFavorite) {
+          await likeClip(accessToken, clip.id);
+        } else {
+          await unlikeClip(accessToken, clip.id);
+        }
+      } catch {
+        rollbackFavorite();
+      }
     },
-    [accessToken, refreshClipQueries],
+    [accessToken, queryClient],
   );
 
   const handleOpenContextMenu = useCallback(
@@ -258,7 +269,6 @@ export const useFolderClipsPage = () => {
     isDeleteAllOpen,
     isFetchingNextPage,
     isLoading: isPending,
-    queryKey,
     searchQuery,
     setActiveFilter,
     setContextMenu,
