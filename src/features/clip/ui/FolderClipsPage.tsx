@@ -17,6 +17,7 @@ export function FolderClipsPage() {
     clips,
     contextMenu,
     copyToast,
+    fetchNextPage,
     filteredClips,
     handleCopy,
     handleCopyFromMenu,
@@ -24,9 +25,11 @@ export function FolderClipsPage() {
     handleDeleteClip,
     handleOpenContextMenu,
     handleToggleFavorite,
+    hasNextPage,
     hasClips,
     isActive,
     isDeleteAllOpen,
+    isFetchingNextPage,
     isLoading,
     searchQuery,
     setActiveFilter,
@@ -57,7 +60,12 @@ export function FolderClipsPage() {
       ) : null}
       <ClipResultsSection
         clips={filteredClips}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
+        onFetchNextPage={() => {
+          void fetchNextPage();
+        }}
         onCopy={handleCopy}
         onToggleFavorite={handleToggleFavorite}
         onContextMenu={handleOpenContextMenu}
