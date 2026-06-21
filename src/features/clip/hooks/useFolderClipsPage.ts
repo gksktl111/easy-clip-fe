@@ -1,41 +1,36 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
-  startTransition,
   useCallback,
   useEffect,
-  useMemo,
-  useRef,
   useState,
 } from "react";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import {
   createImageClip,
   createTextClip,
-  fetchClips,
   likeClip,
   recordClipView,
   removeClip,
   unlikeClip,
 } from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
+import {
+  CLIP_QUERY_KEY,
+  useInfiniteClips,
+} from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
-import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
 import { FilterType } from "@/features/clip/ui/FilterBar";
-import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 export const useFolderClipsPage = () => {
   const params = useParams<{ id?: string }>();
   const router = useRouter();
   const folderId = params?.id ?? "";
-  const session = useAuthSession();
-  const accessToken = session?.accessToken ?? null;
+  const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isActive, setIsActive] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [clips, setClips] = useState<Clip[]>([]);
   const [contextMenu, setContextMenu] = useState<{
     id: string;
     x: number;
@@ -43,83 +38,25 @@ export const useFolderClipsPage = () => {
   } | null>(null);
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
   const { copyToast, showCopyToast } = useCopyToast();
-  const requestSerialRef = useRef(0);
-  const hasLoadedOnceRef = useRef(false);
+  const {
+    accessToken,
+    clips,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    queryKey,
+  } = useInfiniteClips({
+    folderId,
+    filter: activeFilter,
+    searchQuery,
+    enabled: Boolean(folderId),
+  });
 
-  const loadFolderClips = useCallback(async () => {
-    const requestId = requestSerialRef.current + 1;
-    requestSerialRef.current = requestId;
-    const shouldShowSkeleton = !hasLoadedOnceRef.current;
-    const loadingStartedAt = Date.now();
-
-    if (!accessToken || !folderId) {
-      if (shouldShowSkeleton) {
-        await waitForMinimumLoading(loadingStartedAt);
-      }
-
-      if (requestId !== requestSerialRef.current) {
-        return;
-      }
-
-      startTransition(() => {
-        setClips([]);
-        hasLoadedOnceRef.current = true;
-        setIsLoading(false);
-      });
-      return;
-    }
-
-    if (shouldShowSkeleton) {
-      setIsLoading(true);
-    }
-
-    try {
-      const response = await fetchClips(accessToken, {
-        folderId,
-      });
-
-      if (requestId !== requestSerialRef.current) {
-        return;
-      }
-
-      startTransition(() => {
-        setClips(response.map(mapClipResponse));
-        hasLoadedOnceRef.current = true;
-      });
-    } finally {
-      if (shouldShowSkeleton) {
-        await waitForMinimumLoading(loadingStartedAt);
-      }
-      if (requestId === requestSerialRef.current) {
-        setIsLoading(false);
-      }
-    }
-  }, [accessToken, folderId]);
-
-  useEffect(() => {
-    hasLoadedOnceRef.current = false;
-    setIsLoading(true);
-  }, [accessToken, folderId]);
-
-  useEffect(() => {
-    void loadFolderClips();
-  }, [loadFolderClips]);
-
-  const filteredClips = useMemo(() => {
-    const clipsByType =
-      activeFilter === "all"
-        ? clips
-        : clips.filter((clip) => clip.type === activeFilter);
-
-    if (!searchQuery.trim()) {
-      return clipsByType;
-    }
-
-    const loweredQuery = searchQuery.toLowerCase();
-    return clipsByType.filter((clip) =>
-      clip.name.toLowerCase().includes(loweredQuery),
-    );
-  }, [activeFilter, clips, searchQuery]);
+  const refreshClipQueries = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: [CLIP_QUERY_KEY] }),
+    [queryClient],
+  );
 
   useEffect(() => {
     const handleBlur = () => setIsActive(false);
@@ -165,9 +102,9 @@ export const useFolderClipsPage = () => {
         folderId,
         text: trimmed,
       });
-      await loadFolderClips();
+      await refreshClipQueries();
     },
-    [accessToken, folderId, loadFolderClips],
+    [accessToken, folderId, refreshClipQueries],
   );
 
   const createImageClipFromPaste = useCallback(
@@ -180,9 +117,9 @@ export const useFolderClipsPage = () => {
         folderId,
         file,
       });
-      await loadFolderClips();
+      await refreshClipQueries();
     },
-    [accessToken, folderId, loadFolderClips],
+    [accessToken, folderId, refreshClipQueries],
   );
 
   useEffect(() => {
@@ -268,9 +205,9 @@ export const useFolderClipsPage = () => {
         await likeClip(accessToken, clip.id);
       }
 
-      await loadFolderClips();
+      await refreshClipQueries();
     },
-    [accessToken, loadFolderClips],
+    [accessToken, refreshClipQueries],
   );
 
   const handleOpenContextMenu = useCallback(
@@ -293,9 +230,9 @@ export const useFolderClipsPage = () => {
 
       await removeClip(accessToken, clipId);
       setContextMenu(null);
-      await loadFolderClips();
+      await refreshClipQueries();
     },
-    [accessToken, loadFolderClips],
+    [accessToken, refreshClipQueries],
   );
 
   const handleDeleteAll = useCallback(async () => {
@@ -305,19 +242,23 @@ export const useFolderClipsPage = () => {
 
     await Promise.all(clips.map((clip) => removeClip(accessToken, clip.id)));
     setIsDeleteAllOpen(false);
-    await loadFolderClips();
-  }, [accessToken, clips, loadFolderClips]);
+    await refreshClipQueries();
+  }, [accessToken, clips, refreshClipQueries]);
 
   return {
     activeFilter,
     clips,
     contextMenu,
     copyToast,
-    filteredClips,
+    fetchNextPage,
+    filteredClips: clips,
     hasClips: clips.length > 0,
+    hasNextPage: Boolean(hasNextPage),
     isActive,
     isDeleteAllOpen,
-    isLoading,
+    isFetchingNextPage,
+    isLoading: isPending,
+    queryKey,
     searchQuery,
     setActiveFilter,
     setContextMenu,

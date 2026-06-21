@@ -13,9 +13,12 @@ export function RecentClipsPage() {
     activeFilter,
     clearAll,
     copyToast,
+    fetchNextPage,
     filteredClips,
     handleCopy,
+    hasNextPage,
     hasClips,
+    isFetchingNextPage,
     isLoading,
     searchQuery,
     setActiveFilter,
@@ -34,7 +37,12 @@ export function RecentClipsPage() {
       />
       <ClipResultsSection
         clips={filteredClips}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
+        onFetchNextPage={() => {
+          void fetchNextPage();
+        }}
         onCopy={handleCopy}
       />
       <DeleteAllButton disabled={!hasClips} onClick={clearAll} />

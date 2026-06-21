@@ -47,6 +47,7 @@ export interface FetchClipsQueryDto {
   recent?: boolean;
   type?: "TEXT" | "COLOR" | "IMAGE" | "ALL";
   q?: string;
+  cursor?: string | null;
 }
 
 export interface CreateTextClipRequestDto {
