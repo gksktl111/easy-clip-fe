@@ -39,7 +39,7 @@ const createAuthRequiredError = () => new Error("AUTH_REQUIRED");
 
 export const useFolders = () => {
   const session = useAuthSession();
-  const accessToken = session?.accessToken ?? null;
+  const isAuthenticated = Boolean(session?.user);
   const userId = session?.user?.id ?? null;
   const queryClient = useQueryClient();
   const folderQueryKey = useMemo(
@@ -49,16 +49,16 @@ export const useFolders = () => {
 
   const folderQuery = useQuery({
     queryKey: folderQueryKey,
-    enabled: Boolean(accessToken),
+    enabled: isAuthenticated,
     queryFn: async () => {
       const loadingStartedAt = Date.now();
 
-      if (!accessToken) {
+      if (!isAuthenticated) {
         return [];
       }
 
       try {
-        const response = await fetchFolders(accessToken);
+        const response = await fetchFolders();
         return sortFolders(response.map(mapFolder));
       } finally {
         await waitForMinimumLoading(loadingStartedAt);
@@ -67,8 +67,8 @@ export const useFolders = () => {
   });
 
   const folders = useMemo(
-    () => (accessToken ? (folderQuery.data ?? []) : []),
-    [accessToken, folderQuery.data],
+    () => (isAuthenticated ? (folderQuery.data ?? []) : []),
+    [isAuthenticated, folderQuery.data],
   );
   const setFolders = useCallback(
     (updater: (currentFolders: FolderItem[]) => FolderItem[]) => {
@@ -82,11 +82,11 @@ export const useFolders = () => {
 
   const { mutateAsync: createFolderAsync } = useMutation({
     mutationFn: async (name: string) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         throw createAuthRequiredError();
       }
 
-      return createFolderRequest(accessToken, { name });
+      return createFolderRequest({ name });
     },
     onSuccess: (createdFolder) => {
       setFolders((currentFolders) =>
@@ -103,11 +103,11 @@ export const useFolders = () => {
       folderId: string;
       name: string;
     }) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         throw createAuthRequiredError();
       }
 
-      return updateFolderRequest(accessToken, folderId, { name });
+      return updateFolderRequest(folderId, { name });
     },
     onSuccess: (updatedFolder) => {
       setFolders((currentFolders) =>
@@ -122,11 +122,11 @@ export const useFolders = () => {
 
   const { mutateAsync: removeFolderAsync } = useMutation({
     mutationFn: async (folderId: string) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         throw createAuthRequiredError();
       }
 
-      await deleteFolderRequest(accessToken, folderId);
+      await deleteFolderRequest(folderId);
       return folderId;
     },
     onSuccess: (folderId) => {
@@ -137,12 +137,12 @@ export const useFolders = () => {
   });
 
   const { mutateAsync: reorderFolderAsync } = useMutation({
-    mutationFn: async (payload: Parameters<typeof reorderFolderRequest>[1]) => {
-      if (!accessToken) {
+    mutationFn: async (payload: Parameters<typeof reorderFolderRequest>[0]) => {
+      if (!isAuthenticated) {
         throw createAuthRequiredError();
       }
 
-      return reorderFolderRequest(accessToken, payload);
+      return reorderFolderRequest(payload);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: folderQueryKey });
@@ -172,7 +172,7 @@ export const useFolders = () => {
 
   const reorderFolders = useCallback(
     async (sourceId: string, targetId: string) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         throw createAuthRequiredError();
       }
 
@@ -194,12 +194,12 @@ export const useFolders = () => {
 
       await reorderFolderAsync(payload);
     },
-    [accessToken, folders, reorderFolderAsync],
+    [folders, isAuthenticated, reorderFolderAsync],
   );
 
   return {
     folders,
-    isLoading: Boolean(accessToken) && folderQuery.isPending,
+    isLoading: isAuthenticated && folderQuery.isPending,
     createFolder,
     renameFolder,
     removeFolder,

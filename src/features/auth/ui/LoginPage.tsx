@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { getAuthStartPath } from "@/features/auth/api/authApi";
 import { restoreSessionFromRefreshCookie } from "@/features/auth/service/authService";
-import { persistAuthSession } from "@/features/auth/service/authSession";
 import { buildApiUrl } from "@/shared/config/env";
 import { LoginAgreementNotice } from "@/features/auth/ui/LoginAgreementNotice";
 import { LoginBrandPanel } from "@/features/auth/ui/LoginBrandPanel";
@@ -16,7 +15,6 @@ import { LoginSocialActions } from "@/features/auth/ui/LoginSocialActions";
 export function LoginPage() {
   const t = useTranslations("login");
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<
     "google" | "github" | null
@@ -24,43 +22,20 @@ export function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const hasTriedCookieRestoreRef = useRef(false);
 
-  const redirectedSession = useMemo(() => {
-    const accessToken = searchParams.get("access_token");
-    const refreshToken = searchParams.get("refresh_token");
-
-    if (!accessToken || !refreshToken) {
-      return null;
-    }
-
-    return {
-      accessToken,
-      refreshToken,
-      user: null,
-    };
-  }, [searchParams]);
-
   useEffect(() => {
-    if (!redirectedSession) {
-      return;
-    }
-
-    persistAuthSession(redirectedSession);
-    router.replace("/favorites");
-  }, [redirectedSession, router]);
-
-  useEffect(() => {
-    if (redirectedSession || hasTriedCookieRestoreRef.current) {
+    if (hasTriedCookieRestoreRef.current) {
       return;
     }
 
     hasTriedCookieRestoreRef.current = true;
 
+    // OAuth redirect 이후에도 URL 토큰을 저장하지 않고 쿠키 기반 내 정보 조회로 세션을 복구한다.
     void restoreSessionFromRefreshCookie()
       .then(() => router.replace("/favorites"))
       .catch(() => {
         // Stay on the login page when there is no active OAuth cookie session.
       });
-  }, [redirectedSession, router]);
+  }, [router]);
 
   const handleLogin = async (provider: "google" | "github") => {
     try {

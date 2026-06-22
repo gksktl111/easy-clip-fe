@@ -1,46 +1,56 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { syncUserSettings } from "@/features/settings/service/settingsService";
-import { ApiError } from "@/shared/lib/apiClient";
+import { ApiError, subscribeToAuthExpired } from "@/shared/lib/apiClient";
 import {
   clearSessionOnUnauthorized,
   restoreSessionFromRefreshCookie,
-  syncSessionProfile,
 } from "@/features/auth/service/authService";
 
 export function AuthBootstrap() {
   const session = useAuthSession();
-  const lastTokenRef = useRef<string | null>(null);
-  const hasTriedCookieRestoreRef = useRef(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const hasBootstrappedRef = useRef(false);
 
   useEffect(() => {
-    if (!session?.accessToken) {
-      lastTokenRef.current = null;
-      if (!hasTriedCookieRestoreRef.current) {
-        hasTriedCookieRestoreRef.current = true;
+    const unsubscribe = subscribeToAuthExpired(() => {
+      clearSessionOnUnauthorized();
+      queryClient.clear();
 
-        void restoreSessionFromRefreshCookie().catch(() => {
-          // No refresh cookie means the user is simply logged out.
-        });
+      if (pathname !== "/login") {
+        router.push("/login");
       }
+    });
+
+    return unsubscribe;
+  }, [pathname, queryClient, router]);
+
+  useEffect(() => {
+    if (hasBootstrappedRef.current) {
       return;
     }
 
-    const currentSession = session;
-    const accessToken = currentSession.accessToken;
+    hasBootstrappedRef.current = true;
 
-    if (lastTokenRef.current === accessToken) {
+    void restoreSessionFromRefreshCookie().catch((error: unknown) => {
+      if (error instanceof ApiError && error.status === 401) {
+        clearSessionOnUnauthorized();
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!session?.user) {
       return;
     }
 
-    lastTokenRef.current = accessToken;
-
-    void Promise.all([
-      syncSessionProfile(currentSession),
-      syncUserSettings(accessToken),
-    ]).catch((error: unknown) => {
+    void syncUserSettings().catch((error: unknown) => {
       if (error instanceof ApiError && error.status === 401) {
         clearSessionOnUnauthorized();
       }

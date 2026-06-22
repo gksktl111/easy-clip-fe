@@ -18,6 +18,7 @@ export interface AuthSignInResponseDto {
 
 export interface RefreshAccessTokenResponseDto {
   access_token: string;
+  refresh_token?: string;
 }
 
 export interface UserProfileResponseDto {

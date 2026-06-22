@@ -20,7 +20,7 @@ import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 export const useTrashPage = () => {
   const session = useAuthSession();
-  const accessToken = session?.accessToken ?? null;
+  const isAuthenticated = Boolean(session?.user);
   const [clips, setClips] = useState<TrashClipResponseDto[]>([]);
   const [folders, setFolders] = useState<TrashFolderResponseDto[]>([]);
   const [activeFolders, setActiveFolders] = useState<FolderResponseDto[]>([]);
@@ -35,7 +35,7 @@ export const useTrashPage = () => {
     const loadingStartedAt = Date.now();
     const isLatestRequest = () => loadRequestIdRef.current === requestId;
 
-    if (!accessToken) {
+    if (!isAuthenticated) {
       await waitForMinimumLoading(loadingStartedAt);
 
       if (!isLatestRequest()) {
@@ -56,9 +56,9 @@ export const useTrashPage = () => {
 
     try {
       const [trashClips, trashFolders, currentFolders] = await Promise.all([
-        fetchTrashClips(accessToken),
-        fetchTrashFolders(accessToken),
-        fetchFolders(accessToken),
+        fetchTrashClips(),
+        fetchTrashFolders(),
+        fetchFolders(),
       ]);
 
       startTransition(() => {
@@ -82,7 +82,7 @@ export const useTrashPage = () => {
         setIsLoading(false);
       }
     }
-  }, [accessToken]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     void loadTrash();
@@ -107,71 +107,71 @@ export const useTrashPage = () => {
 
   const handleRestoreClip = useCallback(
     async (clipId: string) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         return;
       }
 
       await runAction(`clip-restore-${clipId}`, () =>
-        restoreTrashClip(accessToken, clipId),
+        restoreTrashClip(clipId),
       );
     },
-    [accessToken, runAction],
+    [isAuthenticated, runAction],
   );
 
   const handleDeleteClip = useCallback(
     async (clipId: string) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         return;
       }
 
       await runAction(`clip-delete-${clipId}`, () =>
-        deleteTrashClip(accessToken, clipId),
+        deleteTrashClip(clipId),
       );
     },
-    [accessToken, runAction],
+    [isAuthenticated, runAction],
   );
 
   const handleRestoreFolder = useCallback(
     async (folderId: string) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         return;
       }
 
       await runAction(`folder-restore-${folderId}`, () =>
-        restoreTrashFolder(accessToken, folderId),
+        restoreTrashFolder(folderId),
       );
     },
-    [accessToken, runAction],
+    [isAuthenticated, runAction],
   );
 
   const handleDeleteFolder = useCallback(
     async (folderId: string) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         return;
       }
 
       await runAction(`folder-delete-${folderId}`, () =>
-        deleteTrashFolder(accessToken, folderId),
+        deleteTrashFolder(folderId),
       );
     },
-    [accessToken, runAction],
+    [isAuthenticated, runAction],
   );
 
   const handleClearAll = useCallback(async () => {
-    if (!accessToken) {
+    if (!isAuthenticated) {
       return;
     }
 
     await runAction("trash-clear-all", async () => {
       for (const clip of clips) {
-        await deleteTrashClip(accessToken, clip.id);
+        await deleteTrashClip(clip.id);
       }
 
       for (const folder of folders) {
-        await deleteTrashFolder(accessToken, folder.id);
+        await deleteTrashFolder(folder.id);
       }
     });
-  }, [accessToken, clips, folders, runAction]);
+  }, [clips, folders, isAuthenticated, runAction]);
 
   return {
     clips,

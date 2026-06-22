@@ -18,10 +18,10 @@ export const useFavoriteClipsPage = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const { copyToast, showCopyToast } = useCopyToast();
   const {
-    accessToken,
     clips,
     fetchNextPage,
     hasNextPage,
+    isAuthenticated,
     isFetchingNextPage,
     isPending,
   } = useInfiniteClips({
@@ -39,16 +39,16 @@ export const useFavoriteClipsPage = () => {
         // no-op
       }
 
-      if (accessToken) {
-        await recordClipView(accessToken, clip.id);
+      if (isAuthenticated) {
+        await recordClipView(clip.id);
       }
     },
-    [accessToken, showCopyToast],
+    [isAuthenticated, showCopyToast],
   );
 
   const handleToggleFavorite = useCallback(
     async (clip: Clip) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         return;
       }
 
@@ -61,15 +61,15 @@ export const useFavoriteClipsPage = () => {
 
       try {
         if (nextFavorite) {
-          await likeClip(accessToken, clip.id);
+          await likeClip(clip.id);
         } else {
-          await unlikeClip(accessToken, clip.id);
+          await unlikeClip(clip.id);
         }
       } catch {
         rollbackFavorite();
       }
     },
-    [accessToken, queryClient],
+    [isAuthenticated, queryClient],
   );
 
   return {
