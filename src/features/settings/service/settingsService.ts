@@ -45,8 +45,8 @@ export const isServerSupportedLanguage = (
 ): language is ServerSupportedLanguage =>
   SERVER_SUPPORTED_LANGUAGES.includes(language as ServerSupportedLanguage);
 
-export const syncUserSettings = async (accessToken: string) => {
-  const settings = await fetchMySettings(accessToken);
+export const syncUserSettings = async () => {
+  const settings = await fetchMySettings();
   const currentLanguage = useSettingsStore.getState().language;
 
   useSettingsStore.getState().hydrateFromServer({
@@ -60,7 +60,6 @@ export const syncUserSettings = async (accessToken: string) => {
 };
 
 export const persistUserSettings = async (
-  accessToken: string,
   nextSettings: {
     theme?: ThemeMode;
     language?: LanguageCode;
@@ -83,7 +82,7 @@ export const persistUserSettings = async (
     return null;
   }
 
-  const settings = await updateMySettings(accessToken, payload);
+  const settings = await updateMySettings(payload);
 
   useSettingsStore.getState().hydrateFromServer({
     theme: mapThemeFromServer(settings.theme),

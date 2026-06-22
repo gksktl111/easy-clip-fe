@@ -9,7 +9,6 @@ import {
 import { apiRequest } from "@/shared/lib/apiClient";
 
 export const fetchClips = async (
-  accessToken: string,
   options: FetchClipsQueryDto = {},
 ) => {
   const searchParams = new URLSearchParams();
@@ -36,61 +35,48 @@ export const fetchClips = async (
   }
 
   return apiRequest<ClipCursorPageResponseDto>(`/clips?${searchParams}`, {
-    accessToken,
     cache: "no-store",
   });
 };
 
-export const createTextClip = (
-  accessToken: string,
-  payload: CreateTextClipRequestDto,
-) => {
+export const createTextClip = (payload: CreateTextClipRequestDto) => {
   const formData = new FormData();
   formData.set("folderId", payload.folderId);
   formData.set("text", payload.text);
 
   return apiRequest<ClipResponseDto>("/clips", {
     method: "POST",
-    accessToken,
     body: formData,
   });
 };
 
-export const createImageClip = (
-  accessToken: string,
-  payload: CreateImageClipRequestDto,
-) => {
+export const createImageClip = (payload: CreateImageClipRequestDto) => {
   const formData = new FormData();
   formData.set("folderId", payload.folderId);
   formData.set("file", payload.file);
 
   return apiRequest<ClipResponseDto>("/clips", {
     method: "POST",
-    accessToken,
     body: formData,
   });
 };
 
-export const removeClip = (accessToken: string, clipId: string) =>
+export const removeClip = (clipId: string) =>
   apiRequest<ClipResponseDto>(`/clips/${clipId}`, {
     method: "DELETE",
-    accessToken,
   });
 
-export const likeClip = (accessToken: string, clipId: string) =>
+export const likeClip = (clipId: string) =>
   apiRequest<LikeClipResponseDto>(`/clips/${clipId}/likes`, {
     method: "POST",
-    accessToken,
   });
 
-export const unlikeClip = (accessToken: string, clipId: string) =>
+export const unlikeClip = (clipId: string) =>
   apiRequest<LikeClipResponseDto>(`/clips/${clipId}/likes`, {
     method: "DELETE",
-    accessToken,
   });
 
-export const recordClipView = (accessToken: string, clipId: string) =>
+export const recordClipView = (clipId: string) =>
   apiRequest<null>(`/clips/${clipId}/views`, {
     method: "POST",
-    accessToken,
   });

@@ -40,7 +40,7 @@ export const useInfiniteClips = ({
   enabled = true,
 }: UseInfiniteClipsOptions) => {
   const session = useAuthSession();
-  const accessToken = session?.accessToken ?? null;
+  const isAuthenticated = Boolean(session?.user);
   const normalizedSearchQuery = searchQuery.trim();
   const queryKey = [
     CLIP_QUERY_KEY,
@@ -55,10 +55,10 @@ export const useInfiniteClips = ({
 
   const query = useInfiniteQuery({
     queryKey,
-    enabled: Boolean(accessToken) && enabled,
+    enabled: isAuthenticated && enabled,
     initialPageParam: null as string | null,
     queryFn: async ({ pageParam }) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         return {
           items: [],
           hasMore: false,
@@ -69,7 +69,7 @@ export const useInfiniteClips = ({
       const loadingStartedAt = Date.now();
 
       try {
-        return await fetchClips(accessToken, {
+        return await fetchClips({
           folderId,
           favorite,
           recent,
@@ -96,9 +96,9 @@ export const useInfiniteClips = ({
 
   return {
     ...query,
-    accessToken,
+    isAuthenticated,
     clips,
-    isPending: Boolean(accessToken) && enabled && query.isPending,
+    isPending: isAuthenticated && enabled && query.isPending,
     queryKey,
   };
 };

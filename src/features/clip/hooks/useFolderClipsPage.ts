@@ -42,10 +42,10 @@ export const useFolderClipsPage = () => {
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
   const { copyToast, showCopyToast } = useCopyToast();
   const {
-    accessToken,
     clips,
     fetchNextPage,
     hasNextPage,
+    isAuthenticated,
     isFetchingNextPage,
     isPending,
   } = useInfiniteClips({
@@ -85,43 +85,43 @@ export const useFolderClipsPage = () => {
   }, [contextMenu]);
 
   const ensureAuthenticated = useCallback(() => {
-    if (accessToken) {
+    if (isAuthenticated) {
       return true;
     }
 
     router.push("/login");
     return false;
-  }, [accessToken, router]);
+  }, [isAuthenticated, router]);
 
   const createTextClipFromPaste = useCallback(
     async (content: string) => {
       const trimmed = content.trim();
-      if (!trimmed || !folderId || !accessToken) {
+      if (!trimmed || !folderId || !isAuthenticated) {
         return;
       }
 
-      await createTextClip(accessToken, {
+      await createTextClip({
         folderId,
         text: trimmed,
       });
       await refreshClipQueries();
     },
-    [accessToken, folderId, refreshClipQueries],
+    [folderId, isAuthenticated, refreshClipQueries],
   );
 
   const createImageClipFromPaste = useCallback(
     async (file: File) => {
-      if (!folderId || !accessToken) {
+      if (!folderId || !isAuthenticated) {
         return;
       }
 
-      await createImageClip(accessToken, {
+      await createImageClip({
         folderId,
         file,
       });
       await refreshClipQueries();
     },
-    [accessToken, folderId, refreshClipQueries],
+    [folderId, isAuthenticated, refreshClipQueries],
   );
 
   useEffect(() => {
@@ -171,11 +171,11 @@ export const useFolderClipsPage = () => {
         // no-op
       }
 
-      if (accessToken) {
-        await recordClipView(accessToken, clip.id);
+      if (isAuthenticated) {
+        await recordClipView(clip.id);
       }
     },
-    [accessToken, showCopyToast],
+    [isAuthenticated, showCopyToast],
   );
 
   const handleCopyFromMenu = useCallback(
@@ -186,18 +186,18 @@ export const useFolderClipsPage = () => {
         // no-op
       }
 
-      if (accessToken) {
-        await recordClipView(accessToken, clip.id);
+      if (isAuthenticated) {
+        await recordClipView(clip.id);
       }
 
       setContextMenu(null);
     },
-    [accessToken],
+    [isAuthenticated],
   );
 
   const handleToggleFavorite = useCallback(
     async (clip: Clip) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         return;
       }
 
@@ -210,15 +210,15 @@ export const useFolderClipsPage = () => {
 
       try {
         if (nextFavorite) {
-          await likeClip(accessToken, clip.id);
+          await likeClip(clip.id);
         } else {
-          await unlikeClip(accessToken, clip.id);
+          await unlikeClip(clip.id);
         }
       } catch {
         rollbackFavorite();
       }
     },
-    [accessToken, queryClient],
+    [isAuthenticated, queryClient],
   );
 
   const handleOpenContextMenu = useCallback(
@@ -235,26 +235,26 @@ export const useFolderClipsPage = () => {
 
   const handleDeleteClip = useCallback(
     async (clipId: string) => {
-      if (!accessToken) {
+      if (!isAuthenticated) {
         return;
       }
 
-      await removeClip(accessToken, clipId);
+      await removeClip(clipId);
       setContextMenu(null);
       await refreshClipQueries();
     },
-    [accessToken, refreshClipQueries],
+    [isAuthenticated, refreshClipQueries],
   );
 
   const handleDeleteAll = useCallback(async () => {
-    if (!accessToken) {
+    if (!isAuthenticated) {
       return;
     }
 
-    await Promise.all(clips.map((clip) => removeClip(accessToken, clip.id)));
+    await Promise.all(clips.map((clip) => removeClip(clip.id)));
     setIsDeleteAllOpen(false);
     await refreshClipQueries();
-  }, [accessToken, clips, refreshClipQueries]);
+  }, [clips, isAuthenticated, refreshClipQueries]);
 
   return {
     activeFilter,
