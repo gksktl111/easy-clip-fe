@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { logout } from "@/features/auth/api/authApi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { syncUserSettings } from "@/features/settings/service/settingsService";
 import { ApiError, subscribeToAuthExpired } from "@/shared/lib/apiClient";
@@ -10,6 +11,7 @@ import {
   clearSessionOnUnauthorized,
   restoreSessionFromRefreshCookie,
 } from "@/features/auth/service/authService";
+import { notifyError } from "@/shared/lib/toast";
 
 export function AuthBootstrap() {
   const session = useAuthSession();
@@ -38,12 +40,26 @@ export function AuthBootstrap() {
 
     hasBootstrappedRef.current = true;
 
-    void restoreSessionFromRefreshCookie().catch((error: unknown) => {
-      if (error instanceof ApiError && error.status === 401) {
+    void restoreSessionFromRefreshCookie().catch(async (error: unknown) => {
+      if (!(error instanceof ApiError)) {
+        return;
+      }
+
+      if (error.status === 401) {
         clearSessionOnUnauthorized();
+        return;
+      }
+
+      if (error.status === 404) {
+        clearSessionOnUnauthorized();
+        queryClient.clear();
+        // 쿠키는 있지만 서버에 유저가 없으면 사용자를 랜딩으로 되돌려 재진입을 유도한다.
+        notifyError("존재하지 않는 유저입니다.");
+        await logout().catch(() => undefined);
+        router.push("/");
       }
     });
-  }, []);
+  }, [queryClient, router]);
 
   useEffect(() => {
     if (!session?.user) {

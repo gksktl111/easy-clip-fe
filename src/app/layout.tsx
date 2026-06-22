@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getInitialLocale } from "@/shared/server/getUserLocale";
 import { IntlProvider } from "@/shared/ui/IntlProvider";
+import { AppToaster } from "@/shared/ui/AppToaster";
 import { QueryProvider } from "@/shared/ui/QueryProvider";
 import "./globals.css";
 
@@ -21,7 +22,10 @@ export default async function RootLayout({
     <html lang={locale}>
       <body className="bg-slate-50 antialiased">
         <QueryProvider>
-          <IntlProvider initialLocale={locale}>{children}</IntlProvider>
+          <IntlProvider initialLocale={locale}>
+            {children}
+            <AppToaster />
+          </IntlProvider>
         </QueryProvider>
       </body>
     </html>
