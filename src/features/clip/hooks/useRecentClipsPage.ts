@@ -15,10 +15,10 @@ export const useRecentClipsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { copyToast, showCopyToast } = useCopyToast();
   const {
-    accessToken,
     clips,
     fetchNextPage,
     hasNextPage,
+    isAuthenticated,
     isFetchingNextPage,
     isPending,
   } = useInfiniteClips({
@@ -42,12 +42,12 @@ export const useRecentClipsPage = () => {
         // no-op
       }
 
-      if (accessToken) {
-        await recordClipView(accessToken, clip.id);
+      if (isAuthenticated) {
+        await recordClipView(clip.id);
         await refreshClipQueries();
       }
     },
-    [accessToken, refreshClipQueries, showCopyToast],
+    [isAuthenticated, refreshClipQueries, showCopyToast],
   );
 
   return {

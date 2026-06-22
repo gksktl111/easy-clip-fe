@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HiOutlineClock, HiOutlineStar, HiOutlineTrash } from "react-icons/hi";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { logout } from "@/features/auth/api/authApi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { clearAuthSession } from "@/features/auth/service/authSession";
@@ -31,7 +32,9 @@ export function Sidebar({
   const t = useTranslations("sidebar");
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const session = useAuthSession();
+  const isAuthenticated = Boolean(session?.user);
   const {
     createFolder,
     folders,
@@ -118,14 +121,14 @@ export function Sidebar({
   }, [onCloseMobile, pathname]);
 
   const ensureAuthenticated = useCallback(() => {
-    if (session?.accessToken) {
+    if (isAuthenticated) {
       return true;
     }
 
     onCloseMobile?.();
     router.push("/login");
     return false;
-  }, [onCloseMobile, router, session?.accessToken]);
+  }, [isAuthenticated, onCloseMobile, router]);
 
   const handleReorderFolders = useCallback(
     (sourceId: string, targetId: string) => {
@@ -202,17 +205,18 @@ export function Sidebar({
     onCloseMobile?.();
 
     try {
-      if (session?.accessToken) {
-        await logout(session.accessToken);
+      if (isAuthenticated) {
+        await logout();
       }
     } catch {
       // clear client session even when the server session is already invalid
     } finally {
       clearAuthSession();
+      queryClient.clear();
       router.push("/login");
       router.refresh();
     }
-  }, [onCloseMobile, router, session?.accessToken]);
+  }, [isAuthenticated, onCloseMobile, queryClient, router]);
 
   return (
     <>

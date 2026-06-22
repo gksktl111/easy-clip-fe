@@ -8,23 +8,21 @@ import { apiRequest } from "@/shared/lib/apiClient";
 
 export const getAuthStartPath = (provider: AuthProvider) => `/auth/${provider}`;
 
-export const fetchMyProfile = async (accessToken: string) =>
+export const fetchMyProfile = async () =>
   apiRequest<UserProfileResponseDto>("/users/me", {
-    accessToken,
     cache: "no-store",
   });
 
-export const logout = async (accessToken: string) =>
+export const logout = async () =>
   apiRequest<LogoutResponseDto>("/auth/logout", {
     method: "POST",
-    accessToken,
-    credentials: "include",
+    skipAuthRefresh: true,
   });
 
 export const refreshAccessToken = async () =>
   apiRequest<RefreshAccessTokenResponseDto>("/auth/refresh", {
     method: "POST",
-    credentials: "include",
+    skipAuthRefresh: true,
   });
 
 // 테스트 어드민 로그인 API는 실제 OAuth 연동 전 임시 우회용으로 사용했습니다.

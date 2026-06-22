@@ -35,14 +35,14 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     setErrorMessage(null);
     setTheme(nextTheme);
 
-    if (!session?.accessToken) {
+    if (!session?.user) {
       return;
     }
 
     setSavingField("theme");
 
     try {
-      await persistUserSettings(session.accessToken, { theme: nextTheme });
+      await persistUserSettings({ theme: nextTheme });
     } catch {
       setTheme(previousTheme);
       setErrorMessage(t("saveError"));
@@ -57,14 +57,14 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     setErrorMessage(null);
     setLanguage(nextLanguage);
 
-    if (!session?.accessToken) {
+    if (!session?.user) {
       return;
     }
 
     setSavingField("language");
 
     try {
-      await persistUserSettings(session.accessToken, { language: nextLanguage });
+      await persistUserSettings({ language: nextLanguage });
     } catch {
       setLanguage(previousLanguage);
       setErrorMessage(t("saveError"));

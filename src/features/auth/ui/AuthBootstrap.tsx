@@ -1,46 +1,72 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { logout } from "@/features/auth/api/authApi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { syncUserSettings } from "@/features/settings/service/settingsService";
-import { ApiError } from "@/shared/lib/apiClient";
+import { ApiError, subscribeToAuthExpired } from "@/shared/lib/apiClient";
 import {
   clearSessionOnUnauthorized,
   restoreSessionFromRefreshCookie,
-  syncSessionProfile,
 } from "@/features/auth/service/authService";
+import { notifyError } from "@/shared/lib/toast";
 
 export function AuthBootstrap() {
   const session = useAuthSession();
-  const lastTokenRef = useRef<string | null>(null);
-  const hasTriedCookieRestoreRef = useRef(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const hasBootstrappedRef = useRef(false);
 
   useEffect(() => {
-    if (!session?.accessToken) {
-      lastTokenRef.current = null;
-      if (!hasTriedCookieRestoreRef.current) {
-        hasTriedCookieRestoreRef.current = true;
+    const unsubscribe = subscribeToAuthExpired(() => {
+      clearSessionOnUnauthorized();
+      queryClient.clear();
 
-        void restoreSessionFromRefreshCookie().catch(() => {
-          // No refresh cookie means the user is simply logged out.
-        });
+      if (pathname !== "/login") {
+        router.push("/login");
       }
+    });
+
+    return unsubscribe;
+  }, [pathname, queryClient, router]);
+
+  useEffect(() => {
+    if (hasBootstrappedRef.current) {
       return;
     }
 
-    const currentSession = session;
-    const accessToken = currentSession.accessToken;
+    hasBootstrappedRef.current = true;
 
-    if (lastTokenRef.current === accessToken) {
+    void restoreSessionFromRefreshCookie().catch(async (error: unknown) => {
+      if (!(error instanceof ApiError)) {
+        return;
+      }
+
+      if (error.status === 401) {
+        clearSessionOnUnauthorized();
+        return;
+      }
+
+      if (error.status === 404) {
+        clearSessionOnUnauthorized();
+        queryClient.clear();
+        // 쿠키는 있지만 서버에 유저가 없으면 사용자를 랜딩으로 되돌려 재진입을 유도한다.
+        notifyError("존재하지 않는 유저입니다.");
+        await logout().catch(() => undefined);
+        router.push("/");
+      }
+    });
+  }, [queryClient, router]);
+
+  useEffect(() => {
+    if (!session?.user) {
       return;
     }
 
-    lastTokenRef.current = accessToken;
-
-    void Promise.all([
-      syncSessionProfile(currentSession),
-      syncUserSettings(accessToken),
-    ]).catch((error: unknown) => {
+    void syncUserSettings().catch((error: unknown) => {
       if (error instanceof ApiError && error.status === 401) {
         clearSessionOnUnauthorized();
       }

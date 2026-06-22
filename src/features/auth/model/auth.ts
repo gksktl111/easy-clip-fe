@@ -10,7 +10,5 @@ export interface AuthSessionUser {
 }
 
 export interface AuthSession {
-  accessToken: string;
-  refreshToken?: string | null;
   user: AuthSessionUser | null;
 }
