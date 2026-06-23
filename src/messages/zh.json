@@ -161,6 +161,7 @@
       "description": "复制新的内容，或在文件夹中开始粘贴后，这里就会显示内容。"
     },
     "item": {
+      "saving": "保存中",
       "toggleFavorite": "切换收藏"
     },
     "actions": {
