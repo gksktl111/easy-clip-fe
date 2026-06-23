@@ -62,6 +62,7 @@
     "logout": "退出登录",
     "guest": "访客",
     "settings": "设置",
+    "upgradePlan": "升级套餐",
     "closeCreateFolder": "关闭新建文件夹",
     "createFolder": "新建文件夹",
     "folderName": "文件夹名称",

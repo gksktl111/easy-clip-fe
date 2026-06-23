@@ -62,6 +62,7 @@
     "logout": "Log out",
     "guest": "Guest",
     "settings": "Settings",
+    "upgradePlan": "Upgrade plan",
     "closeCreateFolder": "Close create folder",
     "createFolder": "Create folder",
     "folderName": "Folder name",

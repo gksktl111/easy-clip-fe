@@ -314,9 +314,14 @@ export function Sidebar({
           userLabel={userLabel}
           settingsLabel={t("settings")}
           logoutLabel={t("logout")}
+          upgradePlanLabel={t("upgradePlan")}
           onOpenSettings={() => {
             onCloseMobile?.();
             onOpenSettings();
+          }}
+          onUpgradePlan={() => {
+            onCloseMobile?.();
+            router.push("/pricing");
           }}
           onLogout={handleLogout}
         />
