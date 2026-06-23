@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getInitialLocale } from "@/shared/server/getUserLocale";
+import { getInitialUserSettings } from "@/features/settings/server/getInitialUserSettings";
 import { IntlProvider } from "@/shared/ui/IntlProvider";
 import { AppToaster } from "@/shared/ui/AppToaster";
 import { QueryProvider } from "@/shared/ui/QueryProvider";
@@ -16,13 +16,21 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getInitialLocale();
+  const initialSettings = await getInitialUserSettings();
 
   return (
-    <html lang={locale}>
-      <body className="bg-slate-50 antialiased">
+    <html
+      lang={initialSettings.language}
+      data-theme={initialSettings.theme}
+      suppressHydrationWarning
+    >
+      <body className="bg-background text-foreground antialiased">
         <QueryProvider>
-          <IntlProvider initialLocale={locale}>
+          <IntlProvider
+            initialLocale={initialSettings.language}
+            initialTheme={initialSettings.theme}
+            preferServerSettings={initialSettings.source === "server"}
+          >
             {children}
             <AppToaster />
           </IntlProvider>
