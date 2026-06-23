@@ -161,6 +161,7 @@ const updateClipFavoriteData = (
   queryKey: QueryKey,
   clipId: string,
   isFavorite: boolean,
+  favoriteClip: ClipListItemResponseDto | null,
 ) => {
   if (!data) {
     return data;
@@ -169,6 +170,19 @@ const updateClipFavoriteData = (
   const queryOptions = getClipQueryOptions(queryKey);
   const shouldRemoveFromFavorites =
     queryOptions?.favorite === true && !isFavorite;
+  const nextFavoriteClip = favoriteClip
+    ? { ...favoriteClip, likeByMe: isFavorite }
+    : null;
+  const shouldInsertIntoFavorites =
+    queryOptions?.favorite === true &&
+    isFavorite &&
+    nextFavoriteClip &&
+    matchesClipQueryOptions(nextFavoriteClip, queryOptions) &&
+    !data.pages.some((page) => page.items.some((clip) => clip.id === clipId));
+
+  if (shouldInsertIntoFavorites && nextFavoriteClip) {
+    return moveClipToFirstPage(data, nextFavoriteClip);
+  }
 
   return {
     ...data,
@@ -180,6 +194,38 @@ const updateClipFavoriteData = (
             clip.id === clipId ? { ...clip, likeByMe: isFavorite } : clip,
           ),
     })),
+  };
+};
+
+const moveClipToFirstPage = (
+  data: InfiniteData<ClipCursorPageResponseDto> | undefined,
+  clip: ClipListItemResponseDto,
+) => {
+  if (!data) {
+    return data;
+  }
+
+  const [firstPage] = data.pages;
+
+  if (!firstPage) {
+    return data;
+  }
+
+  const pagesWithoutClip = data.pages.map((page) => ({
+    ...page,
+    items: page.items.filter((item) => item.id !== clip.id),
+  }));
+  const [nextFirstPage, ...nextRestPages] = pagesWithoutClip;
+
+  return {
+    ...data,
+    pages: [
+      {
+        ...nextFirstPage,
+        items: [clip, ...nextFirstPage.items],
+      },
+      ...nextRestPages,
+    ],
   };
 };
 
@@ -196,12 +242,28 @@ export const updateClipFavoriteCache = (
 ) => {
   const clipQueries = getClipQueries(queryClient);
   const snapshots = getClipQuerySnapshots(queryClient);
+  const favoriteClip =
+    clipQueries
+      .flatMap((query) => {
+        const data = query.state.data as
+          | InfiniteData<ClipCursorPageResponseDto>
+          | undefined;
+
+        return data?.pages.flatMap((page) => page.items) ?? [];
+      })
+      .find((clip) => clip.id === clipId) ?? null;
 
   for (const query of clipQueries) {
     queryClient.setQueryData<InfiniteData<ClipCursorPageResponseDto>>(
       query.queryKey,
       (data) =>
-        updateClipFavoriteData(data, query.queryKey, clipId, isFavorite),
+        updateClipFavoriteData(
+          data,
+          query.queryKey,
+          clipId,
+          isFavorite,
+          favoriteClip,
+        ),
     );
   }
 
@@ -362,6 +424,42 @@ export const replaceOptimisticClipInCache = (
           })),
         };
       },
+    );
+  }
+};
+
+export const moveClipToRecentCache = (
+  queryClient: QueryClient,
+  clipId: string,
+) => {
+  const clipQueries = getClipQueries(queryClient);
+  const copiedClip = clipQueries
+    .flatMap((query) => {
+      const data = query.state.data as
+        | InfiniteData<ClipCursorPageResponseDto>
+        | undefined;
+
+      return data?.pages.flatMap((page) => page.items) ?? [];
+    })
+    .find((clip) => clip.id === clipId);
+
+  if (!copiedClip) {
+    return;
+  }
+
+  for (const query of clipQueries) {
+    const queryOptions = getClipQueryOptions(query.queryKey);
+
+    if (
+      !queryOptions?.recent ||
+      !matchesClipQueryOptions(copiedClip, queryOptions)
+    ) {
+      continue;
+    }
+
+    queryClient.setQueryData<InfiniteData<ClipCursorPageResponseDto>>(
+      query.queryKey,
+      (data) => moveClipToFirstPage(data, copiedClip),
     );
   }
 };

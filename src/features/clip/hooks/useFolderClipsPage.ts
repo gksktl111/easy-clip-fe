@@ -21,10 +21,12 @@ import {
   mapClipResponseToListItem,
   removeClipsFromCache,
   replaceOptimisticClipInCache,
+  moveClipToRecentCache,
   updateClipFavoriteCache,
 } from "@/features/clip/service/clipQueryCache";
 import { ClipListItemResponseDto } from "@/features/clip/model/clip.dto";
 import { FilterType } from "@/features/clip/ui/FilterBar";
+import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 import { notifyError } from "@/shared/lib/toast";
 
@@ -92,6 +94,7 @@ export const useFolderClipsPage = () => {
   const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery);
   const [isActive, setIsActive] = useState(false);
   const [contextMenu, setContextMenu] = useState<{
     id: string;
@@ -110,7 +113,7 @@ export const useFolderClipsPage = () => {
   } = useInfiniteClips({
     folderId,
     filter: activeFilter,
-    searchQuery,
+    searchQuery: debouncedSearchQuery,
     enabled: Boolean(folderId),
   });
 
@@ -284,9 +287,11 @@ export const useFolderClipsPage = () => {
 
       if (isAuthenticated) {
         await recordClipView(clip.id);
+        moveClipToRecentCache(queryClient, clip.id);
+        void refreshClipQueries();
       }
     },
-    [isAuthenticated, showCopyToast],
+    [isAuthenticated, queryClient, refreshClipQueries, showCopyToast],
   );
 
   const handleCopyFromMenu = useCallback(
@@ -299,11 +304,13 @@ export const useFolderClipsPage = () => {
 
       if (isAuthenticated) {
         await recordClipView(clip.id);
+        moveClipToRecentCache(queryClient, clip.id);
+        void refreshClipQueries();
       }
 
       setContextMenu(null);
     },
-    [isAuthenticated],
+    [isAuthenticated, queryClient, refreshClipQueries],
   );
 
   const handleToggleFavorite = useCallback(
@@ -327,9 +334,11 @@ export const useFolderClipsPage = () => {
         }
       } catch {
         rollbackFavorite();
+      } finally {
+        void refreshClipQueries();
       }
     },
-    [isAuthenticated, queryClient],
+    [isAuthenticated, queryClient, refreshClipQueries],
   );
 
   const handleOpenContextMenu = useCallback(
