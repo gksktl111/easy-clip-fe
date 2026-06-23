@@ -224,7 +224,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onCloseMobile}
-          className="fixed inset-0 z-30 bg-(--overlay) md:hidden"
+          className="fixed inset-0 z-30 cursor-pointer bg-(--overlay) md:hidden"
           aria-label="사이드바 닫기"
         />
       ) : null}
