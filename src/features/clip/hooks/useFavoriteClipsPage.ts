@@ -10,12 +10,19 @@ import {
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
-import { updateClipFavoriteCache } from "@/features/clip/service/clipQueryCache";
+import {
+  invalidateClipQueries,
+  moveClipToRecentCache,
+  updateClipFavoriteCache,
+} from "@/features/clip/service/clipQueryCache";
 import { FilterType } from "@/features/clip/ui/FilterBar";
+import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 
 export const useFavoriteClipsPage = () => {
   const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery);
   const { copyToast, showCopyToast } = useCopyToast();
   const {
     clips,
@@ -27,7 +34,13 @@ export const useFavoriteClipsPage = () => {
   } = useInfiniteClips({
     favorite: true,
     filter: activeFilter,
+    searchQuery: debouncedSearchQuery,
   });
+
+  const refreshClipQueries = useCallback(
+    () => invalidateClipQueries(queryClient),
+    [queryClient],
+  );
 
   const handleCopy = useCallback(
     async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
@@ -41,9 +54,11 @@ export const useFavoriteClipsPage = () => {
 
       if (isAuthenticated) {
         await recordClipView(clip.id);
+        moveClipToRecentCache(queryClient, clip.id);
+        void refreshClipQueries();
       }
     },
-    [isAuthenticated, showCopyToast],
+    [isAuthenticated, queryClient, refreshClipQueries, showCopyToast],
   );
 
   const handleToggleFavorite = useCallback(
@@ -67,9 +82,11 @@ export const useFavoriteClipsPage = () => {
         }
       } catch {
         rollbackFavorite();
+      } finally {
+        void refreshClipQueries();
       }
     },
-    [isAuthenticated, queryClient],
+    [isAuthenticated, queryClient, refreshClipQueries],
   );
 
   return {
@@ -80,7 +97,9 @@ export const useFavoriteClipsPage = () => {
     hasNextPage: Boolean(hasNextPage),
     isFetchingNextPage,
     isLoading: isPending,
+    searchQuery,
     setActiveFilter,
+    setSearchQuery,
     handleCopy,
     handleToggleFavorite,
   };

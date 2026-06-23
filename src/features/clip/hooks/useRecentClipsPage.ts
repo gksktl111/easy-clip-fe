@@ -6,13 +6,18 @@ import { recordClipView } from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
-import { invalidateClipQueries } from "@/features/clip/service/clipQueryCache";
+import {
+  invalidateClipQueries,
+  moveClipToRecentCache,
+} from "@/features/clip/service/clipQueryCache";
 import { FilterType } from "@/features/clip/ui/FilterBar";
+import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 
 export const useRecentClipsPage = () => {
   const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery);
   const { copyToast, showCopyToast } = useCopyToast();
   const {
     clips,
@@ -24,7 +29,7 @@ export const useRecentClipsPage = () => {
   } = useInfiniteClips({
     recent: true,
     filter: activeFilter,
-    searchQuery,
+    searchQuery: debouncedSearchQuery,
   });
 
   const refreshClipQueries = useCallback(
@@ -44,10 +49,11 @@ export const useRecentClipsPage = () => {
 
       if (isAuthenticated) {
         await recordClipView(clip.id);
-        await refreshClipQueries();
+        moveClipToRecentCache(queryClient, clip.id);
+        void refreshClipQueries();
       }
     },
-    [isAuthenticated, refreshClipQueries, showCopyToast],
+    [isAuthenticated, queryClient, refreshClipQueries, showCopyToast],
   );
 
   return {
