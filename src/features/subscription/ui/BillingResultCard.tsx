@@ -43,9 +43,13 @@ export function BillingResultCard({
       <div className="mt-6 flex flex-col gap-2">
         <Link
           href={isSuccess ? "/recent" : "/billing"}
-          className="flex flex-1 cursor-pointer items-center justify-center rounded-xl bg-(--primary) px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-(--primary-hover)"
+          className="flex flex-1 cursor-pointer items-center justify-center rounded-xl bg-(--primary) px-4 py-3 text-sm font-semibold transition hover:bg-(--primary-hover)"
         >
-          {isSuccess ? "앱으로 이동" : "결제 다시 시도"}
+          {isSuccess ? (
+            <span className="text-primary-foreground">앱으로 이동</span>
+          ) : (
+            <span className="text-primary-foreground">결제 다시 시도</span>
+          )}
         </Link>
       </div>
     </section>
