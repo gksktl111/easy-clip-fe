@@ -6,10 +6,15 @@ import {
   persist,
   type StateStorage,
 } from "zustand/middleware";
-import { DEFAULT_LOCALE, type AppLocale } from "@/shared/config/locale";
+import { DEFAULT_LOCALE } from "@/shared/config/locale";
+import {
+  DEFAULT_THEME,
+  type LanguageCode,
+  type ThemeMode,
+} from "@/shared/config/settings";
 
-export type ThemeMode = "light" | "dark";
-export type LanguageCode = AppLocale;
+export { DEFAULT_THEME };
+export type { LanguageCode, ThemeMode };
 
 interface SettingsState {
   theme: ThemeMode;
@@ -32,7 +37,7 @@ const noopStorage: StateStorage = {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
-      theme: "dark",
+      theme: DEFAULT_THEME,
       language: DEFAULT_LOCALE,
       setTheme: (theme) => set({ theme }),
       toggleTheme: () =>
@@ -47,6 +52,7 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "easy-clip-settings",
+      skipHydration: true,
       storage: createJSONStorage(() =>
         typeof window === "undefined" ? noopStorage : localStorage,
       ),
