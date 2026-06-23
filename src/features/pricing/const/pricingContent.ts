@@ -6,6 +6,7 @@ export interface PricingPlan {
   priceSuffix?: string;
   billingNote: string;
   ctaLabel: string;
+  ctaHref: string;
   highlight: boolean;
   features: readonly string[];
 }
@@ -25,6 +26,7 @@ export const PRICING_PLANS: readonly PricingPlan[] = [
     priceSuffix: "/ month",
     billingNote: "월간 요금 없이 바로 사용",
     ctaLabel: "무료로 시작하기",
+    ctaHref: "/login",
     highlight: false,
     features: [
       "하나의 프로젝트 사용 가능",
@@ -37,9 +39,11 @@ export const PRICING_PLANS: readonly PricingPlan[] = [
     name: "Pro",
     badge: "집중 작업용",
     description: "프로젝트를 여러 개 운영하고 태그 기반 정리가 필요한 플랜",
-    price: "출시 예정",
-    billingNote: "상세 요금과 결제 방식은 추후 공개",
-    ctaLabel: "Pro 플랜 보기",
+    price: "₩3,900",
+    priceSuffix: "/ month",
+    billingNote: "월 3,900원으로 Pro 기능 사용",
+    ctaLabel: "Pro로 업그레이드",
+    ctaHref: "/billing",
     highlight: true,
     features: [
       "무제한 프로젝트 생성 가능",

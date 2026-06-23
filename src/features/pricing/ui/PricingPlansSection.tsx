@@ -85,8 +85,8 @@ export function PricingPlansSection() {
           </p>
 
           <Link
-            href="/login"
-            className="mt-8 inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition-[opacity,transform] duration-200 hover:opacity-90"
+            href={plan.ctaHref}
+            className="mt-8 inline-flex w-full cursor-pointer items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition-[opacity,transform] duration-200 hover:opacity-90"
             style={{
               backgroundColor: plan.highlight
                 ? "var(--pricing-button-featured-bg)"
