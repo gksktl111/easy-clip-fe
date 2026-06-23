@@ -236,43 +236,18 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                   <HiOutlineCreditCard className="h-5 w-5" aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold">
-                      {t("subscriptionTitle")}
-                    </p>
-                    <span className="rounded-full bg-(--surface-muted) px-2.5 py-1 text-xs font-semibold text-(--muted)">
-                      {isSubscriptionLoading
-                        ? t("subscriptionLoading")
-                        : (subscription?.plan ?? t("subscriptionEmptyValue"))}
-                    </span>
-                  </div>
-                  <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <p className="text-left text-sm font-semibold">
+                    {t("subscriptionTitle")}
+                  </p>
+                  <dl className="mt-4 grid gap-3 text-left text-sm">
                     <div>
                       <dt className="text-xs text-(--muted)">
                         {t("subscriptionPlan")}
                       </dt>
                       <dd className="mt-1 font-semibold">
-                        {subscription?.plan ?? t("subscriptionEmptyValue")}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-(--muted)">
-                        {t("subscriptionStatus")}
-                      </dt>
-                      <dd className="mt-1 font-semibold">
-                        {subscription?.status ?? t("subscriptionEmptyValue")}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-(--muted)">
-                        {t("subscriptionAutoRenew")}
-                      </dt>
-                      <dd className="mt-1 font-semibold">
-                        {subscription
-                          ? subscription.autoRenew
-                            ? t("subscriptionAutoRenewOn")
-                            : t("subscriptionAutoRenewOff")
-                          : t("subscriptionEmptyValue")}
+                        {isSubscriptionLoading
+                          ? t("subscriptionLoading")
+                          : (subscription?.plan ?? t("subscriptionEmptyValue"))}
                       </dd>
                     </div>
                     <div>
