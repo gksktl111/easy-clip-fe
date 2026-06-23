@@ -8,3 +8,9 @@ export const notifyError = (message: string, description?: string) => {
     description,
   });
 };
+
+export const notifySuccess = (message: string, description?: string) => {
+  toast.success(message, {
+    description,
+  });
+};

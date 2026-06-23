@@ -6,6 +6,7 @@ const MAIN_APP_PATH = "/favorites";
 const LOGIN_PATH = "/login";
 
 const PUBLIC_PATHS = new Set(["/", LOGIN_PATH, "/pricing"]);
+const AUTH_REDIRECT_PATHS = new Set(["/", LOGIN_PATH]);
 
 const hasAuthCookie = (request: NextRequest) =>
   request.cookies.has(ACCESS_TOKEN_COOKIE_NAME) ||
@@ -24,8 +25,8 @@ export function proxy(request: NextRequest) {
   const isPublicPath = PUBLIC_PATHS.has(pathname);
   const isAuthenticated = hasAuthCookie(request);
 
-  if (isAuthenticated && isPublicPath) {
-    // 로그인된 사용자는 랜딩/로그인/가격 페이지 대신 메인 앱 도메인에서만 활동한다.
+  if (isAuthenticated && AUTH_REDIRECT_PATHS.has(pathname)) {
+    // 로그인된 사용자는 랜딩/로그인 페이지 대신 메인 앱 도메인에서 활동한다.
     return redirectTo(request, MAIN_APP_PATH);
   }
 
