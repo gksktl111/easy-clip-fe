@@ -10,14 +10,14 @@ export function PricingPlansSection() {
   const isAuthenticated = Boolean(session?.user);
 
   return (
-    <div className="mt-16 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+    <div className="mt-10 grid gap-4 sm:mt-12 sm:gap-6 lg:mt-16 lg:grid-cols-[0.95fr_1.05fr]">
       {PRICING_PLANS.map((plan) => {
         const isCurrentFreePlan = isAuthenticated && !plan.highlight;
 
         return (
           <article
             key={plan.name}
-            className={`relative overflow-hidden rounded-[2rem] border px-8 py-8 transition-transform duration-300 hover:-translate-y-1 ${
+            className={`relative overflow-hidden rounded-2xl border px-5 py-6 transition-transform duration-300 hover:-translate-y-1 sm:rounded-[2rem] sm:px-8 sm:py-8 ${
               plan.highlight
                 ? "border-transparent text-white"
                 : "border-(--border) bg-(--surface)"
@@ -44,7 +44,9 @@ export function PricingPlansSection() {
                 >
                   {plan.badge}
                 </p>
-                <h2 className="mt-3 text-3xl font-semibold">{plan.name}</h2>
+                <h2 className="mt-3 text-2xl font-semibold sm:text-3xl">
+                  {plan.name}
+                </h2>
               </div>
               {plan.highlight ? (
                 <span
@@ -57,7 +59,7 @@ export function PricingPlansSection() {
             </div>
 
             <p
-              className={`mt-5 text-base leading-7 ${
+              className={`mt-5 text-sm leading-6 sm:text-base sm:leading-7 ${
                 plan.highlight
                   ? "text-[var(--pricing-featured-text)]"
                   : "text-(--muted)"
@@ -67,7 +69,7 @@ export function PricingPlansSection() {
             </p>
 
             <div className="mt-8 flex items-end gap-2">
-              <span className="text-5xl font-semibold tracking-tight">
+              <span className="text-4xl font-semibold tracking-tight sm:text-5xl">
                 {plan.price}
               </span>
               {plan.priceSuffix ? (

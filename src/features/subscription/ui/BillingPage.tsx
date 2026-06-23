@@ -7,7 +7,6 @@ import {
   HiCheck,
   HiOutlineCreditCard,
   HiOutlineRefresh,
-  HiOutlineShieldCheck,
 } from "react-icons/hi";
 import {
   createBillingAuthRequest,
@@ -37,6 +36,13 @@ declare global {
 
 const TOSS_PAYMENTS_SCRIPT_ID = "toss-payments-sdk";
 const TOSS_PAYMENTS_SCRIPT_SRC = "https://js.tosspayments.com/v1/payment";
+const PRO_UNLOCKED_FEATURES = [
+  "무제한 프로젝트 생성",
+  "프로젝트당 최대 500개 클립 저장",
+  "무제한 기기 연동",
+  "태그 기반 클립 정리",
+  "AI 기능 우선 제공 예정",
+] as const;
 
 const loadTossPaymentsScript = () =>
   new Promise<void>((resolve, reject) => {
@@ -69,17 +75,6 @@ const loadTossPaymentsScript = () =>
     script.onerror = () => reject(new Error("결제 모듈을 불러오지 못했습니다."));
     document.head.appendChild(script);
   });
-
-const formatDateTime = (value: string | null) => {
-  if (!value) {
-    return "없음";
-  }
-
-  return new Intl.DateTimeFormat("ko-KR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-};
 
 const mapBillingAuthMethod = (method: BillingAuthRequestResponseDto["method"]) =>
   method === "CARD" ? "카드" : method;
@@ -177,7 +172,7 @@ export function BillingPage() {
 
   return (
     <main className="bg-background text-foreground min-h-screen">
-      <section className="mx-auto grid min-h-screen w-full max-w-6xl gap-8 px-5 py-8 md:grid-cols-[0.95fr_1.05fr] md:px-8 md:py-12">
+      <section className="mx-auto grid min-h-screen w-full max-w-6xl gap-6 px-4 py-6 sm:px-5 sm:py-8 md:grid-cols-[0.95fr_1.05fr] md:gap-8 md:px-8 md:py-12">
         <div className="flex flex-col justify-center">
           <Link
             href="/pricing"
@@ -191,7 +186,7 @@ export function BillingPage() {
               <HiOutlineCreditCard className="h-4 w-4" aria-hidden />
               Pro subscription
             </div>
-            <h1 className="mt-5 text-4xl leading-tight font-semibold md:text-5xl">
+            <h1 className="mt-5 text-3xl leading-tight font-semibold sm:text-4xl md:text-5xl">
               Pro로 업그레이드
             </h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-(--muted)">
@@ -200,7 +195,7 @@ export function BillingPage() {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+          <div className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-3">
             {["무제한 프로젝트", "기기 제한 해제", "태그 정리"].map((item) => (
               <div
                 key={item}
@@ -214,12 +209,12 @@ export function BillingPage() {
         </div>
 
         <div className="flex items-center">
-          <div className="w-full rounded-2xl border border-(--border) bg-(--surface-elevated) p-5 shadow-xl md:p-6">
+          <div className="w-full rounded-2xl border border-(--border) bg-(--surface-elevated) p-4 shadow-xl sm:p-5 md:p-6">
             <div className="flex items-start justify-between gap-4 border-b border-(--border) pb-5">
               <div>
                 <p className="text-sm font-medium text-(--muted)">EasyClip Pro</p>
                 <div className="mt-3 flex items-end gap-2">
-                  <span className="text-4xl font-semibold">₩3,900</span>
+                  <span className="text-3xl font-semibold sm:text-4xl">₩3,900</span>
                   <span className="pb-1 text-sm text-(--muted)">/ month</span>
                 </div>
               </div>
@@ -229,36 +224,17 @@ export function BillingPage() {
             </div>
 
             <div className="mt-5 rounded-xl border border-(--border) bg-(--surface-muted) p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold">
-                <HiOutlineShieldCheck className="h-5 w-5" aria-hidden />
-                현재 구독 상태
-              </div>
-              <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <dt className="text-(--muted)">플랜</dt>
-                  <dd className="mt-1 font-semibold">
-                    {subscription?.plan ?? "확인 중"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-(--muted)">상태</dt>
-                  <dd className="mt-1 font-semibold">
-                    {subscription?.status ?? "확인 중"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-(--muted)">자동 갱신</dt>
-                  <dd className="mt-1 font-semibold">
-                    {subscription ? (subscription.autoRenew ? "사용" : "중지") : "확인 중"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-(--muted)">다음 결제</dt>
-                  <dd className="mt-1 font-semibold">
-                    {formatDateTime(subscription?.nextBillingAt ?? null)}
-                  </dd>
-                </div>
-              </dl>
+              <p className="text-sm font-semibold">Pro 구독 시 해금되는 기능</p>
+              <ul className="mt-4 space-y-3">
+                {PRO_UNLOCKED_FEATURES.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 text-sm">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-(--primary) text-(--primary-foreground)">
+                      <HiCheck className="h-3.5 w-3.5" aria-hidden />
+                    </span>
+                    <span className="leading-6">{feature}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {billingAuth ? (
