@@ -14,6 +14,7 @@ import {
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
+import { copyClipToClipboard } from "@/features/clip/service/clipClipboard";
 import {
   addOptimisticClipToCache,
   cancelClipQueries,
@@ -277,13 +278,14 @@ export const useFolderClipsPage = () => {
 
   const handleCopy = useCallback(
     async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
-      showCopyToast(event.clientX, event.clientY);
-
       try {
-        await navigator.clipboard.writeText(clip.content);
+        await copyClipToClipboard(clip);
       } catch {
-        // no-op
+        notifyError("클립을 복사하지 못했습니다. 잠시 후 다시 시도해주세요.");
+        return;
       }
+
+      showCopyToast(event.clientX, event.clientY);
 
       if (isAuthenticated) {
         await recordClipView(clip.id);
@@ -297,9 +299,10 @@ export const useFolderClipsPage = () => {
   const handleCopyFromMenu = useCallback(
     async (clip: Clip) => {
       try {
-        await navigator.clipboard.writeText(clip.content);
+        await copyClipToClipboard(clip);
       } catch {
-        // no-op
+        notifyError("클립을 복사하지 못했습니다. 잠시 후 다시 시도해주세요.");
+        return;
       }
 
       if (isAuthenticated) {
