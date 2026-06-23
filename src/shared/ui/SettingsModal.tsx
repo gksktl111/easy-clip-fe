@@ -239,7 +239,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                   <p className="text-left text-sm font-semibold">
                     {t("subscriptionTitle")}
                   </p>
-                  <dl className="mt-4 grid gap-3 text-left text-sm">
+                  <dl className="mt-4 grid grid-cols-2 gap-3 text-left text-sm">
                     <div>
                       <dt className="text-xs text-(--muted)">
                         {t("subscriptionPlan")}
