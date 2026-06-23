@@ -26,7 +26,7 @@ export function AppShell({ children }: AppShellProps) {
           <button
             type="button"
             onClick={openSidebar}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-(--muted) transition hover:bg-(--surface-muted) hover:text-(--foreground)"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-(--muted) transition hover:bg-(--surface-muted) hover:text-(--foreground)"
             aria-label="사이드바 열기"
           >
             <HiOutlineMenuAlt4 className="h-5 w-5" aria-hidden />
