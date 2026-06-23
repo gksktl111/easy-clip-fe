@@ -19,6 +19,7 @@ export interface ClipListItemResponseDto {
   deletedAt: string | null;
   likeByMe: boolean;
   tags: ClipTagResponseDto[];
+  isOptimistic?: boolean;
 }
 
 export interface ClipResponseDto {

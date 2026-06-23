@@ -161,6 +161,7 @@
       "description": "새 클립을 복사하거나 폴더에서 붙여넣기를 시작하면 이곳에 표시됩니다."
     },
     "item": {
+      "saving": "저장 중",
       "toggleFavorite": "즐겨찾기 전환"
     },
     "actions": {

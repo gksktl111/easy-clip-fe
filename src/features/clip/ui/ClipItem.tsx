@@ -25,6 +25,7 @@ export function ClipItem({
   onContextMenu,
 }: ClipItemProps) {
   const t = useTranslations("clips.item");
+  const isOptimistic = Boolean(clip.isOptimistic);
 
   const getIcon = () => {
     switch (clip.type) {
@@ -52,14 +53,28 @@ export function ClipItem({
 
     if (clip.type === "image") {
       return (
-        <div className="relative h-full w-full rounded-xl bg-(--surface-muted)">
-          <Image
-            src={clip.content}
-            alt={clip.name}
-            fill
-            sizes="(min-width: 1200px) 18vw, (min-width: 1024px) 22vw, (min-width: 768px) 28vw, 90vw"
-            className="rounded-xl object-contain"
-          />
+        <div
+          className="relative h-full w-full rounded-xl bg-(--surface-muted)"
+          style={
+            isOptimistic && clip.content
+              ? {
+                  backgroundImage: `url(${clip.content})`,
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "contain",
+                }
+              : undefined
+          }
+        >
+          {isOptimistic ? null : (
+            <Image
+              src={clip.content}
+              alt={clip.name}
+              fill
+              sizes="(min-width: 1200px) 18vw, (min-width: 1024px) 22vw, (min-width: 768px) 28vw, 90vw"
+              className="rounded-xl object-contain"
+            />
+          )}
         </div>
       );
     }
@@ -73,19 +88,38 @@ export function ClipItem({
 
   return (
     <div
-      className="group relative flex h-52 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md"
-      onClick={(event) => onCopy?.(clip, event)}
-      onContextMenu={(event) => onContextMenu?.(event, clip)}
+      className="group relative flex h-52 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[optimistic=true]:cursor-wait data-[optimistic=true]:opacity-75"
+      data-optimistic={isOptimistic}
+      onClick={(event) => {
+        if (!isOptimistic) {
+          onCopy?.(clip, event);
+        }
+      }}
+      onContextMenu={(event) => {
+        if (!isOptimistic) {
+          onContextMenu?.(event, clip);
+        }
+      }}
       role="button"
       tabIndex={0}
     >
+      {isOptimistic ? (
+        <div className="absolute inset-x-3 top-3 z-20 flex justify-start">
+          <span className="rounded-full bg-(--primary) px-2.5 py-1 text-[11px] font-semibold text-(--primary-foreground) shadow-sm">
+            {t("saving")}
+          </span>
+        </div>
+      ) : null}
       <button
         type="button"
         onClick={(event) => {
           event.stopPropagation();
-          onToggleFavorite?.(clip);
+          if (!isOptimistic) {
+            onToggleFavorite?.(clip);
+          }
         }}
-        className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-(--favorite-btn-bg-hover)"
+        disabled={isOptimistic}
+        className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-(--favorite-btn-bg-hover) disabled:cursor-wait disabled:opacity-50"
         style={{ boxShadow: "var(--favorite-btn-shadow)" }}
         aria-label={t("toggleFavorite")}
       >
