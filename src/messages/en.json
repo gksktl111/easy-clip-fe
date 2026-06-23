@@ -161,6 +161,7 @@
       "description": "Copied clips or new pasted items from a folder will appear here."
     },
     "item": {
+      "saving": "Saving",
       "toggleFavorite": "Toggle favorite"
     },
     "actions": {

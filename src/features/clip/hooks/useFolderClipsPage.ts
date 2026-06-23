@@ -2,11 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   createImageClip,
   createTextClip,
@@ -16,15 +12,78 @@ import {
   unlikeClip,
 } from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
-import {
-  useInfiniteClips,
-} from "@/features/clip/hooks/useInfiniteClips";
+import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
 import {
+  addOptimisticClipToCache,
+  cancelClipQueries,
   invalidateClipQueries,
+  mapClipResponseToListItem,
+  removeClipsFromCache,
+  replaceOptimisticClipInCache,
   updateClipFavoriteCache,
 } from "@/features/clip/service/clipQueryCache";
+import { ClipListItemResponseDto } from "@/features/clip/model/clip.dto";
 import { FilterType } from "@/features/clip/ui/FilterBar";
+import { waitForMinimumLoading } from "@/shared/lib/loading";
+import { notifyError } from "@/shared/lib/toast";
+
+const createOptimisticClipId = () => {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `temp-${crypto.randomUUID()}`;
+  }
+
+  return `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+};
+
+const createOptimisticTextClip = (
+  folderId: string,
+  text: string,
+): ClipListItemResponseDto => {
+  const createdAt = new Date().toISOString();
+
+  return {
+    id: createOptimisticClipId(),
+    type: "TEXT",
+    title: text.slice(0, 48),
+    textContent: text,
+    colorHex: null,
+    imageUrl: null,
+    workspaceId: "optimistic",
+    folderId,
+    createdAt,
+    updatedAt: createdAt,
+    deletedAt: null,
+    likeByMe: false,
+    tags: [],
+    isOptimistic: true,
+  };
+};
+
+const createOptimisticImageClip = (
+  folderId: string,
+  file: File,
+  previewUrl: string,
+): ClipListItemResponseDto => {
+  const createdAt = new Date().toISOString();
+
+  return {
+    id: createOptimisticClipId(),
+    type: "IMAGE",
+    title: file.name || "Uploading image",
+    textContent: null,
+    colorHex: null,
+    imageUrl: previewUrl,
+    workspaceId: "optimistic",
+    folderId,
+    createdAt,
+    updatedAt: createdAt,
+    deletedAt: null,
+    likeByMe: false,
+    tags: [],
+    isOptimistic: true,
+  };
+};
 
 export const useFolderClipsPage = () => {
   const params = useParams<{ id?: string }>();
@@ -100,13 +159,35 @@ export const useFolderClipsPage = () => {
         return;
       }
 
-      await createTextClip({
-        folderId,
-        text: trimmed,
-      });
-      await refreshClipQueries();
+      const optimisticClip = createOptimisticTextClip(folderId, trimmed);
+      await cancelClipQueries(queryClient);
+      const rollbackOptimisticClip = addOptimisticClipToCache(
+        queryClient,
+        optimisticClip,
+      );
+      const optimisticStartedAt = Date.now();
+
+      try {
+        const createdClip = await createTextClip({
+          folderId,
+          text: trimmed,
+        });
+
+        await waitForMinimumLoading(optimisticStartedAt);
+        replaceOptimisticClipInCache(
+          queryClient,
+          optimisticClip.id,
+          mapClipResponseToListItem(createdClip),
+        );
+      } catch {
+        await waitForMinimumLoading(optimisticStartedAt);
+        rollbackOptimisticClip();
+        notifyError("클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      } finally {
+        void refreshClipQueries();
+      }
     },
-    [folderId, isAuthenticated, refreshClipQueries],
+    [folderId, isAuthenticated, queryClient, refreshClipQueries],
   );
 
   const createImageClipFromPaste = useCallback(
@@ -115,13 +196,43 @@ export const useFolderClipsPage = () => {
         return;
       }
 
-      await createImageClip({
+      const previewUrl = URL.createObjectURL(file);
+      const optimisticClip = createOptimisticImageClip(
         folderId,
         file,
-      });
-      await refreshClipQueries();
+        previewUrl,
+      );
+      await cancelClipQueries(queryClient);
+      const rollbackOptimisticClip = addOptimisticClipToCache(
+        queryClient,
+        optimisticClip,
+      );
+      const optimisticStartedAt = Date.now();
+
+      try {
+        const createdClip = await createImageClip({
+          folderId,
+          file,
+        });
+
+        await waitForMinimumLoading(optimisticStartedAt);
+        replaceOptimisticClipInCache(
+          queryClient,
+          optimisticClip.id,
+          mapClipResponseToListItem(createdClip),
+        );
+      } catch {
+        await waitForMinimumLoading(optimisticStartedAt);
+        rollbackOptimisticClip();
+        notifyError(
+          "이미지 클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        );
+      } finally {
+        URL.revokeObjectURL(previewUrl);
+        void refreshClipQueries();
+      }
     },
-    [folderId, isAuthenticated, refreshClipQueries],
+    [folderId, isAuthenticated, queryClient, refreshClipQueries],
   );
 
   useEffect(() => {
@@ -239,11 +350,20 @@ export const useFolderClipsPage = () => {
         return;
       }
 
-      await removeClip(clipId);
+      await cancelClipQueries(queryClient);
+      const rollbackDeletedClip = removeClipsFromCache(queryClient, [clipId]);
       setContextMenu(null);
-      await refreshClipQueries();
+
+      try {
+        await removeClip(clipId);
+      } catch {
+        rollbackDeletedClip();
+        notifyError("클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      } finally {
+        void refreshClipQueries();
+      }
     },
-    [isAuthenticated, refreshClipQueries],
+    [isAuthenticated, queryClient, refreshClipQueries],
   );
 
   const handleDeleteAll = useCallback(async () => {
@@ -251,10 +371,25 @@ export const useFolderClipsPage = () => {
       return;
     }
 
-    await Promise.all(clips.map((clip) => removeClip(clip.id)));
+    const clipIds = clips.map((clip) => clip.id);
+    if (clipIds.length === 0) {
+      setIsDeleteAllOpen(false);
+      return;
+    }
+
+    await cancelClipQueries(queryClient);
+    const rollbackDeletedClips = removeClipsFromCache(queryClient, clipIds);
     setIsDeleteAllOpen(false);
-    await refreshClipQueries();
-  }, [clips, isAuthenticated, refreshClipQueries]);
+
+    try {
+      await Promise.all(clipIds.map((clipId) => removeClip(clipId)));
+    } catch {
+      rollbackDeletedClips();
+      notifyError("클립 전체 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      void refreshClipQueries();
+    }
+  }, [clips, isAuthenticated, queryClient, refreshClipQueries]);
 
   return {
     activeFilter,
