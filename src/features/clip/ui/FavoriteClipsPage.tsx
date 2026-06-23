@@ -18,7 +18,9 @@ export function FavoriteClipsPage() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    searchQuery,
     setActiveFilter,
+    setSearchQuery,
   } = useFavoriteClipsPage();
 
   return (
@@ -26,6 +28,8 @@ export function FavoriteClipsPage() {
       <FilterBar
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
         showStatus={false}
         countLabel={t("count", { count: filteredClips.length })}
       />
