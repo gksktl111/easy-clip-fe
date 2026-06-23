@@ -86,6 +86,12 @@
     "saveError": "설정을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.",
     "subscriptionTitle": "현재 구독 정보",
     "subscriptionPlan": "플랜",
+    "subscriptionStatus": "구독 상태",
+    "subscriptionStatusValues": {
+      "ACTIVE": "구독중",
+      "CANCELED": "구독 해지",
+      "EXPIRED": "구독 만료"
+    },
     "subscriptionNextBillingAt": "다음 결제",
     "subscriptionLoading": "확인 중",
     "subscriptionEmptyValue": "-",

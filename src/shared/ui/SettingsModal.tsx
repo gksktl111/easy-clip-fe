@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   HiOutlineCog,
@@ -11,7 +11,7 @@ import {
 } from "react-icons/hi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { persistUserSettings } from "@/features/settings/service/settingsService";
-import { fetchMySubscription } from "@/features/subscription/api/subscriptionApi";
+import { useMySubscription } from "@/features/subscription/hooks/useMySubscription";
 import { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 import { LOCALE_LABELS, type AppLocale } from "@/shared/config/locale";
 import { useSettingsStore } from "@/shared/store/settingsStore";
@@ -24,44 +24,20 @@ interface SettingsModalProps {
 export function SettingsModal({ onClose }: SettingsModalProps) {
   const t = useTranslations("settings");
   const session = useAuthSession();
+  const subscriptionQuery = useMySubscription();
   const { theme, language, setLanguage, setTheme } = useSettingsStore();
   const [savingField, setSavingField] = useState<"theme" | "language" | null>(
     null,
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [subscription, setSubscription] =
-    useState<MySubscriptionResponseDto | null>(null);
-  const [subscriptionError, setSubscriptionError] = useState<string | null>(
-    null,
-  );
+  const subscription = subscriptionQuery.subscription;
   const isDark = theme === "dark";
   const isSubscriptionLoading = Boolean(
-    session?.user && !subscription && !subscriptionError,
+    session?.user && subscriptionQuery.isPending,
   );
-
-  useEffect(() => {
-    if (!session?.user) {
-      return;
-    }
-
-    let isMounted = true;
-
-    fetchMySubscription()
-      .then((nextSubscription) => {
-        if (isMounted) {
-          setSubscription(nextSubscription);
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setSubscriptionError(t("subscriptionLoadError"));
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [session?.user, t]);
+  const subscriptionError = subscriptionQuery.isError
+    ? t("subscriptionLoadError")
+    : null;
 
   const formatNullableDate = (value: string | null) => {
     if (!value) {
@@ -72,6 +48,16 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
       dateStyle: "medium",
       timeStyle: "short",
     }).format(new Date(value));
+  };
+
+  const formatSubscriptionStatus = (
+    status: MySubscriptionResponseDto["status"] | null | undefined,
+  ) => {
+    if (!status) {
+      return t("subscriptionEmptyValue");
+    }
+
+    return t(`subscriptionStatusValues.${status}`);
   };
 
   const handleThemeToggle = async () => {
@@ -248,6 +234,16 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                         {isSubscriptionLoading
                           ? t("subscriptionLoading")
                           : (subscription?.plan ?? t("subscriptionEmptyValue"))}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-(--muted)">
+                        {t("subscriptionStatus")}
+                      </dt>
+                      <dd className="mt-1 font-semibold">
+                        {isSubscriptionLoading
+                          ? t("subscriptionLoading")
+                          : formatSubscriptionStatus(subscription?.status)}
                       </dd>
                     </div>
                     <div>

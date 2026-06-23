@@ -86,6 +86,12 @@
     "saveError": "Failed to save settings. Please try again shortly.",
     "subscriptionTitle": "Current subscription",
     "subscriptionPlan": "Plan",
+    "subscriptionStatus": "Subscription status",
+    "subscriptionStatusValues": {
+      "ACTIVE": "Active",
+      "CANCELED": "Canceled",
+      "EXPIRED": "Expired"
+    },
     "subscriptionNextBillingAt": "Next billing",
     "subscriptionLoading": "Loading",
     "subscriptionEmptyValue": "-",

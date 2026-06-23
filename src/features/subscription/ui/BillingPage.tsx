@@ -1,8 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { createBillingAuthRequest } from "@/features/subscription/api/subscriptionApi";
+import {
+  createBillingAuthRequest,
+  fetchMySubscription,
+  updateMySubscription,
+} from "@/features/subscription/api/subscriptionApi";
+import { MY_SUBSCRIPTION_QUERY_KEY } from "@/features/subscription/hooks/useMySubscription";
+import { hasRemainingCanceledProPeriod } from "@/features/subscription/model/subscription";
 import { BillingAuthRequestResponseDto } from "@/features/subscription/model/subscription.dto";
 import {
   BillingCheckoutCard,
@@ -72,6 +79,7 @@ const mapBillingAuthMethod = (
 
 export function BillingPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [billingAuth, setBillingAuth] =
     useState<BillingAuthRequestResponseDto | null>(null);
   const [step, setStep] = useState<BillingStep>("idle");
@@ -86,6 +94,20 @@ export function BillingPage() {
     setMessage(null);
 
     try {
+      const currentSubscription = await fetchMySubscription();
+
+      if (hasRemainingCanceledProPeriod(currentSubscription)) {
+        const nextSubscription = await updateMySubscription({ type: "RESUME" });
+        queryClient.setQueriesData(
+          { queryKey: [MY_SUBSCRIPTION_QUERY_KEY] },
+          nextSubscription,
+        );
+        setStep("idle");
+        setMessage("Pro 구독 자동갱신이 재개되었습니다.");
+        router.push("/pricing");
+        return;
+      }
+
       // 백엔드가 customerKey/successUrl/failUrl을 생성하고,
       // 프론트는 해당 값으로 Toss 빌링 인증 화면만 호출한다.
       const request = await createBillingAuthRequest();
@@ -111,6 +133,10 @@ export function BillingPage() {
       if (error instanceof ApiError && error.status === 401) {
         router.push("/login");
         return;
+      }
+
+      if (error instanceof ApiError && error.status === 409) {
+        await fetchMySubscription().catch(() => undefined);
       }
 
       setStep("error");

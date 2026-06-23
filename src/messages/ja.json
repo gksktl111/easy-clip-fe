@@ -86,6 +86,12 @@
     "saveError": "設定を保存できませんでした。しばらくしてからもう一度お試しください。",
     "subscriptionTitle": "現在のサブスクリプション",
     "subscriptionPlan": "プラン",
+    "subscriptionStatus": "サブスクリプション状態",
+    "subscriptionStatusValues": {
+      "ACTIVE": "購読中",
+      "CANCELED": "解約済み",
+      "EXPIRED": "期限切れ"
+    },
     "subscriptionNextBillingAt": "次回請求",
     "subscriptionLoading": "確認中",
     "subscriptionEmptyValue": "-",
