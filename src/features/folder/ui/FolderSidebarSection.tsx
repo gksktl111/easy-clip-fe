@@ -72,63 +72,76 @@ export function FolderSidebarSection({
       <ul className="space-y-1 px-2">
         {isLoading
           ? skeletonRows.map((row) => <FolderSidebarSkeletonRow key={row} />)
-          : folders.map((folder) => (
-              <li
-                key={folder.id}
-                onDragOver={(event) => onDragOver(folder.id, event)}
-                onDrop={(event) => onDrop(folder.id, event)}
-                className={`relative rounded-lg ${
-                  draggingFolderId === folder.id ? "opacity-50" : ""
-                }`}
-              >
-                <div
-                  className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
-                    pathname === `/${folder.id}`
-                      ? "text-foreground bg-(--surface)"
-                      : "text-muted hover:text-foreground hover:bg-(--surface)"
+          : folders.map((folder) => {
+              const isDragging = Boolean(draggingFolderId);
+              const isActiveFolder = pathname === `/${folder.id}`;
+
+              return (
+                <li
+                  key={folder.id}
+                  onDragOver={(event) => onDragOver(folder.id, event)}
+                  onDrop={(event) => onDrop(folder.id, event)}
+                  className={`relative rounded-lg ${
+                    draggingFolderId === folder.id ? "opacity-50" : ""
                   }`}
                 >
-                  <button
-                    type="button"
-                    draggable
-                    onDragStart={(event) => onDragStart(folder.id, event)}
-                    onDragEnd={onDragEnd}
-                    className="text-muted hover:text-foreground cursor-grab rounded p-1"
-                    aria-label={reorderFolderLabel}
+                  <div
+                    className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium ${
+                      isDragging ? "" : "transition-colors"
+                    } ${
+                      isActiveFolder
+                        ? "text-foreground bg-(--surface)"
+                        : isDragging
+                          ? "text-muted"
+                          : "text-muted hover:text-foreground hover:bg-(--surface)"
+                    }`}
                   >
-                    <HiOutlineMenuAlt4 className="h-4 w-4" aria-hidden />
-                  </button>
+                    <button
+                      type="button"
+                      draggable
+                      onDragStart={(event) => onDragStart(folder.id, event)}
+                      onDragEnd={onDragEnd}
+                      className={`text-muted cursor-grab rounded p-1 ${
+                        isDragging ? "" : "hover:text-foreground"
+                      }`}
+                      aria-label={reorderFolderLabel}
+                    >
+                      <HiOutlineMenuAlt4 className="h-4 w-4" aria-hidden />
+                    </button>
 
-                  <Link
-                    href={`/${folder.id}`}
-                    onClick={onNavigate}
-                    className="flex flex-1 items-center gap-2 truncate"
-                  >
-                    <HiOutlineFolder className="h-5 w-5" aria-hidden />
-                    <span className="truncate">{folder.name}</span>
-                  </Link>
+                    <Link
+                      href={`/${folder.id}`}
+                      onClick={onNavigate}
+                      className="flex flex-1 items-center gap-2 truncate"
+                    >
+                      <HiOutlineFolder className="h-5 w-5" aria-hidden />
+                      <span className="truncate">{folder.name}</span>
+                    </Link>
 
-                  <button
-                    type="button"
-                    onClick={() => onToggleOptions(folder.id)}
-                    className="text-muted hover:text-foreground cursor-pointer rounded p-1 transition"
-                    aria-label={openFolderOptionsLabel}
-                    data-folder-options
-                  >
-                    <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => onToggleOptions(folder.id)}
+                      className={`text-muted cursor-pointer rounded p-1 ${
+                        isDragging ? "" : "transition hover:text-foreground"
+                      }`}
+                      aria-label={openFolderOptionsLabel}
+                      data-folder-options
+                    >
+                      <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />
+                    </button>
+                  </div>
 
-                {openOptionsFolderId === folder.id ? (
-                  <FolderOptionsMenu
-                    renameLabel={renameLabel}
-                    deleteLabel={deleteLabel}
-                    onRename={() => onRenameFolder(folder.id)}
-                    onDelete={() => onDeleteFolder(folder.id)}
-                  />
-                ) : null}
-              </li>
-            ))}
+                  {openOptionsFolderId === folder.id ? (
+                    <FolderOptionsMenu
+                      renameLabel={renameLabel}
+                      deleteLabel={deleteLabel}
+                      onRename={() => onRenameFolder(folder.id)}
+                      onDelete={() => onDeleteFolder(folder.id)}
+                    />
+                  ) : null}
+                </li>
+              );
+            })}
       </ul>
     </div>
   );
