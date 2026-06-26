@@ -77,7 +77,7 @@ export function StyledSelect({
 
       {isOpen ? (
         <div className="absolute top-[calc(100%+0.5rem)] left-0 z-50 w-full overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-[0_18px_40px_rgba(15,23,42,0.16)]">
-          <ul className="py-2" role="listbox">
+          <ul role="listbox">
             {options.map((option) => {
               const isSelected = option.value === value;
 
