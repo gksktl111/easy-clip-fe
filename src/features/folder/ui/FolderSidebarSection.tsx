@@ -1,10 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type {
-  FolderDropPosition,
-  FolderItem,
-} from "@/features/folder/model/folder";
+import type { FolderItem } from "@/features/folder/model/folder";
 import {
   HiOutlineDotsVertical,
   HiOutlineFolder,
@@ -24,10 +21,7 @@ interface FolderSidebarSectionProps {
   deleteLabel: string;
   openOptionsFolderId: string | null;
   draggingFolderId: string | null;
-  dropTarget: {
-    folderId: string;
-    position: FolderDropPosition;
-  } | null;
+  dropTargetId: string | null;
   onAddFolder: () => void;
   onNavigate?: () => void;
   onDragStart: (
@@ -53,7 +47,7 @@ export function FolderSidebarSection({
   deleteLabel,
   openOptionsFolderId,
   draggingFolderId,
-  dropTarget,
+  dropTargetId,
   onAddFolder,
   onNavigate,
   onDragStart,
@@ -83,8 +77,7 @@ export function FolderSidebarSection({
           : folders.map((folder) => {
               const isDragging = Boolean(draggingFolderId);
               const isActiveFolder = pathname === `/${folder.id}`;
-              const dropPosition =
-                dropTarget?.folderId === folder.id ? dropTarget.position : null;
+              const isDropTarget = dropTargetId === folder.id;
 
               return (
                 <li
@@ -95,13 +88,9 @@ export function FolderSidebarSection({
                     draggingFolderId === folder.id ? "opacity-50" : ""
                   }`}
                 >
-                  {dropPosition ? (
+                  {isDropTarget ? (
                     <span
-                      className={`pointer-events-none absolute right-2 left-2 z-10 h-0.5 rounded-full bg-(--focus-ring) opacity-100 shadow-[0_0_0_1px_var(--surface-muted)] transition-[opacity,transform] duration-150 ${
-                        dropPosition === "before"
-                          ? "top-0 -translate-y-1/2"
-                          : "bottom-0 translate-y-1/2"
-                      }`}
+                      className="pointer-events-none absolute right-2 bottom-0 left-2 z-10 h-0.5 translate-y-1/2 rounded-full bg-(--focus-ring) opacity-100 shadow-[0_0_0_1px_var(--surface-muted)] transition-[opacity,transform] duration-150"
                       aria-hidden
                     />
                   ) : null}
@@ -112,7 +101,7 @@ export function FolderSidebarSection({
                         ? "transition-colors duration-150"
                         : "transition-colors"
                     } ${
-                      dropPosition
+                      isDropTarget
                         ? "text-foreground bg-(--surface-elevated)"
                         : isActiveFolder
                         ? "text-foreground bg-(--surface)"
