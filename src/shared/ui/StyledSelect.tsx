@@ -92,8 +92,8 @@ export function StyledSelect({
                     }}
                     className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition-colors ${
                       isSelected
-                        ? "bg-(--surface-muted) text-(--foreground)"
-                        : "text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground)"
+                        ? "bg-(--dropdown-option-hover) text-(--foreground)"
+                        : "text-(--muted) hover:bg-(--dropdown-option-hover) hover:text-(--foreground)"
                     }`}
                     role="option"
                     aria-selected={isSelected}
