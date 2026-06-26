@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { HiCheck, HiChevronDown } from "react-icons/hi";
+import { HiChevronDown } from "react-icons/hi";
 
 interface StyledSelectOption {
   value: string;
@@ -62,7 +62,7 @@ export function StyledSelect({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen((previous) => !previous)}
-        className="text-foreground flex h-11 w-full items-center justify-between rounded-xl border border-(--border) bg-(--surface) px-4 text-sm font-medium transition-colors hover:bg-(--surface-muted)"
+        className="text-foreground flex h-11 w-full cursor-pointer items-center justify-between rounded-xl border border-(--border) bg-(--surface) px-4 text-sm font-medium transition-colors hover:bg-(--surface-muted) disabled:cursor-default"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -90,7 +90,7 @@ export function StyledSelect({
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                    className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition-colors ${
+                    className={`flex w-full cursor-pointer items-center px-4 py-3 text-left text-sm transition-colors disabled:cursor-default ${
                       isSelected
                         ? "bg-(--dropdown-option-hover) text-(--foreground)"
                         : "text-(--muted) hover:bg-(--dropdown-option-hover) hover:text-(--foreground)"
@@ -99,15 +99,6 @@ export function StyledSelect({
                     aria-selected={isSelected}
                   >
                     <span className="truncate font-medium">{option.label}</span>
-                    <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full ${
-                        isSelected
-                          ? "bg-(--icon-chip) text-(--icon-chip-text)"
-                          : "text-transparent"
-                      }`}
-                    >
-                      <HiCheck className="h-3.5 w-3.5" aria-hidden />
-                    </span>
                   </button>
                 </li>
               );
