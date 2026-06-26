@@ -39,7 +39,6 @@ export function Sidebar({
     createFolder,
     folders,
     isLoading: isFoldersLoading,
-    previewFolderOrder,
     removeFolder,
     renameFolder,
     saveFolderOrder,
@@ -55,8 +54,6 @@ export function Sidebar({
   const [draggingFolderId, setDraggingFolderId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
-  const hasPendingFolderReorderRef = useRef(false);
-  const lastReorderTargetIdRef = useRef<string | null>(null);
   const pathSegments = pathname.split("/").filter(Boolean);
   const pathnameFolderId = pathSegments[0] ?? null;
   const reservedPathnames = new Set([
@@ -133,46 +130,23 @@ export function Sidebar({
     return false;
   }, [isAuthenticated, onCloseMobile, router]);
 
-  const handleReorderFolders = useCallback(
-    (sourceId: string, targetId: string) => {
-      if (!ensureAuthenticated()) {
+  const clearFolderDragState = useCallback(() => {
+    setDraggingFolderId(null);
+  }, []);
+
+  const handleDropFolder = useCallback(
+    (sourceId: string | null, targetId: string) => {
+      clearFolderDragState();
+
+      if (!sourceId || sourceId === targetId || !ensureAuthenticated()) {
         return;
       }
 
-      if (sourceId === targetId) {
-        return;
-      }
-
-      if (lastReorderTargetIdRef.current === targetId) {
-        return;
-      }
-
-      const didReorder = previewFolderOrder(sourceId, targetId);
-
-      if (didReorder) {
-        hasPendingFolderReorderRef.current = true;
-        lastReorderTargetIdRef.current = targetId;
-      }
-    },
-    [ensureAuthenticated, previewFolderOrder],
-  );
-
-  const handleCommitFolderReorder = useCallback(
-    (folderId: string | null) => {
-      setDraggingFolderId(null);
-      lastReorderTargetIdRef.current = null;
-
-      if (!folderId || !hasPendingFolderReorderRef.current) {
-        return;
-      }
-
-      hasPendingFolderReorderRef.current = false;
-
-      void saveFolderOrder(folderId).catch(() => {
+      void saveFolderOrder(sourceId, targetId).catch(() => {
         // refresh from the server when the final order cannot be saved
       });
     },
-    [saveFolderOrder],
+    [clearFolderDragState, ensureAuthenticated, saveFolderOrder],
   );
 
   const closeCreateModal = () => {
@@ -290,24 +264,17 @@ export function Sidebar({
               onNavigate={onCloseMobile}
               onDragStart={(folderId, event) => {
                 setDraggingFolderId(folderId);
-                hasPendingFolderReorderRef.current = false;
-                lastReorderTargetIdRef.current = null;
                 event.dataTransfer.effectAllowed = "move";
                 event.dataTransfer.setData("text/plain", folderId);
               }}
-              onDragEnd={() => handleCommitFolderReorder(draggingFolderId)}
-              onDragOver={(folderId, event) => {
+              onDragEnd={clearFolderDragState}
+              onDragOver={(_, event) => {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = "move";
-                if (!draggingFolderId || draggingFolderId === folderId) {
-                  return;
-                }
-
-                handleReorderFolders(draggingFolderId, folderId);
               }}
-              onDrop={(_, event) => {
+              onDrop={(folderId, event) => {
                 event.preventDefault();
-                handleCommitFolderReorder(draggingFolderId);
+                handleDropFolder(draggingFolderId, folderId);
               }}
               onToggleOptions={(folderId) =>
                 setOpenOptionsFolderId((previous) =>
