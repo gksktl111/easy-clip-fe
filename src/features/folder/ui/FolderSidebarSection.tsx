@@ -21,7 +21,10 @@ interface FolderSidebarSectionProps {
   deleteLabel: string;
   openOptionsFolderId: string | null;
   draggingFolderId: string | null;
-  dropTargetId: string | null;
+  dropIndicator: {
+    folderId: string;
+    edge: "top" | "bottom";
+  } | null;
   onAddFolder: () => void;
   onNavigate?: () => void;
   onDragStart: (
@@ -47,7 +50,7 @@ export function FolderSidebarSection({
   deleteLabel,
   openOptionsFolderId,
   draggingFolderId,
-  dropTargetId,
+  dropIndicator,
   onAddFolder,
   onNavigate,
   onDragStart,
@@ -77,7 +80,7 @@ export function FolderSidebarSection({
           : folders.map((folder) => {
               const isDragging = Boolean(draggingFolderId);
               const isActiveFolder = pathname === `/${folder.id}`;
-              const isDropTarget = dropTargetId === folder.id;
+              const isDropTarget = dropIndicator?.folderId === folder.id;
 
               return (
                 <li
@@ -90,7 +93,11 @@ export function FolderSidebarSection({
                 >
                   {isDropTarget ? (
                     <span
-                      className="pointer-events-none absolute right-2 bottom-0 left-2 z-10 h-0.5 translate-y-1/2 rounded-full bg-(--focus-ring) opacity-100 shadow-[0_0_0_1px_var(--surface-muted)] transition-[opacity,transform] duration-150"
+                      className={`pointer-events-none absolute right-2 left-2 z-10 h-0.5 rounded-full bg-(--focus-ring) opacity-100 shadow-[0_0_0_1px_var(--surface-muted)] transition-[opacity,transform] duration-150 ${
+                        dropIndicator.edge === "top"
+                          ? "top-0 -translate-y-1/2"
+                          : "bottom-0 translate-y-1/2"
+                      }`}
                       aria-hidden
                     />
                   ) : null}
