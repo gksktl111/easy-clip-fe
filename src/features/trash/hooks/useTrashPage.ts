@@ -18,6 +18,11 @@ import {
 } from "@/features/trash/model/trash.dto";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
+interface ClearAllFailure {
+  failedCount: number;
+  totalCount: number;
+}
+
 export const useTrashPage = () => {
   const session = useAuthSession();
   const isAuthenticated = Boolean(session?.user);
@@ -26,6 +31,8 @@ export const useTrashPage = () => {
   const [activeFolders, setActiveFolders] = useState<FolderResponseDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [clearAllFailure, setClearAllFailure] =
+    useState<ClearAllFailure | null>(null);
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const loadRequestIdRef = useRef(0);
 
@@ -53,6 +60,7 @@ export const useTrashPage = () => {
 
     setIsLoading(true);
     setError(null);
+    setClearAllFailure(null);
 
     try {
       const [trashClips, trashFolders, currentFolders] = await Promise.all([
@@ -92,6 +100,7 @@ export const useTrashPage = () => {
     async (actionKey: string, action: () => Promise<unknown>) => {
       setPendingActionKey(actionKey);
       setError(null);
+      setClearAllFailure(null);
 
       try {
         await action();
@@ -162,16 +171,39 @@ export const useTrashPage = () => {
       return;
     }
 
-    await runAction("trash-clear-all", async () => {
-      for (const clip of clips) {
-        await deleteTrashClip(clip.id);
-      }
+    const deleteTasks = [
+      ...clips.map((clip) => () => deleteTrashClip(clip.id)),
+      ...folders.map((folder) => () => deleteTrashFolder(folder.id)),
+    ];
 
-      for (const folder of folders) {
-        await deleteTrashFolder(folder.id);
+    if (deleteTasks.length === 0) {
+      return;
+    }
+
+    setPendingActionKey("trash-clear-all");
+    setError(null);
+    setClearAllFailure(null);
+
+    try {
+      const results = await Promise.allSettled(deleteTasks.map((task) => task()));
+      const failedCount = results.filter(
+        (result) => result.status === "rejected",
+      ).length;
+
+      await loadTrash();
+
+      if (failedCount > 0) {
+        setClearAllFailure({
+          failedCount,
+          totalCount: deleteTasks.length,
+        });
       }
-    });
-  }, [clips, folders, isAuthenticated, runAction]);
+    } catch {
+      setError("action");
+    } finally {
+      setPendingActionKey(null);
+    }
+  }, [clips, folders, isAuthenticated, loadTrash]);
 
   return {
     clips,
@@ -179,6 +211,7 @@ export const useTrashPage = () => {
     activeFolders,
     isLoading,
     error,
+    clearAllFailure,
     hasItems: clips.length > 0 || folders.length > 0,
     pendingActionKey,
     reload: loadTrash,

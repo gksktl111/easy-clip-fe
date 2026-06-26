@@ -34,6 +34,7 @@ export function TrashListRow({
       : `clip-restore-${row.id}`;
   const deleteActionKey =
     row.kind === "folder" ? `folder-delete-${row.id}` : `clip-delete-${row.id}`;
+  const isBulkActionPending = pendingActionKey === "trash-clear-all";
 
   return (
     <article className="px-4 py-4 transition-colors hover:bg-(--surface-elevated)">
@@ -80,7 +81,7 @@ export function TrashListRow({
         <div className="flex flex-wrap justify-end gap-2 min-[1200px]:justify-start">
           <button
             type="button"
-            disabled={pendingActionKey === restoreActionKey}
+            disabled={isBulkActionPending || pendingActionKey === restoreActionKey}
             onClick={() => {
               if (row.kind === "folder") {
                 onRestoreFolder(row.id);
@@ -89,13 +90,13 @@ export function TrashListRow({
 
               onRestoreClip(row.id);
             }}
-            className="cursor-pointer rounded-lg border border-(--border) px-3 py-2 text-xs font-medium text-(--foreground) transition hover:bg-(--surface-muted)"
+            className="cursor-pointer rounded-lg border border-(--border) px-3 py-2 text-xs font-medium text-(--foreground) transition hover:bg-(--surface-muted) disabled:cursor-default disabled:opacity-50"
           >
             {t("restore")}
           </button>
           <button
             type="button"
-            disabled={pendingActionKey === deleteActionKey}
+            disabled={isBulkActionPending || pendingActionKey === deleteActionKey}
             onClick={() => {
               if (row.kind === "folder") {
                 onDeleteFolder(row.id);
@@ -104,7 +105,7 @@ export function TrashListRow({
 
               onDeleteClip(row.id);
             }}
-            className="cursor-pointer rounded-lg bg-red-500/15 px-3 py-2 text-xs font-medium text-red-500 transition hover:bg-red-500/25"
+            className="cursor-pointer rounded-lg bg-red-500/15 px-3 py-2 text-xs font-medium text-red-500 transition hover:bg-red-500/25 disabled:cursor-default disabled:opacity-50"
           >
             {t("deleteForever")}
           </button>

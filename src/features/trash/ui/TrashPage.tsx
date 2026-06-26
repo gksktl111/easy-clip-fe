@@ -31,6 +31,7 @@ export function TrashPage() {
     activeFolders,
     isLoading,
     error,
+    clearAllFailure,
     hasItems,
     pendingActionKey,
     reload,
@@ -78,6 +79,17 @@ export function TrashPage() {
         <div className="px-6 pt-6">
           <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
             {t("error")}
+          </p>
+        </div>
+      ) : null}
+
+      {clearAllFailure ? (
+        <div className="px-6 pt-6">
+          <p className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            {t("clearAllPartialError", {
+              failedCount: clearAllFailure.failedCount,
+              totalCount: clearAllFailure.totalCount,
+            })}
           </p>
         </div>
       ) : null}

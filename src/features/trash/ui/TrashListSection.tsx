@@ -34,6 +34,7 @@ export function TrashListSection({
   const t = useTranslations("trash");
   const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
   const skeletonRows = Array.from({ length: 6 }, (_, index) => index);
+  const isClearingAll = pendingActionKey === "trash-clear-all";
 
   return (
     <>
@@ -44,7 +45,11 @@ export function TrashListSection({
               {t("listTitle")}
             </h2>
             <p className="text-sm text-(--muted)">
-              {isLoading ? t("loading") : t("totalCount", { count: rows.length })}
+              {isLoading
+                ? t("loading")
+                : isClearingAll
+                  ? t("clearing")
+                  : t("totalCount", { count: rows.length })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -53,12 +58,12 @@ export function TrashListSection({
               disabled={
                 isLoading ||
                 !rows.length ||
-                pendingActionKey === "trash-clear-all"
+                isClearingAll
               }
               onClick={() => setIsClearAllModalOpen(true)}
               className="cursor-pointer rounded-lg bg-red-500/15 px-4 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500/25 disabled:cursor-default disabled:opacity-50"
             >
-              {t("clearAll")}
+              {isClearingAll ? t("clearingAction") : t("clearAll")}
             </button>
             <button
               type="button"
