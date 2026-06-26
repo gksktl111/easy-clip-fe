@@ -18,8 +18,10 @@ export function RecentClipsPage() {
     handleCopy,
     hasNextPage,
     hasClips,
+    isError,
     isFetchingNextPage,
     isLoading,
+    refetchClips,
     searchQuery,
     setActiveFilter,
     setSearchQuery,
@@ -38,10 +40,14 @@ export function RecentClipsPage() {
       <ClipResultsSection
         clips={filteredClips}
         hasNextPage={hasNextPage}
+        isError={isError}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
         onFetchNextPage={() => {
           void fetchNextPage();
+        }}
+        onRetry={() => {
+          void refetchClips();
         }}
         onCopy={handleCopy}
       />

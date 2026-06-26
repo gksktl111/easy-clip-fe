@@ -16,8 +16,10 @@ export function FavoriteClipsPage() {
     handleCopy,
     handleToggleFavorite,
     hasNextPage,
+    isError,
     isFetchingNextPage,
     isLoading,
+    refetchClips,
     searchQuery,
     setActiveFilter,
     setSearchQuery,
@@ -36,10 +38,14 @@ export function FavoriteClipsPage() {
       <ClipResultsSection
         clips={filteredClips}
         hasNextPage={hasNextPage}
+        isError={isError}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
         onFetchNextPage={() => {
           void fetchNextPage();
+        }}
+        onRetry={() => {
+          void refetchClips();
         }}
         onCopy={handleCopy}
         onToggleFavorite={handleToggleFavorite}

@@ -29,8 +29,10 @@ export function FolderClipsPage() {
     hasClips,
     isActive,
     isDeleteAllOpen,
+    isError,
     isFetchingNextPage,
     isLoading,
+    refetchClips,
     searchQuery,
     setActiveFilter,
     setContextMenu,
@@ -61,10 +63,14 @@ export function FolderClipsPage() {
       <ClipResultsSection
         clips={filteredClips}
         hasNextPage={hasNextPage}
+        isError={isError}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
         onFetchNextPage={() => {
           void fetchNextPage();
+        }}
+        onRetry={() => {
+          void refetchClips();
         }}
         onCopy={handleCopy}
         onToggleFavorite={handleToggleFavorite}
