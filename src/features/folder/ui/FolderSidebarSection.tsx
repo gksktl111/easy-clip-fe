@@ -23,9 +23,13 @@ interface FolderSidebarSectionProps {
   draggingFolderId: string | null;
   onAddFolder: () => void;
   onNavigate?: () => void;
-  onDragStart: (folderId: string, event: React.DragEvent<HTMLButtonElement>) => void;
+  onDragStart: (
+    folderId: string,
+    event: React.DragEvent<HTMLButtonElement>,
+  ) => void;
   onDragEnd: () => void;
   onDragOver: (folderId: string, event: React.DragEvent<HTMLLIElement>) => void;
+  onDrop: (folderId: string, event: React.DragEvent<HTMLLIElement>) => void;
   onToggleOptions: (folderId: string) => void;
   onRenameFolder: (folderId: string) => void;
   onDeleteFolder: (folderId: string) => void;
@@ -47,6 +51,7 @@ export function FolderSidebarSection({
   onDragStart,
   onDragEnd,
   onDragOver,
+  onDrop,
   onToggleOptions,
   onRenameFolder,
   onDeleteFolder,
@@ -71,6 +76,7 @@ export function FolderSidebarSection({
               <li
                 key={folder.id}
                 onDragOver={(event) => onDragOver(folder.id, event)}
+                onDrop={(event) => onDrop(folder.id, event)}
                 className={`relative rounded-lg ${
                   draggingFolderId === folder.id ? "opacity-50" : ""
                 }`}
