@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { FolderItem } from "@/features/folder/model/folder";
+import type {
+  FolderDropPosition,
+  FolderItem,
+} from "@/features/folder/model/folder";
 import {
   HiOutlineDotsVertical,
   HiOutlineFolder,
@@ -21,6 +24,10 @@ interface FolderSidebarSectionProps {
   deleteLabel: string;
   openOptionsFolderId: string | null;
   draggingFolderId: string | null;
+  dropTarget: {
+    folderId: string;
+    position: FolderDropPosition;
+  } | null;
   onAddFolder: () => void;
   onNavigate?: () => void;
   onDragStart: (
@@ -46,6 +53,7 @@ export function FolderSidebarSection({
   deleteLabel,
   openOptionsFolderId,
   draggingFolderId,
+  dropTarget,
   onAddFolder,
   onNavigate,
   onDragStart,
@@ -75,6 +83,8 @@ export function FolderSidebarSection({
           : folders.map((folder) => {
               const isDragging = Boolean(draggingFolderId);
               const isActiveFolder = pathname === `/${folder.id}`;
+              const dropPosition =
+                dropTarget?.folderId === folder.id ? dropTarget.position : null;
 
               return (
                 <li
@@ -85,11 +95,26 @@ export function FolderSidebarSection({
                     draggingFolderId === folder.id ? "opacity-50" : ""
                   }`}
                 >
+                  {dropPosition ? (
+                    <span
+                      className={`pointer-events-none absolute right-2 left-2 z-10 h-0.5 rounded-full bg-(--focus-ring) opacity-100 shadow-[0_0_0_1px_var(--surface-muted)] transition-[opacity,transform] duration-150 ${
+                        dropPosition === "before"
+                          ? "top-0 -translate-y-1/2"
+                          : "bottom-0 translate-y-1/2"
+                      }`}
+                      aria-hidden
+                    />
+                  ) : null}
+
                   <div
                     className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium ${
-                      isDragging ? "" : "transition-colors"
+                      isDragging
+                        ? "transition-colors duration-150"
+                        : "transition-colors"
                     } ${
-                      isActiveFolder
+                      dropPosition
+                        ? "text-foreground bg-(--surface-elevated)"
+                        : isActiveFolder
                         ? "text-foreground bg-(--surface)"
                         : isDragging
                           ? "text-muted"

@@ -3,3 +3,5 @@ export interface FolderItem {
   name: string;
   order: number;
 }
+
+export type FolderDropPosition = "before" | "after";
