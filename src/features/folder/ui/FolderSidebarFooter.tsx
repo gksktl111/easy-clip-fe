@@ -68,11 +68,11 @@ export function FolderSidebarFooter({
     <div className="border-t border-(--border) px-4 py-4">
       <div ref={menuRef} className="relative">
         {isMenuOpen ? (
-          <div className="absolute right-0 bottom-full left-0 z-20 mb-2 overflow-hidden rounded-xl border border-(--border) bg-(--surface-elevated) py-2 shadow-xl">
+          <div className="absolute right-0 bottom-full left-0 z-20 mb-2 overflow-hidden rounded-xl border border-(--border) bg-(--surface-elevated) shadow-xl">
             <button
               type="button"
               onClick={() => handleMenuAction(onOpenSettings)}
-              className="text-foreground hover:bg-(--surface-muted) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors"
+              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors"
             >
               <HiOutlineCog className="h-5 w-5 text-(--muted)" aria-hidden />
               {settingsLabel}
@@ -80,7 +80,7 @@ export function FolderSidebarFooter({
             <button
               type="button"
               onClick={() => handleMenuAction(onUpgradePlan)}
-              className="text-foreground hover:bg-(--surface-muted) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors"
+              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors"
             >
               <HiOutlineCreditCard
                 className="h-5 w-5 text-(--muted)"
@@ -91,7 +91,7 @@ export function FolderSidebarFooter({
             <button
               type="button"
               onClick={() => handleMenuAction(onLogout)}
-              className="text-foreground hover:bg-(--surface-muted) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors"
+              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors"
             >
               <HiOutlineLogout
                 className="h-5 w-5 text-(--muted)"
