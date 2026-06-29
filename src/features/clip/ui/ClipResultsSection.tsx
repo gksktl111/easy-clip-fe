@@ -3,16 +3,19 @@
 import { useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import { Clip } from "@/features/clip/model/clip";
+import { ClipErrorState } from "@/features/clip/ui/ClipErrorState";
 import { ClipList } from "@/features/clip/ui/ClipList";
 import { ClipListSkeleton } from "@/features/clip/ui/ClipListSkeleton";
 import { EmptyState } from "@/features/clip/ui/EmptyState";
 
 interface ClipResultsSectionProps {
   clips: Clip[];
+  isError?: boolean;
   isLoading?: boolean;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
   onFetchNextPage?: () => void;
+  onRetry?: () => void;
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
   onContextMenu?: (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => void;
@@ -20,10 +23,12 @@ interface ClipResultsSectionProps {
 
 export function ClipResultsSection({
   clips,
+  isError = false,
   isLoading = false,
   hasNextPage = false,
   isFetchingNextPage = false,
   onFetchNextPage,
+  onRetry,
   onCopy,
   onToggleFavorite,
   onContextMenu,
@@ -53,6 +58,10 @@ export function ClipResultsSection({
 
   if (isLoading) {
     return <ClipListSkeleton />;
+  }
+
+  if (isError && !clips.length) {
+    return <ClipErrorState onRetry={onRetry} />;
   }
 
   if (!clips.length) {
