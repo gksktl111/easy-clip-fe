@@ -29,6 +29,37 @@ const FOLDER_QUERY_KEYS = {
 const sortFolders = (folders: FolderItem[]) =>
   [...folders].sort((left, right) => left.order - right.order);
 
+const reorderFolderItems = (
+  folders: FolderItem[],
+  sourceId: string,
+  targetId: string,
+) => {
+  if (sourceId === targetId) {
+    return folders;
+  }
+
+  const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
+  const targetIndex = folders.findIndex((folder) => folder.id === targetId);
+
+  if (sourceIndex === -1 || targetIndex === -1) {
+    return folders;
+  }
+
+  const nextFolders = [...folders];
+  const [sourceFolder] = nextFolders.splice(sourceIndex, 1);
+
+  if (!sourceFolder) {
+    return folders;
+  }
+
+  nextFolders.splice(targetIndex, 0, sourceFolder);
+
+  return nextFolders.map((folder, index) => ({
+    ...folder,
+    order: index,
+  }));
+};
+
 const mapFolder = (folder: FolderResponseDto): FolderItem => ({
   id: folder.id,
   name: folder.name,
@@ -170,31 +201,76 @@ export const useFolders = () => {
     [removeFolderAsync],
   );
 
-  const reorderFolders = useCallback(
-    async (sourceId: string, targetId: string) => {
+  const previewFolderOrder = useCallback(
+    (sourceId: string, targetId: string) => {
       if (!isAuthenticated) {
         throw createAuthRequiredError();
       }
 
       if (sourceId === targetId) {
-        return;
+        return false;
       }
 
-      const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
-      const targetIndex = folders.findIndex((folder) => folder.id === targetId);
+      let didReorder = false;
 
-      if (sourceIndex === -1 || targetIndex === -1) {
-        return;
-      }
+      setFolders((currentFolders) => {
+        const nextFolders = reorderFolderItems(
+          currentFolders,
+          sourceId,
+          targetId,
+        );
 
-      const payload =
-        sourceIndex < targetIndex
-          ? { targetId: sourceId, afterId: targetId }
-          : { targetId: sourceId, beforeId: targetId };
+        didReorder = nextFolders !== currentFolders;
 
-      await reorderFolderAsync(payload);
+        return nextFolders;
+      });
+
+      return didReorder;
     },
-    [folders, isAuthenticated, reorderFolderAsync],
+    [isAuthenticated, setFolders],
+  );
+
+  const saveFolderOrder = useCallback(
+    async (folderId: string) => {
+      if (!isAuthenticated) {
+        throw createAuthRequiredError();
+      }
+
+      const currentFolders =
+        queryClient.getQueryData<FolderItem[]>(folderQueryKey) ?? folders;
+      const folderIndex = currentFolders.findIndex(
+        (folder) => folder.id === folderId,
+      );
+
+      if (folderIndex === -1) {
+        return;
+      }
+
+      const previousFolder = currentFolders[folderIndex - 1] ?? null;
+      const nextFolder = currentFolders[folderIndex + 1] ?? null;
+
+      if (!previousFolder && !nextFolder) {
+        return;
+      }
+
+      const payload = previousFolder
+        ? { targetId: folderId, afterId: previousFolder.id }
+        : { targetId: folderId, beforeId: nextFolder?.id };
+
+      try {
+        await reorderFolderAsync(payload);
+      } catch (error) {
+        void queryClient.invalidateQueries({ queryKey: folderQueryKey });
+        throw error;
+      }
+    },
+    [
+      folderQueryKey,
+      folders,
+      isAuthenticated,
+      queryClient,
+      reorderFolderAsync,
+    ],
   );
 
   return {
@@ -203,6 +279,7 @@ export const useFolders = () => {
     createFolder,
     renameFolder,
     removeFolder,
-    reorderFolders,
+    previewFolderOrder,
+    saveFolderOrder,
   };
 };

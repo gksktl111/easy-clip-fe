@@ -40,9 +40,10 @@ export function Sidebar({
     createFolder,
     folders,
     isLoading: isFoldersLoading,
+    previewFolderOrder,
     removeFolder,
     renameFolder,
-    reorderFolders,
+    saveFolderOrder,
   } = useFolders();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -55,6 +56,8 @@ export function Sidebar({
   const [draggingFolderId, setDraggingFolderId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
+  const hasPendingFolderReorderRef = useRef(false);
+  const lastReorderTargetIdRef = useRef<string | null>(null);
   const pathSegments = pathname.split("/").filter(Boolean);
   const pathnameFolderId = pathSegments[0] ?? null;
   const reservedPathnames = new Set([
@@ -141,11 +144,36 @@ export function Sidebar({
         return;
       }
 
-      void reorderFolders(sourceId, targetId).catch(() => {
-        // keep the current order when the request fails
+      if (lastReorderTargetIdRef.current === targetId) {
+        return;
+      }
+
+      const didReorder = previewFolderOrder(sourceId, targetId);
+
+      if (didReorder) {
+        hasPendingFolderReorderRef.current = true;
+        lastReorderTargetIdRef.current = targetId;
+      }
+    },
+    [ensureAuthenticated, previewFolderOrder],
+  );
+
+  const handleCommitFolderReorder = useCallback(
+    (folderId: string | null) => {
+      setDraggingFolderId(null);
+      lastReorderTargetIdRef.current = null;
+
+      if (!folderId || !hasPendingFolderReorderRef.current) {
+        return;
+      }
+
+      hasPendingFolderReorderRef.current = false;
+
+      void saveFolderOrder(folderId).catch(() => {
+        // refresh from the server when the final order cannot be saved
       });
     },
-    [ensureAuthenticated, reorderFolders],
+    [saveFolderOrder],
   );
 
   const closeCreateModal = () => {
@@ -290,10 +318,12 @@ export function Sidebar({
               onNavigate={onCloseMobile}
               onDragStart={(folderId, event) => {
                 setDraggingFolderId(folderId);
+                hasPendingFolderReorderRef.current = false;
+                lastReorderTargetIdRef.current = null;
                 event.dataTransfer.effectAllowed = "move";
                 event.dataTransfer.setData("text/plain", folderId);
               }}
-              onDragEnd={() => setDraggingFolderId(null)}
+              onDragEnd={() => handleCommitFolderReorder(draggingFolderId)}
               onDragOver={(folderId, event) => {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = "move";
