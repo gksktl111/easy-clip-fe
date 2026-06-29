@@ -24,7 +24,7 @@ export function LandingFooter({ currentYear }: LandingFooterProps) {
           </a>
 
           <a
-            href="mailto:user@example.com"
+            href="mailto:medic6655@gmail.com"
             className="flex items-center gap-2 transition-colors hover:text-(--foreground)"
           >
             <HiOutlineMail className="h-4 w-4" />
