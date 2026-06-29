@@ -17,7 +17,10 @@ import {
   reorderFolder as reorderFolderRequest,
   updateFolder as updateFolderRequest,
 } from "@/features/folder/api/folderApi";
-import { FolderItem } from "@/features/folder/model/folder";
+import type {
+  FolderDropPosition,
+  FolderItem,
+} from "@/features/folder/model/folder";
 import { FolderResponseDto } from "@/features/folder/model/folder.dto";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
@@ -33,6 +36,7 @@ const reorderFolderItems = (
   folders: FolderItem[],
   sourceId: string,
   targetId: string,
+  position: FolderDropPosition,
 ) => {
   if (sourceId === targetId) {
     return folders;
@@ -52,7 +56,27 @@ const reorderFolderItems = (
     return folders;
   }
 
-  nextFolders.splice(targetIndex, 0, sourceFolder);
+  const adjustedTargetIndex = nextFolders.findIndex(
+    (folder) => folder.id === targetId,
+  );
+
+  if (adjustedTargetIndex === -1) {
+    return folders;
+  }
+
+  nextFolders.splice(
+    position === "after" ? adjustedTargetIndex + 1 : adjustedTargetIndex,
+    0,
+    sourceFolder,
+  );
+
+  const isSameOrder = nextFolders.every(
+    (folder, index) => folder.id === folders[index]?.id,
+  );
+
+  if (isSameOrder) {
+    return folders;
+  }
 
   return nextFolders.map((folder, index) => ({
     ...folder,
@@ -201,65 +225,44 @@ export const useFolders = () => {
     [removeFolderAsync],
   );
 
-  const previewFolderOrder = useCallback(
-    (sourceId: string, targetId: string) => {
+  const saveFolderOrder = useCallback(
+    async (
+      sourceId: string,
+      targetId: string,
+      position: FolderDropPosition,
+    ) => {
       if (!isAuthenticated) {
         throw createAuthRequiredError();
       }
 
       if (sourceId === targetId) {
-        return false;
-      }
-
-      let didReorder = false;
-
-      setFolders((currentFolders) => {
-        const nextFolders = reorderFolderItems(
-          currentFolders,
-          sourceId,
-          targetId,
-        );
-
-        didReorder = nextFolders !== currentFolders;
-
-        return nextFolders;
-      });
-
-      return didReorder;
-    },
-    [isAuthenticated, setFolders],
-  );
-
-  const saveFolderOrder = useCallback(
-    async (folderId: string) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
+        return;
       }
 
       const currentFolders =
         queryClient.getQueryData<FolderItem[]>(folderQueryKey) ?? folders;
-      const folderIndex = currentFolders.findIndex(
-        (folder) => folder.id === folderId,
+      const nextFolders = reorderFolderItems(
+        currentFolders,
+        sourceId,
+        targetId,
+        position,
       );
 
-      if (folderIndex === -1) {
+      if (nextFolders === currentFolders) {
         return;
       }
 
-      const previousFolder = currentFolders[folderIndex - 1] ?? null;
-      const nextFolder = currentFolders[folderIndex + 1] ?? null;
-
-      if (!previousFolder && !nextFolder) {
-        return;
-      }
-
-      const payload = previousFolder
-        ? { targetId: folderId, afterId: previousFolder.id }
-        : { targetId: folderId, beforeId: nextFolder?.id };
+      const payload =
+        position === "after"
+          ? { targetId: sourceId, afterId: targetId }
+          : { targetId: sourceId, beforeId: targetId };
 
       try {
+        await queryClient.cancelQueries({ queryKey: folderQueryKey });
+        queryClient.setQueryData(folderQueryKey, nextFolders);
         await reorderFolderAsync(payload);
       } catch (error) {
+        queryClient.setQueryData(folderQueryKey, currentFolders);
         void queryClient.invalidateQueries({ queryKey: folderQueryKey });
         throw error;
       }
@@ -279,7 +282,6 @@ export const useFolders = () => {
     createFolder,
     renameFolder,
     removeFolder,
-    previewFolderOrder,
     saveFolderOrder,
   };
 };
