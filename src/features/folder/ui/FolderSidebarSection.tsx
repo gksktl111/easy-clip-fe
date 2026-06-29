@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FolderItem } from "@/features/folder/model/folder";
+import type { FolderItem } from "@/features/folder/model/folder";
 import {
   HiOutlineDotsVertical,
   HiOutlineFolder,
@@ -21,11 +21,19 @@ interface FolderSidebarSectionProps {
   deleteLabel: string;
   openOptionsFolderId: string | null;
   draggingFolderId: string | null;
+  dropIndicator: {
+    folderId: string;
+    edge: "top" | "bottom";
+  } | null;
   onAddFolder: () => void;
   onNavigate?: () => void;
-  onDragStart: (folderId: string, event: React.DragEvent<HTMLButtonElement>) => void;
+  onDragStart: (
+    folderId: string,
+    event: React.DragEvent<HTMLButtonElement>,
+  ) => void;
   onDragEnd: () => void;
   onDragOver: (folderId: string, event: React.DragEvent<HTMLLIElement>) => void;
+  onDrop: (folderId: string, event: React.DragEvent<HTMLLIElement>) => void;
   onToggleOptions: (folderId: string) => void;
   onRenameFolder: (folderId: string) => void;
   onDeleteFolder: (folderId: string) => void;
@@ -42,11 +50,13 @@ export function FolderSidebarSection({
   deleteLabel,
   openOptionsFolderId,
   draggingFolderId,
+  dropIndicator,
   onAddFolder,
   onNavigate,
   onDragStart,
   onDragEnd,
   onDragOver,
+  onDrop,
   onToggleOptions,
   onRenameFolder,
   onDeleteFolder,
@@ -67,62 +77,92 @@ export function FolderSidebarSection({
       <ul className="space-y-1 px-2">
         {isLoading
           ? skeletonRows.map((row) => <FolderSidebarSkeletonRow key={row} />)
-          : folders.map((folder) => (
-              <li
-                key={folder.id}
-                onDragOver={(event) => onDragOver(folder.id, event)}
-                className={`relative rounded-lg ${
-                  draggingFolderId === folder.id ? "opacity-50" : ""
-                }`}
-              >
-                <div
-                  className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
-                    pathname === `/${folder.id}`
-                      ? "text-foreground bg-(--surface)"
-                      : "text-muted hover:text-foreground hover:bg-(--surface)"
+          : folders.map((folder) => {
+              const isDragging = Boolean(draggingFolderId);
+              const isActiveFolder = pathname === `/${folder.id}`;
+              const isDropTarget = dropIndicator?.folderId === folder.id;
+
+              return (
+                <li
+                  key={folder.id}
+                  onDragOver={(event) => onDragOver(folder.id, event)}
+                  onDrop={(event) => onDrop(folder.id, event)}
+                  className={`relative rounded-lg ${
+                    draggingFolderId === folder.id ? "opacity-50" : ""
                   }`}
                 >
-                  <button
-                    type="button"
-                    draggable
-                    onDragStart={(event) => onDragStart(folder.id, event)}
-                    onDragEnd={onDragEnd}
-                    className="text-muted hover:text-foreground cursor-grab rounded p-1"
-                    aria-label={reorderFolderLabel}
-                  >
-                    <HiOutlineMenuAlt4 className="h-4 w-4" aria-hidden />
-                  </button>
+                  {isDropTarget ? (
+                    <span
+                      className={`pointer-events-none absolute right-2 left-2 z-10 h-0.5 rounded-full bg-(--focus-ring) opacity-100 shadow-[0_0_0_1px_var(--surface-muted)] transition-[opacity,transform] duration-150 ${
+                        dropIndicator.edge === "top"
+                          ? "top-0 -translate-y-1/2"
+                          : "bottom-0 translate-y-1/2"
+                      }`}
+                      aria-hidden
+                    />
+                  ) : null}
 
-                  <Link
-                    href={`/${folder.id}`}
-                    onClick={onNavigate}
-                    className="flex flex-1 items-center gap-2 truncate"
+                  <div
+                    className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium ${
+                      isDragging
+                        ? "transition-colors duration-150"
+                        : "transition-colors"
+                    } ${
+                      isDropTarget
+                        ? "text-foreground bg-(--surface-elevated)"
+                        : isActiveFolder
+                        ? "text-foreground bg-(--surface)"
+                        : isDragging
+                          ? "text-muted"
+                          : "text-muted hover:text-foreground hover:bg-(--surface)"
+                    }`}
                   >
-                    <HiOutlineFolder className="h-5 w-5" aria-hidden />
-                    <span className="truncate">{folder.name}</span>
-                  </Link>
+                    <button
+                      type="button"
+                      draggable
+                      onDragStart={(event) => onDragStart(folder.id, event)}
+                      onDragEnd={onDragEnd}
+                      className={`text-muted cursor-grab rounded p-1 ${
+                        isDragging ? "" : "hover:text-foreground"
+                      }`}
+                      aria-label={reorderFolderLabel}
+                    >
+                      <HiOutlineMenuAlt4 className="h-4 w-4" aria-hidden />
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => onToggleOptions(folder.id)}
-                    className="text-muted hover:text-foreground cursor-pointer rounded p-1 transition"
-                    aria-label={openFolderOptionsLabel}
-                    data-folder-options
-                  >
-                    <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />
-                  </button>
-                </div>
+                    <Link
+                      href={`/${folder.id}`}
+                      onClick={onNavigate}
+                      className="flex flex-1 items-center gap-2 truncate"
+                    >
+                      <HiOutlineFolder className="h-5 w-5" aria-hidden />
+                      <span className="truncate">{folder.name}</span>
+                    </Link>
 
-                {openOptionsFolderId === folder.id ? (
-                  <FolderOptionsMenu
-                    renameLabel={renameLabel}
-                    deleteLabel={deleteLabel}
-                    onRename={() => onRenameFolder(folder.id)}
-                    onDelete={() => onDeleteFolder(folder.id)}
-                  />
-                ) : null}
-              </li>
-            ))}
+                    <button
+                      type="button"
+                      onClick={() => onToggleOptions(folder.id)}
+                      className={`text-muted cursor-pointer rounded p-1 ${
+                        isDragging ? "" : "transition hover:text-foreground"
+                      }`}
+                      aria-label={openFolderOptionsLabel}
+                      data-folder-options
+                    >
+                      <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />
+                    </button>
+                  </div>
+
+                  {openOptionsFolderId === folder.id ? (
+                    <FolderOptionsMenu
+                      renameLabel={renameLabel}
+                      deleteLabel={deleteLabel}
+                      onRename={() => onRenameFolder(folder.id)}
+                      onDelete={() => onDeleteFolder(folder.id)}
+                    />
+                  ) : null}
+                </li>
+              );
+            })}
       </ul>
     </div>
   );
