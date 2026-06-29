@@ -25,6 +25,11 @@ import {
   moveClipToRecentCache,
   updateClipFavoriteCache,
 } from "@/features/clip/service/clipQueryCache";
+import {
+  isAllowedImageClipFile,
+  isUnsupportedImageClipError,
+  UNSUPPORTED_IMAGE_CLIP_MESSAGE,
+} from "@/features/clip/service/imageClipValidation";
 import { ClipListItemResponseDto } from "@/features/clip/model/clip.dto";
 import { FilterType } from "@/features/clip/ui/FilterBar";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
@@ -202,6 +207,11 @@ export const useFolderClipsPage = () => {
         return;
       }
 
+      if (!isAllowedImageClipFile(file)) {
+        notifyError(UNSUPPORTED_IMAGE_CLIP_MESSAGE);
+        return;
+      }
+
       const previewUrl = URL.createObjectURL(file);
       const optimisticClip = createOptimisticImageClip(
         folderId,
@@ -227,11 +237,13 @@ export const useFolderClipsPage = () => {
           optimisticClip.id,
           mapClipResponseToListItem(createdClip),
         );
-      } catch {
+      } catch (error) {
         await waitForMinimumLoading(optimisticStartedAt);
         rollbackOptimisticClip();
         notifyError(
-          "이미지 클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+          isUnsupportedImageClipError(error)
+            ? UNSUPPORTED_IMAGE_CLIP_MESSAGE
+            : "이미지 클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
         );
       } finally {
         URL.revokeObjectURL(previewUrl);
