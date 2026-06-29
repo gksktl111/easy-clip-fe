@@ -24,17 +24,20 @@ export function FavoriteClipsPage() {
     setActiveFilter,
     setSearchQuery,
   } = useFavoriteClipsPage();
+  const hasClipLoadError = isError && filteredClips.length === 0;
 
   return (
     <div className="bg-background relative flex h-full flex-col">
-      <FilterBar
-        activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        showStatus={false}
-        countLabel={t("count", { count: filteredClips.length })}
-      />
+      {!hasClipLoadError ? (
+        <FilterBar
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          showStatus={false}
+          countLabel={t("count", { count: filteredClips.length })}
+        />
+      ) : null}
       <ClipResultsSection
         clips={filteredClips}
         hasNextPage={hasNextPage}

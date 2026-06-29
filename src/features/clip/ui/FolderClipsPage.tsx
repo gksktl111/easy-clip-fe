@@ -40,6 +40,7 @@ export function FolderClipsPage() {
     setIsDeleteAllOpen,
     setSearchQuery,
   } = useFolderClipsPage();
+  const hasClipLoadError = isError && filteredClips.length === 0;
 
   return (
     <div
@@ -49,15 +50,17 @@ export function FolderClipsPage() {
         setContextMenu(null);
       }}
     >
-      <FilterBar
-        activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        isActive={isActive}
-        countLabel={t("count", { count: filteredClips.length })}
-      />
-      {!isActive ? (
+      {!hasClipLoadError ? (
+        <FilterBar
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          isActive={isActive}
+          countLabel={t("count", { count: filteredClips.length })}
+        />
+      ) : null}
+      {!hasClipLoadError && !isActive ? (
         <FolderClipCaptureHint message={t("captureHint")} />
       ) : null}
       <ClipResultsSection
@@ -76,10 +79,12 @@ export function FolderClipsPage() {
         onToggleFavorite={handleToggleFavorite}
         onContextMenu={handleOpenContextMenu}
       />
-      <DeleteAllButton
-        disabled={!hasClips}
-        onClick={() => setIsDeleteAllOpen(true)}
-      />
+      {!hasClipLoadError ? (
+        <DeleteAllButton
+          disabled={!hasClips}
+          onClick={() => setIsDeleteAllOpen(true)}
+        />
+      ) : null}
 
       <ClipContextMenu
         clips={clips}
