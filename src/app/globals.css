@@ -51,6 +51,7 @@
   --modal-section-bg: #f8fafc;
   --modal-icon-bg: #e5e7eb;
   --modal-icon-fg: #4b5563;
+  --dropdown-option-hover: #e2e8f0;
   --landing-header-bg: rgba(255, 255, 255, 0.9);
   --landing-brand-bg: #334155;
   --landing-brand-fg: #ffffff;
@@ -125,6 +126,7 @@
   --modal-section-bg: rgba(255, 255, 255, 0.05);
   --modal-icon-bg: rgba(255, 255, 255, 0.1);
   --modal-icon-fg: #e5e7eb;
+  --dropdown-option-hover: rgba(99, 102, 241, 0.22);
   --landing-header-bg: rgba(30, 30, 31, 0.9);
   --landing-brand-bg: #4f46e5;
   --landing-brand-fg: #f8fafc;

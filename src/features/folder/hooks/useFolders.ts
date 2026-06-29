@@ -241,17 +241,6 @@ export const useFolders = () => {
 
       const currentFolders =
         queryClient.getQueryData<FolderItem[]>(folderQueryKey) ?? folders;
-      const sourceIndex = currentFolders.findIndex(
-        (folder) => folder.id === sourceId,
-      );
-      const targetIndex = currentFolders.findIndex(
-        (folder) => folder.id === targetId,
-      );
-
-      if (sourceIndex === -1 || targetIndex === -1) {
-        return;
-      }
-
       const nextFolders = reorderFolderItems(
         currentFolders,
         sourceId,

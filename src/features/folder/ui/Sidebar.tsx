@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { logout } from "@/features/auth/api/authApi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { clearAuthSession } from "@/features/auth/service/authSession";
+import { invalidateClipQueries } from "@/features/clip/service/clipQueryCache";
 import { useFolders } from "@/features/folder/hooks/useFolders";
 import type { FolderDropPosition } from "@/features/folder/model/folder";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
@@ -275,6 +276,33 @@ export function Sidebar({
       });
   }, [ensureAuthenticated, renameFolder, renameFolderId, renameFolderName]);
 
+  const getRedirectPathAfterFolderDelete = useCallback(
+    (deletedFolderId: string) => {
+      const deletedFolderIndex = folders.findIndex(
+        (folder) => folder.id === deletedFolderId,
+      );
+      const remainingFolders = folders.filter(
+        (folder) => folder.id !== deletedFolderId,
+      );
+      const nextFolder =
+        remainingFolders[
+          Math.min(Math.max(deletedFolderIndex, 0), remainingFolders.length - 1)
+        ] ?? null;
+      const [, section] = pathname.split("/").filter(Boolean);
+
+      if (section === "favorites") {
+        return nextFolder ? `/${nextFolder.id}/favorites` : "/favorites";
+      }
+
+      if (section === "recent") {
+        return nextFolder ? `/${nextFolder.id}/recent` : "/recent";
+      }
+
+      return nextFolder ? `/${nextFolder.id}` : "/recent";
+    },
+    [folders, pathname],
+  );
+
   const userLabel =
     session?.user?.authAccounts?.[0]?.email ??
     session?.user?.displayName ??
@@ -421,9 +449,19 @@ export function Sidebar({
                   return;
                 }
 
+                const isDeletingCurrentFolder = pathnameFolderId === folderId;
+                const redirectPath =
+                  getRedirectPathAfterFolderDelete(folderId);
+
                 void removeFolder(folderId)
                   .then(() => {
                     setOpenOptionsFolderId(null);
+                    void invalidateClipQueries(queryClient);
+
+                    if (isDeletingCurrentFolder) {
+                      onCloseMobile?.();
+                      router.replace(redirectPath);
+                    }
                   })
                   .catch(() => {
                     // keep the menu open when the request fails
