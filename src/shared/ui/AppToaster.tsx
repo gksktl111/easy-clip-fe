@@ -6,12 +6,13 @@ export function AppToaster() {
   return (
     <Toaster
       position="top-center"
-      richColors
-      closeButton
+      closeButton={false}
+      duration={3000}
       toastOptions={{
+        duration: 3000,
         classNames: {
           toast:
-            "border border-(--border) bg-(--surface-elevated) text-(--foreground)",
+            "bg-transparent p-0 shadow-none",
         },
       }}
     />
