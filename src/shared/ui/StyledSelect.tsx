@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { HiCheck, HiChevronDown } from "react-icons/hi";
+import { HiChevronDown } from "react-icons/hi";
 
 interface StyledSelectOption {
   value: string;
@@ -62,7 +62,7 @@ export function StyledSelect({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen((previous) => !previous)}
-        className="text-foreground flex h-11 w-full items-center justify-between rounded-xl border border-(--border) bg-(--surface) px-4 text-sm font-medium transition-colors hover:bg-(--surface-muted)"
+        className="text-foreground flex h-11 w-full cursor-pointer items-center justify-between rounded-xl border border-(--border) bg-(--surface) px-4 text-sm font-medium transition-colors hover:bg-(--surface-muted) disabled:cursor-default"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -77,7 +77,7 @@ export function StyledSelect({
 
       {isOpen ? (
         <div className="absolute top-[calc(100%+0.5rem)] left-0 z-50 w-full overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-[0_18px_40px_rgba(15,23,42,0.16)]">
-          <ul className="py-2" role="listbox">
+          <ul role="listbox">
             {options.map((option) => {
               const isSelected = option.value === value;
 
@@ -90,24 +90,15 @@ export function StyledSelect({
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                    className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition-colors ${
+                    className={`flex w-full cursor-pointer items-center px-4 py-3 text-left text-sm transition-colors disabled:cursor-default ${
                       isSelected
-                        ? "bg-(--surface-muted) text-(--foreground)"
-                        : "text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground)"
+                        ? "bg-(--dropdown-option-hover) text-(--foreground)"
+                        : "text-(--muted) hover:bg-(--dropdown-option-hover) hover:text-(--foreground)"
                     }`}
                     role="option"
                     aria-selected={isSelected}
                   >
                     <span className="truncate font-medium">{option.label}</span>
-                    <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full ${
-                        isSelected
-                          ? "bg-(--icon-chip) text-(--icon-chip-text)"
-                          : "text-transparent"
-                      }`}
-                    >
-                      <HiCheck className="h-3.5 w-3.5" aria-hidden />
-                    </span>
                   </button>
                 </li>
               );

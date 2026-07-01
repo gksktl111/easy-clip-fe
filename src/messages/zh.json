@@ -163,6 +163,11 @@
       "title": "还没有保存的剪贴内容",
       "description": "复制新的内容，或在文件夹中开始粘贴后，这里就会显示内容。"
     },
+    "errorState": {
+      "title": "无法加载剪贴内容",
+      "description": "请检查网络连接，或稍后再试。",
+      "retry": "重试"
+    },
     "item": {
       "saving": "保存中",
       "toggleFavorite": "切换收藏"

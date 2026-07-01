@@ -163,6 +163,11 @@
       "title": "No saved clips yet",
       "description": "Copied clips or new pasted items from a folder will appear here."
     },
+    "errorState": {
+      "title": "Failed to load clips",
+      "description": "Check your network connection or try again shortly.",
+      "retry": "Try again"
+    },
     "item": {
       "saving": "Saving",
       "toggleFavorite": "Toggle favorite"

@@ -17,7 +17,10 @@ import {
   reorderFolder as reorderFolderRequest,
   updateFolder as updateFolderRequest,
 } from "@/features/folder/api/folderApi";
-import { FolderItem } from "@/features/folder/model/folder";
+import type {
+  FolderDropPosition,
+  FolderItem,
+} from "@/features/folder/model/folder";
 import { FolderResponseDto } from "@/features/folder/model/folder.dto";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
@@ -28,6 +31,58 @@ const FOLDER_QUERY_KEYS = {
 
 const sortFolders = (folders: FolderItem[]) =>
   [...folders].sort((left, right) => left.order - right.order);
+
+const reorderFolderItems = (
+  folders: FolderItem[],
+  sourceId: string,
+  targetId: string,
+  position: FolderDropPosition,
+) => {
+  if (sourceId === targetId) {
+    return folders;
+  }
+
+  const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
+  const targetIndex = folders.findIndex((folder) => folder.id === targetId);
+
+  if (sourceIndex === -1 || targetIndex === -1) {
+    return folders;
+  }
+
+  const nextFolders = [...folders];
+  const [sourceFolder] = nextFolders.splice(sourceIndex, 1);
+
+  if (!sourceFolder) {
+    return folders;
+  }
+
+  const adjustedTargetIndex = nextFolders.findIndex(
+    (folder) => folder.id === targetId,
+  );
+
+  if (adjustedTargetIndex === -1) {
+    return folders;
+  }
+
+  nextFolders.splice(
+    position === "after" ? adjustedTargetIndex + 1 : adjustedTargetIndex,
+    0,
+    sourceFolder,
+  );
+
+  const isSameOrder = nextFolders.every(
+    (folder, index) => folder.id === folders[index]?.id,
+  );
+
+  if (isSameOrder) {
+    return folders;
+  }
+
+  return nextFolders.map((folder, index) => ({
+    ...folder,
+    order: index,
+  }));
+};
 
 const mapFolder = (folder: FolderResponseDto): FolderItem => ({
   id: folder.id,
@@ -170,8 +225,12 @@ export const useFolders = () => {
     [removeFolderAsync],
   );
 
-  const reorderFolders = useCallback(
-    async (sourceId: string, targetId: string) => {
+  const saveFolderOrder = useCallback(
+    async (
+      sourceId: string,
+      targetId: string,
+      position: FolderDropPosition,
+    ) => {
       if (!isAuthenticated) {
         throw createAuthRequiredError();
       }
@@ -180,21 +239,41 @@ export const useFolders = () => {
         return;
       }
 
-      const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
-      const targetIndex = folders.findIndex((folder) => folder.id === targetId);
+      const currentFolders =
+        queryClient.getQueryData<FolderItem[]>(folderQueryKey) ?? folders;
+      const nextFolders = reorderFolderItems(
+        currentFolders,
+        sourceId,
+        targetId,
+        position,
+      );
 
-      if (sourceIndex === -1 || targetIndex === -1) {
+      if (nextFolders === currentFolders) {
         return;
       }
 
       const payload =
-        sourceIndex < targetIndex
+        position === "after"
           ? { targetId: sourceId, afterId: targetId }
           : { targetId: sourceId, beforeId: targetId };
 
-      await reorderFolderAsync(payload);
+      try {
+        await queryClient.cancelQueries({ queryKey: folderQueryKey });
+        queryClient.setQueryData(folderQueryKey, nextFolders);
+        await reorderFolderAsync(payload);
+      } catch (error) {
+        queryClient.setQueryData(folderQueryKey, currentFolders);
+        void queryClient.invalidateQueries({ queryKey: folderQueryKey });
+        throw error;
+      }
     },
-    [folders, isAuthenticated, reorderFolderAsync],
+    [
+      folderQueryKey,
+      folders,
+      isAuthenticated,
+      queryClient,
+      reorderFolderAsync,
+    ],
   );
 
   return {
@@ -203,6 +282,6 @@ export const useFolders = () => {
     createFolder,
     renameFolder,
     removeFolder,
-    reorderFolders,
+    saveFolderOrder,
   };
 };
