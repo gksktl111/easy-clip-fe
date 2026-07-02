@@ -26,12 +26,13 @@ const getClipTypeLabel = (
 export function TrashPage() {
   const t = useTranslations("trash");
   const {
-    clips,
-    folders,
+    items,
     activeFolders,
+    fetchNextPage,
+    hasNextPage,
     isLoading,
+    isFetchingNextPage,
     error,
-    clearAllFailure,
     hasItems,
     pendingActionKey,
     reload,
@@ -43,32 +44,32 @@ export function TrashPage() {
   } = useTrashPage();
   const folderNameById = new Map([
     ...activeFolders.map((folder) => [folder.id, folder.name] as const),
-    ...folders.map((folder) => [folder.id, folder.name] as const),
+    ...items
+      .filter((item) => item.itemType === "FOLDER")
+      .map((folder) => [folder.id, folder.name] as const),
   ]);
 
-  const rows: TrashItemRow[] = [
-    ...folders.map((folder) => ({
-      kind: "folder" as const,
-      id: folder.id,
-      name: folder.name,
-      deletedAt: folder.deletedAt,
-      typeLabel: t("folderType"),
-    })),
-    ...clips.map((clip) => ({
-      kind: "clip" as const,
-      id: clip.id,
-      name: clip.title,
-      deletedAt: clip.deletedAt,
-      typeLabel: `${t("fileType")} · ${getClipTypeLabel(clip.type, t)}`,
-      clipType: clip.type,
-      parentFolderName:
-        folderNameById.get(clip.folderId) ?? t("unknownParentFolder"),
-    })),
-  ].sort((left, right) => {
-    const leftTime = left.deletedAt ? new Date(left.deletedAt).getTime() : 0;
-    const rightTime = right.deletedAt ? new Date(right.deletedAt).getTime() : 0;
+  const rows: TrashItemRow[] = items.map((item) => {
+    if (item.itemType === "FOLDER") {
+      return {
+        kind: "folder",
+        id: item.id,
+        name: item.name,
+        deletedAt: item.deletedAt,
+        typeLabel: t("folderType"),
+      };
+    }
 
-    return rightTime - leftTime;
+    return {
+      kind: "clip",
+      id: item.id,
+      name: item.title,
+      deletedAt: item.deletedAt,
+      typeLabel: `${t("fileType")} · ${getClipTypeLabel(item.type, t)}`,
+      clipType: item.type,
+      parentFolderName:
+        folderNameById.get(item.folderId) ?? t("unknownParentFolder"),
+    };
   });
 
   return (
@@ -83,27 +84,19 @@ export function TrashPage() {
         </div>
       ) : null}
 
-      {clearAllFailure ? (
-        <div className="px-6 pt-6">
-          <p className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-            {t("clearAllPartialError", {
-              failedCount: clearAllFailure.failedCount,
-              totalCount: clearAllFailure.totalCount,
-            })}
-          </p>
-        </div>
-      ) : null}
-
-      {!isLoading && !hasItems ? (
-        <TrashPageEmptyState />
-      ) : null}
+      {!isLoading && !hasItems ? <TrashPageEmptyState /> : null}
 
       {isLoading || hasItems ? (
         <div className="flex min-h-0 flex-1 flex-col px-4 py-4 min-[1200px]:px-6">
           <TrashListSection
             rows={rows}
             isLoading={isLoading}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
             pendingActionKey={pendingActionKey}
+            onFetchNextPage={() => {
+              void fetchNextPage();
+            }}
             onReload={() => {
               void reload();
             }}

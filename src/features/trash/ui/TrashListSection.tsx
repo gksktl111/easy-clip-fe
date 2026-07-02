@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useInView } from "react-intersection-observer";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { TrashListRow } from "@/features/trash/ui/TrashListRow";
@@ -10,7 +11,10 @@ import { TrashItemRow } from "@/features/trash/ui/trashRow";
 interface TrashListSectionProps {
   rows: TrashItemRow[];
   isLoading?: boolean;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
   pendingActionKey: string | null;
+  onFetchNextPage?: () => void;
   onReload: () => void;
   onClearAll: () => void;
   onRestoreFolder: (folderId: string) => void;
@@ -23,7 +27,10 @@ interface TrashListSectionProps {
 export function TrashListSection({
   rows,
   isLoading = false,
+  hasNextPage = false,
+  isFetchingNextPage = false,
   pendingActionKey,
+  onFetchNextPage,
   onReload,
   onClearAll,
   onRestoreFolder,
@@ -35,6 +42,28 @@ export function TrashListSection({
   const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
   const skeletonRows = Array.from({ length: 6 }, (_, index) => index);
   const isClearingAll = pendingActionKey === "trash-clear-all";
+  const hasTriggeredInViewRef = useRef(false);
+  const { ref: loadMoreRef, inView } = useInView({
+    rootMargin: "240px 0px",
+  });
+
+  useEffect(() => {
+    if (!inView) {
+      hasTriggeredInViewRef.current = false;
+      return;
+    }
+
+    if (!hasNextPage || isFetchingNextPage || isLoading || !onFetchNextPage) {
+      return;
+    }
+
+    if (hasTriggeredInViewRef.current) {
+      return;
+    }
+
+    hasTriggeredInViewRef.current = true;
+    onFetchNextPage();
+  }, [hasNextPage, inView, isFetchingNextPage, isLoading, onFetchNextPage]);
 
   return (
     <>
@@ -55,11 +84,7 @@ export function TrashListSection({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              disabled={
-                isLoading ||
-                !rows.length ||
-                isClearingAll
-              }
+              disabled={isLoading || !rows.length || isClearingAll}
               onClick={() => setIsClearAllModalOpen(true)}
               className="cursor-pointer rounded-lg bg-red-500/15 px-4 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500/25 disabled:cursor-default disabled:opacity-50"
             >
@@ -99,6 +124,12 @@ export function TrashListSection({
                   onDeleteClip={onDeleteClip}
                 />
               ))}
+
+          {!isLoading ? (
+            <div ref={loadMoreRef}>
+              {isFetchingNextPage ? <TrashListSkeletonRow /> : null}
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -120,10 +151,7 @@ export function TrashListSection({
 
 function TrashListSkeletonRow() {
   return (
-    <article
-      className="px-4 py-4"
-      aria-hidden
-    >
+    <article className="px-4 py-4" aria-hidden>
       <div className="flex flex-col gap-3 min-[1200px]:grid min-[1200px]:grid-cols-[minmax(0,1.5fr)_180px_220px_220px] min-[1200px]:items-center min-[1200px]:gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <div className="skeleton-shimmer h-10 w-10 shrink-0 rounded-xl" />
