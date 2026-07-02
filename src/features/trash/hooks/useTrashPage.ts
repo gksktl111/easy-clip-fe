@@ -1,108 +1,78 @@
 "use client";
 
-import { startTransition, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import { fetchFolders } from "@/features/folder/api/folderApi";
-import { FolderResponseDto } from "@/features/folder/model/folder.dto";
+import { useFolders } from "@/features/folder/hooks/useFolders";
 import {
+  deleteAllTrashItems,
+  deleteTrashItems,
   deleteTrashClip,
   deleteTrashFolder,
-  fetchTrashClips,
-  fetchTrashFolders,
+  fetchTrashItems,
   restoreTrashClip,
   restoreTrashFolder,
 } from "@/features/trash/api/trashApi";
-import {
-  TrashClipResponseDto,
-  TrashFolderResponseDto,
-} from "@/features/trash/model/trash.dto";
+import { TrashItemMutationDto } from "@/features/trash/model/trash.dto";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
+
+const TRASH_QUERY_KEYS = {
+  all: ["trash"] as const,
+  items: (userId: string | null) =>
+    [...TRASH_QUERY_KEYS.all, "items", userId] as const,
+};
 
 export const useTrashPage = () => {
   const session = useAuthSession();
   const isAuthenticated = Boolean(session?.user);
-  const [clips, setClips] = useState<TrashClipResponseDto[]>([]);
-  const [folders, setFolders] = useState<TrashFolderResponseDto[]>([]);
-  const [activeFolders, setActiveFolders] = useState<FolderResponseDto[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const userId = session?.user?.id ?? null;
+  const queryClient = useQueryClient();
+  const { folders: activeFolders } = useFolders();
+  const [actionError, setActionError] = useState<string | null>(null);
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
-  const loadRequestIdRef = useRef(0);
 
-  const loadTrash = useCallback(async () => {
-    const requestId = loadRequestIdRef.current + 1;
-    loadRequestIdRef.current = requestId;
-    const loadingStartedAt = Date.now();
-    const isLatestRequest = () => loadRequestIdRef.current === requestId;
+  const trashItemsQuery = useInfiniteQuery({
+    queryKey: TRASH_QUERY_KEYS.items(userId),
+    enabled: isAuthenticated,
+    initialPageParam: null as string | null,
+    queryFn: async ({ pageParam }) => {
+      const loadingStartedAt = Date.now();
 
-    if (!isAuthenticated) {
-      await waitForMinimumLoading(loadingStartedAt);
-
-      if (!isLatestRequest()) {
-        return;
+      try {
+        return await fetchTrashItems({ cursor: pageParam });
+      } finally {
+        await waitForMinimumLoading(loadingStartedAt);
       }
+    },
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNextPage ? lastPage.nextCursor : undefined,
+    placeholderData: (previousData) => previousData,
+  });
 
-      startTransition(() => {
-        setClips([]);
-        setFolders([]);
-        setActiveFolders([]);
-        setIsLoading(false);
-      });
-      return;
-    }
+  const reload = useCallback(async () => {
+    setActionError(null);
+    await trashItemsQuery.refetch();
+  }, [trashItemsQuery]);
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const [trashClips, trashFolders, currentFolders] = await Promise.all([
-        fetchTrashClips(),
-        fetchTrashFolders(),
-        fetchFolders(),
-      ]);
-
-      startTransition(() => {
-        if (!isLatestRequest()) {
-          return;
-        }
-
-        setClips(trashClips.items);
-        setFolders(trashFolders.items);
-        setActiveFolders(currentFolders);
-      });
-    } catch {
-      if (!isLatestRequest()) {
-        return;
-      }
-
-      setError("load");
-    } finally {
-      await waitForMinimumLoading(loadingStartedAt);
-      if (isLatestRequest()) {
-        setIsLoading(false);
-      }
-    }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    void loadTrash();
-  }, [loadTrash]);
+  const refreshTrash = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: TRASH_QUERY_KEYS.all });
+  }, [queryClient]);
 
   const runAction = useCallback(
     async (actionKey: string, action: () => Promise<unknown>) => {
       setPendingActionKey(actionKey);
-      setError(null);
+      setActionError(null);
 
       try {
         await action();
-        await loadTrash();
+        await refreshTrash();
       } catch {
-        setError("action");
+        setActionError("action");
       } finally {
         setPendingActionKey(null);
       }
     },
-    [loadTrash],
+    [refreshTrash],
   );
 
   const handleRestoreClip = useCallback(
@@ -111,9 +81,7 @@ export const useTrashPage = () => {
         return;
       }
 
-      await runAction(`clip-restore-${clipId}`, () =>
-        restoreTrashClip(clipId),
-      );
+      await runAction(`clip-restore-${clipId}`, () => restoreTrashClip(clipId));
     },
     [isAuthenticated, runAction],
   );
@@ -124,8 +92,19 @@ export const useTrashPage = () => {
         return;
       }
 
-      await runAction(`clip-delete-${clipId}`, () =>
-        deleteTrashClip(clipId),
+      await runAction(`clip-delete-${clipId}`, () => deleteTrashClip(clipId));
+    },
+    [isAuthenticated, runAction],
+  );
+
+  const handleDeleteItems = useCallback(
+    async (itemsToDelete: TrashItemMutationDto[]) => {
+      if (!isAuthenticated || itemsToDelete.length === 0) {
+        return;
+      }
+
+      await runAction("trash-delete-selected", () =>
+        deleteTrashItems(itemsToDelete),
       );
     },
     [isAuthenticated, runAction],
@@ -162,28 +141,29 @@ export const useTrashPage = () => {
       return;
     }
 
-    await runAction("trash-clear-all", async () => {
-      for (const clip of clips) {
-        await deleteTrashClip(clip.id);
-      }
+    await runAction("trash-clear-all", deleteAllTrashItems);
+  }, [isAuthenticated, runAction]);
 
-      for (const folder of folders) {
-        await deleteTrashFolder(folder.id);
-      }
-    });
-  }, [clips, folders, isAuthenticated, runAction]);
+  const items = isAuthenticated
+    ? (trashItemsQuery.data?.pages.flatMap((page) => page.items) ?? [])
+    : [];
+  const isLoading = isAuthenticated && trashItemsQuery.isPending;
+  const error = actionError ?? (trashItemsQuery.isError ? "load" : null);
 
   return {
-    clips,
-    folders,
+    items,
     activeFolders,
+    fetchNextPage: trashItemsQuery.fetchNextPage,
+    hasNextPage: Boolean(trashItemsQuery.hasNextPage),
     isLoading,
+    isFetchingNextPage: trashItemsQuery.isFetchingNextPage,
     error,
-    hasItems: clips.length > 0 || folders.length > 0,
+    hasItems: items.length > 0,
     pendingActionKey,
-    reload: loadTrash,
+    reload,
     handleRestoreClip,
     handleDeleteClip,
+    handleDeleteItems,
     handleRestoreFolder,
     handleDeleteFolder,
     handleClearAll,

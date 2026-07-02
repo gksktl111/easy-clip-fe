@@ -1,27 +1,38 @@
 import { ClipApiType } from "@/features/clip/model/clip.dto";
 
-export interface TrashClipResponseDto {
+export type TrashItemResponseDto =
+  | {
+      itemType: "CLIP";
+      id: string;
+      deletedAt: string | null;
+      title: string;
+      type: ClipApiType;
+      folderId: string;
+    }
+  | {
+      itemType: "FOLDER";
+      id: string;
+      deletedAt: string | null;
+      name: string;
+    };
+
+export interface TrashListResponseDto {
+  items: TrashItemResponseDto[];
+  nextCursor: string | null;
+  hasNextPage: boolean;
+}
+
+export interface TrashItemMutationDto {
+  itemType: "CLIP" | "FOLDER";
   id: string;
-  title: string;
-  type: ClipApiType;
-  folderId: string;
-  deletedAt: string | null;
 }
 
-export interface TrashClipListResponseDto {
-  items: TrashClipResponseDto[];
+export interface TrashRestoreResponseDto {
+  restoredCount: number;
 }
 
-export interface TrashFolderResponseDto {
-  id: string;
-  name: string;
-  deletedAt: string | null;
-}
-
-export interface TrashFolderListResponseDto {
-  items: TrashFolderResponseDto[];
-}
-
-export interface TrashDeleteResponseDto {
-  success: boolean;
+export interface TrashDeleteAllResponseDto {
+  clipsDeleted: number;
+  foldersDeleted: number;
+  totalDeleted: number;
 }
