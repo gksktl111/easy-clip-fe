@@ -6,12 +6,14 @@ import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { useFolders } from "@/features/folder/hooks/useFolders";
 import {
   deleteAllTrashItems,
+  deleteTrashItems,
   deleteTrashClip,
   deleteTrashFolder,
   fetchTrashItems,
   restoreTrashClip,
   restoreTrashFolder,
 } from "@/features/trash/api/trashApi";
+import { TrashItemMutationDto } from "@/features/trash/model/trash.dto";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 const TRASH_QUERY_KEYS = {
@@ -95,6 +97,19 @@ export const useTrashPage = () => {
     [isAuthenticated, runAction],
   );
 
+  const handleDeleteItems = useCallback(
+    async (itemsToDelete: TrashItemMutationDto[]) => {
+      if (!isAuthenticated || itemsToDelete.length === 0) {
+        return;
+      }
+
+      await runAction("trash-delete-selected", () =>
+        deleteTrashItems(itemsToDelete),
+      );
+    },
+    [isAuthenticated, runAction],
+  );
+
   const handleRestoreFolder = useCallback(
     async (folderId: string) => {
       if (!isAuthenticated) {
@@ -148,6 +163,7 @@ export const useTrashPage = () => {
     reload,
     handleRestoreClip,
     handleDeleteClip,
+    handleDeleteItems,
     handleRestoreFolder,
     handleDeleteFolder,
     handleClearAll,

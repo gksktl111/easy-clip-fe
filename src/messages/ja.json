@@ -106,9 +106,15 @@
     "retentionNotice": "最大30日間保管されます",
     "description": "削除したクリップとフォルダを確認し、復元または完全削除できます。",
     "refresh": "再読み込み",
-    "clearAll": "ゴミ箱を空にする",
+    "clearAll": "すべて削除",
     "clearing": "ゴミ箱を空にしています。",
     "clearingAction": "処理中",
+    "deleteSelected": "選択項目を削除",
+    "deletingSelected": "選択した項目を削除しています。",
+    "deletingSelectedAction": "削除中",
+    "selectedCount": "{count, plural, =0 {未選択} other {#件選択中}}",
+    "selectAll": "ゴミ箱の項目をすべて選択",
+    "selectItem": "{name}を選択",
     "cancel": "キャンセル",
     "loading": "ゴミ箱を読み込んでいます。",
     "error": "ゴミ箱データを読み込めませんでした。しばらくしてから再試行してください。",
@@ -133,8 +139,12 @@
       "actions": "操作"
     },
     "clearAllModal": {
-      "title": "ゴミ箱を空にする",
+      "title": "ゴミ箱をすべて削除",
       "description": "本当にゴミ箱内のすべての項目を完全削除しますか？"
+    },
+    "deleteSelectedModal": {
+      "title": "選択項目を削除",
+      "description": "選択した{count, plural, other {#件}}を完全削除しますか？"
     },
     "clipsTitle": "削除済みクリップ",
     "clipsCount": "{count, plural, =0 {クリップ 0件} other {クリップ #件}}",
@@ -144,7 +154,7 @@
     "foldersEmpty": "削除済みフォルダはありません。",
     "deletedAt": "削除日時",
     "restore": "復元",
-    "deleteForever": "完全削除"
+    "deleteForever": "削除"
   },
   "clips": {
     "count": "{count, plural, =0 {0 件のクリップ} other {# 件のクリップ}}",

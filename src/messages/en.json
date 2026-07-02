@@ -106,9 +106,15 @@
     "retentionNotice": "Kept for up to 30 days",
     "description": "Review deleted clips and folders, then restore or permanently remove them.",
     "refresh": "Refresh",
-    "clearAll": "Empty trash",
+    "clearAll": "Delete all",
     "clearing": "Clearing trash.",
     "clearingAction": "Clearing",
+    "deleteSelected": "Delete selected",
+    "deletingSelected": "Deleting selected items.",
+    "deletingSelectedAction": "Deleting",
+    "selectedCount": "{count, plural, =0 {None selected} one {# selected} other {# selected}}",
+    "selectAll": "Select all trash items",
+    "selectItem": "Select {name}",
     "cancel": "Cancel",
     "loading": "Loading trash items.",
     "error": "Failed to load trash data. Please try again shortly.",
@@ -133,8 +139,12 @@
       "actions": "Actions"
     },
     "clearAllModal": {
-      "title": "Empty trash",
+      "title": "Delete all trash items",
       "description": "Are you sure you want to permanently delete every item in trash?"
+    },
+    "deleteSelectedModal": {
+      "title": "Delete selected items",
+      "description": "Are you sure you want to permanently delete {count, plural, one {# selected item} other {# selected items}}?"
     },
     "clipsTitle": "Deleted clips",
     "clipsCount": "{count, plural, =0 {0 clips} one {# clip} other {# clips}}",
@@ -144,7 +154,7 @@
     "foldersEmpty": "No deleted folders.",
     "deletedAt": "Deleted at",
     "restore": "Restore",
-    "deleteForever": "Delete forever"
+    "deleteForever": "Delete"
   },
   "clips": {
     "count": "{count, plural, =0 {0 clips} one {# clip} other {# clips}}",
