@@ -3,6 +3,8 @@ import {
   ClipResponseDto,
   CreateImageClipRequestDto,
   CreateTextClipRequestDto,
+  DeleteClipsRequestDto,
+  DeleteClipsResponseDto,
   FetchClipsQueryDto,
   LikeClipResponseDto,
 } from "@/features/clip/model/clip.dto";
@@ -64,6 +66,15 @@ export const createImageClip = (payload: CreateImageClipRequestDto) => {
 export const removeClip = (clipId: string) =>
   apiRequest<ClipResponseDto>(`/clips/${clipId}`, {
     method: "DELETE",
+  });
+
+export const removeClips = (payload: DeleteClipsRequestDto) =>
+  apiRequest<DeleteClipsResponseDto>("/clips", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
   });
 
 export const likeClip = (clipId: string) =>

@@ -61,6 +61,14 @@ export interface CreateImageClipRequestDto {
   file: File;
 }
 
+export interface DeleteClipsRequestDto {
+  clipIds: string[];
+}
+
+export interface DeleteClipsResponseDto {
+  deletedCount: number;
+}
+
 export interface LikeClipResponseDto {
   likeByMe: boolean;
 }
