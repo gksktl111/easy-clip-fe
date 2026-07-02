@@ -37,7 +37,7 @@ export function TrashListRow({
   const isBulkActionPending = pendingActionKey === "trash-clear-all";
 
   return (
-    <article className="px-4 py-4 transition-colors hover:bg-(--surface-elevated)">
+    <article className="px-4 py-4 transition-colors hover:bg-(--surface-elevated) min-[1200px]:px-6">
       <div className="flex flex-col gap-3 min-[1200px]:grid min-[1200px]:grid-cols-[minmax(0,1.5fr)_180px_220px_220px] min-[1200px]:items-center min-[1200px]:gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-(--icon-chip) text-(--icon-chip-text)">

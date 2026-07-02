@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { useTrashPage } from "@/features/trash/hooks/useTrashPage";
 import { TrashListSection } from "@/features/trash/ui/TrashListSection";
 import { TrashPageEmptyState } from "@/features/trash/ui/TrashPageEmptyState";
@@ -25,6 +27,7 @@ const getClipTypeLabel = (
 // 휴지통 페이지의 상태에 따라 안내, 빈 상태, 리스트 섹션을 조합하는 루트 컴포넌트입니다.
 export function TrashPage() {
   const t = useTranslations("trash");
+  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
   const {
     items,
     activeFolders,
@@ -71,10 +74,19 @@ export function TrashPage() {
         folderNameById.get(item.folderId) ?? t("unknownParentFolder"),
     };
   });
+  const isClearingAll = pendingActionKey === "trash-clear-all";
 
   return (
     <div className="bg-background flex h-full min-h-0 flex-col overflow-hidden">
-      <TrashPageHeader />
+      <TrashPageHeader
+        count={rows.length}
+        isLoading={isLoading}
+        isClearingAll={isClearingAll}
+        onReload={() => {
+          void reload();
+        }}
+        onRequestClearAll={() => setIsClearAllModalOpen(true)}
+      />
 
       {error ? (
         <div className="px-6 pt-6">
@@ -87,7 +99,7 @@ export function TrashPage() {
       {!isLoading && !hasItems ? <TrashPageEmptyState /> : null}
 
       {isLoading || hasItems ? (
-        <div className="flex min-h-0 flex-1 flex-col px-4 py-4 min-[1200px]:px-6">
+        <div className="flex min-h-0 flex-1 flex-col">
           <TrashListSection
             rows={rows}
             isLoading={isLoading}
@@ -96,12 +108,6 @@ export function TrashPage() {
             pendingActionKey={pendingActionKey}
             onFetchNextPage={() => {
               void fetchNextPage();
-            }}
-            onReload={() => {
-              void reload();
-            }}
-            onClearAll={() => {
-              void handleClearAll();
             }}
             onRestoreFolder={(folderId) => {
               void handleRestoreFolder(folderId);
@@ -118,6 +124,19 @@ export function TrashPage() {
           />
         </div>
       ) : null}
+
+      <DeleteAllClipsModal
+        isOpen={isClearAllModalOpen}
+        title={t("clearAllModal.title")}
+        description={t("clearAllModal.description")}
+        cancelLabel={t("cancel")}
+        confirmLabel={t("clearAll")}
+        onCancel={() => setIsClearAllModalOpen(false)}
+        onConfirm={() => {
+          setIsClearAllModalOpen(false);
+          void handleClearAll();
+        }}
+      />
     </div>
   );
 }
