@@ -90,7 +90,7 @@ export function StyledSelect({
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                    className={`flex w-full cursor-pointer items-center px-4 py-3 text-left text-sm transition-colors disabled:cursor-default ${
+                    className={`flex w-full cursor-pointer items-center px-4 py-3 text-left text-sm transition-colors duration-150 ease-out disabled:cursor-default motion-reduce:transition-none ${
                       isSelected
                         ? "bg-(--dropdown-option-hover) text-(--foreground)"
                         : "text-(--muted) hover:bg-(--dropdown-option-hover) hover:text-(--foreground)"

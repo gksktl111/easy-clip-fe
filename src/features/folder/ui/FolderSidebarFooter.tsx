@@ -72,7 +72,7 @@ export function FolderSidebarFooter({
             <button
               type="button"
               onClick={() => handleMenuAction(onOpenSettings)}
-              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors"
+              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors duration-150 ease-out motion-reduce:transition-none"
             >
               <HiOutlineCog className="h-5 w-5 text-(--muted)" aria-hidden />
               {settingsLabel}
@@ -80,7 +80,7 @@ export function FolderSidebarFooter({
             <button
               type="button"
               onClick={() => handleMenuAction(onUpgradePlan)}
-              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors"
+              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors duration-150 ease-out motion-reduce:transition-none"
             >
               <HiOutlineCreditCard
                 className="h-5 w-5 text-(--muted)"
@@ -91,7 +91,7 @@ export function FolderSidebarFooter({
             <button
               type="button"
               onClick={() => handleMenuAction(onLogout)}
-              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors"
+              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors duration-150 ease-out motion-reduce:transition-none"
             >
               <HiOutlineLogout
                 className="h-5 w-5 text-(--muted)"

@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { useTrashPage } from "@/features/trash/hooks/useTrashPage";
 import { TrashListSection } from "@/features/trash/ui/TrashListSection";
 import { TrashPageEmptyState } from "@/features/trash/ui/TrashPageEmptyState";
@@ -25,54 +27,120 @@ const getClipTypeLabel = (
 // 휴지통 페이지의 상태에 따라 안내, 빈 상태, 리스트 섹션을 조합하는 루트 컴포넌트입니다.
 export function TrashPage() {
   const t = useTranslations("trash");
+  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
+  const [isDeleteSelectedModalOpen, setIsDeleteSelectedModalOpen] =
+    useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Set<string>>(
+    () => new Set(),
+  );
   const {
-    clips,
-    folders,
+    items,
     activeFolders,
+    fetchNextPage,
+    hasNextPage,
     isLoading,
+    isFetchingNextPage,
     error,
     hasItems,
     pendingActionKey,
     reload,
     handleRestoreClip,
     handleDeleteClip,
+    handleDeleteItems,
     handleRestoreFolder,
     handleDeleteFolder,
     handleClearAll,
   } = useTrashPage();
   const folderNameById = new Map([
     ...activeFolders.map((folder) => [folder.id, folder.name] as const),
-    ...folders.map((folder) => [folder.id, folder.name] as const),
+    ...items
+      .filter((item) => item.itemType === "FOLDER")
+      .map((folder) => [folder.id, folder.name] as const),
   ]);
 
-  const rows: TrashItemRow[] = [
-    ...folders.map((folder) => ({
-      kind: "folder" as const,
-      id: folder.id,
-      name: folder.name,
-      deletedAt: folder.deletedAt,
-      typeLabel: t("folderType"),
-    })),
-    ...clips.map((clip) => ({
-      kind: "clip" as const,
-      id: clip.id,
-      name: clip.title,
-      deletedAt: clip.deletedAt,
-      typeLabel: `${t("fileType")} · ${getClipTypeLabel(clip.type, t)}`,
-      clipType: clip.type,
-      parentFolderName:
-        folderNameById.get(clip.folderId) ?? t("unknownParentFolder"),
-    })),
-  ].sort((left, right) => {
-    const leftTime = left.deletedAt ? new Date(left.deletedAt).getTime() : 0;
-    const rightTime = right.deletedAt ? new Date(right.deletedAt).getTime() : 0;
+  const rows: TrashItemRow[] = items.map((item) => {
+    if (item.itemType === "FOLDER") {
+      return {
+        kind: "folder",
+        id: item.id,
+        name: item.name,
+        deletedAt: item.deletedAt,
+        typeLabel: t("folderType"),
+      };
+    }
 
-    return rightTime - leftTime;
+    return {
+      kind: "clip",
+      id: item.id,
+      name: item.title,
+      deletedAt: item.deletedAt,
+      typeLabel: `${t("fileType")} · ${getClipTypeLabel(item.type, t)}`,
+      clipType: item.type,
+      parentFolderName:
+        folderNameById.get(item.folderId) ?? t("unknownParentFolder"),
+    };
   });
+  const isClearingAll = pendingActionKey === "trash-clear-all";
+  const isDeletingSelected = pendingActionKey === "trash-delete-selected";
+  const rowKey = (row: TrashItemRow) => `${row.kind}-${row.id}`;
+  const selectedRows = rows.filter((row) => selectedRowKeys.has(rowKey(row)));
+
+  const handleToggleRow = (row: TrashItemRow) => {
+    setSelectedRowKeys((currentKeys) => {
+      const nextKeys = new Set(currentKeys);
+      const key = rowKey(row);
+
+      if (nextKeys.has(key)) {
+        nextKeys.delete(key);
+      } else {
+        nextKeys.add(key);
+      }
+
+      return nextKeys;
+    });
+  };
+
+  const handleToggleAllRows = () => {
+    setSelectedRowKeys((currentKeys) => {
+      const areAllRowsSelected =
+        rows.length > 0 && rows.every((row) => currentKeys.has(rowKey(row)));
+
+      if (areAllRowsSelected) {
+        return new Set();
+      }
+
+      return new Set(rows.map(rowKey));
+    });
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedRows.length === 0) {
+      return;
+    }
+
+    await handleDeleteItems(
+      selectedRows.map((row) => ({
+        itemType: row.kind === "clip" ? "CLIP" : "FOLDER",
+        id: row.id,
+      })),
+    );
+    setSelectedRowKeys(new Set());
+  };
 
   return (
     <div className="bg-background flex h-full min-h-0 flex-col overflow-hidden">
-      <TrashPageHeader />
+      <TrashPageHeader
+        count={rows.length}
+        selectedCount={selectedRows.length}
+        isLoading={isLoading}
+        isClearingAll={isClearingAll}
+        isDeletingSelected={isDeletingSelected}
+        onReload={() => {
+          void reload();
+        }}
+        onRequestClearAll={() => setIsClearAllModalOpen(true)}
+        onRequestDeleteSelected={() => setIsDeleteSelectedModalOpen(true)}
+      />
 
       {error ? (
         <div className="px-6 pt-6">
@@ -82,22 +150,22 @@ export function TrashPage() {
         </div>
       ) : null}
 
-      {!isLoading && !hasItems ? (
-        <TrashPageEmptyState />
-      ) : null}
+      {!isLoading && !hasItems ? <TrashPageEmptyState /> : null}
 
       {isLoading || hasItems ? (
-        <div className="flex min-h-0 flex-1 flex-col px-4 py-4 min-[1200px]:px-6">
+        <div className="flex min-h-0 flex-1 flex-col">
           <TrashListSection
             rows={rows}
             isLoading={isLoading}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
             pendingActionKey={pendingActionKey}
-            onReload={() => {
-              void reload();
+            selectedRowKeys={selectedRowKeys}
+            onFetchNextPage={() => {
+              void fetchNextPage();
             }}
-            onClearAll={() => {
-              void handleClearAll();
-            }}
+            onToggleRow={handleToggleRow}
+            onToggleAllRows={handleToggleAllRows}
             onRestoreFolder={(folderId) => {
               void handleRestoreFolder(folderId);
             }}
@@ -113,6 +181,34 @@ export function TrashPage() {
           />
         </div>
       ) : null}
+
+      <DeleteAllClipsModal
+        isOpen={isClearAllModalOpen}
+        title={t("clearAllModal.title")}
+        description={t("clearAllModal.description")}
+        cancelLabel={t("cancel")}
+        confirmLabel={t("clearAll")}
+        onCancel={() => setIsClearAllModalOpen(false)}
+        onConfirm={() => {
+          setIsClearAllModalOpen(false);
+          void handleClearAll();
+        }}
+      />
+
+      <DeleteAllClipsModal
+        isOpen={isDeleteSelectedModalOpen}
+        title={t("deleteSelectedModal.title", { count: selectedRows.length })}
+        description={t("deleteSelectedModal.description", {
+          count: selectedRows.length,
+        })}
+        cancelLabel={t("cancel")}
+        confirmLabel={t("deleteSelected")}
+        onCancel={() => setIsDeleteSelectedModalOpen(false)}
+        onConfirm={() => {
+          setIsDeleteSelectedModalOpen(false);
+          void handleDeleteSelected();
+        }}
+      />
     </div>
   );
 }

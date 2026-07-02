@@ -1,18 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { HiOutlineRefresh } from "react-icons/hi";
-import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
+import { useInView } from "react-intersection-observer";
 import { TrashListRow } from "@/features/trash/ui/TrashListRow";
 import { TrashItemRow } from "@/features/trash/ui/trashRow";
 
 interface TrashListSectionProps {
   rows: TrashItemRow[];
   isLoading?: boolean;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
   pendingActionKey: string | null;
-  onReload: () => void;
-  onClearAll: () => void;
+  selectedRowKeys: Set<string>;
+  onFetchNextPage?: () => void;
+  onToggleRow: (row: TrashItemRow) => void;
+  onToggleAllRows: () => void;
   onRestoreFolder: (folderId: string) => void;
   onDeleteFolder: (folderId: string) => void;
   onRestoreClip: (clipId: string) => void;
@@ -23,103 +26,108 @@ interface TrashListSectionProps {
 export function TrashListSection({
   rows,
   isLoading = false,
+  hasNextPage = false,
+  isFetchingNextPage = false,
   pendingActionKey,
-  onReload,
-  onClearAll,
+  selectedRowKeys,
+  onFetchNextPage,
+  onToggleRow,
+  onToggleAllRows,
   onRestoreFolder,
   onDeleteFolder,
   onRestoreClip,
   onDeleteClip,
 }: TrashListSectionProps) {
   const t = useTranslations("trash");
-  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
   const skeletonRows = Array.from({ length: 6 }, (_, index) => index);
+  const hasTriggeredInViewRef = useRef(false);
+  const { ref: loadMoreRef, inView } = useInView({
+    rootMargin: "240px 0px",
+  });
+  const allRowsSelected =
+    rows.length > 0 &&
+    rows.every((row) => selectedRowKeys.has(`${row.kind}-${row.id}`));
+
+  useEffect(() => {
+    if (!inView) {
+      hasTriggeredInViewRef.current = false;
+      return;
+    }
+
+    if (!hasNextPage || isFetchingNextPage || isLoading || !onFetchNextPage) {
+      return;
+    }
+
+    if (hasTriggeredInViewRef.current) {
+      return;
+    }
+
+    hasTriggeredInViewRef.current = true;
+    onFetchNextPage();
+  }, [hasNextPage, inView, isFetchingNextPage, isLoading, onFetchNextPage]);
 
   return (
-    <>
-      <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface)">
-        <div className="flex items-center justify-between gap-3 border-b border-(--border) px-4 py-4">
-          <div>
-            <h2 className="text-base font-semibold text-(--foreground)">
-              {t("listTitle")}
-            </h2>
-            <p className="text-sm text-(--muted)">
-              {isLoading ? t("loading") : t("totalCount", { count: rows.length })}
-            </p>
+    <section className="flex min-h-0 flex-1 flex-col overflow-hidden bg-(--surface)">
+      <div className="flex items-center justify-between border-y border-(--border) bg-(--surface-muted) px-4 py-3 min-[1200px]:hidden">
+        <label className="flex min-w-0 items-center gap-3 text-sm font-medium text-(--foreground)">
+          <input
+            type="checkbox"
+            checked={allRowsSelected}
+            disabled={isLoading || rows.length === 0}
+            onChange={onToggleAllRows}
+            className="h-4 w-4 cursor-pointer rounded border-(--border) accent-(--primary) disabled:cursor-default"
+          />
+          <span>{t("selectAll")}</span>
+        </label>
+      </div>
+
+      <div className="hidden grid-cols-[2rem_minmax(0,1.5fr)_180px_220px_220px] items-center gap-4 border-y border-(--border) bg-(--surface-muted) px-4 py-3 text-xs font-semibold tracking-wide text-(--muted) uppercase min-[1200px]:grid min-[1200px]:px-6">
+        <input
+          type="checkbox"
+          checked={allRowsSelected}
+          disabled={isLoading || rows.length === 0}
+          onChange={onToggleAllRows}
+          className="h-4 w-4 cursor-pointer rounded border-(--border) accent-(--primary) disabled:cursor-default"
+          aria-label={t("selectAll")}
+        />
+        <span>{t("columns.name")}</span>
+        <span>{t("columns.type")}</span>
+        <span>{t("columns.deletedAt")}</span>
+        <span>{t("columns.actions")}</span>
+      </div>
+
+      <div className="clip-scrollbar min-h-0 flex-1 divide-y divide-(--border) overflow-y-auto">
+        {isLoading
+          ? skeletonRows.map((row) => <TrashListSkeletonRow key={row} />)
+          : rows.map((row) => (
+              <TrashListRow
+                key={`${row.kind}-${row.id}`}
+                row={row}
+                isSelected={selectedRowKeys.has(`${row.kind}-${row.id}`)}
+                pendingActionKey={pendingActionKey}
+                onToggleSelected={onToggleRow}
+                onRestoreFolder={onRestoreFolder}
+                onDeleteFolder={onDeleteFolder}
+                onRestoreClip={onRestoreClip}
+                onDeleteClip={onDeleteClip}
+              />
+            ))}
+
+        {!isLoading ? (
+          <div ref={loadMoreRef}>
+            {isFetchingNextPage ? <TrashListSkeletonRow /> : null}
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              disabled={
-                isLoading ||
-                !rows.length ||
-                pendingActionKey === "trash-clear-all"
-              }
-              onClick={() => setIsClearAllModalOpen(true)}
-              className="cursor-pointer rounded-lg bg-red-500/15 px-4 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500/25 disabled:cursor-default disabled:opacity-50"
-            >
-              {t("clearAll")}
-            </button>
-            <button
-              type="button"
-              disabled={isLoading}
-              onClick={onReload}
-              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-(--border) text-(--foreground) transition hover:bg-(--surface) disabled:cursor-default disabled:opacity-50"
-              aria-label={t("refresh")}
-              title={t("refresh")}
-            >
-              <HiOutlineRefresh className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
-        </div>
-
-        <div className="hidden grid-cols-[minmax(0,1.5fr)_180px_220px_220px] items-center gap-4 border-b border-(--border) bg-(--surface-elevated) px-4 py-3 text-xs font-semibold tracking-wide text-(--muted) uppercase min-[1200px]:grid">
-          <span>{t("columns.name")}</span>
-          <span>{t("columns.type")}</span>
-          <span>{t("columns.deletedAt")}</span>
-          <span>{t("columns.actions")}</span>
-        </div>
-
-        <div className="clip-scrollbar min-h-0 flex-1 divide-y divide-(--border) overflow-y-auto">
-          {isLoading
-            ? skeletonRows.map((row) => <TrashListSkeletonRow key={row} />)
-            : rows.map((row) => (
-                <TrashListRow
-                  key={`${row.kind}-${row.id}`}
-                  row={row}
-                  pendingActionKey={pendingActionKey}
-                  onRestoreFolder={onRestoreFolder}
-                  onDeleteFolder={onDeleteFolder}
-                  onRestoreClip={onRestoreClip}
-                  onDeleteClip={onDeleteClip}
-                />
-              ))}
-        </div>
-      </section>
-
-      <DeleteAllClipsModal
-        isOpen={isClearAllModalOpen}
-        title={t("clearAllModal.title")}
-        description={t("clearAllModal.description")}
-        cancelLabel={t("cancel")}
-        confirmLabel={t("clearAll")}
-        onCancel={() => setIsClearAllModalOpen(false)}
-        onConfirm={() => {
-          setIsClearAllModalOpen(false);
-          onClearAll();
-        }}
-      />
-    </>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
 function TrashListSkeletonRow() {
   return (
-    <article
-      className="px-4 py-4"
-      aria-hidden
-    >
-      <div className="flex flex-col gap-3 min-[1200px]:grid min-[1200px]:grid-cols-[minmax(0,1.5fr)_180px_220px_220px] min-[1200px]:items-center min-[1200px]:gap-4">
+    <article className="px-4 py-4 min-[1200px]:px-6" aria-hidden>
+      <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 min-[1200px]:grid-cols-[2rem_minmax(0,1.5fr)_180px_220px_220px] min-[1200px]:items-center min-[1200px]:gap-4">
+        <div className="mt-3 h-4 w-4 rounded border border-(--border) min-[1200px]:mt-0" />
         <div className="flex min-w-0 items-center gap-3">
           <div className="skeleton-shimmer h-10 w-10 shrink-0 rounded-xl" />
           <div className="min-w-0 flex-1 space-y-2">
@@ -128,9 +136,9 @@ function TrashListSkeletonRow() {
           </div>
         </div>
 
-        <div className="skeleton-shimmer h-7 w-24 rounded-full" />
-        <div className="skeleton-shimmer h-4 w-32 rounded-md" />
-        <div className="flex flex-wrap justify-end gap-2 min-[1200px]:justify-start">
+        <div className="skeleton-shimmer col-start-2 h-7 w-24 rounded-full min-[1200px]:col-start-auto" />
+        <div className="skeleton-shimmer col-start-2 h-4 w-32 rounded-md min-[1200px]:col-start-auto" />
+        <div className="col-start-2 flex flex-wrap justify-end gap-2 min-[1200px]:col-start-auto min-[1200px]:justify-start">
           <div className="skeleton-shimmer h-8 w-16 rounded-lg" />
           <div className="skeleton-shimmer h-8 w-20 rounded-lg" />
         </div>

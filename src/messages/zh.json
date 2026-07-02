@@ -106,10 +106,19 @@
     "retentionNotice": "最多保留 30 天",
     "description": "查看已删除的剪贴内容和文件夹，并可执行恢复或永久删除。",
     "refresh": "刷新",
-    "clearAll": "清空回收站",
+    "clearAll": "全部删除",
+    "clearing": "正在清空回收站。",
+    "clearingAction": "清空中",
+    "deleteSelected": "删除所选",
+    "deletingSelected": "正在删除所选项目。",
+    "deletingSelectedAction": "删除中",
+    "selectedCount": "{count, plural, =0 {未选择} other {已选择 # 个}}",
+    "selectAll": "选择所有回收站项目",
+    "selectItem": "选择 {name}",
     "cancel": "取消",
     "loading": "正在加载回收站内容。",
     "error": "无法加载回收站数据。请稍后再试。",
+    "clearAllPartialError": "部分项目未能删除。失败 {failedCount} 个 / 共 {totalCount} 个。",
     "emptyTitle": "回收站为空",
     "emptyDescription": "删除的剪贴内容或文件夹会显示在这里。",
     "listTitle": "已删除项目",
@@ -130,8 +139,12 @@
       "actions": "操作"
     },
     "clearAllModal": {
-      "title": "清空回收站",
+      "title": "删除全部回收站项目",
       "description": "确定要永久删除回收站中的全部项目吗？"
+    },
+    "deleteSelectedModal": {
+      "title": "删除所选项目",
+      "description": "确定要永久删除所选的 {count, plural, other {# 个项目}}吗？"
     },
     "clipsTitle": "已删除剪贴内容",
     "clipsCount": "{count, plural, =0 {0 个剪贴项} other {# 个剪贴项}}",
@@ -141,7 +154,7 @@
     "foldersEmpty": "没有已删除的文件夹。",
     "deletedAt": "删除时间",
     "restore": "恢复",
-    "deleteForever": "永久删除"
+    "deleteForever": "删除"
   },
   "clips": {
     "count": "{count, plural, =0 {0 个剪贴项} other {# 个剪贴项}}",

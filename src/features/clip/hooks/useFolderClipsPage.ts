@@ -9,6 +9,7 @@ import {
   likeClip,
   recordClipView,
   removeClip,
+  removeClips,
   unlikeClip,
 } from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
@@ -408,7 +409,7 @@ export const useFolderClipsPage = () => {
     setIsDeleteAllOpen(false);
 
     try {
-      await Promise.all(clipIds.map((clipId) => removeClip(clipId)));
+      await removeClips({ clipIds });
     } catch {
       rollbackDeletedClips();
       notifyError("클립 전체 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
