@@ -41,16 +41,21 @@ export function TrashPage() {
     isLoading,
     isFetchingNextPage,
     error,
-    hasItems,
     pendingActionKey,
     reload,
     handleRestoreClip,
+    handleRestoreItems,
     handleDeleteClip,
     handleDeleteItems,
     handleRestoreFolder,
     handleDeleteFolder,
     handleClearAll,
   } = useTrashPage();
+  const deletedFolderIds = new Set(
+    items
+      .filter((item) => item.itemType === "FOLDER")
+      .map((folder) => folder.id),
+  );
   const folderNameById = new Map([
     ...activeFolders.map((folder) => [folder.id, folder.name] as const),
     ...items
@@ -58,32 +63,45 @@ export function TrashPage() {
       .map((folder) => [folder.id, folder.name] as const),
   ]);
 
-  const rows: TrashItemRow[] = items.map((item) => {
-    if (item.itemType === "FOLDER") {
-      return {
-        kind: "folder",
-        id: item.id,
-        name: item.name,
-        deletedAt: item.deletedAt,
-        typeLabel: t("folderType"),
-      };
-    }
+  const rows: TrashItemRow[] = items
+    .filter(
+      (item) =>
+        item.itemType === "FOLDER" || !deletedFolderIds.has(item.folderId),
+    )
+    .map((item) => {
+      if (item.itemType === "FOLDER") {
+        return {
+          kind: "folder",
+          id: item.id,
+          name: item.name,
+          deletedAt: item.deletedAt,
+          typeLabel: t("folderType"),
+        };
+      }
 
-    return {
-      kind: "clip",
-      id: item.id,
-      name: item.title,
-      deletedAt: item.deletedAt,
-      typeLabel: `${t("fileType")} · ${getClipTypeLabel(item.type, t)}`,
-      clipType: item.type,
-      parentFolderName:
-        folderNameById.get(item.folderId) ?? t("unknownParentFolder"),
-    };
-  });
+      return {
+        kind: "clip",
+        id: item.id,
+        name: item.title,
+        deletedAt: item.deletedAt,
+        typeLabel: `${t("fileType")} · ${getClipTypeLabel(item.type, t)}`,
+        clipType: item.type,
+        parentFolderName:
+          folderNameById.get(item.folderId) ?? t("unknownParentFolder"),
+      };
+    });
   const isClearingAll = pendingActionKey === "trash-clear-all";
+  const isRestoringSelected = pendingActionKey === "trash-restore-selected";
   const isDeletingSelected = pendingActionKey === "trash-delete-selected";
   const rowKey = (row: TrashItemRow) => `${row.kind}-${row.id}`;
   const selectedRows = rows.filter((row) => selectedRowKeys.has(rowKey(row)));
+  const hasRows = rows.length > 0;
+  const errorMessage =
+    error === "restoreConflict"
+      ? t("restoreConflictError")
+      : error === "action"
+        ? t("actionError")
+        : t("error");
 
   const handleToggleRow = (row: TrashItemRow) => {
     setSelectedRowKeys((currentKeys) => {
@@ -118,13 +136,33 @@ export function TrashPage() {
       return;
     }
 
-    await handleDeleteItems(
+    const isDeleted = await handleDeleteItems(
       selectedRows.map((row) => ({
         itemType: row.kind === "clip" ? "CLIP" : "FOLDER",
         id: row.id,
       })),
     );
-    setSelectedRowKeys(new Set());
+
+    if (isDeleted) {
+      setSelectedRowKeys(new Set());
+    }
+  };
+
+  const handleRestoreSelected = async () => {
+    if (selectedRows.length === 0) {
+      return;
+    }
+
+    const isRestored = await handleRestoreItems(
+      selectedRows.map((row) => ({
+        itemType: row.kind === "clip" ? "CLIP" : "FOLDER",
+        id: row.id,
+      })),
+    );
+
+    if (isRestored) {
+      setSelectedRowKeys(new Set());
+    }
   };
 
   return (
@@ -134,25 +172,29 @@ export function TrashPage() {
         selectedCount={selectedRows.length}
         isLoading={isLoading}
         isClearingAll={isClearingAll}
+        isRestoringSelected={isRestoringSelected}
         isDeletingSelected={isDeletingSelected}
         onReload={() => {
           void reload();
         }}
         onRequestClearAll={() => setIsClearAllModalOpen(true)}
+        onRestoreSelected={() => {
+          void handleRestoreSelected();
+        }}
         onRequestDeleteSelected={() => setIsDeleteSelectedModalOpen(true)}
       />
 
       {error ? (
         <div className="px-6 pt-6">
-          <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-            {t("error")}
+          <p className="rounded-xl border border-(--danger-border) bg-(--danger-surface) px-4 py-3 text-sm text-(--danger-text)">
+            {errorMessage}
           </p>
         </div>
       ) : null}
 
-      {!isLoading && !hasItems ? <TrashPageEmptyState /> : null}
+      {!isLoading && !hasRows ? <TrashPageEmptyState /> : null}
 
-      {isLoading || hasItems ? (
+      {isLoading || hasRows ? (
         <div className="flex min-h-0 flex-1 flex-col">
           <TrashListSection
             rows={rows}
