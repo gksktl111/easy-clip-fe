@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { CLIP_QUERY_KEY } from "@/features/clip/hooks/useInfiniteClips";
@@ -36,6 +36,7 @@ export const useTrashPage = () => {
   const { folders: activeFolders } = useFolders();
   const [actionError, setActionError] = useState<TrashPageError | null>(null);
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
+  const pendingActionKeyRef = useRef<string | null>(null);
 
   const trashItemsQuery = useInfiniteQuery({
     queryKey: TRASH_QUERY_KEYS.items(userId),
@@ -70,6 +71,11 @@ export const useTrashPage = () => {
 
   const runAction = useCallback(
     async (actionKey: string, action: () => Promise<unknown>) => {
+      if (pendingActionKeyRef.current) {
+        return false;
+      }
+
+      pendingActionKeyRef.current = actionKey;
       setPendingActionKey(actionKey);
       setActionError(null);
 
@@ -89,6 +95,7 @@ export const useTrashPage = () => {
         await refreshRelatedData().catch(() => undefined);
         return false;
       } finally {
+        pendingActionKeyRef.current = null;
         setPendingActionKey(null);
       }
     },

@@ -30,8 +30,6 @@ export function TrashPage() {
   const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
   const [isDeleteSelectedModalOpen, setIsDeleteSelectedModalOpen] =
     useState(false);
-  const [isRestoreConflictPreviewVisible, setIsRestoreConflictPreviewVisible] =
-    useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Set<string>>(
     () => new Set(),
   );
@@ -95,12 +93,12 @@ export function TrashPage() {
   const isClearingAll = pendingActionKey === "trash-clear-all";
   const isRestoringSelected = pendingActionKey === "trash-restore-selected";
   const isDeletingSelected = pendingActionKey === "trash-delete-selected";
+  const isActionPending = pendingActionKey !== null;
   const rowKey = (row: TrashItemRow) => `${row.kind}-${row.id}`;
   const selectedRows = rows.filter((row) => selectedRowKeys.has(rowKey(row)));
   const hasRows = rows.length > 0;
-  const shouldShowError = Boolean(error) || isRestoreConflictPreviewVisible;
   const errorMessage =
-    isRestoreConflictPreviewVisible || error === "restoreConflict"
+    error === "restoreConflict"
       ? t("restoreConflictError")
       : error === "action"
         ? t("actionError")
@@ -174,6 +172,7 @@ export function TrashPage() {
         count={rows.length}
         selectedCount={selectedRows.length}
         isLoading={isLoading}
+        isActionPending={isActionPending}
         isClearingAll={isClearingAll}
         isRestoringSelected={isRestoringSelected}
         isDeletingSelected={isDeletingSelected}
@@ -187,7 +186,7 @@ export function TrashPage() {
         onRequestDeleteSelected={() => setIsDeleteSelectedModalOpen(true)}
       />
 
-      {shouldShowError ? (
+      {error ? (
         <div className="p-6 pt-6">
           <p className="rounded-xl border border-(--danger-border) bg-(--danger-surface) px-4 py-3 text-sm text-(--danger-text)">
             {errorMessage}

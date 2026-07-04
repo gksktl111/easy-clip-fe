@@ -38,9 +38,7 @@ export function TrashListRow({
       : `clip-restore-${row.id}`;
   const deleteActionKey =
     row.kind === "folder" ? `folder-delete-${row.id}` : `clip-delete-${row.id}`;
-  const isBulkActionPending = pendingActionKey === "trash-clear-all";
-  const isSelectedActionPending = pendingActionKey === "trash-delete-selected";
-  const areActionsDisabled = isBulkActionPending || isSelectedActionPending;
+  const areActionsDisabled = pendingActionKey !== null;
 
   return (
     <article className="px-4 py-4 transition-colors hover:bg-(--surface-elevated) min-[1200px]:px-6">

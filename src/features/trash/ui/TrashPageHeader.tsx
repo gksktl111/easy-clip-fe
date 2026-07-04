@@ -7,6 +7,7 @@ interface TrashPageHeaderProps {
   count: number;
   selectedCount?: number;
   isLoading?: boolean;
+  isActionPending?: boolean;
   isClearingAll?: boolean;
   isRestoringSelected?: boolean;
   isDeletingSelected?: boolean;
@@ -21,6 +22,7 @@ export function TrashPageHeader({
   count,
   selectedCount = 0,
   isLoading = false,
+  isActionPending = false,
   isClearingAll = false,
   isRestoringSelected = false,
   isDeletingSelected = false,
@@ -31,6 +33,7 @@ export function TrashPageHeader({
 }: TrashPageHeaderProps) {
   const t = useTranslations("trash");
   const hasSelection = selectedCount > 0;
+  const areControlsDisabled = isLoading || isActionPending;
 
   return (
     <div className="border-b border-(--border) px-4 py-6 min-[1200px]:px-6">
@@ -73,7 +76,7 @@ export function TrashPageHeader({
                 <button
                   type="button"
                   disabled={
-                    isLoading ||
+                    areControlsDisabled ||
                     isRestoringSelected ||
                     isDeletingSelected ||
                     isClearingAll
@@ -91,7 +94,7 @@ export function TrashPageHeader({
                 <button
                   type="button"
                   disabled={
-                    isLoading ||
+                    areControlsDisabled ||
                     isRestoringSelected ||
                     isDeletingSelected ||
                     isClearingAll
@@ -111,7 +114,7 @@ export function TrashPageHeader({
             <button
               type="button"
               disabled={
-                isLoading ||
+                areControlsDisabled ||
                 count === 0 ||
                 isClearingAll ||
                 isRestoringSelected ||
@@ -127,7 +130,7 @@ export function TrashPageHeader({
             </button>
             <button
               type="button"
-              disabled={isLoading || isRestoringSelected || isDeletingSelected}
+              disabled={areControlsDisabled}
               onClick={onReload}
               className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-(--border) text-(--foreground) transition-colors duration-150 ease-out hover:bg-(--surface-muted) disabled:cursor-default disabled:opacity-45"
               aria-label={t("refresh")}
