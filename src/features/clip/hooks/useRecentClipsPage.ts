@@ -71,11 +71,9 @@ export const useRecentClipsPage = () => {
     isFetchingNextPage,
     isLoading: isPending,
     searchQuery,
-    hasClips: clips.length > 0,
     refetchClips: refetch,
     setActiveFilter,
     setSearchQuery,
-    clearAll: () => undefined,
     handleCopy,
   };
 };

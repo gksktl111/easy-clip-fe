@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   createImageClip,
   createTextClip,
+  fetchClips,
   likeClip,
   recordClipView,
   removeClip,
@@ -109,6 +110,11 @@ export const useFolderClipsPage = () => {
     y: number;
   } | null>(null);
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [isDeletingClips, setIsDeletingClips] = useState(false);
+  const [selectedClipIds, setSelectedClipIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const { copyToast, showCopyToast } = useCopyToast();
   const {
     clips,
@@ -136,6 +142,18 @@ export const useFolderClipsPage = () => {
     window.addEventListener("blur", handleBlur);
     return () => window.removeEventListener("blur", handleBlur);
   }, []);
+
+  useEffect(() => {
+    const availableClipIds = new Set(clips.map((clip) => clip.id));
+
+    setSelectedClipIds((currentIds) => {
+      const nextIds = new Set(
+        [...currentIds].filter((clipId) => availableClipIds.has(clipId)),
+      );
+
+      return nextIds.size === currentIds.size ? currentIds : nextIds;
+    });
+  }, [clips]);
 
   useEffect(() => {
     if (!contextMenu) {
@@ -166,6 +184,10 @@ export const useFolderClipsPage = () => {
 
   const createTextClipFromPaste = useCallback(
     async (content: string) => {
+      if (isDeleteMode || isDeletingClips) {
+        return;
+      }
+
       const trimmed = content.trim();
       if (!trimmed || !folderId || !isAuthenticated) {
         return;
@@ -199,11 +221,22 @@ export const useFolderClipsPage = () => {
         void refreshClipQueries();
       }
     },
-    [folderId, isAuthenticated, queryClient, refreshClipQueries],
+    [
+      folderId,
+      isAuthenticated,
+      isDeleteMode,
+      isDeletingClips,
+      queryClient,
+      refreshClipQueries,
+    ],
   );
 
   const createImageClipFromPaste = useCallback(
     async (file: File) => {
+      if (isDeleteMode || isDeletingClips) {
+        return;
+      }
+
       if (!folderId || !isAuthenticated) {
         return;
       }
@@ -251,7 +284,14 @@ export const useFolderClipsPage = () => {
         void refreshClipQueries();
       }
     },
-    [folderId, isAuthenticated, queryClient, refreshClipQueries],
+    [
+      folderId,
+      isAuthenticated,
+      isDeleteMode,
+      isDeletingClips,
+      queryClient,
+      refreshClipQueries,
+    ],
   );
 
   useEffect(() => {
@@ -293,6 +333,10 @@ export const useFolderClipsPage = () => {
 
   const handleCopy = useCallback(
     async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
+      if (isDeleteMode || isDeletingClips) {
+        return;
+      }
+
       try {
         await copyClipToClipboard(clip);
       } catch {
@@ -308,11 +352,22 @@ export const useFolderClipsPage = () => {
         void refreshClipQueries();
       }
     },
-    [isAuthenticated, queryClient, refreshClipQueries, showCopyToast],
+    [
+      isAuthenticated,
+      isDeleteMode,
+      isDeletingClips,
+      queryClient,
+      refreshClipQueries,
+      showCopyToast,
+    ],
   );
 
   const handleCopyFromMenu = useCallback(
     async (clip: Clip) => {
+      if (isDeleteMode || isDeletingClips) {
+        return;
+      }
+
       try {
         await copyClipToClipboard(clip);
       } catch {
@@ -328,12 +383,12 @@ export const useFolderClipsPage = () => {
 
       setContextMenu(null);
     },
-    [isAuthenticated, queryClient, refreshClipQueries],
+    [isAuthenticated, isDeleteMode, isDeletingClips, queryClient, refreshClipQueries],
   );
 
   const handleToggleFavorite = useCallback(
     async (clip: Clip) => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated || isDeleteMode || isDeletingClips) {
         return;
       }
 
@@ -356,27 +411,39 @@ export const useFolderClipsPage = () => {
         void refreshClipQueries();
       }
     },
-    [isAuthenticated, queryClient, refreshClipQueries],
+    [
+      isAuthenticated,
+      isDeleteMode,
+      isDeletingClips,
+      queryClient,
+      refreshClipQueries,
+    ],
   );
 
   const handleOpenContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => {
       event.preventDefault();
+
+      if (isDeleteMode || isDeletingClips) {
+        return;
+      }
+
       setContextMenu({
         id: clip.id,
         x: event.clientX,
         y: event.clientY,
       });
     },
-    [],
+    [isDeleteMode, isDeletingClips],
   );
 
   const handleDeleteClip = useCallback(
     async (clipId: string) => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated || isDeletingClips) {
         return;
       }
 
+      setIsDeletingClips(true);
       await cancelClipQueries(queryClient);
       const rollbackDeletedClip = removeClipsFromCache(queryClient, [clipId]);
       setContextMenu(null);
@@ -387,36 +454,164 @@ export const useFolderClipsPage = () => {
         rollbackDeletedClip();
         notifyError("클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
       } finally {
+        setIsDeletingClips(false);
         void refreshClipQueries();
       }
     },
-    [isAuthenticated, queryClient, refreshClipQueries],
+    [isAuthenticated, isDeletingClips, queryClient, refreshClipQueries],
   );
 
-  const handleDeleteAll = useCallback(async () => {
-    if (!isAuthenticated) {
+  const deleteClipsByIds = useCallback(
+    async (clipIds: string[], errorMessage: string) => {
+      if (!isAuthenticated || isDeletingClips) {
+        return false;
+      }
+
+      const uniqueClipIds = [...new Set(clipIds)];
+      if (uniqueClipIds.length === 0) {
+        return false;
+      }
+
+      setIsDeletingClips(true);
+      await cancelClipQueries(queryClient);
+      const rollbackDeletedClips = removeClipsFromCache(queryClient, uniqueClipIds);
+
+      try {
+        await removeClips({ clipIds: uniqueClipIds });
+        return true;
+      } catch {
+        rollbackDeletedClips();
+        notifyError(errorMessage);
+        return false;
+      } finally {
+        setIsDeletingClips(false);
+        void refreshClipQueries();
+      }
+    },
+    [isAuthenticated, isDeletingClips, queryClient, refreshClipQueries],
+  );
+
+  const fetchAllFolderClipIds = useCallback(async () => {
+    const clipIds: string[] = [];
+    let cursor: string | null = null;
+
+    do {
+      const response = await fetchClips({
+        folderId,
+        type: "ALL",
+        cursor,
+      });
+
+      clipIds.push(...response.items.map((clip) => clip.id));
+      cursor = response.hasMore ? response.nextCursor : null;
+    } while (cursor);
+
+    return clipIds;
+  }, [folderId]);
+
+  const handleEnterDeleteMode = useCallback(() => {
+    if (!isAuthenticated || clips.length === 0 || isDeletingClips) {
       return;
     }
 
-    const clipIds = clips.map((clip) => clip.id);
+    setContextMenu(null);
+    setIsActive(false);
+    setIsDeleteMode(true);
+    setSelectedClipIds(new Set());
+  }, [clips.length, isAuthenticated, isDeletingClips]);
+
+  const handleCancelDeleteMode = useCallback(() => {
+    if (isDeletingClips) {
+      return;
+    }
+
+    setIsDeleteMode(false);
+    setSelectedClipIds(new Set());
+  }, [isDeletingClips]);
+
+  const handleToggleClipSelected = useCallback(
+    (clipId: string) => {
+      if (!isDeleteMode || isDeletingClips) {
+        return;
+      }
+
+      setSelectedClipIds((currentIds) => {
+        const nextIds = new Set(currentIds);
+
+        if (nextIds.has(clipId)) {
+          nextIds.delete(clipId);
+        } else {
+          nextIds.add(clipId);
+        }
+
+        return nextIds;
+      });
+    },
+    [isDeleteMode, isDeletingClips],
+  );
+
+  const handleDeleteSelected = useCallback(async () => {
+    const clipIds = [...selectedClipIds];
     if (clipIds.length === 0) {
-      setIsDeleteAllOpen(false);
       return;
     }
 
-    await cancelClipQueries(queryClient);
-    const rollbackDeletedClips = removeClipsFromCache(queryClient, clipIds);
+    const isDeleted = await deleteClipsByIds(
+      clipIds,
+      "선택한 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    );
+
+    if (isDeleted) {
+      setSelectedClipIds(new Set());
+      setIsDeleteMode(false);
+    }
+  }, [deleteClipsByIds, selectedClipIds]);
+
+  const handleDeleteAll = useCallback(async () => {
+    if (!isAuthenticated || isDeletingClips || !folderId) {
+      return;
+    }
+
     setIsDeleteAllOpen(false);
+    setIsDeletingClips(true);
 
     try {
-      await removeClips({ clipIds });
+      const clipIds = await fetchAllFolderClipIds();
+
+      if (clipIds.length === 0) {
+        setIsDeleteMode(false);
+        setSelectedClipIds(new Set());
+        return;
+      }
+
+      const uniqueClipIds = [...new Set(clipIds)];
+      await cancelClipQueries(queryClient);
+      const rollbackDeletedClips = removeClipsFromCache(queryClient, uniqueClipIds);
+
+      try {
+        await removeClips({ clipIds: uniqueClipIds });
+        setSelectedClipIds(new Set());
+        setIsDeleteMode(false);
+      } catch {
+        rollbackDeletedClips();
+        notifyError(
+          "현재 폴더의 모든 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        );
+      }
     } catch {
-      rollbackDeletedClips();
-      notifyError("클립 전체 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      notifyError("현재 폴더의 모든 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
+      setIsDeletingClips(false);
       void refreshClipQueries();
     }
-  }, [clips, isAuthenticated, queryClient, refreshClipQueries]);
+  }, [
+    fetchAllFolderClipIds,
+    folderId,
+    isAuthenticated,
+    isDeletingClips,
+    queryClient,
+    refreshClipQueries,
+  ]);
 
   return {
     activeFilter,
@@ -429,6 +624,8 @@ export const useFolderClipsPage = () => {
     hasNextPage: Boolean(hasNextPage),
     isActive,
     isDeleteAllOpen,
+    isDeleteMode,
+    isDeletingClips,
     isError,
     isFetchingNextPage,
     isLoading: isPending,
@@ -439,11 +636,17 @@ export const useFolderClipsPage = () => {
     setIsActive,
     setIsDeleteAllOpen,
     setSearchQuery,
+    selectedClipCount: selectedClipIds.size,
+    selectedClipIds,
     handleCopy,
     handleCopyFromMenu,
+    handleCancelDeleteMode,
     handleDeleteAll,
     handleDeleteClip,
+    handleDeleteSelected,
+    handleEnterDeleteMode,
     handleOpenContextMenu,
+    handleToggleClipSelected,
     handleToggleFavorite,
   };
 };

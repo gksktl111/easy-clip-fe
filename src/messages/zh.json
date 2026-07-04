@@ -185,19 +185,29 @@
     },
     "item": {
       "saving": "保存中",
-      "toggleFavorite": "切换收藏"
+      "toggleFavorite": "切换收藏",
+      "selectForDelete": "选择删除 {name}"
     },
     "actions": {
       "copy": "复制",
       "rename": "重命名",
       "delete": "删除",
+      "deleteClips": "删除剪贴内容",
       "deleteAll": "全部删除",
       "cancel": "取消",
       "change": "保存"
     },
+    "deleteMode": {
+      "title": "删除剪贴内容",
+      "selectedCount": "已选择 {selectedCount} 个 / 当前屏幕 {totalCount} 个",
+      "deleteSelected": "删除所选",
+      "deleteAll": "全部删除",
+      "deleting": "删除中",
+      "cancel": "取消"
+    },
     "deleteModal": {
-      "title": "删除所有剪贴内容",
-      "description": "确定要删除全部剪贴内容吗？"
+      "title": "删除当前文件夹内容",
+      "description": "确定要删除当前文件夹中的全部剪贴内容吗？"
     },
     "renameModal": {
       "title": "重命名",
