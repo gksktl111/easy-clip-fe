@@ -185,19 +185,29 @@
     },
     "item": {
       "saving": "저장 중",
-      "toggleFavorite": "즐겨찾기 전환"
+      "toggleFavorite": "즐겨찾기 전환",
+      "selectForDelete": "{name} 삭제 선택"
     },
     "actions": {
       "copy": "복사",
       "rename": "이름 변경",
       "delete": "삭제",
+      "deleteClips": "클립 삭제",
       "deleteAll": "전체 삭제",
       "cancel": "취소",
       "change": "변경"
     },
+    "deleteMode": {
+      "title": "클립 삭제 모드",
+      "selectedCount": "선택 {selectedCount}개 / 현재 화면 {totalCount}개",
+      "deleteSelected": "삭제하기",
+      "deleteAll": "전체 삭제",
+      "deleting": "삭제 중",
+      "cancel": "취소"
+    },
     "deleteModal": {
-      "title": "모든 클립 삭제",
-      "description": "정말 모든 클립을 삭제하시겠습니까?"
+      "title": "현재 폴더 전체 삭제",
+      "description": "정말 현재 폴더의 모든 클립을 삭제하시겠습니까?"
     },
     "renameModal": {
       "title": "이름 변경",

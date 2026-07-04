@@ -19,6 +19,10 @@ interface ClipResultsSectionProps {
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
   onContextMenu?: (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => void;
+  isDeleteMode?: boolean;
+  isInteractionDisabled?: boolean;
+  selectedClipIds?: Set<string>;
+  onToggleSelected?: (clipId: string) => void;
 }
 
 export function ClipResultsSection({
@@ -32,6 +36,10 @@ export function ClipResultsSection({
   onCopy,
   onToggleFavorite,
   onContextMenu,
+  isDeleteMode = false,
+  isInteractionDisabled = false,
+  selectedClipIds = new Set(),
+  onToggleSelected,
 }: ClipResultsSectionProps) {
   const hasTriggeredInViewRef = useRef(false);
   const { ref, inView } = useInView({
@@ -76,6 +84,10 @@ export function ClipResultsSection({
       onCopy={onCopy}
       onToggleFavorite={onToggleFavorite}
       onContextMenu={onContextMenu}
+      isDeleteMode={isDeleteMode}
+      isInteractionDisabled={isInteractionDisabled}
+      selectedClipIds={selectedClipIds}
+      onToggleSelected={onToggleSelected}
     />
   );
 }
