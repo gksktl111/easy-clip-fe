@@ -30,6 +30,8 @@ export function TrashPage() {
   const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
   const [isDeleteSelectedModalOpen, setIsDeleteSelectedModalOpen] =
     useState(false);
+  const [isRestoreConflictPreviewVisible, setIsRestoreConflictPreviewVisible] =
+    useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Set<string>>(
     () => new Set(),
   );
@@ -96,8 +98,9 @@ export function TrashPage() {
   const rowKey = (row: TrashItemRow) => `${row.kind}-${row.id}`;
   const selectedRows = rows.filter((row) => selectedRowKeys.has(rowKey(row)));
   const hasRows = rows.length > 0;
+  const shouldShowError = Boolean(error) || isRestoreConflictPreviewVisible;
   const errorMessage =
-    error === "restoreConflict"
+    isRestoreConflictPreviewVisible || error === "restoreConflict"
       ? t("restoreConflictError")
       : error === "action"
         ? t("actionError")
@@ -184,8 +187,8 @@ export function TrashPage() {
         onRequestDeleteSelected={() => setIsDeleteSelectedModalOpen(true)}
       />
 
-      {error ? (
-        <div className="px-6 pt-6">
+      {shouldShowError ? (
+        <div className="p-6 pt-6">
           <p className="rounded-xl border border-(--danger-border) bg-(--danger-surface) px-4 py-3 text-sm text-(--danger-text)">
             {errorMessage}
           </p>
