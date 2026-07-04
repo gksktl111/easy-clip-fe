@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useFolderClipsPage } from "@/features/clip/hooks/useFolderClipsPage";
+import { ClipDeleteActionBar } from "@/features/clip/ui/ClipDeleteActionBar";
 import { ClipContextMenu } from "@/features/clip/ui/ClipContextMenu";
 import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
 import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
@@ -23,12 +24,18 @@ export function FolderClipsPage() {
     handleCopyFromMenu,
     handleDeleteAll,
     handleDeleteClip,
+    handleDeleteSelected,
+    handleEnterDeleteMode,
+    handleCancelDeleteMode,
     handleOpenContextMenu,
+    handleToggleClipSelected,
     handleToggleFavorite,
     hasNextPage,
     hasClips,
     isActive,
     isDeleteAllOpen,
+    isDeleteMode,
+    isDeletingClips,
     isError,
     isFetchingNextPage,
     isLoading,
@@ -39,14 +46,18 @@ export function FolderClipsPage() {
     setIsActive,
     setIsDeleteAllOpen,
     setSearchQuery,
+    selectedClipCount,
+    selectedClipIds,
   } = useFolderClipsPage();
   const hasClipLoadError = isError && filteredClips.length === 0;
 
   return (
     <div
-      className="bg-background flex h-full flex-col overflow-hidden"
+      className="bg-background relative flex h-full flex-col overflow-hidden"
       onClick={() => {
-        setIsActive(true);
+        if (!isDeleteMode && !isDeletingClips) {
+          setIsActive(true);
+        }
         setContextMenu(null);
       }}
     >
@@ -78,30 +89,54 @@ export function FolderClipsPage() {
         onCopy={handleCopy}
         onToggleFavorite={handleToggleFavorite}
         onContextMenu={handleOpenContextMenu}
+        isDeleteMode={isDeleteMode}
+        isInteractionDisabled={isDeletingClips}
+        selectedClipIds={selectedClipIds}
+        onToggleSelected={handleToggleClipSelected}
       />
-      {!hasClipLoadError ? (
+      {!hasClipLoadError && !isDeleteMode ? (
         <DeleteAllButton
-          disabled={!hasClips}
-          onClick={() => setIsDeleteAllOpen(true)}
+          disabled={!hasClips || isDeletingClips}
+          label={t("actions.deleteClips")}
+          onClick={handleEnterDeleteMode}
+        />
+      ) : null}
+      {!hasClipLoadError && isDeleteMode ? (
+        <ClipDeleteActionBar
+          selectedCount={selectedClipCount}
+          totalCount={filteredClips.length}
+          isDeleting={isDeletingClips}
+          onCancel={handleCancelDeleteMode}
+          onDeleteSelected={handleDeleteSelected}
+          onRequestDeleteAll={() => setIsDeleteAllOpen(true)}
         />
       ) : null}
 
-      <ClipContextMenu
-        clips={clips}
-        contextMenu={contextMenu}
-        copyLabel={t("actions.copy")}
-        deleteLabel={t("actions.delete")}
-        onCopy={handleCopyFromMenu}
-        onDelete={handleDeleteClip}
-      />
+      {!isDeleteMode ? (
+        <ClipContextMenu
+          clips={clips}
+          contextMenu={contextMenu}
+          copyLabel={t("actions.copy")}
+          deleteLabel={t("actions.delete")}
+          onCopy={handleCopyFromMenu}
+          onDelete={handleDeleteClip}
+        />
+      ) : null}
       <ClipCopyToast label={t("copyToast")} position={copyToast} />
       <DeleteAllClipsModal
         isOpen={isDeleteAllOpen}
         title={t("deleteModal.title")}
         description={t("deleteModal.description")}
         cancelLabel={t("actions.cancel")}
-        confirmLabel={t("actions.delete")}
-        onCancel={() => setIsDeleteAllOpen(false)}
+        confirmLabel={
+          isDeletingClips ? t("deleteMode.deleting") : t("actions.delete")
+        }
+        onCancel={() => {
+          if (!isDeletingClips) {
+            setIsDeleteAllOpen(false);
+          }
+        }}
+        isConfirming={isDeletingClips}
         onConfirm={handleDeleteAll}
       />
     </div>

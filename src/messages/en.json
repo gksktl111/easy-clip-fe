@@ -185,19 +185,29 @@
     },
     "item": {
       "saving": "Saving",
-      "toggleFavorite": "Toggle favorite"
+      "toggleFavorite": "Toggle favorite",
+      "selectForDelete": "Select {name} for deletion"
     },
     "actions": {
       "copy": "Copy",
       "rename": "Rename",
       "delete": "Delete",
+      "deleteClips": "Delete clips",
       "deleteAll": "Delete All",
       "cancel": "Cancel",
       "change": "Save"
     },
+    "deleteMode": {
+      "title": "Delete clips",
+      "selectedCount": "{selectedCount} selected / {totalCount} on screen",
+      "deleteSelected": "Delete selected",
+      "deleteAll": "Delete all",
+      "deleting": "Deleting",
+      "cancel": "Cancel"
+    },
     "deleteModal": {
-      "title": "Delete all clips",
-      "description": "Are you sure you want to delete every clip?"
+      "title": "Delete current folder clips",
+      "description": "Are you sure you want to delete every clip in the current folder?"
     },
     "renameModal": {
       "title": "Rename",

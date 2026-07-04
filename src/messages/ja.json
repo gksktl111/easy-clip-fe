@@ -185,19 +185,29 @@
     },
     "item": {
       "saving": "保存中",
-      "toggleFavorite": "お気に入りを切り替え"
+      "toggleFavorite": "お気に入りを切り替え",
+      "selectForDelete": "{name}を削除対象として選択"
     },
     "actions": {
       "copy": "コピー",
       "rename": "名前を変更",
       "delete": "削除",
+      "deleteClips": "クリップを削除",
       "deleteAll": "すべて削除",
       "cancel": "キャンセル",
       "change": "変更"
     },
+    "deleteMode": {
+      "title": "クリップ削除モード",
+      "selectedCount": "選択 {selectedCount} 件 / 現在の画面 {totalCount} 件",
+      "deleteSelected": "削除する",
+      "deleteAll": "すべて削除",
+      "deleting": "削除中",
+      "cancel": "キャンセル"
+    },
     "deleteModal": {
-      "title": "すべてのクリップを削除",
-      "description": "本当にすべてのクリップを削除しますか？"
+      "title": "現在のフォルダをすべて削除",
+      "description": "本当に現在のフォルダ内のすべてのクリップを削除しますか？"
     },
     "renameModal": {
       "title": "名前を変更",

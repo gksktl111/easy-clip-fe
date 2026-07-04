@@ -10,6 +10,10 @@ interface ClipListProps {
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
   onContextMenu?: (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => void;
+  isDeleteMode?: boolean;
+  isInteractionDisabled?: boolean;
+  selectedClipIds?: Set<string>;
+  onToggleSelected?: (clipId: string) => void;
 }
 
 export function ClipList({
@@ -19,6 +23,10 @@ export function ClipList({
   onCopy,
   onToggleFavorite,
   onContextMenu,
+  isDeleteMode = false,
+  isInteractionDisabled = false,
+  selectedClipIds = new Set(),
+  onToggleSelected,
 }: ClipListProps) {
   if (clips.length === 0) {
     return null;
@@ -34,6 +42,10 @@ export function ClipList({
             onCopy={onCopy}
             onToggleFavorite={onToggleFavorite}
             onContextMenu={onContextMenu}
+            isDeleteMode={isDeleteMode}
+            isInteractionDisabled={isInteractionDisabled}
+            isSelected={selectedClipIds.has(clip.id)}
+            onToggleSelected={onToggleSelected}
           />
         ))}
       </div>
