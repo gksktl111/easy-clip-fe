@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { CLIP_QUERY_KEY } from "@/features/clip/hooks/useInfiniteClips";
+import { FOLDER_QUERY_KEY } from "@/features/folder/hooks/useFolders";
 import { useFolders } from "@/features/folder/hooks/useFolders";
 import {
   deleteAllTrashItems,
@@ -12,8 +14,10 @@ import {
   fetchTrashItems,
   restoreTrashClip,
   restoreTrashFolder,
+  restoreTrashItems,
 } from "@/features/trash/api/trashApi";
 import { TrashItemMutationDto } from "@/features/trash/model/trash.dto";
+import { ApiError } from "@/shared/lib/apiClient";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 const TRASH_QUERY_KEYS = {
@@ -22,14 +26,17 @@ const TRASH_QUERY_KEYS = {
     [...TRASH_QUERY_KEYS.all, "items", userId] as const,
 };
 
+type TrashPageError = "load" | "action" | "restoreConflict";
+
 export const useTrashPage = () => {
   const session = useAuthSession();
   const isAuthenticated = Boolean(session?.user);
   const userId = session?.user?.id ?? null;
   const queryClient = useQueryClient();
   const { folders: activeFolders } = useFolders();
-  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<TrashPageError | null>(null);
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
+  const pendingActionKeyRef = useRef<string | null>(null);
 
   const trashItemsQuery = useInfiniteQuery({
     queryKey: TRASH_QUERY_KEYS.items(userId),
@@ -54,25 +61,45 @@ export const useTrashPage = () => {
     await trashItemsQuery.refetch();
   }, [trashItemsQuery]);
 
-  const refreshTrash = useCallback(async () => {
-    await queryClient.invalidateQueries({ queryKey: TRASH_QUERY_KEYS.all });
+  const refreshRelatedData = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: TRASH_QUERY_KEYS.all }),
+      queryClient.invalidateQueries({ queryKey: [FOLDER_QUERY_KEY] }),
+      queryClient.invalidateQueries({ queryKey: [CLIP_QUERY_KEY] }),
+    ]);
   }, [queryClient]);
 
   const runAction = useCallback(
     async (actionKey: string, action: () => Promise<unknown>) => {
+      if (pendingActionKeyRef.current) {
+        return false;
+      }
+
+      pendingActionKeyRef.current = actionKey;
       setPendingActionKey(actionKey);
       setActionError(null);
 
       try {
         await action();
-        await refreshTrash();
-      } catch {
-        setActionError("action");
+        await refreshRelatedData();
+        return true;
+      } catch (error) {
+        const isRestoreConflict =
+          actionKey.includes("restore") &&
+          error instanceof ApiError &&
+          error.status === 409;
+
+        setActionError(
+          isRestoreConflict ? "restoreConflict" : "action",
+        );
+        await refreshRelatedData().catch(() => undefined);
+        return false;
       } finally {
+        pendingActionKeyRef.current = null;
         setPendingActionKey(null);
       }
     },
-    [refreshTrash],
+    [refreshRelatedData],
   );
 
   const handleRestoreClip = useCallback(
@@ -81,7 +108,20 @@ export const useTrashPage = () => {
         return;
       }
 
-      await runAction(`clip-restore-${clipId}`, () => restoreTrashClip(clipId));
+      return runAction(`clip-restore-${clipId}`, () => restoreTrashClip(clipId));
+    },
+    [isAuthenticated, runAction],
+  );
+
+  const handleRestoreItems = useCallback(
+    async (itemsToRestore: TrashItemMutationDto[]) => {
+      if (!isAuthenticated || itemsToRestore.length === 0) {
+        return false;
+      }
+
+      return runAction("trash-restore-selected", () =>
+        restoreTrashItems(itemsToRestore),
+      );
     },
     [isAuthenticated, runAction],
   );
@@ -92,7 +132,7 @@ export const useTrashPage = () => {
         return;
       }
 
-      await runAction(`clip-delete-${clipId}`, () => deleteTrashClip(clipId));
+      return runAction(`clip-delete-${clipId}`, () => deleteTrashClip(clipId));
     },
     [isAuthenticated, runAction],
   );
@@ -103,7 +143,7 @@ export const useTrashPage = () => {
         return;
       }
 
-      await runAction("trash-delete-selected", () =>
+      return runAction("trash-delete-selected", () =>
         deleteTrashItems(itemsToDelete),
       );
     },
@@ -116,7 +156,7 @@ export const useTrashPage = () => {
         return;
       }
 
-      await runAction(`folder-restore-${folderId}`, () =>
+      return runAction(`folder-restore-${folderId}`, () =>
         restoreTrashFolder(folderId),
       );
     },
@@ -129,7 +169,7 @@ export const useTrashPage = () => {
         return;
       }
 
-      await runAction(`folder-delete-${folderId}`, () =>
+      return runAction(`folder-delete-${folderId}`, () =>
         deleteTrashFolder(folderId),
       );
     },
@@ -141,7 +181,7 @@ export const useTrashPage = () => {
       return;
     }
 
-    await runAction("trash-clear-all", deleteAllTrashItems);
+    return runAction("trash-clear-all", deleteAllTrashItems);
   }, [isAuthenticated, runAction]);
 
   const items = isAuthenticated
@@ -162,6 +202,7 @@ export const useTrashPage = () => {
     pendingActionKey,
     reload,
     handleRestoreClip,
+    handleRestoreItems,
     handleDeleteClip,
     handleDeleteItems,
     handleRestoreFolder,
