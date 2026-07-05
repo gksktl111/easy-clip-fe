@@ -22,6 +22,7 @@ import type {
   FolderItem,
 } from "@/features/folder/model/folder";
 import { FolderResponseDto } from "@/features/folder/model/folder.dto";
+import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 export const FOLDER_QUERY_KEY = "folders";
@@ -188,6 +189,7 @@ export const useFolders = () => {
       setFolders((currentFolders) =>
         currentFolders.filter((folder) => folder.id !== folderId),
       );
+      void invalidateTrashQueries(queryClient);
     },
   });
 

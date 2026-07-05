@@ -4,11 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { fetchMySubscription } from "@/features/subscription/api/subscriptionApi";
+import { getMySubscriptionQueryKey } from "@/features/subscription/service/subscriptionQueryCache";
 
-export const MY_SUBSCRIPTION_QUERY_KEY = "mySubscription";
-
-export const getMySubscriptionQueryKey = (userId: string | null) =>
-  [MY_SUBSCRIPTION_QUERY_KEY, userId] as const;
+export {
+  getMySubscriptionQueryKey,
+  MY_SUBSCRIPTION_QUERY_KEY,
+} from "@/features/subscription/service/subscriptionQueryCache";
 
 export const useMySubscription = () => {
   const session = useAuthSession();
