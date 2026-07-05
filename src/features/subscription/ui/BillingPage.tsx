@@ -8,9 +8,13 @@ import {
   fetchMySubscription,
   updateMySubscription,
 } from "@/features/subscription/api/subscriptionApi";
-import { MY_SUBSCRIPTION_QUERY_KEY } from "@/features/subscription/hooks/useMySubscription";
+import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { hasRemainingCanceledProPeriod } from "@/features/subscription/model/subscription";
 import { BillingAuthRequestResponseDto } from "@/features/subscription/model/subscription.dto";
+import {
+  invalidateMySubscriptionQueries,
+  syncMySubscriptionQueryData,
+} from "@/features/subscription/service/subscriptionQueryCache";
 import {
   BillingCheckoutCard,
   type BillingStep,
@@ -80,6 +84,8 @@ const mapBillingAuthMethod = (
 export function BillingPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const session = useAuthSession();
+  const userId = session?.user?.id ?? null;
   const [billingAuth, setBillingAuth] =
     useState<BillingAuthRequestResponseDto | null>(null);
   const [step, setStep] = useState<BillingStep>("idle");
@@ -98,9 +104,10 @@ export function BillingPage() {
 
       if (hasRemainingCanceledProPeriod(currentSubscription)) {
         const nextSubscription = await updateMySubscription({ type: "RESUME" });
-        queryClient.setQueriesData(
-          { queryKey: [MY_SUBSCRIPTION_QUERY_KEY] },
+        syncMySubscriptionQueryData(
+          queryClient,
           nextSubscription,
+          userId,
         );
         setStep("idle");
         setMessage("Pro 구독 자동갱신이 재개되었습니다.");
@@ -136,7 +143,13 @@ export function BillingPage() {
       }
 
       if (error instanceof ApiError && error.status === 409) {
-        await fetchMySubscription().catch(() => undefined);
+        const latestSubscription = await fetchMySubscription().catch(() => null);
+
+        if (latestSubscription) {
+          syncMySubscriptionQueryData(queryClient, latestSubscription, userId);
+        } else {
+          void invalidateMySubscriptionQueries(queryClient);
+        }
       }
 
       setStep("error");

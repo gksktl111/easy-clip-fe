@@ -1,9 +1,11 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { confirmBillingAuth } from "@/features/subscription/api/subscriptionApi";
 import { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
+import { syncMySubscriptionQueryData } from "@/features/subscription/service/subscriptionQueryCache";
 import { BillingResultCard } from "@/features/subscription/ui/BillingResultCard";
 
 interface BillingResultPageProps {
@@ -19,6 +21,7 @@ export function BillingResultPage({
   errorMessage,
   status,
 }: BillingResultPageProps) {
+  const queryClient = useQueryClient();
   const isMissingSuccessParams =
     status === "success" && (!authKey || !customerKey);
   const [subscription, setSubscription] =
@@ -51,6 +54,7 @@ export function BillingResultPage({
     // Toss 성공 리다이렉트의 authKey/customerKey를 서버에 전달해 최종 구독 승인을 완료한다.
     confirmBillingAuth({ authKey, customerKey })
       .then((nextSubscription) => {
+        syncMySubscriptionQueryData(queryClient, nextSubscription, null);
         setSubscription(nextSubscription);
         setMessage("Pro 구독이 활성화되었습니다.");
       })
@@ -58,7 +62,7 @@ export function BillingResultPage({
         setMessage("결제 승인을 완료하지 못했습니다.");
       })
       .finally(() => setIsConfirming(false));
-  }, [authKey, customerKey, status]);
+  }, [authKey, customerKey, queryClient, status]);
 
   const isSuccess = status === "success" && subscription?.plan === "PRO";
 
