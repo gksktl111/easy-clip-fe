@@ -34,6 +34,7 @@ import {
 } from "@/features/clip/service/imageClipValidation";
 import { ClipListItemResponseDto } from "@/features/clip/model/clip.dto";
 import { FilterType } from "@/features/clip/ui/FilterBar";
+import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 import { notifyError } from "@/shared/lib/toast";
@@ -446,16 +447,21 @@ export const useFolderClipsPage = () => {
       setIsDeletingClips(true);
       await cancelClipQueries(queryClient);
       const rollbackDeletedClip = removeClipsFromCache(queryClient, [clipId]);
+      let isDeleted = false;
       setContextMenu(null);
 
       try {
         await removeClip(clipId);
+        isDeleted = true;
       } catch {
         rollbackDeletedClip();
         notifyError("클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
       } finally {
         setIsDeletingClips(false);
         void refreshClipQueries();
+        if (isDeleted) {
+          void invalidateTrashQueries(queryClient);
+        }
       }
     },
     [isAuthenticated, isDeletingClips, queryClient, refreshClipQueries],
@@ -475,9 +481,11 @@ export const useFolderClipsPage = () => {
       setIsDeletingClips(true);
       await cancelClipQueries(queryClient);
       const rollbackDeletedClips = removeClipsFromCache(queryClient, uniqueClipIds);
+      let isDeleted = false;
 
       try {
         await removeClips({ clipIds: uniqueClipIds });
+        isDeleted = true;
         return true;
       } catch {
         rollbackDeletedClips();
@@ -486,6 +494,9 @@ export const useFolderClipsPage = () => {
       } finally {
         setIsDeletingClips(false);
         void refreshClipQueries();
+        if (isDeleted) {
+          void invalidateTrashQueries(queryClient);
+        }
       }
     },
     [isAuthenticated, isDeletingClips, queryClient, refreshClipQueries],
@@ -574,6 +585,7 @@ export const useFolderClipsPage = () => {
 
     setIsDeleteAllOpen(false);
     setIsDeletingClips(true);
+    let isDeleted = false;
 
     try {
       const clipIds = await fetchAllFolderClipIds();
@@ -590,6 +602,7 @@ export const useFolderClipsPage = () => {
 
       try {
         await removeClips({ clipIds: uniqueClipIds });
+        isDeleted = true;
         setSelectedClipIds(new Set());
         setIsDeleteMode(false);
       } catch {
@@ -603,6 +616,9 @@ export const useFolderClipsPage = () => {
     } finally {
       setIsDeletingClips(false);
       void refreshClipQueries();
+      if (isDeleted) {
+        void invalidateTrashQueries(queryClient);
+      }
     }
   }, [
     fetchAllFolderClipIds,
