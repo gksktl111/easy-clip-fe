@@ -17,14 +17,12 @@ import {
   restoreTrashItems,
 } from "@/features/trash/api/trashApi";
 import { TrashItemMutationDto } from "@/features/trash/model/trash.dto";
+import {
+  invalidateTrashQueries,
+  TRASH_QUERY_KEYS,
+} from "@/features/trash/service/trashQueryCache";
 import { ApiError } from "@/shared/lib/apiClient";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
-
-const TRASH_QUERY_KEYS = {
-  all: ["trash"] as const,
-  items: (userId: string | null) =>
-    [...TRASH_QUERY_KEYS.all, "items", userId] as const,
-};
 
 type TrashPageError = "load" | "action" | "restoreConflict";
 
@@ -63,7 +61,7 @@ export const useTrashPage = () => {
 
   const refreshRelatedData = useCallback(async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: TRASH_QUERY_KEYS.all }),
+      invalidateTrashQueries(queryClient),
       queryClient.invalidateQueries({ queryKey: [FOLDER_QUERY_KEY] }),
       queryClient.invalidateQueries({ queryKey: [CLIP_QUERY_KEY] }),
     ]);
