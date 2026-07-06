@@ -1,7 +1,8 @@
-export const SERVER_SUPPORTED_LANGUAGES = ["ko", "en"] as const;
+import { APP_LOCALES, type AppLocale } from "@/shared/config/locale";
 
-export type ServerSupportedLanguage =
-  (typeof SERVER_SUPPORTED_LANGUAGES)[number];
+export const SERVER_SUPPORTED_LANGUAGES = APP_LOCALES;
+
+export type ServerSupportedLanguage = AppLocale;
 
 export type UserSettingsThemeDto = "LIGHT" | "DARK" | "SYSTEM";
 
