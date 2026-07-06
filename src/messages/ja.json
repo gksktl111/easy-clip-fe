@@ -41,6 +41,7 @@
     "continueWithGoogle": "Google で続行",
     "continueWithGithub": "GitHub で続行",
     "loading": "ログイン中...",
+    "configError": "API 接続設定がありません。環境変数を確認してください。",
     "or": "または",
     "backHome": "ホームに戻る",
     "agreementPrefix": "続行すると、",
@@ -52,13 +53,16 @@
   "sidebar": {
     "favorites": "お気に入り",
     "recent": "最近",
+    "trash": "ゴミ箱",
     "addFolder": "フォルダ追加",
     "reorderFolder": "フォルダの並び替え",
     "openFolderOptions": "フォルダオプションを開く",
     "rename": "名前を変更",
     "delete": "削除",
     "logout": "ログアウト",
+    "guest": "ゲスト",
     "settings": "設定",
+    "upgradePlan": "プランをアップグレード",
     "closeCreateFolder": "フォルダ作成を閉じる",
     "createFolder": "新しいフォルダを作成",
     "folderName": "フォルダ名",
@@ -79,10 +83,83 @@
     "general": "一般",
     "language": "言語",
     "languageDescription": "希望する言語を選択してください。",
+    "saveError": "設定を保存できませんでした。しばらくしてからもう一度お試しください。",
+    "subscriptionTitle": "現在のサブスクリプション",
+    "subscriptionPlan": "プラン",
+    "subscriptionStatus": "サブスクリプション状態",
+    "subscriptionStatusValues": {
+      "ACTIVE": "購読中",
+      "CANCELED": "解約済み",
+      "EXPIRED": "期限切れ"
+    },
+    "subscriptionNextBillingAt": "次回請求",
+    "subscriptionLoading": "確認中",
+    "subscriptionEmptyValue": "-",
+    "subscriptionLoadError": "サブスクリプション情報を読み込めませんでした。",
     "about": "情報",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "デザイナーと開発者のためのモダンなクリップボードマネージャー",
     "closeButton": "閉じる"
+  },
+  "trash": {
+    "title": "ゴミ箱",
+    "retentionNotice": "最大30日間保管されます",
+    "description": "削除したクリップとフォルダを確認し、復元または完全削除できます。",
+    "refresh": "再読み込み",
+    "clearAll": "すべて削除",
+    "clearing": "ゴミ箱を空にしています。",
+    "clearingAction": "処理中",
+    "deleteSelected": "選択項目を削除",
+    "deletingSelected": "選択した項目を削除しています。",
+    "deletingSelectedAction": "削除中",
+    "restoreSelected": "選択項目を復元",
+    "restoringSelected": "選択した項目を復元しています。",
+    "restoringSelectedAction": "復元中",
+    "selectedCount": "{count, plural, =0 {未選択} other {#件選択中}}",
+    "selectAll": "ゴミ箱の項目をすべて選択",
+    "selectItem": "{name}を選択",
+    "cancel": "キャンセル",
+    "loading": "ゴミ箱を読み込んでいます。",
+    "error": "ゴミ箱データを読み込めませんでした。しばらくしてから再試行してください。",
+    "actionError": "ゴミ箱の操作を完了できませんでした。しばらくしてから再試行してください。",
+    "restoreConflictError": "削除されたフォルダ内のクリップは単独では復元できません。先に親フォルダを復元してください。",
+    "clearAllPartialError": "一部の項目を削除できませんでした。失敗 {failedCount} 件 / 全体 {totalCount} 件",
+    "emptyTitle": "ゴミ箱は空です",
+    "emptyDescription": "削除されたクリップやフォルダがここに表示されます。",
+    "listTitle": "削除済みアイテム",
+    "totalCount": "{count, plural, =0 {0件} other {#件}}",
+    "folderType": "フォルダ",
+    "fileType": "ファイル",
+    "parentFolder": "親フォルダ",
+    "unknownParentFolder": "不明なフォルダ",
+    "clipKinds": {
+      "text": "テキスト",
+      "color": "カラー",
+      "image": "画像"
+    },
+    "columns": {
+      "name": "名前",
+      "type": "種類",
+      "deletedAt": "削除日時",
+      "actions": "操作"
+    },
+    "clearAllModal": {
+      "title": "ゴミ箱をすべて削除",
+      "description": "本当にゴミ箱内のすべての項目を完全削除しますか？"
+    },
+    "deleteSelectedModal": {
+      "title": "選択項目を削除",
+      "description": "選択した{count, plural, other {#件}}を完全削除しますか？"
+    },
+    "clipsTitle": "削除済みクリップ",
+    "clipsCount": "{count, plural, =0 {クリップ 0件} other {クリップ #件}}",
+    "clipsEmpty": "削除済みクリップはありません。",
+    "foldersTitle": "削除済みフォルダ",
+    "foldersCount": "{count, plural, =0 {フォルダ 0件} other {フォルダ #件}}",
+    "foldersEmpty": "削除済みフォルダはありません。",
+    "deletedAt": "削除日時",
+    "restore": "復元",
+    "deleteForever": "削除"
   },
   "clips": {
     "count": "{count, plural, =0 {0 件のクリップ} other {# 件のクリップ}}",
@@ -101,20 +178,36 @@
       "title": "保存されたクリップはまだありません",
       "description": "新しいクリップをコピーするか、フォルダで貼り付けを始めるとここに表示されます。"
     },
+    "errorState": {
+      "title": "クリップを読み込めませんでした",
+      "description": "ネットワーク接続を確認するか、しばらくしてから再試行してください。",
+      "retry": "再試行"
+    },
     "item": {
-      "toggleFavorite": "お気に入りを切り替え"
+      "saving": "保存中",
+      "toggleFavorite": "お気に入りを切り替え",
+      "selectForDelete": "{name}を削除対象として選択"
     },
     "actions": {
       "copy": "コピー",
       "rename": "名前を変更",
       "delete": "削除",
+      "deleteClips": "クリップを削除",
       "deleteAll": "すべて削除",
       "cancel": "キャンセル",
       "change": "変更"
     },
+    "deleteMode": {
+      "title": "クリップ削除モード",
+      "selectedCount": "選択 {selectedCount} 件 / 現在の画面 {totalCount} 件",
+      "deleteSelected": "削除する",
+      "deleteAll": "すべて削除",
+      "deleting": "削除中",
+      "cancel": "キャンセル"
+    },
     "deleteModal": {
-      "title": "すべてのクリップを削除",
-      "description": "本当にすべてのクリップを削除しますか？"
+      "title": "現在のフォルダをすべて削除",
+      "description": "本当に現在のフォルダ内のすべてのクリップを削除しますか？"
     },
     "renameModal": {
       "title": "名前を変更",

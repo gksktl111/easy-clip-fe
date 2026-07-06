@@ -10,4 +10,5 @@ export interface Clip {
   updatedAt?: Date;
   lastCopiedAt?: Date | null;
   isFavorite?: boolean;
+  isOptimistic?: boolean;
 }

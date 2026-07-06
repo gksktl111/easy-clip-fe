@@ -30,6 +30,9 @@
   --danger: #ef4444;
   --danger-hover: #dc2626;
   --danger-foreground: #ffffff;
+  --danger-surface: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-text: #b91c1c;
   --success: #22c55e;
   --warning: #f59e0b;
   --overlay: rgba(15, 23, 42, 0.4);
@@ -51,6 +54,7 @@
   --modal-section-bg: #f8fafc;
   --modal-icon-bg: #e5e7eb;
   --modal-icon-fg: #4b5563;
+  --dropdown-option-hover: #e2e8f0;
   --landing-header-bg: rgba(255, 255, 255, 0.9);
   --landing-brand-bg: #334155;
   --landing-brand-fg: #ffffff;
@@ -106,6 +110,9 @@
   --danger: #f87171;
   --danger-hover: #ef4444;
   --danger-foreground: #ffffff;
+  --danger-surface: rgba(248, 113, 113, 0.12);
+  --danger-border: rgba(248, 113, 113, 0.28);
+  --danger-text: #fecaca;
   --success: #4ade80;
   --warning: #fbbf24;
   --overlay: rgba(0, 0, 0, 0.4);
@@ -125,6 +132,7 @@
   --modal-section-bg: rgba(255, 255, 255, 0.05);
   --modal-icon-bg: rgba(255, 255, 255, 0.1);
   --modal-icon-fg: #e5e7eb;
+  --dropdown-option-hover: rgba(99, 102, 241, 0.22);
   --landing-header-bg: rgba(30, 30, 31, 0.9);
   --landing-brand-bg: #4f46e5;
   --landing-brand-fg: #f8fafc;
@@ -227,6 +235,26 @@ a {
   to {
     transform: translateX(calc(-50% - (var(--marquee-gap, 0px) / 2)));
   }
+}
+
+@keyframes shimmer-x {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-muted) 0%,
+    var(--surface-elevated) 50%,
+    var(--surface-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-x 1.15s ease-in-out infinite;
 }
 
 .clip-scrollbar {

@@ -1,5 +1,5 @@
-import { RecentClipsPage } from "@/features/clip/ui/RecentClipsPage";
+import { RecentEntryPage } from "@/features/clip/ui/RecentEntryPage";
 
 export default function Recent() {
-  return <RecentClipsPage />;
+  return <RecentEntryPage />;
 }

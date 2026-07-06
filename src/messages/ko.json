@@ -41,6 +41,7 @@
     "continueWithGoogle": "Google로 계속하기",
     "continueWithGithub": "GitHub로 계속하기",
     "loading": "로그인 중...",
+    "configError": "API 연결 정보가 설정되지 않았습니다. 환경변수를 확인해주세요.",
     "or": "또는",
     "backHome": "홈으로 돌아가기",
     "agreementPrefix": "계속하면",
@@ -52,13 +53,16 @@
   "sidebar": {
     "favorites": "즐겨찾기",
     "recent": "최근 항목",
+    "trash": "휴지통",
     "addFolder": "폴더 추가",
     "reorderFolder": "폴더 순서 변경",
     "openFolderOptions": "폴더 옵션 열기",
     "rename": "이름 변경",
     "delete": "삭제",
     "logout": "로그아웃",
+    "guest": "게스트",
     "settings": "설정",
+    "upgradePlan": "요금제 업그레이드",
     "closeCreateFolder": "폴더 생성 닫기",
     "createFolder": "새 폴더 생성",
     "folderName": "폴더 이름",
@@ -79,10 +83,83 @@
     "general": "일반",
     "language": "언어",
     "languageDescription": "선호하는 언어를 선택하세요.",
+    "saveError": "설정을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.",
+    "subscriptionTitle": "현재 구독 정보",
+    "subscriptionPlan": "플랜",
+    "subscriptionStatus": "구독 상태",
+    "subscriptionStatusValues": {
+      "ACTIVE": "구독중",
+      "CANCELED": "구독 해지",
+      "EXPIRED": "구독 만료"
+    },
+    "subscriptionNextBillingAt": "다음 결제",
+    "subscriptionLoading": "확인 중",
+    "subscriptionEmptyValue": "-",
+    "subscriptionLoadError": "구독 정보를 불러오지 못했습니다.",
     "about": "정보",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "디자이너와 개발자를 위한 현대적인 클립보드 매니저",
     "closeButton": "닫기"
+  },
+  "trash": {
+    "title": "휴지통",
+    "retentionNotice": "최대 30일까지 보관됩니다",
+    "description": "삭제된 클립과 폴더를 확인하고 복구하거나 영구 삭제할 수 있습니다.",
+    "refresh": "새로고침",
+    "clearAll": "전체 삭제",
+    "clearing": "휴지통을 비우는 중입니다.",
+    "clearingAction": "비우는 중",
+    "deleteSelected": "선택 삭제",
+    "deletingSelected": "선택한 항목을 삭제하는 중입니다.",
+    "deletingSelectedAction": "삭제 중",
+    "restoreSelected": "선택 복구",
+    "restoringSelected": "선택한 항목을 복구하는 중입니다.",
+    "restoringSelectedAction": "복구 중",
+    "selectedCount": "{count, plural, =0 {선택 없음} other {#개 선택됨}}",
+    "selectAll": "모든 휴지통 항목 선택",
+    "selectItem": "{name} 선택",
+    "cancel": "취소",
+    "loading": "휴지통을 불러오는 중입니다.",
+    "error": "휴지통 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
+    "actionError": "휴지통 작업을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.",
+    "restoreConflictError": "삭제된 폴더에 속한 클립은 단독으로 복구할 수 없습니다. 먼저 부모 폴더를 복구해주세요.",
+    "clearAllPartialError": "일부 항목을 삭제하지 못했습니다. 실패 {failedCount}개 / 전체 {totalCount}개",
+    "emptyTitle": "휴지통이 비어 있습니다",
+    "emptyDescription": "삭제된 클립이나 폴더가 생기면 이곳에 표시됩니다.",
+    "listTitle": "삭제 항목",
+    "totalCount": "{count, plural, =0 {항목 0개} other {항목 #개}}",
+    "folderType": "폴더",
+    "fileType": "파일",
+    "parentFolder": "부모 폴더",
+    "unknownParentFolder": "알 수 없는 폴더",
+    "clipKinds": {
+      "text": "텍스트",
+      "color": "색상",
+      "image": "이미지"
+    },
+    "columns": {
+      "name": "이름",
+      "type": "유형",
+      "deletedAt": "삭제 시각",
+      "actions": "작업"
+    },
+    "clearAllModal": {
+      "title": "휴지통 전체 삭제",
+      "description": "정말 휴지통의 모든 항목을 영구 삭제하시겠습니까?"
+    },
+    "deleteSelectedModal": {
+      "title": "선택 항목 삭제",
+      "description": "선택한 {count, plural, other {#개 항목}}을 영구 삭제하시겠습니까?"
+    },
+    "clipsTitle": "삭제된 클립",
+    "clipsCount": "{count, plural, =0 {클립 0개} other {클립 #개}}",
+    "clipsEmpty": "삭제된 클립이 없습니다.",
+    "foldersTitle": "삭제된 폴더",
+    "foldersCount": "{count, plural, =0 {폴더 0개} other {폴더 #개}}",
+    "foldersEmpty": "삭제된 폴더가 없습니다.",
+    "deletedAt": "삭제 시각",
+    "restore": "복구",
+    "deleteForever": "삭제"
   },
   "clips": {
     "count": "{count, plural, =0 {0개 클립} other {#개 클립}}",
@@ -101,20 +178,36 @@
       "title": "아직 저장된 클립이 없습니다",
       "description": "새 클립을 복사하거나 폴더에서 붙여넣기를 시작하면 이곳에 표시됩니다."
     },
+    "errorState": {
+      "title": "클립을 불러오지 못했습니다",
+      "description": "네트워크 상태를 확인하거나 잠시 후 다시 시도해주세요.",
+      "retry": "다시 시도"
+    },
     "item": {
-      "toggleFavorite": "즐겨찾기 전환"
+      "saving": "저장 중",
+      "toggleFavorite": "즐겨찾기 전환",
+      "selectForDelete": "{name} 삭제 선택"
     },
     "actions": {
       "copy": "복사",
       "rename": "이름 변경",
       "delete": "삭제",
+      "deleteClips": "클립 삭제",
       "deleteAll": "전체 삭제",
       "cancel": "취소",
       "change": "변경"
     },
+    "deleteMode": {
+      "title": "클립 삭제 모드",
+      "selectedCount": "선택 {selectedCount}개 / 현재 화면 {totalCount}개",
+      "deleteSelected": "삭제하기",
+      "deleteAll": "전체 삭제",
+      "deleting": "삭제 중",
+      "cancel": "취소"
+    },
     "deleteModal": {
-      "title": "모든 클립 삭제",
-      "description": "정말 모든 클립을 삭제하시겠습니까?"
+      "title": "현재 폴더 전체 삭제",
+      "description": "정말 현재 폴더의 모든 클립을 삭제하시겠습니까?"
     },
     "renameModal": {
       "title": "이름 변경",

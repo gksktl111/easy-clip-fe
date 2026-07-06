@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useFolderClipsPage } from "@/features/clip/hooks/useFolderClipsPage";
+import { ClipDeleteActionBar } from "@/features/clip/ui/ClipDeleteActionBar";
 import { ClipContextMenu } from "@/features/clip/ui/ClipContextMenu";
 import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
 import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
@@ -9,7 +10,6 @@ import { DeleteAllButton } from "@/features/clip/ui/DeleteAllButton";
 import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 import { FolderClipCaptureHint } from "@/features/clip/ui/FolderClipCaptureHint";
-import { RenameClipModal } from "@/features/clip/ui/RenameClipModal";
 
 export function FolderClipsPage() {
   const t = useTranslations("clips");
@@ -18,93 +18,126 @@ export function FolderClipsPage() {
     clips,
     contextMenu,
     copyToast,
+    fetchNextPage,
     filteredClips,
     handleCopy,
     handleCopyFromMenu,
     handleDeleteAll,
     handleDeleteClip,
+    handleDeleteSelected,
+    handleEnterDeleteMode,
+    handleCancelDeleteMode,
     handleOpenContextMenu,
-    handleOpenRename,
-    handleRenameClip,
+    handleToggleClipSelected,
     handleToggleFavorite,
+    hasNextPage,
     hasClips,
     isActive,
     isDeleteAllOpen,
-    isRenameOpen,
-    renameInputRef,
-    renameName,
+    isDeleteMode,
+    isDeletingClips,
+    isError,
+    isFetchingNextPage,
+    isLoading,
+    refetchClips,
     searchQuery,
     setActiveFilter,
     setContextMenu,
     setIsActive,
     setIsDeleteAllOpen,
-    setIsRenameOpen,
-    setRenameName,
     setSearchQuery,
+    selectedClipCount,
+    selectedClipIds,
   } = useFolderClipsPage();
+  const hasClipLoadError = isError && filteredClips.length === 0;
 
   return (
     <div
-      className="bg-background flex h-full flex-col overflow-hidden"
+      className="bg-background relative flex h-full flex-col overflow-hidden"
       onClick={() => {
-        setIsActive(true);
+        if (!isDeleteMode && !isDeletingClips) {
+          setIsActive(true);
+        }
         setContextMenu(null);
       }}
     >
-      <FilterBar
-        activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        isActive={isActive}
-        countLabel={t("count", { count: filteredClips.length })}
-      />
-      {!isActive ? (
+      {!hasClipLoadError ? (
+        <FilterBar
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          isActive={isActive}
+          countLabel={t("count", { count: filteredClips.length })}
+        />
+      ) : null}
+      {!hasClipLoadError && !isActive ? (
         <FolderClipCaptureHint message={t("captureHint")} />
       ) : null}
       <ClipResultsSection
         clips={filteredClips}
+        hasNextPage={hasNextPage}
+        isError={isError}
+        isFetchingNextPage={isFetchingNextPage}
+        isLoading={isLoading}
+        onFetchNextPage={() => {
+          void fetchNextPage();
+        }}
+        onRetry={() => {
+          void refetchClips();
+        }}
         onCopy={handleCopy}
         onToggleFavorite={handleToggleFavorite}
         onContextMenu={handleOpenContextMenu}
+        isDeleteMode={isDeleteMode}
+        isInteractionDisabled={isDeletingClips}
+        selectedClipIds={selectedClipIds}
+        onToggleSelected={handleToggleClipSelected}
       />
-      <DeleteAllButton
-        disabled={!hasClips}
-        onClick={() => setIsDeleteAllOpen(true)}
-      />
+      {!hasClipLoadError && !isDeleteMode ? (
+        <DeleteAllButton
+          disabled={!hasClips || isDeletingClips}
+          label={t("actions.deleteClips")}
+          onClick={handleEnterDeleteMode}
+        />
+      ) : null}
+      {!hasClipLoadError && isDeleteMode ? (
+        <ClipDeleteActionBar
+          selectedCount={selectedClipCount}
+          totalCount={filteredClips.length}
+          isDeleting={isDeletingClips}
+          onCancel={handleCancelDeleteMode}
+          onDeleteSelected={handleDeleteSelected}
+          onRequestDeleteAll={() => setIsDeleteAllOpen(true)}
+        />
+      ) : null}
 
-      <ClipContextMenu
-        clips={clips}
-        contextMenu={contextMenu}
-        copyLabel={t("actions.copy")}
-        renameLabel={t("actions.rename")}
-        deleteLabel={t("actions.delete")}
-        onCopy={handleCopyFromMenu}
-        onRename={(clip) => handleOpenRename(clip.id, clip.name)}
-        onDelete={handleDeleteClip}
-      />
+      {!isDeleteMode ? (
+        <ClipContextMenu
+          clips={clips}
+          contextMenu={contextMenu}
+          copyLabel={t("actions.copy")}
+          deleteLabel={t("actions.delete")}
+          onCopy={handleCopyFromMenu}
+          onDelete={handleDeleteClip}
+        />
+      ) : null}
       <ClipCopyToast label={t("copyToast")} position={copyToast} />
       <DeleteAllClipsModal
         isOpen={isDeleteAllOpen}
         title={t("deleteModal.title")}
         description={t("deleteModal.description")}
         cancelLabel={t("actions.cancel")}
-        confirmLabel={t("actions.delete")}
-        onCancel={() => setIsDeleteAllOpen(false)}
+        confirmLabel={
+          isDeletingClips ? t("deleteMode.deleting") : t("actions.delete")
+        }
+        onCancel={() => {
+          if (!isDeletingClips) {
+            setIsDeleteAllOpen(false);
+          }
+        }}
+        isConfirming={isDeletingClips}
         onConfirm={handleDeleteAll}
-      />
-      <RenameClipModal
-        isOpen={isRenameOpen}
-        title={t("renameModal.title")}
-        label={t("renameModal.label")}
-        placeholder={t("renameModal.placeholder")}
-        cancelLabel={t("actions.cancel")}
-        confirmLabel={t("actions.change")}
-        inputRef={renameInputRef}
-        value={renameName}
-        onChange={setRenameName}
-        onCancel={() => setIsRenameOpen(false)}
-        onConfirm={handleRenameClip}
       />
     </div>
   );

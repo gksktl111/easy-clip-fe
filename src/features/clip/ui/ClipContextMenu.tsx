@@ -10,10 +10,10 @@ interface ClipContextMenuProps {
     y: number;
   } | null;
   copyLabel: string;
-  renameLabel: string;
+  renameLabel?: string;
   deleteLabel: string;
   onCopy: (clip: Clip) => void;
-  onRename: (clip: Clip) => void;
+  onRename?: (clip: Clip) => void;
   onDelete: (clipId: string) => void;
 }
 
@@ -50,14 +50,16 @@ export function ClipContextMenu({
       >
         {copyLabel}
       </button>
-      <button
-        type="button"
-        onClick={() => onRename(targetClip)}
-        className="hover:text-foreground flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--muted) hover:bg-(--surface-muted)"
-        data-clip-menu
-      >
-        {renameLabel}
-      </button>
+      {renameLabel && onRename ? (
+        <button
+          type="button"
+          onClick={() => onRename(targetClip)}
+          className="hover:text-foreground flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--muted) hover:bg-(--surface-muted)"
+          data-clip-menu
+        >
+          {renameLabel}
+        </button>
+      ) : null}
       <button
         type="button"
         onClick={() => onDelete(targetClip.id)}

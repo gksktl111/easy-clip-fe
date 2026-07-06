@@ -1,97 +1,79 @@
 "use client";
 
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { subscribeToClipStore } from "@/features/clip/service/clipStoreSubscription";
-import { mapStoredClipDates } from "@/features/clip/service/mapStoredClipDates";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
+import { recordClipView } from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
-import {
-  clearRecentClips,
-  getRecentClips,
-  readClipStorageRaw,
-  recordCopy,
-  StoredClip,
-} from "@/features/clip/service/clipStorage";
-import { FilterType } from "@/features/clip/ui/FilterBar";
+import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
-
-const EMPTY_RECENTS: StoredClip[] = [];
+import { copyClipToClipboard } from "@/features/clip/service/clipClipboard";
+import {
+  invalidateClipQueries,
+  moveClipToRecentCache,
+} from "@/features/clip/service/clipQueryCache";
+import { FilterType } from "@/features/clip/ui/FilterBar";
+import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
+import { notifyError } from "@/shared/lib/toast";
 
 export const useRecentClipsPage = () => {
+  const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery);
   const { copyToast, showCopyToast } = useCopyToast();
-  const lastRawRef = useRef<string | null>(null);
-  const lastClipsRef = useRef<StoredClip[]>(EMPTY_RECENTS);
+  const {
+    clips,
+    fetchNextPage,
+    hasNextPage,
+    isAuthenticated,
+    isError,
+    isFetchingNextPage,
+    isPending,
+    refetch,
+  } = useInfiniteClips({
+    recent: true,
+    filter: activeFilter,
+    searchQuery: debouncedSearchQuery,
+  });
 
-  const getRecentSnapshot = useCallback(() => {
-    const stored = readClipStorageRaw();
-    if (stored === lastRawRef.current) {
-      return lastClipsRef.current;
-    }
-
-    const nextClips = getRecentClips();
-    lastRawRef.current = stored;
-    lastClipsRef.current = nextClips;
-    return nextClips;
-  }, []);
-
-  const storedClips = useSyncExternalStore(
-    subscribeToClipStore,
-    getRecentSnapshot,
-    () => EMPTY_RECENTS,
+  const refreshClipQueries = useCallback(
+    () => invalidateClipQueries(queryClient),
+    [queryClient],
   );
-
-  const recentClips = useMemo<Clip[]>(
-    () => storedClips.map(mapStoredClipDates),
-    [storedClips],
-  );
-
-  const filteredClips = useMemo(() => {
-    const clipsByType =
-      activeFilter === "all"
-        ? recentClips
-        : recentClips.filter((clip) => clip.type === activeFilter);
-
-    if (!searchQuery.trim()) {
-      return clipsByType;
-    }
-
-    const loweredQuery = searchQuery.toLowerCase();
-    return clipsByType.filter((clip) =>
-      clip.name.toLowerCase().includes(loweredQuery),
-    );
-  }, [activeFilter, recentClips, searchQuery]);
 
   const handleCopy = useCallback(
     async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
-      showCopyToast(event.clientX, event.clientY);
-
       try {
-        await navigator.clipboard.writeText(clip.content);
+        await copyClipToClipboard(clip);
       } catch {
-        // no-op
+        notifyError("클립을 복사하지 못했습니다. 잠시 후 다시 시도해주세요.");
+        return;
       }
 
-      recordCopy(clip.id);
+      showCopyToast(event.clientX, event.clientY);
+
+      if (isAuthenticated) {
+        await recordClipView(clip.id);
+        moveClipToRecentCache(queryClient, clip.id);
+        void refreshClipQueries();
+      }
     },
-    [showCopyToast],
+    [isAuthenticated, queryClient, refreshClipQueries, showCopyToast],
   );
 
   return {
     activeFilter,
     copyToast,
-    filteredClips,
+    fetchNextPage,
+    filteredClips: clips,
+    hasNextPage: Boolean(hasNextPage),
+    isError,
+    isFetchingNextPage,
+    isLoading: isPending,
     searchQuery,
-    hasClips: storedClips.length > 0,
+    refetchClips: refetch,
     setActiveFilter,
     setSearchQuery,
-    clearAll: clearRecentClips,
     handleCopy,
   };
 };

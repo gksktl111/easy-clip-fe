@@ -1,86 +1,112 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
 import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { subscribeToClipStore } from "@/features/clip/service/clipStoreSubscription";
-import { Clip } from "@/features/clip/model/clip";
-import {
-  getFavoriteClips,
-  readClipStorageRaw,
-  recordCopy,
-  StoredClip,
-  updateClip,
-} from "@/features/clip/service/clipStorage";
-import { mapStoredClipDates } from "@/features/clip/service/mapStoredClipDates";
+  likeClip,
+  recordClipView,
+  unlikeClip,
+} from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
+import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
+import { Clip } from "@/features/clip/model/clip";
+import { copyClipToClipboard } from "@/features/clip/service/clipClipboard";
+import {
+  invalidateClipQueries,
+  moveClipToRecentCache,
+  updateClipFavoriteCache,
+} from "@/features/clip/service/clipQueryCache";
 import { FilterType } from "@/features/clip/ui/FilterBar";
-
-const EMPTY_CLIPS: StoredClip[] = [];
+import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
+import { notifyError } from "@/shared/lib/toast";
 
 export const useFavoriteClipsPage = () => {
+  const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery);
   const { copyToast, showCopyToast } = useCopyToast();
-  const lastRawRef = useRef<string | null>(null);
-  const lastClipsRef = useRef<StoredClip[]>(EMPTY_CLIPS);
+  const {
+    clips,
+    fetchNextPage,
+    hasNextPage,
+    isAuthenticated,
+    isError,
+    isFetchingNextPage,
+    isPending,
+    refetch,
+  } = useInfiniteClips({
+    favorite: true,
+    filter: activeFilter,
+    searchQuery: debouncedSearchQuery,
+  });
 
-  const getFavoritesSnapshot = useCallback(() => {
-    const stored = readClipStorageRaw();
-    if (stored === lastRawRef.current) {
-      return lastClipsRef.current;
-    }
-
-    const nextClips = getFavoriteClips();
-    lastRawRef.current = stored;
-    lastClipsRef.current = nextClips;
-    return nextClips;
-  }, []);
-
-  const storedClips = useSyncExternalStore(
-    subscribeToClipStore,
-    getFavoritesSnapshot,
-    () => EMPTY_CLIPS,
-  );
-
-  const filteredClips = useMemo(
-    () =>
-      storedClips
-        .map(mapStoredClipDates)
-        .filter((clip) => activeFilter === "all" || clip.type === activeFilter),
-    [activeFilter, storedClips],
+  const refreshClipQueries = useCallback(
+    () => invalidateClipQueries(queryClient),
+    [queryClient],
   );
 
   const handleCopy = useCallback(
     async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
-      showCopyToast(event.clientX, event.clientY);
-
       try {
-        await navigator.clipboard.writeText(clip.content);
+        await copyClipToClipboard(clip);
       } catch {
-        // no-op
+        notifyError("클립을 복사하지 못했습니다. 잠시 후 다시 시도해주세요.");
+        return;
       }
 
-      recordCopy(clip.id);
+      showCopyToast(event.clientX, event.clientY);
+
+      if (isAuthenticated) {
+        await recordClipView(clip.id);
+        moveClipToRecentCache(queryClient, clip.id);
+        void refreshClipQueries();
+      }
     },
-    [showCopyToast],
+    [isAuthenticated, queryClient, refreshClipQueries, showCopyToast],
   );
 
-  const handleToggleFavorite = useCallback((clip: Clip) => {
-    updateClip(clip.id, {
-      isFavorite: !clip.isFavorite,
-      updatedAt: new Date().toISOString(),
-    });
-  }, []);
+  const handleToggleFavorite = useCallback(
+    async (clip: Clip) => {
+      if (!isAuthenticated) {
+        return;
+      }
+
+      const nextFavorite = !clip.isFavorite;
+      const rollbackFavorite = updateClipFavoriteCache(
+        queryClient,
+        clip.id,
+        nextFavorite,
+      );
+
+      try {
+        if (nextFavorite) {
+          await likeClip(clip.id);
+        } else {
+          await unlikeClip(clip.id);
+        }
+      } catch {
+        rollbackFavorite();
+      } finally {
+        void refreshClipQueries();
+      }
+    },
+    [isAuthenticated, queryClient, refreshClipQueries],
+  );
 
   return {
     activeFilter,
     copyToast,
-    filteredClips,
+    fetchNextPage,
+    filteredClips: clips,
+    hasNextPage: Boolean(hasNextPage),
+    isError,
+    isFetchingNextPage,
+    isLoading: isPending,
+    refetchClips: refetch,
+    searchQuery,
     setActiveFilter,
+    setSearchQuery,
     handleCopy,
     handleToggleFavorite,
   };

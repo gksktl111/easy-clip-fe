@@ -11,22 +11,45 @@ export function FavoriteClipsPage() {
   const {
     activeFilter,
     copyToast,
+    fetchNextPage,
     filteredClips,
     handleCopy,
     handleToggleFavorite,
+    hasNextPage,
+    isError,
+    isFetchingNextPage,
+    isLoading,
+    refetchClips,
+    searchQuery,
     setActiveFilter,
+    setSearchQuery,
   } = useFavoriteClipsPage();
+  const hasClipLoadError = isError && filteredClips.length === 0;
 
   return (
     <div className="bg-background relative flex h-full flex-col">
-      <FilterBar
-        activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
-        showStatus={false}
-        countLabel={t("count", { count: filteredClips.length })}
-      />
+      {!hasClipLoadError ? (
+        <FilterBar
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          showStatus={false}
+          countLabel={t("count", { count: filteredClips.length })}
+        />
+      ) : null}
       <ClipResultsSection
         clips={filteredClips}
+        hasNextPage={hasNextPage}
+        isError={isError}
+        isFetchingNextPage={isFetchingNextPage}
+        isLoading={isLoading}
+        onFetchNextPage={() => {
+          void fetchNextPage();
+        }}
+        onRetry={() => {
+          void refetchClips();
+        }}
         onCopy={handleCopy}
         onToggleFavorite={handleToggleFavorite}
       />

@@ -1,37 +1,109 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useState } from "react";
 import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { subscribeToClipStore } from "@/features/clip/service/clipStoreSubscription";
-import { mapStoredClipDates } from "@/features/clip/service/mapStoredClipDates";
+  createImageClip,
+  createTextClip,
+  fetchClips,
+  likeClip,
+  recordClipView,
+  removeClip,
+  removeClips,
+  unlikeClip,
+} from "@/features/clip/api/clipApi";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
-import {
-  clearFolderClips,
-  deleteClip,
-  getFolderClips,
-  readClipStorageRaw,
-  recordCopy,
-  StoredClip,
-  updateClip,
-  upsertClip,
-} from "@/features/clip/service/clipStorage";
-import { FilterType } from "@/features/clip/ui/FilterBar";
+import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
 import { Clip } from "@/features/clip/model/clip";
+import { copyClipToClipboard } from "@/features/clip/service/clipClipboard";
+import {
+  addOptimisticClipToCache,
+  cancelClipQueries,
+  invalidateClipQueries,
+  mapClipResponseToListItem,
+  removeClipsFromCache,
+  replaceOptimisticClipInCache,
+  moveClipToRecentCache,
+  updateClipFavoriteCache,
+} from "@/features/clip/service/clipQueryCache";
+import {
+  isAllowedImageClipFile,
+  isUnsupportedImageClipError,
+  UNSUPPORTED_IMAGE_CLIP_MESSAGE,
+} from "@/features/clip/service/imageClipValidation";
+import { ClipListItemResponseDto } from "@/features/clip/model/clip.dto";
+import { FilterType } from "@/features/clip/ui/FilterBar";
+import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
+import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
+import { waitForMinimumLoading } from "@/shared/lib/loading";
+import { notifyError } from "@/shared/lib/toast";
 
-const EMPTY_CLIPS: StoredClip[] = [];
+const createOptimisticClipId = () => {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `temp-${crypto.randomUUID()}`;
+  }
+
+  return `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+};
+
+const createOptimisticTextClip = (
+  folderId: string,
+  text: string,
+): ClipListItemResponseDto => {
+  const createdAt = new Date().toISOString();
+
+  return {
+    id: createOptimisticClipId(),
+    type: "TEXT",
+    title: text.slice(0, 48),
+    textContent: text,
+    colorHex: null,
+    imageUrl: null,
+    workspaceId: "optimistic",
+    folderId,
+    createdAt,
+    updatedAt: createdAt,
+    deletedAt: null,
+    likeByMe: false,
+    tags: [],
+    isOptimistic: true,
+  };
+};
+
+const createOptimisticImageClip = (
+  folderId: string,
+  file: File,
+  previewUrl: string,
+): ClipListItemResponseDto => {
+  const createdAt = new Date().toISOString();
+
+  return {
+    id: createOptimisticClipId(),
+    type: "IMAGE",
+    title: file.name || "Uploading image",
+    textContent: null,
+    colorHex: null,
+    imageUrl: previewUrl,
+    workspaceId: "optimistic",
+    folderId,
+    createdAt,
+    updatedAt: createdAt,
+    deletedAt: null,
+    likeByMe: false,
+    tags: [],
+    isOptimistic: true,
+  };
+};
 
 export const useFolderClipsPage = () => {
   const params = useParams<{ id?: string }>();
+  const router = useRouter();
   const folderId = params?.id ?? "";
+  const queryClient = useQueryClient();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery);
   const [isActive, setIsActive] = useState(false);
   const [contextMenu, setContextMenu] = useState<{
     id: string;
@@ -39,61 +111,32 @@ export const useFolderClipsPage = () => {
     y: number;
   } | null>(null);
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
-  const [isRenameOpen, setIsRenameOpen] = useState(false);
-  const [renameClipId, setRenameClipId] = useState<string | null>(null);
-  const [renameName, setRenameName] = useState("");
-  const renameInputRef = useRef<HTMLInputElement>(null);
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [isDeletingClips, setIsDeletingClips] = useState(false);
+  const [selectedClipIds, setSelectedClipIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const { copyToast, showCopyToast } = useCopyToast();
-  const lastClipsRawRef = useRef<string | null>(null);
-  const lastFolderIdRef = useRef("");
-  const lastClipsRef = useRef<StoredClip[]>(EMPTY_CLIPS);
+  const {
+    clips,
+    fetchNextPage,
+    hasNextPage,
+    isAuthenticated,
+    isError,
+    isFetchingNextPage,
+    isPending,
+    refetch,
+  } = useInfiniteClips({
+    folderId,
+    filter: activeFilter,
+    searchQuery: debouncedSearchQuery,
+    enabled: Boolean(folderId),
+  });
 
-  const getClipsSnapshot = useCallback(() => {
-    if (!folderId) {
-      return EMPTY_CLIPS;
-    }
-
-    const stored = readClipStorageRaw();
-    if (
-      stored === lastClipsRawRef.current &&
-      folderId === lastFolderIdRef.current
-    ) {
-      return lastClipsRef.current;
-    }
-
-    const nextClips = getFolderClips(folderId);
-    lastClipsRawRef.current = stored;
-    lastFolderIdRef.current = folderId;
-    lastClipsRef.current = nextClips;
-    return nextClips;
-  }, [folderId]);
-
-  const storedClips = useSyncExternalStore(
-    subscribeToClipStore,
-    getClipsSnapshot,
-    () => EMPTY_CLIPS,
+  const refreshClipQueries = useCallback(
+    () => invalidateClipQueries(queryClient),
+    [queryClient],
   );
-
-  const clips = useMemo<Clip[]>(
-    () => storedClips.map(mapStoredClipDates),
-    [storedClips],
-  );
-
-  const filteredClips = useMemo(() => {
-    const clipsByType =
-      activeFilter === "all"
-        ? clips
-        : clips.filter((clip) => clip.type === activeFilter);
-
-    if (!searchQuery.trim()) {
-      return clipsByType;
-    }
-
-    const loweredQuery = searchQuery.toLowerCase();
-    return clipsByType.filter((clip) =>
-      clip.name.toLowerCase().includes(loweredQuery),
-    );
-  }, [activeFilter, clips, searchQuery]);
 
   useEffect(() => {
     const handleBlur = () => setIsActive(false);
@@ -102,10 +145,16 @@ export const useFolderClipsPage = () => {
   }, []);
 
   useEffect(() => {
-    if (isRenameOpen && renameInputRef.current) {
-      renameInputRef.current.focus();
-    }
-  }, [isRenameOpen]);
+    const availableClipIds = new Set(clips.map((clip) => clip.id));
+
+    setSelectedClipIds((currentIds) => {
+      const nextIds = new Set(
+        [...currentIds].filter((clipId) => availableClipIds.has(clipId)),
+      );
+
+      return nextIds.size === currentIds.size ? currentIds : nextIds;
+    });
+  }, [clips]);
 
   useEffect(() => {
     if (!contextMenu) {
@@ -125,70 +174,130 @@ export const useFolderClipsPage = () => {
     return () => window.removeEventListener("pointerdown", handlePointerDown);
   }, [contextMenu]);
 
-  const addClip = useCallback((clip: StoredClip) => {
-    upsertClip(clip);
-  }, []);
+  const ensureAuthenticated = useCallback(() => {
+    if (isAuthenticated) {
+      return true;
+    }
 
-  const createTextClip = useCallback(
-    (content: string) => {
-      const trimmed = content.trim();
-      if (!trimmed) {
+    router.push("/login");
+    return false;
+  }, [isAuthenticated, router]);
+
+  const createTextClipFromPaste = useCallback(
+    async (content: string) => {
+      if (isDeleteMode || isDeletingClips) {
         return;
       }
 
-      const now = new Date().toISOString();
-      const isColor = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(trimmed);
-      addClip({
-        id:
-          typeof crypto !== "undefined" && "randomUUID" in crypto
-            ? crypto.randomUUID()
-            : `${Date.now()}`,
-        folderId: folderId || null,
-        type: isColor ? "color" : "text",
-        name: isColor ? "Color Clip" : "Text Clip",
-        content: trimmed,
-        createdAt: now,
-        updatedAt: now,
-        lastCopiedAt: now,
-        isFavorite: false,
-      });
+      const trimmed = content.trim();
+      if (!trimmed || !folderId || !isAuthenticated) {
+        return;
+      }
+
+      const optimisticClip = createOptimisticTextClip(folderId, trimmed);
+      await cancelClipQueries(queryClient);
+      const rollbackOptimisticClip = addOptimisticClipToCache(
+        queryClient,
+        optimisticClip,
+      );
+      const optimisticStartedAt = Date.now();
+
+      try {
+        const createdClip = await createTextClip({
+          folderId,
+          text: trimmed,
+        });
+
+        await waitForMinimumLoading(optimisticStartedAt);
+        replaceOptimisticClipInCache(
+          queryClient,
+          optimisticClip.id,
+          mapClipResponseToListItem(createdClip),
+        );
+      } catch {
+        await waitForMinimumLoading(optimisticStartedAt);
+        rollbackOptimisticClip();
+        notifyError("클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      } finally {
+        void refreshClipQueries();
+      }
     },
-    [addClip, folderId],
+    [
+      folderId,
+      isAuthenticated,
+      isDeleteMode,
+      isDeletingClips,
+      queryClient,
+      refreshClipQueries,
+    ],
   );
 
-  const createImageClip = useCallback(
-    (file: File) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = typeof reader.result === "string" ? reader.result : "";
-        if (!result) {
-          return;
-        }
+  const createImageClipFromPaste = useCallback(
+    async (file: File) => {
+      if (isDeleteMode || isDeletingClips) {
+        return;
+      }
 
-        const now = new Date().toISOString();
-        addClip({
-          id:
-            typeof crypto !== "undefined" && "randomUUID" in crypto
-              ? crypto.randomUUID()
-              : `${Date.now()}`,
-          folderId: folderId || null,
-          type: "image",
-          name: "Image Clip",
-          content: result,
-          createdAt: now,
-          updatedAt: now,
-          lastCopiedAt: now,
-          isFavorite: false,
+      if (!folderId || !isAuthenticated) {
+        return;
+      }
+
+      if (!isAllowedImageClipFile(file)) {
+        notifyError(UNSUPPORTED_IMAGE_CLIP_MESSAGE);
+        return;
+      }
+
+      const previewUrl = URL.createObjectURL(file);
+      const optimisticClip = createOptimisticImageClip(
+        folderId,
+        file,
+        previewUrl,
+      );
+      await cancelClipQueries(queryClient);
+      const rollbackOptimisticClip = addOptimisticClipToCache(
+        queryClient,
+        optimisticClip,
+      );
+      const optimisticStartedAt = Date.now();
+
+      try {
+        const createdClip = await createImageClip({
+          folderId,
+          file,
         });
-      };
-      reader.readAsDataURL(file);
+
+        await waitForMinimumLoading(optimisticStartedAt);
+        replaceOptimisticClipInCache(
+          queryClient,
+          optimisticClip.id,
+          mapClipResponseToListItem(createdClip),
+        );
+      } catch (error) {
+        await waitForMinimumLoading(optimisticStartedAt);
+        rollbackOptimisticClip();
+        notifyError(
+          isUnsupportedImageClipError(error)
+            ? UNSUPPORTED_IMAGE_CLIP_MESSAGE
+            : "이미지 클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        );
+      } finally {
+        URL.revokeObjectURL(previewUrl);
+        void refreshClipQueries();
+      }
     },
-    [addClip, folderId],
+    [
+      folderId,
+      isAuthenticated,
+      isDeleteMode,
+      isDeletingClips,
+      queryClient,
+      refreshClipQueries,
+    ],
   );
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
-      if (!isActive || !folderId) {
+      if (!isActive || !folderId || !ensureAuthenticated()) {
         return;
       }
 
@@ -202,131 +311,358 @@ export const useFolderClipsPage = () => {
       if (imageItem) {
         const file = imageItem.getAsFile();
         if (file) {
-          createImageClip(file);
+          void createImageClipFromPaste(file);
           return;
         }
       }
 
       const text = clipboard.getData("text");
       if (text) {
-        createTextClip(text);
+        void createTextClipFromPaste(text);
       }
     };
 
     window.addEventListener("paste", handlePaste);
     return () => window.removeEventListener("paste", handlePaste);
-  }, [createImageClip, createTextClip, folderId, isActive]);
+  }, [
+    createImageClipFromPaste,
+    createTextClipFromPaste,
+    ensureAuthenticated,
+    folderId,
+    isActive,
+  ]);
 
   const handleCopy = useCallback(
     async (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => {
-      showCopyToast(event.clientX, event.clientY);
-
-      try {
-        await navigator.clipboard.writeText(clip.content);
-      } catch {
-        // no-op
+      if (isDeleteMode || isDeletingClips) {
+        return;
       }
 
-      recordCopy(clip.id);
+      try {
+        await copyClipToClipboard(clip);
+      } catch {
+        notifyError("클립을 복사하지 못했습니다. 잠시 후 다시 시도해주세요.");
+        return;
+      }
+
+      showCopyToast(event.clientX, event.clientY);
+
+      if (isAuthenticated) {
+        await recordClipView(clip.id);
+        moveClipToRecentCache(queryClient, clip.id);
+        void refreshClipQueries();
+      }
     },
-    [showCopyToast],
+    [
+      isAuthenticated,
+      isDeleteMode,
+      isDeletingClips,
+      queryClient,
+      refreshClipQueries,
+      showCopyToast,
+    ],
   );
 
-  const handleCopyFromMenu = useCallback(async (clip: Clip) => {
-    try {
-      await navigator.clipboard.writeText(clip.content);
-    } catch {
-      // no-op
-    }
+  const handleCopyFromMenu = useCallback(
+    async (clip: Clip) => {
+      if (isDeleteMode || isDeletingClips) {
+        return;
+      }
 
-    recordCopy(clip.id);
-    setContextMenu(null);
-  }, []);
+      try {
+        await copyClipToClipboard(clip);
+      } catch {
+        notifyError("클립을 복사하지 못했습니다. 잠시 후 다시 시도해주세요.");
+        return;
+      }
 
-  const handleToggleFavorite = useCallback((clip: Clip) => {
-    updateClip(clip.id, {
-      isFavorite: !clip.isFavorite,
-      updatedAt: new Date().toISOString(),
-    });
-  }, []);
+      if (isAuthenticated) {
+        await recordClipView(clip.id);
+        moveClipToRecentCache(queryClient, clip.id);
+        void refreshClipQueries();
+      }
+
+      setContextMenu(null);
+    },
+    [isAuthenticated, isDeleteMode, isDeletingClips, queryClient, refreshClipQueries],
+  );
+
+  const handleToggleFavorite = useCallback(
+    async (clip: Clip) => {
+      if (!isAuthenticated || isDeleteMode || isDeletingClips) {
+        return;
+      }
+
+      const nextFavorite = !clip.isFavorite;
+      const rollbackFavorite = updateClipFavoriteCache(
+        queryClient,
+        clip.id,
+        nextFavorite,
+      );
+
+      try {
+        if (nextFavorite) {
+          await likeClip(clip.id);
+        } else {
+          await unlikeClip(clip.id);
+        }
+      } catch {
+        rollbackFavorite();
+      } finally {
+        void refreshClipQueries();
+      }
+    },
+    [
+      isAuthenticated,
+      isDeleteMode,
+      isDeletingClips,
+      queryClient,
+      refreshClipQueries,
+    ],
+  );
 
   const handleOpenContextMenu = useCallback(
     (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => {
       event.preventDefault();
+
+      if (isDeleteMode || isDeletingClips) {
+        return;
+      }
+
       setContextMenu({
         id: clip.id,
         x: event.clientX,
         y: event.clientY,
       });
     },
-    [],
+    [isDeleteMode, isDeletingClips],
   );
 
-  const handleDeleteClip = useCallback((clipId: string) => {
-    deleteClip(clipId);
-    setContextMenu(null);
-  }, []);
+  const handleDeleteClip = useCallback(
+    async (clipId: string) => {
+      if (!isAuthenticated || isDeletingClips) {
+        return;
+      }
 
-  const handleOpenRename = useCallback((clipId: string, name: string) => {
-    setContextMenu(null);
-    setRenameClipId(clipId);
-    setRenameName(name);
-    setIsRenameOpen(true);
-  }, []);
+      setIsDeletingClips(true);
+      await cancelClipQueries(queryClient);
+      const rollbackDeletedClip = removeClipsFromCache(queryClient, [clipId]);
+      let isDeleted = false;
+      setContextMenu(null);
 
-  const handleRenameClip = useCallback(() => {
-    if (!renameClipId) {
-      return;
-    }
+      try {
+        await removeClip(clipId);
+        isDeleted = true;
+      } catch {
+        rollbackDeletedClip();
+        notifyError("클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      } finally {
+        setIsDeletingClips(false);
+        void refreshClipQueries();
+        if (isDeleted) {
+          void invalidateTrashQueries(queryClient);
+        }
+      }
+    },
+    [isAuthenticated, isDeletingClips, queryClient, refreshClipQueries],
+  );
 
-    const trimmed = renameName.trim();
-    if (!trimmed) {
-      return;
-    }
+  const deleteClipsByIds = useCallback(
+    async (clipIds: string[], errorMessage: string) => {
+      if (!isAuthenticated || isDeletingClips) {
+        return false;
+      }
 
-    updateClip(renameClipId, {
-      name: trimmed,
-      updatedAt: new Date().toISOString(),
-    });
-    setIsRenameOpen(false);
-    setRenameClipId(null);
-    setRenameName("");
-  }, [renameClipId, renameName]);
+      const uniqueClipIds = [...new Set(clipIds)];
+      if (uniqueClipIds.length === 0) {
+        return false;
+      }
 
-  const handleDeleteAll = useCallback(() => {
-    if (folderId) {
-      clearFolderClips(folderId);
-    }
-    setIsDeleteAllOpen(false);
+      setIsDeletingClips(true);
+      await cancelClipQueries(queryClient);
+      const rollbackDeletedClips = removeClipsFromCache(queryClient, uniqueClipIds);
+      let isDeleted = false;
+
+      try {
+        await removeClips({ clipIds: uniqueClipIds });
+        isDeleted = true;
+        return true;
+      } catch {
+        rollbackDeletedClips();
+        notifyError(errorMessage);
+        return false;
+      } finally {
+        setIsDeletingClips(false);
+        void refreshClipQueries();
+        if (isDeleted) {
+          void invalidateTrashQueries(queryClient);
+        }
+      }
+    },
+    [isAuthenticated, isDeletingClips, queryClient, refreshClipQueries],
+  );
+
+  const fetchAllFolderClipIds = useCallback(async () => {
+    const clipIds: string[] = [];
+    let cursor: string | null = null;
+
+    do {
+      const response = await fetchClips({
+        folderId,
+        type: "ALL",
+        cursor,
+      });
+
+      clipIds.push(...response.items.map((clip) => clip.id));
+      cursor = response.hasMore ? response.nextCursor : null;
+    } while (cursor);
+
+    return clipIds;
   }, [folderId]);
+
+  const handleEnterDeleteMode = useCallback(() => {
+    if (!isAuthenticated || clips.length === 0 || isDeletingClips) {
+      return;
+    }
+
+    setContextMenu(null);
+    setIsActive(false);
+    setIsDeleteMode(true);
+    setSelectedClipIds(new Set());
+  }, [clips.length, isAuthenticated, isDeletingClips]);
+
+  const handleCancelDeleteMode = useCallback(() => {
+    if (isDeletingClips) {
+      return;
+    }
+
+    setIsDeleteMode(false);
+    setSelectedClipIds(new Set());
+  }, [isDeletingClips]);
+
+  const handleToggleClipSelected = useCallback(
+    (clipId: string) => {
+      if (!isDeleteMode || isDeletingClips) {
+        return;
+      }
+
+      setSelectedClipIds((currentIds) => {
+        const nextIds = new Set(currentIds);
+
+        if (nextIds.has(clipId)) {
+          nextIds.delete(clipId);
+        } else {
+          nextIds.add(clipId);
+        }
+
+        return nextIds;
+      });
+    },
+    [isDeleteMode, isDeletingClips],
+  );
+
+  const handleDeleteSelected = useCallback(async () => {
+    const clipIds = [...selectedClipIds];
+    if (clipIds.length === 0) {
+      return;
+    }
+
+    const isDeleted = await deleteClipsByIds(
+      clipIds,
+      "선택한 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    );
+
+    if (isDeleted) {
+      setSelectedClipIds(new Set());
+      setIsDeleteMode(false);
+    }
+  }, [deleteClipsByIds, selectedClipIds]);
+
+  const handleDeleteAll = useCallback(async () => {
+    if (!isAuthenticated || isDeletingClips || !folderId) {
+      return;
+    }
+
+    setIsDeleteAllOpen(false);
+    setIsDeletingClips(true);
+    let isDeleted = false;
+
+    try {
+      const clipIds = await fetchAllFolderClipIds();
+
+      if (clipIds.length === 0) {
+        setIsDeleteMode(false);
+        setSelectedClipIds(new Set());
+        return;
+      }
+
+      const uniqueClipIds = [...new Set(clipIds)];
+      await cancelClipQueries(queryClient);
+      const rollbackDeletedClips = removeClipsFromCache(queryClient, uniqueClipIds);
+
+      try {
+        await removeClips({ clipIds: uniqueClipIds });
+        isDeleted = true;
+        setSelectedClipIds(new Set());
+        setIsDeleteMode(false);
+      } catch {
+        rollbackDeletedClips();
+        notifyError(
+          "현재 폴더의 모든 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        );
+      }
+    } catch {
+      notifyError("현재 폴더의 모든 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsDeletingClips(false);
+      void refreshClipQueries();
+      if (isDeleted) {
+        void invalidateTrashQueries(queryClient);
+      }
+    }
+  }, [
+    fetchAllFolderClipIds,
+    folderId,
+    isAuthenticated,
+    isDeletingClips,
+    queryClient,
+    refreshClipQueries,
+  ]);
 
   return {
     activeFilter,
     clips,
     contextMenu,
     copyToast,
-    filteredClips,
-    hasClips: storedClips.length > 0,
+    fetchNextPage,
+    filteredClips: clips,
+    hasClips: clips.length > 0,
+    hasNextPage: Boolean(hasNextPage),
     isActive,
     isDeleteAllOpen,
-    isRenameOpen,
-    renameInputRef,
-    renameName,
+    isDeleteMode,
+    isDeletingClips,
+    isError,
+    isFetchingNextPage,
+    isLoading: isPending,
+    refetchClips: refetch,
     searchQuery,
     setActiveFilter,
     setContextMenu,
     setIsActive,
     setIsDeleteAllOpen,
-    setIsRenameOpen,
-    setRenameName,
     setSearchQuery,
+    selectedClipCount: selectedClipIds.size,
+    selectedClipIds,
     handleCopy,
     handleCopyFromMenu,
+    handleCancelDeleteMode,
     handleDeleteAll,
     handleDeleteClip,
+    handleDeleteSelected,
+    handleEnterDeleteMode,
     handleOpenContextMenu,
-    handleOpenRename,
-    handleRenameClip,
+    handleToggleClipSelected,
     handleToggleFavorite,
   };
 };

@@ -6,6 +6,7 @@ interface DeleteAllClipsModalProps {
   description: string;
   cancelLabel: string;
   confirmLabel: string;
+  isConfirming?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }
@@ -16,6 +17,7 @@ export function DeleteAllClipsModal({
   description,
   cancelLabel,
   confirmLabel,
+  isConfirming = false,
   onCancel,
   onConfirm,
 }: DeleteAllClipsModalProps) {
@@ -33,15 +35,17 @@ export function DeleteAllClipsModal({
         <div className="flex justify-end gap-2 px-5 py-4">
           <button
             type="button"
+            disabled={isConfirming}
             onClick={onCancel}
-            className="hover:text-foreground rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition"
+            className="hover:text-foreground rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition disabled:cursor-default disabled:opacity-50"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
+            disabled={isConfirming}
             onClick={onConfirm}
-            className="rounded-lg bg-(--danger) px-4 py-2 text-sm font-medium text-danger-foreground transition hover:bg-(--danger-hover)"
+            className="rounded-lg bg-(--danger) px-4 py-2 text-sm font-medium text-danger-foreground transition hover:bg-(--danger-hover) disabled:cursor-default disabled:opacity-50"
           >
             {confirmLabel}
           </button>

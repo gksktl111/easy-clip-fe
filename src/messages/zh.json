@@ -41,6 +41,7 @@
     "continueWithGoogle": "使用 Google 继续",
     "continueWithGithub": "使用 GitHub 继续",
     "loading": "登录中...",
+    "configError": "缺少 API 连接配置，请检查环境变量。",
     "or": "或",
     "backHome": "返回首页",
     "agreementPrefix": "继续即表示你同意",
@@ -52,13 +53,16 @@
   "sidebar": {
     "favorites": "收藏",
     "recent": "最近",
+    "trash": "回收站",
     "addFolder": "添加文件夹",
     "reorderFolder": "调整文件夹顺序",
     "openFolderOptions": "打开文件夹选项",
     "rename": "重命名",
     "delete": "删除",
     "logout": "退出登录",
+    "guest": "访客",
     "settings": "设置",
+    "upgradePlan": "升级套餐",
     "closeCreateFolder": "关闭新建文件夹",
     "createFolder": "新建文件夹",
     "folderName": "文件夹名称",
@@ -79,10 +83,83 @@
     "general": "通用",
     "language": "语言",
     "languageDescription": "选择你偏好的语言。",
+    "saveError": "无法保存设置。请稍后再试。",
+    "subscriptionTitle": "当前订阅信息",
+    "subscriptionPlan": "套餐",
+    "subscriptionStatus": "订阅状态",
+    "subscriptionStatusValues": {
+      "ACTIVE": "订阅中",
+      "CANCELED": "已取消订阅",
+      "EXPIRED": "订阅已过期"
+    },
+    "subscriptionNextBillingAt": "下次扣费",
+    "subscriptionLoading": "确认中",
+    "subscriptionEmptyValue": "-",
+    "subscriptionLoadError": "无法加载订阅信息。",
     "about": "关于",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "面向设计师和开发者的现代剪贴板管理器",
     "closeButton": "关闭"
+  },
+  "trash": {
+    "title": "回收站",
+    "retentionNotice": "最多保留 30 天",
+    "description": "查看已删除的剪贴内容和文件夹，并可执行恢复或永久删除。",
+    "refresh": "刷新",
+    "clearAll": "全部删除",
+    "clearing": "正在清空回收站。",
+    "clearingAction": "清空中",
+    "deleteSelected": "删除所选",
+    "deletingSelected": "正在删除所选项目。",
+    "deletingSelectedAction": "删除中",
+    "restoreSelected": "恢复所选",
+    "restoringSelected": "正在恢复所选项目。",
+    "restoringSelectedAction": "恢复中",
+    "selectedCount": "{count, plural, =0 {未选择} other {已选择 # 个}}",
+    "selectAll": "选择所有回收站项目",
+    "selectItem": "选择 {name}",
+    "cancel": "取消",
+    "loading": "正在加载回收站内容。",
+    "error": "无法加载回收站数据。请稍后再试。",
+    "actionError": "无法完成回收站操作。请稍后再试。",
+    "restoreConflictError": "已删除文件夹中的剪贴内容不能单独恢复。请先恢复父级文件夹。",
+    "clearAllPartialError": "部分项目未能删除。失败 {failedCount} 个 / 共 {totalCount} 个。",
+    "emptyTitle": "回收站为空",
+    "emptyDescription": "删除的剪贴内容或文件夹会显示在这里。",
+    "listTitle": "已删除项目",
+    "totalCount": "{count, plural, =0 {0 个项目} other {# 个项目}}",
+    "folderType": "文件夹",
+    "fileType": "文件",
+    "parentFolder": "父级文件夹",
+    "unknownParentFolder": "未知文件夹",
+    "clipKinds": {
+      "text": "文本",
+      "color": "颜色",
+      "image": "图片"
+    },
+    "columns": {
+      "name": "名称",
+      "type": "类型",
+      "deletedAt": "删除时间",
+      "actions": "操作"
+    },
+    "clearAllModal": {
+      "title": "删除全部回收站项目",
+      "description": "确定要永久删除回收站中的全部项目吗？"
+    },
+    "deleteSelectedModal": {
+      "title": "删除所选项目",
+      "description": "确定要永久删除所选的 {count, plural, other {# 个项目}}吗？"
+    },
+    "clipsTitle": "已删除剪贴内容",
+    "clipsCount": "{count, plural, =0 {0 个剪贴项} other {# 个剪贴项}}",
+    "clipsEmpty": "没有已删除的剪贴内容。",
+    "foldersTitle": "已删除文件夹",
+    "foldersCount": "{count, plural, =0 {0 个文件夹} other {# 个文件夹}}",
+    "foldersEmpty": "没有已删除的文件夹。",
+    "deletedAt": "删除时间",
+    "restore": "恢复",
+    "deleteForever": "删除"
   },
   "clips": {
     "count": "{count, plural, =0 {0 个剪贴项} other {# 个剪贴项}}",
@@ -101,20 +178,36 @@
       "title": "还没有保存的剪贴内容",
       "description": "复制新的内容，或在文件夹中开始粘贴后，这里就会显示内容。"
     },
+    "errorState": {
+      "title": "无法加载剪贴内容",
+      "description": "请检查网络连接，或稍后再试。",
+      "retry": "重试"
+    },
     "item": {
-      "toggleFavorite": "切换收藏"
+      "saving": "保存中",
+      "toggleFavorite": "切换收藏",
+      "selectForDelete": "选择删除 {name}"
     },
     "actions": {
       "copy": "复制",
       "rename": "重命名",
       "delete": "删除",
+      "deleteClips": "删除剪贴内容",
       "deleteAll": "全部删除",
       "cancel": "取消",
       "change": "保存"
     },
+    "deleteMode": {
+      "title": "删除剪贴内容",
+      "selectedCount": "已选择 {selectedCount} 个 / 当前屏幕 {totalCount} 个",
+      "deleteSelected": "删除所选",
+      "deleteAll": "全部删除",
+      "deleting": "删除中",
+      "cancel": "取消"
+    },
     "deleteModal": {
-      "title": "删除所有剪贴内容",
-      "description": "确定要删除全部剪贴内容吗？"
+      "title": "删除当前文件夹内容",
+      "description": "确定要删除当前文件夹中的全部剪贴内容吗？"
     },
     "renameModal": {
       "title": "重命名",

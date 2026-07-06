@@ -1,3 +1,4 @@
+import { AuthBootstrap } from "@/features/auth/ui/AuthBootstrap";
 import { PricingComparisonSection } from "@/features/pricing/ui/PricingComparisonSection";
 import { PricingHeroSection } from "@/features/pricing/ui/PricingHeroSection";
 import { PricingPlansSection } from "@/features/pricing/ui/PricingPlansSection";
@@ -5,6 +6,7 @@ import { PricingPlansSection } from "@/features/pricing/ui/PricingPlansSection";
 export function PricingPage() {
   return (
     <section className="relative overflow-hidden">
+      <AuthBootstrap />
       <div
         className="absolute inset-x-0 top-0 -z-10 h-[28rem]"
         style={{
