@@ -1,7 +1,9 @@
-const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
+const trimTrailingSlash = (value: string) => value.trim().replace(/\/+$/, "");
 
-const getRequiredPublicEnv = (name: "NEXT_PUBLIC_API_BASE_URL") => {
-  const value = process.env[name];
+const getRequiredPublicEnv = (
+  name: "NEXT_PUBLIC_API_BASE_URL",
+  value: string | undefined,
+) => {
   if (!value && process.env.NODE_ENV !== "production") {
     return "http://localhost:3000";
   }
@@ -14,7 +16,10 @@ const getRequiredPublicEnv = (name: "NEXT_PUBLIC_API_BASE_URL") => {
 };
 
 export const getApiBaseUrl = () =>
-  getRequiredPublicEnv("NEXT_PUBLIC_API_BASE_URL");
+  getRequiredPublicEnv(
+    "NEXT_PUBLIC_API_BASE_URL",
+    process.env.NEXT_PUBLIC_API_BASE_URL,
+  );
 
 export const isLocalApiBaseUrl = () => {
   const apiBaseUrl = getApiBaseUrl();
