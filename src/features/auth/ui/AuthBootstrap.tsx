@@ -13,6 +13,7 @@ import {
 } from "@/features/auth/service/authService";
 import { notifyError } from "@/shared/feedback/toast";
 
+// 앱 전역의 인증 세션을 복구하고 만료 상태를 라우팅 및 캐시와 동기화합니다.
 export function AuthBootstrap() {
   const session = useAuthSession();
   const router = useRouter();
