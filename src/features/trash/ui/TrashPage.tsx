@@ -33,31 +33,15 @@ export function TrashPage() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Set<string>>(
     () => new Set(),
   );
-  const {
-    items,
-    activeFolders,
-    fetchNextPage,
-    hasNextPage,
-    isLoading,
-    isFetchingNextPage,
-    error,
-    pendingActionKey,
-    reload,
-    handleRestoreClip,
-    handleRestoreItems,
-    handleDeleteClip,
-    handleDeleteItems,
-    handleRestoreFolder,
-    handleDeleteFolder,
-    handleClearAll,
-  } = useTrashPage();
+  const { actions, context, results } = useTrashPage();
+  const { items } = results;
   const deletedFolderIds = new Set(
     items
       .filter((item) => item.itemType === "FOLDER")
       .map((folder) => folder.id),
   );
   const folderNameById = new Map([
-    ...activeFolders.map((folder) => [folder.id, folder.name] as const),
+    ...context.activeFolders.map((folder) => [folder.id, folder.name] as const),
     ...items
       .filter((item) => item.itemType === "FOLDER")
       .map((folder) => [folder.id, folder.name] as const),
@@ -90,17 +74,19 @@ export function TrashPage() {
           folderNameById.get(item.folderId) ?? t("unknownParentFolder"),
       };
     });
-  const isClearingAll = pendingActionKey === "trash-clear-all";
-  const isRestoringSelected = pendingActionKey === "trash-restore-selected";
-  const isDeletingSelected = pendingActionKey === "trash-delete-selected";
-  const isActionPending = pendingActionKey !== null;
+  const isClearingAll = actions.pendingActionKey === "trash-clear-all";
+  const isRestoringSelected =
+    actions.pendingActionKey === "trash-restore-selected";
+  const isDeletingSelected =
+    actions.pendingActionKey === "trash-delete-selected";
+  const isActionPending = actions.pendingActionKey !== null;
   const rowKey = (row: TrashItemRow) => `${row.kind}-${row.id}`;
   const selectedRows = rows.filter((row) => selectedRowKeys.has(rowKey(row)));
   const hasRows = rows.length > 0;
   const errorMessage =
-    error === "restoreConflict"
+    results.error === "restoreConflict"
       ? t("restoreConflictError")
-      : error === "action"
+      : results.error === "action"
         ? t("actionError")
         : t("error");
 
@@ -137,7 +123,7 @@ export function TrashPage() {
       return;
     }
 
-    const isDeleted = await handleDeleteItems(
+    const isDeleted = await actions.deleteItems(
       selectedRows.map((row) => ({
         itemType: row.kind === "clip" ? "CLIP" : "FOLDER",
         id: row.id,
@@ -154,7 +140,7 @@ export function TrashPage() {
       return;
     }
 
-    const isRestored = await handleRestoreItems(
+    const isRestored = await actions.restoreItems(
       selectedRows.map((row) => ({
         itemType: row.kind === "clip" ? "CLIP" : "FOLDER",
         id: row.id,
@@ -171,13 +157,13 @@ export function TrashPage() {
       <TrashPageHeader
         count={rows.length}
         selectedCount={selectedRows.length}
-        isLoading={isLoading}
+        isLoading={results.isLoading}
         isActionPending={isActionPending}
         isClearingAll={isClearingAll}
         isRestoringSelected={isRestoringSelected}
         isDeletingSelected={isDeletingSelected}
         onReload={() => {
-          void reload();
+          void actions.reload();
         }}
         onRequestClearAll={() => setDeleteModal("clearAll")}
         onRestoreSelected={() => {
@@ -186,7 +172,7 @@ export function TrashPage() {
         onRequestDeleteSelected={() => setDeleteModal("selected")}
       />
 
-      {error ? (
+      {results.error ? (
         <div className="p-6 pt-6">
           <p
             className="rounded-xl border border-(--danger-border) bg-(--danger-surface) px-4 py-3 text-sm text-(--danger-text)"
@@ -197,32 +183,32 @@ export function TrashPage() {
         </div>
       ) : null}
 
-      {!isLoading && !hasRows ? <TrashPageEmptyState /> : null}
+      {!results.isLoading && !hasRows ? <TrashPageEmptyState /> : null}
 
-      {isLoading || hasRows ? (
+      {results.isLoading || hasRows ? (
         <TrashListSection
           rows={rows}
-          isLoading={isLoading}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          pendingActionKey={pendingActionKey}
+          isLoading={results.isLoading}
+          hasNextPage={results.hasNextPage}
+          isFetchingNextPage={results.isFetchingNextPage}
+          pendingActionKey={actions.pendingActionKey}
           selectedRowKeys={selectedRowKeys}
           onFetchNextPage={() => {
-            void fetchNextPage();
+            void results.fetchNextPage();
           }}
           onToggleRow={handleToggleRow}
           onToggleAllRows={handleToggleAllRows}
           onRestoreFolder={(folderId) => {
-            void handleRestoreFolder(folderId);
+            void actions.restoreFolder(folderId);
           }}
           onDeleteFolder={(folderId) => {
-            void handleDeleteFolder(folderId);
+            void actions.deleteFolder(folderId);
           }}
           onRestoreClip={(clipId) => {
-            void handleRestoreClip(clipId);
+            void actions.restoreClip(clipId);
           }}
           onDeleteClip={(clipId) => {
-            void handleDeleteClip(clipId);
+            void actions.deleteClip(clipId);
           }}
         />
       ) : null}
@@ -253,7 +239,7 @@ export function TrashPage() {
           if (target === "selected") {
             void handleDeleteSelected();
           } else {
-            void handleClearAll();
+            void actions.clearAll();
           }
         }}
       />
