@@ -1,3 +1,4 @@
+// 클립 저장부터 재사용까지의 제품 흐름을 단계별 카드로 설명합니다.
 interface LandingWorkflowStep {
   step: string;
   title: string;
@@ -6,6 +7,37 @@ interface LandingWorkflowStep {
 
 interface LandingWorkflowSectionProps {
   steps: readonly LandingWorkflowStep[];
+}
+
+function LandingWorkflowStepCard({
+  index,
+  step,
+}: {
+  index: number;
+  step: LandingWorkflowStep;
+}) {
+  return (
+    <article className="relative overflow-hidden rounded-[2rem] border border-(--border) bg-(--background) p-7">
+      <div className="absolute top-0 right-0 h-28 w-28 rounded-full bg-(--surface-muted) blur-2xl" />
+      <div className="relative">
+        <div className="flex items-center justify-between">
+          <span className="rounded-full bg-(--surface-muted) px-3 py-1 text-xs font-semibold tracking-[0.16em] text-(--muted) uppercase">
+            {step.step}
+          </span>
+          <span className="text-4xl font-semibold tracking-tight text-(--border)">
+            0{index + 1}
+          </span>
+        </div>
+
+        <h3 className="mt-10 text-2xl font-semibold tracking-tight">
+          {step.title}
+        </h3>
+        <p className="mt-4 text-sm leading-7 text-(--muted) md:text-base">
+          {step.description}
+        </p>
+      </div>
+    </article>
+  );
 }
 
 export function LandingWorkflowSection({ steps }: LandingWorkflowSectionProps) {
@@ -24,29 +56,11 @@ export function LandingWorkflowSection({ steps }: LandingWorkflowSectionProps) {
 
         <div className="mt-14 grid gap-6 lg:grid-cols-3">
           {steps.map((step, index) => (
-            <article
+            <LandingWorkflowStepCard
               key={step.step}
-              className="relative overflow-hidden rounded-[2rem] border border-(--border) bg-(--background) p-7"
-            >
-              <div className="absolute top-0 right-0 h-28 w-28 rounded-full bg-(--surface-muted) blur-2xl" />
-              <div className="relative">
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-(--surface-muted) px-3 py-1 text-xs font-semibold tracking-[0.16em] text-(--muted) uppercase">
-                    {step.step}
-                  </span>
-                  <span className="text-4xl font-semibold tracking-tight text-(--border)">
-                    0{index + 1}
-                  </span>
-                </div>
-
-                <h3 className="mt-10 text-2xl font-semibold tracking-tight">
-                  {step.title}
-                </h3>
-                <p className="mt-4 text-sm leading-7 text-(--muted) md:text-base">
-                  {step.description}
-                </p>
-              </div>
-            </article>
+              index={index}
+              step={step}
+            />
           ))}
         </div>
       </div>

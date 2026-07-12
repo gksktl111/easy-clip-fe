@@ -4,8 +4,10 @@ import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useInView } from "react-intersection-observer";
 import { TrashListRow } from "@/features/trash/ui/TrashListRow";
-import { TrashItemRow } from "@/features/trash/ui/trashRow";
+import type { TrashItemRow } from "@/features/trash/ui/trashRow";
 import { Checkbox } from "@/shared/ui/input/Checkbox";
+
+const SKELETON_ROWS = Array.from({ length: 6 }, (_, index) => index);
 
 interface TrashListSectionProps {
   rows: TrashItemRow[];
@@ -40,7 +42,6 @@ export function TrashListSection({
   onDeleteClip,
 }: TrashListSectionProps) {
   const t = useTranslations("trash");
-  const skeletonRows = Array.from({ length: 6 }, (_, index) => index);
   const hasTriggeredInViewRef = useRef(false);
   const { ref: loadMoreRef, inView } = useInView({
     rootMargin: "240px 0px",
@@ -95,7 +96,7 @@ export function TrashListSection({
 
       <div className="clip-scrollbar min-h-0 flex-1 divide-y divide-(--border) overflow-y-auto">
         {isLoading
-          ? skeletonRows.map((row) => <TrashListSkeletonRow key={row} />)
+          ? SKELETON_ROWS.map((row) => <TrashListSkeletonRow key={row} />)
           : rows.map((row) => (
               <TrashListRow
                 key={`${row.kind}-${row.id}`}

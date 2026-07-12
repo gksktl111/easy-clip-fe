@@ -1,5 +1,3 @@
-"use client";
-
 import { LandingFeaturesSection } from "@/features/landing/ui/LandingFeaturesSection";
 import { LandingFinalCtaSection } from "@/features/landing/ui/LandingFinalCtaSection";
 import { LandingHeroSection } from "@/features/landing/ui/LandingHeroSection";
@@ -14,6 +12,7 @@ import {
   LANDING_WORKFLOW_STEPS,
 } from "../const/landingContent";
 
+// 랜딩 화면의 마케팅 섹션을 사용자 흐름 순서대로 조합합니다.
 export function LandingPage() {
   return (
     <MarketingShell activeTab="home">

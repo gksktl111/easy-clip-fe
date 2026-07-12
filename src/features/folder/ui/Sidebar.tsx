@@ -18,7 +18,13 @@ import { FolderSidebarHeader } from "@/features/folder/ui/FolderSidebarHeader";
 import { FolderSidebarSection } from "@/features/folder/ui/FolderSidebarSection";
 import { SidebarPrimaryNav } from "@/features/folder/ui/SidebarPrimaryNav";
 
-//TODO : 클립 도메인으로 합병
+const RESERVED_PATHNAMES = new Set([
+  "favorites",
+  "recent",
+  "trash",
+  "login",
+  "pricing",
+]);
 
 interface SidebarProps {
   onOpenSettings: () => void;
@@ -33,6 +39,11 @@ type FolderDropTarget = {
   indicatorEdge: "top" | "bottom";
 };
 
+type FolderNameModalState =
+  | { mode: "create"; value: string }
+  | { mode: "rename"; folderId: string; value: string };
+
+// 앱 탐색과 폴더 생성, 이름 변경, 삭제, 순서 변경 흐름을 조합합니다.
 export function Sidebar({
   onOpenSettings,
   isMobileOpen = false,
@@ -52,30 +63,20 @@ export function Sidebar({
     renameFolder,
     saveFolderOrder,
   } = useFolders();
-  const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
+  const [folderNameModal, setFolderNameModal] =
+    useState<FolderNameModalState | null>(null);
   const [openOptionsFolderId, setOpenOptionsFolderId] = useState<string | null>(
     null,
   );
-  const [isRenameFolderModalOpen, setIsRenameFolderModalOpen] = useState(false);
-  const [renameFolderId, setRenameFolderId] = useState<string | null>(null);
-  const [renameFolderName, setRenameFolderName] = useState("");
   const [draggingFolderId, setDraggingFolderId] = useState<string | null>(null);
   const [folderDropTarget, setFolderDropTarget] =
     useState<FolderDropTarget | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const renameInputRef = useRef<HTMLInputElement>(null);
+  const folderNameInputRef = useRef<HTMLInputElement>(null);
+  const folderNameModalMode = folderNameModal?.mode ?? null;
   const pathSegments = pathname.split("/").filter(Boolean);
   const pathnameFolderId = pathSegments[0] ?? null;
-  const reservedPathnames = new Set([
-    "favorites",
-    "recent",
-    "trash",
-    "login",
-    "pricing",
-  ]);
   const currentFolderId =
-    pathnameFolderId && !reservedPathnames.has(pathnameFolderId)
+    pathnameFolderId && !RESERVED_PATHNAMES.has(pathnameFolderId)
       ? pathnameFolderId
       : (folders[0]?.id ?? null);
 
@@ -98,16 +99,10 @@ export function Sidebar({
   ];
 
   useEffect(() => {
-    if (isCreateFolderModalOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (folderNameModalMode && folderNameInputRef.current) {
+      folderNameInputRef.current.focus();
     }
-  }, [isCreateFolderModalOpen]);
-
-  useEffect(() => {
-    if (isRenameFolderModalOpen && renameInputRef.current) {
-      renameInputRef.current.focus();
-    }
-  }, [isRenameFolderModalOpen]);
+  }, [folderNameModalMode]);
 
   useEffect(() => {
     if (!openOptionsFolderId) {
@@ -157,7 +152,9 @@ export function Sidebar({
       }
 
       const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
-      const hoveredIndex = folders.findIndex((folder) => folder.id === folderId);
+      const hoveredIndex = folders.findIndex(
+        (folder) => folder.id === folderId,
+      );
 
       if (sourceIndex === -1 || hoveredIndex === -1) {
         return null;
@@ -227,19 +224,14 @@ export function Sidebar({
     [clearFolderDragState, ensureAuthenticated, saveFolderOrder],
   );
 
-  const closeCreateModal = () => {
-    setIsCreateFolderModalOpen(false);
-    setNewFolderName("");
-  };
+  const closeFolderNameModal = () => setFolderNameModal(null);
 
-  const closeRenameModal = () => {
-    setIsRenameFolderModalOpen(false);
-    setRenameFolderId(null);
-    setRenameFolderName("");
-  };
+  const handleSubmitFolderName = useCallback(() => {
+    if (!folderNameModal) {
+      return;
+    }
 
-  const handleCreateFolder = useCallback(() => {
-    const trimmedName = newFolderName.trim();
+    const trimmedName = folderNameModal.value.trim();
     if (!trimmedName) {
       return;
     }
@@ -248,33 +240,15 @@ export function Sidebar({
       return;
     }
 
-    void createFolder(trimmedName)
-      .then(() => closeCreateModal())
-      .catch(() => {
-        // keep the modal open when the request fails
-      });
-  }, [createFolder, ensureAuthenticated, newFolderName]);
+    const request =
+      folderNameModal.mode === "create"
+        ? createFolder(trimmedName)
+        : renameFolder(folderNameModal.folderId, trimmedName);
 
-  const handleRenameFolder = useCallback(() => {
-    if (!renameFolderId) {
-      return;
-    }
-
-    const trimmedName = renameFolderName.trim();
-    if (!trimmedName) {
-      return;
-    }
-
-    if (!ensureAuthenticated()) {
-      return;
-    }
-
-    void renameFolder(renameFolderId, trimmedName)
-      .then(() => closeRenameModal())
-      .catch(() => {
-        // keep the modal open when the request fails
-      });
-  }, [ensureAuthenticated, renameFolder, renameFolderId, renameFolderName]);
+    void request.then(closeFolderNameModal).catch(() => {
+      // keep the modal open when the request fails
+    });
+  }, [createFolder, ensureAuthenticated, folderNameModal, renameFolder]);
 
   const getRedirectPathAfterFolderDelete = useCallback(
     (deletedFolderId: string) => {
@@ -302,6 +276,106 @@ export function Sidebar({
     },
     [folders, pathname],
   );
+
+  const handleFolderDragStart = (
+    folderId: string,
+    event: React.DragEvent<HTMLButtonElement>,
+  ) => {
+    setDraggingFolderId(folderId);
+    setFolderDropTarget(null);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", folderId);
+  };
+
+  const handleFolderDragOver = (
+    folderId: string,
+    event: React.DragEvent<HTMLLIElement>,
+  ) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+
+    if (!draggingFolderId || draggingFolderId === folderId) {
+      setFolderDropTarget(null);
+      return;
+    }
+
+    const nextDropTarget = getFolderDropTarget(
+      draggingFolderId,
+      folderId,
+      event,
+    );
+
+    setFolderDropTarget((currentTarget) =>
+      currentTarget?.targetId === nextDropTarget?.targetId &&
+      currentTarget?.position === nextDropTarget?.position &&
+      currentTarget?.indicatorFolderId === nextDropTarget?.indicatorFolderId &&
+      currentTarget?.indicatorEdge === nextDropTarget?.indicatorEdge
+        ? currentTarget
+        : nextDropTarget,
+    );
+  };
+
+  const handleFolderDrop = (
+    folderId: string,
+    event: React.DragEvent<HTMLLIElement>,
+  ) => {
+    event.preventDefault();
+    const dropTarget = getFolderDropTarget(draggingFolderId, folderId, event);
+
+    if (!dropTarget) {
+      clearFolderDragState();
+      return;
+    }
+
+    handleDropFolder(
+      draggingFolderId,
+      dropTarget.targetId,
+      dropTarget.position,
+    );
+  };
+
+  const handleToggleFolderOptions = (folderId: string) => {
+    setOpenOptionsFolderId((previous) =>
+      previous === folderId ? null : folderId,
+    );
+  };
+
+  const handleOpenRenameFolder = (folderId: string) => {
+    const targetFolder = folders.find((folder) => folder.id === folderId);
+    if (!targetFolder) {
+      return;
+    }
+
+    setOpenOptionsFolderId(null);
+    setFolderNameModal({
+      mode: "rename",
+      folderId,
+      value: targetFolder.name,
+    });
+  };
+
+  const handleDeleteFolder = (folderId: string) => {
+    if (!ensureAuthenticated()) {
+      return;
+    }
+
+    const isDeletingCurrentFolder = pathnameFolderId === folderId;
+    const redirectPath = getRedirectPathAfterFolderDelete(folderId);
+
+    void removeFolder(folderId)
+      .then(() => {
+        setOpenOptionsFolderId(null);
+        void invalidateClipQueries(queryClient);
+
+        if (isDeletingCurrentFolder) {
+          onCloseMobile?.();
+          router.replace(redirectPath);
+        }
+      })
+      .catch(() => {
+        // keep the menu open when the request fails
+      });
+  };
 
   const userLabel =
     session?.user?.authAccounts?.[0]?.email ??
@@ -371,102 +445,16 @@ export function Sidebar({
                   : null
               }
               onAddFolder={() => {
-                setNewFolderName("");
-                setIsCreateFolderModalOpen(true);
+                setFolderNameModal({ mode: "create", value: "" });
               }}
               onNavigate={onCloseMobile}
-              onDragStart={(folderId, event) => {
-                setDraggingFolderId(folderId);
-                setFolderDropTarget(null);
-                event.dataTransfer.effectAllowed = "move";
-                event.dataTransfer.setData("text/plain", folderId);
-              }}
+              onDragStart={handleFolderDragStart}
               onDragEnd={clearFolderDragState}
-              onDragOver={(folderId, event) => {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = "move";
-
-                if (!draggingFolderId || draggingFolderId === folderId) {
-                  setFolderDropTarget(null);
-                  return;
-                }
-
-                const nextDropTarget = getFolderDropTarget(
-                  draggingFolderId,
-                  folderId,
-                  event,
-                );
-
-                setFolderDropTarget((currentTarget) =>
-                  currentTarget?.targetId === nextDropTarget?.targetId &&
-                  currentTarget?.position === nextDropTarget?.position &&
-                  currentTarget?.indicatorFolderId ===
-                    nextDropTarget?.indicatorFolderId &&
-                  currentTarget?.indicatorEdge === nextDropTarget?.indicatorEdge
-                    ? currentTarget
-                    : nextDropTarget,
-                );
-              }}
-              onDrop={(folderId, event) => {
-                event.preventDefault();
-                const dropTarget = getFolderDropTarget(
-                  draggingFolderId,
-                  folderId,
-                  event,
-                );
-
-                if (!dropTarget) {
-                  clearFolderDragState();
-                  return;
-                }
-
-                handleDropFolder(
-                  draggingFolderId,
-                  dropTarget.targetId,
-                  dropTarget.position,
-                );
-              }}
-              onToggleOptions={(folderId) =>
-                setOpenOptionsFolderId((previous) =>
-                  previous === folderId ? null : folderId,
-                )
-              }
-              onRenameFolder={(folderId) => {
-                const targetFolder = folders.find(
-                  (folder) => folder.id === folderId,
-                );
-                if (!targetFolder) {
-                  return;
-                }
-
-                setOpenOptionsFolderId(null);
-                setRenameFolderId(folderId);
-                setRenameFolderName(targetFolder.name);
-                setIsRenameFolderModalOpen(true);
-              }}
-              onDeleteFolder={(folderId) => {
-                if (!ensureAuthenticated()) {
-                  return;
-                }
-
-                const isDeletingCurrentFolder = pathnameFolderId === folderId;
-                const redirectPath =
-                  getRedirectPathAfterFolderDelete(folderId);
-
-                void removeFolder(folderId)
-                  .then(() => {
-                    setOpenOptionsFolderId(null);
-                    void invalidateClipQueries(queryClient);
-
-                    if (isDeletingCurrentFolder) {
-                      onCloseMobile?.();
-                      router.replace(redirectPath);
-                    }
-                  })
-                  .catch(() => {
-                    // keep the menu open when the request fails
-                  });
-              }}
+              onDragOver={handleFolderDragOver}
+              onDrop={handleFolderDrop}
+              onToggleOptions={handleToggleFolderOptions}
+              onRenameFolder={handleOpenRenameFolder}
+              onDeleteFolder={handleDeleteFolder}
             />
           </div>
         </nav>
@@ -488,35 +476,31 @@ export function Sidebar({
         />
       </aside>
 
-      {isCreateFolderModalOpen ? (
+      {folderNameModal ? (
         <FolderNameModal
-          title={t("createFolder")}
-          closeLabel={t("closeCreateFolder")}
+          title={t(
+            folderNameModal.mode === "create" ? "createFolder" : "renameFolder",
+          )}
+          closeLabel={t(
+            folderNameModal.mode === "create"
+              ? "closeCreateFolder"
+              : "closeRenameFolder",
+          )}
           fieldLabel={t("folderName")}
           placeholder={t("folderNamePlaceholder")}
-          confirmLabel={t("create")}
+          confirmLabel={t(
+            folderNameModal.mode === "create" ? "create" : "change",
+          )}
           cancelLabel={t("cancel")}
-          value={newFolderName}
-          inputRef={inputRef}
-          onChange={setNewFolderName}
-          onClose={closeCreateModal}
-          onConfirm={handleCreateFolder}
-        />
-      ) : null}
-
-      {isRenameFolderModalOpen ? (
-        <FolderNameModal
-          title={t("renameFolder")}
-          closeLabel={t("closeRenameFolder")}
-          fieldLabel={t("folderName")}
-          placeholder={t("folderNamePlaceholder")}
-          confirmLabel={t("change")}
-          cancelLabel={t("cancel")}
-          value={renameFolderName}
-          inputRef={renameInputRef}
-          onChange={setRenameFolderName}
-          onClose={closeRenameModal}
-          onConfirm={handleRenameFolder}
+          value={folderNameModal.value}
+          inputRef={folderNameInputRef}
+          onChange={(value) =>
+            setFolderNameModal((current) =>
+              current ? { ...current, value } : current,
+            )
+          }
+          onClose={closeFolderNameModal}
+          onConfirm={handleSubmitFolderName}
         />
       ) : null}
     </>

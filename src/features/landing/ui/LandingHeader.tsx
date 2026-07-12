@@ -7,6 +7,7 @@ import {
 
 export type LandingHeaderTab = "home" | "pricing";
 
+// 마케팅 페이지의 브랜드 탐색, 요금제 이동, 테마 전환 액션을 제공합니다.
 interface LandingHeaderProps {
   activeTab?: LandingHeaderTab;
   isDarkMode: boolean;
@@ -34,7 +35,8 @@ export function LandingHeader({
         >
           <Link
             href="/pricing"
-            className={`inline-flex items-center px-1 py-2 text-sm font-medium transition-colors`}
+            className="inline-flex items-center px-1 py-2 text-sm font-medium transition-colors"
+            aria-current={activeTab === "pricing" ? "page" : undefined}
           >
             <span
               className={`${
@@ -50,14 +52,15 @@ export function LandingHeader({
 
         <div className="order-2 flex items-center gap-3 md:order-3">
           <button
+            type="button"
             onClick={onToggleTheme}
             className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-(--muted) transition-colors hover:bg-(--surface-muted) hover:text-(--foreground)"
             aria-label="다크 모드 전환"
           >
             {isDarkMode ? (
-              <HiOutlineSun className="h-5 w-5" />
+              <HiOutlineSun className="h-5 w-5" aria-hidden />
             ) : (
-              <HiOutlineMoon className="h-5 w-5" />
+              <HiOutlineMoon className="h-5 w-5" aria-hidden />
             )}
           </button>
 

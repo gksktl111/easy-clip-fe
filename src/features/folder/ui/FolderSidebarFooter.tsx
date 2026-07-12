@@ -9,6 +9,7 @@ import {
 } from "react-icons/hi";
 import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
+// 사용자 식별 정보와 설정, 요금제, 로그아웃 액션 메뉴를 제공합니다.
 interface FolderSidebarFooterProps {
   userLabel: string;
   settingsLabel: string;
@@ -112,6 +113,7 @@ export function FolderSidebarFooter({
           onClick={() => setIsMenuOpen((previous) => !previous)}
           className="flex w-full cursor-pointer items-center justify-between rounded-lg bg-(--surface) px-3 py-2 transition-colors hover:bg-(--surface-elevated)"
           aria-expanded={isMenuOpen}
+          aria-haspopup="menu"
         >
           <span className="flex min-w-0 items-center gap-2">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-(--icon-chip) text-[10px] font-semibold text-(--icon-chip-text)">

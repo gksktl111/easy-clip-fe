@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HiArrowLeft, HiOutlineCreditCard } from "react-icons/hi";
 
+// 요금제 복귀 링크와 Pro 업그레이드 목적을 결제 화면 상단에 안내합니다.
 export function BillingHeroSection() {
   return (
     <div className="flex flex-col justify-center">

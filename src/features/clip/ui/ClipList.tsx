@@ -1,8 +1,11 @@
 "use client";
 
 import { ClipItem } from "@/features/clip/ui/ClipItem";
-import { Clip } from "@/features/clip/model/clip";
+import type { Clip } from "@/features/clip/model/clip";
 
+const EMPTY_SELECTED_CLIP_IDS = new Set<string>();
+
+// 클립 카드를 반응형 그리드로 렌더링하고 무한 스크롤 감지 영역을 제공합니다.
 interface ClipListProps {
   clips: Clip[];
   loadMoreRef?: React.Ref<HTMLDivElement>;
@@ -25,7 +28,7 @@ export function ClipList({
   onContextMenu,
   isDeleteMode = false,
   isInteractionDisabled = false,
-  selectedClipIds = new Set(),
+  selectedClipIds = EMPTY_SELECTED_CLIP_IDS,
   onToggleSelected,
 }: ClipListProps) {
   if (clips.length === 0) {

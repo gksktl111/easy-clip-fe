@@ -3,6 +3,7 @@
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
+// 폴더 이름 변경과 삭제 액션을 컨텍스트 메뉴로 제공합니다.
 interface FolderOptionsMenuProps {
   renameLabel: string;
   deleteLabel: string;

@@ -1,5 +1,6 @@
 "use client";
 
+// 소셜 로그인 진행 전에 약관 및 개인정보 처리방침 동의 안내를 표시합니다.
 interface LoginAgreementNoticeProps {
   prefix: string;
   middle: string;

@@ -1,13 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
-import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { useRecentClipsPage } from "@/features/clip/hooks/useRecentClipsPage";
-import { FilterBar } from "@/features/clip/ui/FilterBar";
+import { ClipCollectionPage } from "@/features/clip/ui/ClipCollectionPage";
 
+// 최근 사용한 클립 데이터를 공통 컬렉션 화면에 연결합니다.
 export function RecentClipsPage() {
-  const t = useTranslations("clips");
   const {
     activeFilter,
     copyToast,
@@ -23,35 +20,26 @@ export function RecentClipsPage() {
     setActiveFilter,
     setSearchQuery,
   } = useRecentClipsPage();
-  const hasClipLoadError = isError && filteredClips.length === 0;
 
   return (
-    <div className="bg-background relative flex h-full flex-col">
-      {!hasClipLoadError ? (
-        <FilterBar
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          showStatus={false}
-          countLabel={t("count", { count: filteredClips.length })}
-        />
-      ) : null}
-      <ClipResultsSection
-        clips={filteredClips}
-        hasNextPage={hasNextPage}
-        isError={isError}
-        isFetchingNextPage={isFetchingNextPage}
-        isLoading={isLoading}
-        onFetchNextPage={() => {
-          void fetchNextPage();
-        }}
-        onRetry={() => {
-          void refetchClips();
-        }}
-        onCopy={handleCopy}
-      />
-      <ClipCopyToast label={t("copyToast")} position={copyToast} />
-    </div>
+    <ClipCollectionPage
+      activeFilter={activeFilter}
+      clips={filteredClips}
+      copyToastPosition={copyToast}
+      hasNextPage={hasNextPage}
+      isError={isError}
+      isFetchingNextPage={isFetchingNextPage}
+      isLoading={isLoading}
+      onCopy={handleCopy}
+      onFetchNextPage={() => {
+        void fetchNextPage();
+      }}
+      onFilterChange={setActiveFilter}
+      onRetry={() => {
+        void refetchClips();
+      }}
+      onSearchChange={setSearchQuery}
+      searchQuery={searchQuery}
+    />
   );
 }

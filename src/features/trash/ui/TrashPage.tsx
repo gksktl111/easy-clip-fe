@@ -7,7 +7,7 @@ import { useTrashPage } from "@/features/trash/hooks/useTrashPage";
 import { TrashListSection } from "@/features/trash/ui/TrashListSection";
 import { TrashPageEmptyState } from "@/features/trash/ui/TrashPageEmptyState";
 import { TrashPageHeader } from "@/features/trash/ui/TrashPageHeader";
-import { TrashItemRow } from "@/features/trash/ui/trashRow";
+import type { TrashItemRow } from "@/features/trash/ui/trashRow";
 
 const getClipTypeLabel = (
   clipType: "TEXT" | "COLOR" | "IMAGE",
@@ -27,9 +27,9 @@ const getClipTypeLabel = (
 // 휴지통 페이지의 상태에 따라 안내, 빈 상태, 리스트 섹션을 조합하는 루트 컴포넌트입니다.
 export function TrashPage() {
   const t = useTranslations("trash");
-  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
-  const [isDeleteSelectedModalOpen, setIsDeleteSelectedModalOpen] =
-    useState(false);
+  const [deleteModal, setDeleteModal] = useState<
+    "clearAll" | "selected" | null
+  >(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Set<string>>(
     () => new Set(),
   );
@@ -179,16 +179,19 @@ export function TrashPage() {
         onReload={() => {
           void reload();
         }}
-        onRequestClearAll={() => setIsClearAllModalOpen(true)}
+        onRequestClearAll={() => setDeleteModal("clearAll")}
         onRestoreSelected={() => {
           void handleRestoreSelected();
         }}
-        onRequestDeleteSelected={() => setIsDeleteSelectedModalOpen(true)}
+        onRequestDeleteSelected={() => setDeleteModal("selected")}
       />
 
       {error ? (
         <div className="p-6 pt-6">
-          <p className="rounded-xl border border-(--danger-border) bg-(--danger-surface) px-4 py-3 text-sm text-(--danger-text)">
+          <p
+            className="rounded-xl border border-(--danger-border) bg-(--danger-surface) px-4 py-3 text-sm text-(--danger-text)"
+            role="alert"
+          >
             {errorMessage}
           </p>
         </div>
@@ -197,60 +200,61 @@ export function TrashPage() {
       {!isLoading && !hasRows ? <TrashPageEmptyState /> : null}
 
       {isLoading || hasRows ? (
-        <div className="flex min-h-0 flex-1 flex-col">
-          <TrashListSection
-            rows={rows}
-            isLoading={isLoading}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            pendingActionKey={pendingActionKey}
-            selectedRowKeys={selectedRowKeys}
-            onFetchNextPage={() => {
-              void fetchNextPage();
-            }}
-            onToggleRow={handleToggleRow}
-            onToggleAllRows={handleToggleAllRows}
-            onRestoreFolder={(folderId) => {
-              void handleRestoreFolder(folderId);
-            }}
-            onDeleteFolder={(folderId) => {
-              void handleDeleteFolder(folderId);
-            }}
-            onRestoreClip={(clipId) => {
-              void handleRestoreClip(clipId);
-            }}
-            onDeleteClip={(clipId) => {
-              void handleDeleteClip(clipId);
-            }}
-          />
-        </div>
+        <TrashListSection
+          rows={rows}
+          isLoading={isLoading}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          pendingActionKey={pendingActionKey}
+          selectedRowKeys={selectedRowKeys}
+          onFetchNextPage={() => {
+            void fetchNextPage();
+          }}
+          onToggleRow={handleToggleRow}
+          onToggleAllRows={handleToggleAllRows}
+          onRestoreFolder={(folderId) => {
+            void handleRestoreFolder(folderId);
+          }}
+          onDeleteFolder={(folderId) => {
+            void handleDeleteFolder(folderId);
+          }}
+          onRestoreClip={(clipId) => {
+            void handleRestoreClip(clipId);
+          }}
+          onDeleteClip={(clipId) => {
+            void handleDeleteClip(clipId);
+          }}
+        />
       ) : null}
 
       <DeleteAllClipsModal
-        isOpen={isClearAllModalOpen}
-        title={t("clearAllModal.title")}
-        description={t("clearAllModal.description")}
+        isOpen={deleteModal !== null}
+        title={
+          deleteModal === "selected"
+            ? t("deleteSelectedModal.title", { count: selectedRows.length })
+            : t("clearAllModal.title")
+        }
+        description={
+          deleteModal === "selected"
+            ? t("deleteSelectedModal.description", {
+                count: selectedRows.length,
+              })
+            : t("clearAllModal.description")
+        }
         cancelLabel={t("cancel")}
-        confirmLabel={t("clearAll")}
-        onCancel={() => setIsClearAllModalOpen(false)}
+        confirmLabel={
+          deleteModal === "selected" ? t("deleteSelected") : t("clearAll")
+        }
+        onCancel={() => setDeleteModal(null)}
         onConfirm={() => {
-          setIsClearAllModalOpen(false);
-          void handleClearAll();
-        }}
-      />
+          const target = deleteModal;
+          setDeleteModal(null);
 
-      <DeleteAllClipsModal
-        isOpen={isDeleteSelectedModalOpen}
-        title={t("deleteSelectedModal.title", { count: selectedRows.length })}
-        description={t("deleteSelectedModal.description", {
-          count: selectedRows.length,
-        })}
-        cancelLabel={t("cancel")}
-        confirmLabel={t("deleteSelected")}
-        onCancel={() => setIsDeleteSelectedModalOpen(false)}
-        onConfirm={() => {
-          setIsDeleteSelectedModalOpen(false);
-          void handleDeleteSelected();
+          if (target === "selected") {
+            void handleDeleteSelected();
+          } else {
+            void handleClearAll();
+          }
         }}
       />
     </div>

@@ -2,6 +2,7 @@
 
 import { Button } from "@/shared/ui/button/Button";
 
+// OAuth 제공자 아이콘과 라벨을 공통 버튼 스타일로 렌더링합니다.
 interface SocialLoginButtonProps {
   label: string;
   icon: React.ReactNode;
