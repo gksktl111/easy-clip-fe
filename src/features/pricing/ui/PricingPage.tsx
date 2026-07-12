@@ -3,6 +3,7 @@ import { PricingComparisonSection } from "@/features/pricing/ui/PricingCompariso
 import { PricingHeroSection } from "@/features/pricing/ui/PricingHeroSection";
 import { PricingPlansSection } from "@/features/pricing/ui/PricingPlansSection";
 
+// 인증 상태를 준비하고 요금제 소개, 플랜 선택, 비교 섹션을 조합합니다.
 export function PricingPage() {
   return (
     <section className="relative overflow-hidden">

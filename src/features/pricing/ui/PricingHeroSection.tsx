@@ -1,5 +1,6 @@
 import { HiOutlineSparkles } from "react-icons/hi";
 
+// 요금제 페이지의 목적과 선택 안내를 첫 영역에 표시합니다.
 export function PricingHeroSection() {
   return (
     <div className="mx-auto max-w-3xl text-center">
@@ -10,7 +11,7 @@ export function PricingHeroSection() {
           border: "1px solid var(--pricing-chip-border)",
         }}
       >
-        <HiOutlineSparkles className="h-4 w-4" />
+        <HiOutlineSparkles className="h-4 w-4" aria-hidden />
         <span>Simple plans for focused users</span>
       </div>
 
