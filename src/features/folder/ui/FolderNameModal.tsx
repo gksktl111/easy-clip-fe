@@ -5,6 +5,7 @@ import { Button } from "@/shared/ui/button/Button";
 import { TextInput } from "@/shared/ui/input/TextInput";
 import { Modal } from "@/shared/ui/overlay/Modal";
 
+// 폴더 생성과 이름 변경에 공통으로 사용하는 입력 및 확인 모달입니다.
 interface FolderNameModalProps {
   title: string;
   closeLabel: string;
