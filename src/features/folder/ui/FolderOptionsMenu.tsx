@@ -1,6 +1,7 @@
 "use client";
 
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
+import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
 interface FolderOptionsMenuProps {
   renameLabel: string;
@@ -17,27 +18,22 @@ export function FolderOptionsMenu({
 }: FolderOptionsMenuProps) {
   return (
     <div className="relative">
-      <div
-        className="absolute right-0 z-20 w-32 overflow-hidden rounded-lg border border-(--border) bg-(--surface) shadow-lg"
-        data-folder-options
-      >
-        <button
-          type="button"
-          onClick={onRename}
-          className="text-foreground flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm hover:bg-(--surface-muted)"
-        >
-          <HiOutlinePencil className="h-4 w-4" aria-hidden />
-          {renameLabel}
-        </button>
-        <button
-          type="button"
-          onClick={onDelete}
-          className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-(--danger) hover:bg-(--surface-muted)"
-        >
-          <HiOutlineTrash className="h-4 w-4" aria-hidden />
-          {deleteLabel}
-        </button>
-      </div>
+      <ActionMenu
+        dataAttribute="data-folder-options"
+        items={[
+          {
+            label: renameLabel,
+            icon: <HiOutlinePencil className="h-4 w-4" aria-hidden />,
+            onClick: onRename,
+          },
+          {
+            label: deleteLabel,
+            icon: <HiOutlineTrash className="h-4 w-4" aria-hidden />,
+            tone: "danger",
+            onClick: onDelete,
+          },
+        ]}
+      />
     </div>
   );
 }
