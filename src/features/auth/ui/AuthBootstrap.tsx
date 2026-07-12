@@ -11,7 +11,7 @@ import {
   clearSessionOnUnauthorized,
   restoreSessionFromRefreshCookie,
 } from "@/features/auth/service/authService";
-import { notifyError } from "@/shared/lib/toast";
+import { notifyError } from "@/shared/feedback/toast";
 
 export function AuthBootstrap() {
   const session = useAuthSession();

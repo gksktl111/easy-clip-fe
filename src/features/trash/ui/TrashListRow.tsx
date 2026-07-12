@@ -8,6 +8,10 @@ import {
   HiOutlinePhotograph,
 } from "react-icons/hi";
 import { formatDeletedAt, TrashItemRow } from "@/features/trash/ui/trashRow";
+import { Badge } from "@/shared/ui/badge/Badge";
+import { Button } from "@/shared/ui/button/Button";
+import { Checkbox } from "@/shared/ui/input/Checkbox";
+import { Text } from "@/shared/ui/typography/Text";
 
 interface TrashListRowProps {
   row: TrashItemRow;
@@ -44,12 +48,10 @@ export function TrashListRow({
     <article className="px-4 py-4 transition-colors hover:bg-(--surface-elevated) min-[1200px]:px-6">
       <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 min-[1200px]:grid-cols-[2rem_minmax(0,1.5fr)_180px_220px_220px] min-[1200px]:items-center min-[1200px]:gap-4">
         <div className="flex items-start pt-3 min-[1200px]:items-center min-[1200px]:pt-0">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={isSelected}
             disabled={areActionsDisabled}
             onChange={() => onToggleSelected(row)}
-            className="h-4 w-4 cursor-pointer rounded border-(--border) accent-(--primary) disabled:cursor-default"
             aria-label={t("selectItem", { name: row.name })}
           />
         </div>
@@ -67,35 +69,39 @@ export function TrashListRow({
           </div>
 
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-(--foreground)">
+            <Text variant="bodyStrong" className="truncate">
               {row.name}
-            </p>
+            </Text>
             {row.kind === "clip" ? (
-              <p className="mt-1 truncate text-xs text-(--muted)">
+              <Text variant="caption" className="mt-1 truncate">
                 {t("parentFolder")}: {row.parentFolderName}
-              </p>
+              </Text>
             ) : null}
-            <p className="mt-1 text-xs text-(--muted) min-[1200px]:hidden">
+            <Text variant="caption" className="mt-1 min-[1200px]:hidden">
               {row.typeLabel}
-            </p>
+            </Text>
           </div>
         </div>
 
         <div className="col-start-2 min-[1200px]:col-start-auto">
-          <span className="inline-flex rounded-full bg-(--surface-elevated) px-2.5 py-1 text-xs font-medium text-(--muted)">
+          <Badge variant="elevated" className="font-medium">
             {row.typeLabel}
-          </span>
+          </Badge>
         </div>
 
-        <p className="col-start-2 text-xs text-(--muted) min-[1200px]:col-start-auto min-[1200px]:text-sm">
+        <Text
+          variant="caption"
+          className="col-start-2 min-[1200px]:col-start-auto min-[1200px]:text-sm"
+        >
           <span className="mr-2 min-[1200px]:hidden">{t("deletedAt")}:</span>
           {formatDeletedAt(row.deletedAt)}
-        </p>
+        </Text>
 
         <div className="col-start-2 flex flex-wrap justify-end gap-2 min-[1200px]:col-start-auto min-[1200px]:justify-start">
-          <button
-            type="button"
-            disabled={areActionsDisabled || pendingActionKey === restoreActionKey}
+          <Button
+            disabled={
+              areActionsDisabled || pendingActionKey === restoreActionKey
+            }
             onClick={() => {
               if (row.kind === "folder") {
                 onRestoreFolder(row.id);
@@ -104,13 +110,15 @@ export function TrashListRow({
 
               onRestoreClip(row.id);
             }}
-            className="cursor-pointer rounded-lg border border-(--border) px-3 py-2 text-xs font-medium text-(--foreground) transition hover:bg-(--surface-muted) disabled:cursor-default disabled:opacity-50"
+            variant="secondary"
+            size="xs"
           >
             {t("restore")}
-          </button>
-          <button
-            type="button"
-            disabled={areActionsDisabled || pendingActionKey === deleteActionKey}
+          </Button>
+          <Button
+            disabled={
+              areActionsDisabled || pendingActionKey === deleteActionKey
+            }
             onClick={() => {
               if (row.kind === "folder") {
                 onDeleteFolder(row.id);
@@ -119,10 +127,11 @@ export function TrashListRow({
 
               onDeleteClip(row.id);
             }}
-            className="cursor-pointer rounded-lg bg-red-500/15 px-3 py-2 text-xs font-medium text-red-500 transition hover:bg-red-500/25 disabled:cursor-default disabled:opacity-50"
+            variant="dangerSoft"
+            size="xs"
           >
             {t("deleteForever")}
-          </button>
+          </Button>
         </div>
       </div>
     </article>

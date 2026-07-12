@@ -1,5 +1,6 @@
 "use client";
 
+// 초기 사용자 설정을 반영해 다국어 메시지와 테마 상태를 제공합니다.
 import { useEffect, useLayoutEffect, useState } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import enMessages from "@/messages/en.json";

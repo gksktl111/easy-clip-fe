@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/shared/ui/button/Button";
+
 interface SocialLoginButtonProps {
   label: string;
   icon: React.ReactNode;
@@ -14,14 +16,16 @@ export function SocialLoginButton({
   isLoading,
 }: SocialLoginButtonProps) {
   return (
-    <button
-      type="button"
+    <Button
       onClick={onClick}
       disabled={isLoading}
-      className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-lg border border-(--border) bg-(--surface) px-4 py-3 text-sm font-medium text-(--foreground) transition-colors hover:bg-(--surface-muted) disabled:cursor-not-allowed disabled:opacity-50"
+      variant="secondarySurface"
+      size="lg"
+      fullWidth
+      className="rounded-lg disabled:cursor-not-allowed"
     >
       {icon}
       <span>{label}</span>
-    </button>
+    </Button>
   );
 }

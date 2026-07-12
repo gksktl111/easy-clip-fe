@@ -2,6 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { HiOutlineRefresh, HiOutlineReply, HiOutlineTrash } from "react-icons/hi";
+import { Badge } from "@/shared/ui/badge/Badge";
+import { Button } from "@/shared/ui/button/Button";
+import { Text } from "@/shared/ui/typography/Text";
 
 interface TrashPageHeaderProps {
   count: number;
@@ -40,21 +43,21 @@ export function TrashPageHeader({
       <div className="flex flex-col gap-4 min-[1200px]:flex-row min-[1200px]:items-start min-[1200px]:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl font-semibold text-(--foreground)">
+            <Text as="h1" variant="pageTitle">
               {t("title")}
-            </h1>
-            <span className="rounded-full bg-(--surface-muted) px-2.5 py-1 text-xs font-medium text-(--muted)">
+            </Text>
+            <Badge variant="muted" className="font-medium">
               {t("retentionNotice")}
-            </span>
+            </Badge>
           </div>
           <div className="mt-2 flex flex-col gap-1 min-[640px]:flex-row min-[640px]:items-center min-[640px]:gap-3">
-            <p className="text-sm text-(--muted)">{t("description")}</p>
+            <Text variant="bodyMuted">{t("description")}</Text>
             {isLoading ||
             isRestoringSelected ||
             isDeletingSelected ||
             isClearingAll ||
             hasSelection ? (
-              <span className="text-sm font-medium text-(--foreground)">
+              <Text as="span" variant="bodyStrong">
                 {isLoading
                   ? t("loading")
                   : isRestoringSelected
@@ -64,7 +67,7 @@ export function TrashPageHeader({
                       : isClearingAll
                         ? t("clearing")
                         : t("selectedCount", { count: selectedCount })}
-              </span>
+              </Text>
             ) : null}
           </div>
         </div>
@@ -73,8 +76,7 @@ export function TrashPageHeader({
           <div className="flex w-full flex-wrap justify-end gap-2 min-[520px]:w-auto min-[520px]:items-center">
             {hasSelection ? (
               <>
-                <button
-                  type="button"
+                <Button
                   disabled={
                     areControlsDisabled ||
                     isRestoringSelected ||
@@ -82,7 +84,9 @@ export function TrashPageHeader({
                     isClearingAll
                   }
                   onClick={onRestoreSelected}
-                  className="inline-flex h-10 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-(--primary) px-3 text-sm font-medium text-white transition-colors duration-150 ease-out hover:opacity-90 disabled:cursor-default disabled:opacity-45 min-[520px]:flex-none"
+                  variant="primary"
+                  size="md"
+                  className="min-w-0 flex-1 text-white hover:opacity-90 disabled:opacity-45 min-[520px]:flex-none"
                 >
                   <HiOutlineReply className="h-4 w-4 shrink-0" aria-hidden />
                   <span className="truncate">
@@ -90,9 +94,8 @@ export function TrashPageHeader({
                       ? t("restoringSelectedAction")
                       : t("restoreSelected")}
                   </span>
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
                   disabled={
                     areControlsDisabled ||
                     isRestoringSelected ||
@@ -100,7 +103,9 @@ export function TrashPageHeader({
                     isClearingAll
                   }
                   onClick={onRequestDeleteSelected}
-                  className="inline-flex h-10 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-red-500 px-3 text-sm font-medium text-white transition-colors duration-150 ease-out hover:bg-red-600 disabled:cursor-default disabled:opacity-45 min-[520px]:flex-none"
+                  variant="danger"
+                  size="md"
+                  className="min-w-0 flex-1 bg-red-500 text-white hover:bg-red-600 disabled:opacity-45 min-[520px]:flex-none"
                 >
                   <HiOutlineTrash className="h-4 w-4 shrink-0" aria-hidden />
                   <span className="truncate">
@@ -108,11 +113,10 @@ export function TrashPageHeader({
                       ? t("deletingSelectedAction")
                       : t("deleteSelected")}
                   </span>
-                </button>
+                </Button>
               </>
             ) : null}
-            <button
-              type="button"
+            <Button
               disabled={
                 areControlsDisabled ||
                 count === 0 ||
@@ -121,28 +125,31 @@ export function TrashPageHeader({
                 isDeletingSelected
               }
               onClick={onRequestClearAll}
-              className="inline-flex h-10 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-red-500/25 px-3 text-sm font-medium text-red-500 transition-colors duration-150 ease-out hover:bg-red-500/10 disabled:cursor-default disabled:opacity-45 min-[520px]:flex-none"
+              variant="dangerOutline"
+              size="md"
+              className="min-w-0 flex-1 disabled:opacity-45 min-[520px]:flex-none"
             >
               <HiOutlineTrash className="h-4 w-4 shrink-0" aria-hidden />
               <span className="truncate">
                 {isClearingAll ? t("clearingAction") : t("clearAll")}
               </span>
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
               disabled={areControlsDisabled}
               onClick={onReload}
-              className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-(--border) text-(--foreground) transition-colors duration-150 ease-out hover:bg-(--surface-muted) disabled:cursor-default disabled:opacity-45"
+              variant="secondary"
+              size="icon"
+              className="shrink-0 disabled:opacity-45"
               aria-label={t("refresh")}
               title={t("refresh")}
             >
               <HiOutlineRefresh className="h-4 w-4" aria-hidden />
-            </button>
+            </Button>
           </div>
           {!isLoading ? (
-            <span className="rounded-full bg-(--surface-muted) px-4 py-1.5 text-sm font-semibold text-(--foreground)">
+            <Badge variant="mutedStrong" size="md">
               {t("totalCount", { count })}
-            </span>
+            </Badge>
           ) : null}
         </div>
       </div>
