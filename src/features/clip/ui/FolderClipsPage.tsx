@@ -6,7 +6,7 @@ import { ClipDeleteActionBar } from "@/features/clip/ui/ClipDeleteActionBar";
 import { ClipContextMenu } from "@/features/clip/ui/ClipContextMenu";
 import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
 import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
-import { DeleteAllButton } from "@/features/clip/ui/DeleteAllButton";
+import { ClipDeleteModeButton } from "@/features/clip/ui/ClipDeleteModeButton";
 import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 import { FolderClipCaptureHint } from "@/features/clip/ui/FolderClipCaptureHint";
@@ -95,7 +95,7 @@ export function FolderClipsPage() {
         onToggleSelected={handleToggleClipSelected}
       />
       {!hasClipLoadError && !isDeleteMode ? (
-        <DeleteAllButton
+        <ClipDeleteModeButton
           disabled={!hasClips || isDeletingClips}
           label={t("actions.deleteClips")}
           onClick={handleEnterDeleteMode}

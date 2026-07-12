@@ -1,5 +1,6 @@
 "use client";
 
+// 사용자 설정 변경과 구독 정보를 표시하는 설정 도메인 모달입니다.
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -15,7 +16,11 @@ import { useMySubscription } from "@/features/subscription/hooks/useMySubscripti
 import { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 import { LOCALE_LABELS, type AppLocale } from "@/shared/config/locale";
 import { useSettingsStore } from "@/shared/store/settingsStore";
-import { StyledSelect } from "@/shared/ui/StyledSelect";
+import { Button } from "@/shared/ui/button/Button";
+import { Select } from "@/shared/ui/input/Select";
+import { Switch } from "@/shared/ui/input/Switch";
+import { Modal } from "@/shared/ui/overlay/Modal";
+import { Text } from "@/shared/ui/typography/Text";
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -106,17 +111,12 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay-strong) px-4"
-      onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
-      }}
+    <Modal
+      overlay="strong"
+      onClose={onClose}
+      contentClassName="w-full max-w-2xl"
     >
-      <div
-        className="text-foreground relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-xl"
-      >
+      <div className="text-foreground relative flex max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-xl">
         <div className="flex items-center justify-between border-b border-(--border) px-6 py-4">
           <div className="flex items-center gap-3 text-base font-semibold">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--modal-icon-bg) text-(--modal-icon-fg)">
@@ -124,79 +124,73 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             </span>
             {t("title")}
           </div>
-          <button
-            type="button"
+          <Button
             onClick={onClose}
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition hover:bg-(--surface-muted)"
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 rounded-full"
             aria-label={t("close")}
           >
             <HiOutlineX className="h-5 w-5 text-(--muted)" aria-hidden />
-          </button>
+          </Button>
         </div>
 
         <div className="space-y-6 overflow-y-auto px-6 py-6">
           <div>
-            <p className="text-sm font-semibold text-(--muted)">
+            <Text variant="sectionLabel">
               {t("appearance")}
-            </p>
+            </Text>
             <div className="mt-3 flex items-center justify-between rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--modal-icon-bg) text-(--modal-icon-fg)">
                   <HiOutlineMoon className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold">{t("darkMode")}</p>
-                  <p className="text-xs text-(--muted)">
+                  <Text variant="itemTitle">{t("darkMode")}</Text>
+                  <Text variant="caption">
                     {t("darkModeDescription")}
-                  </p>
+                  </Text>
                 </div>
               </div>
-              <button
-                type="button"
+              <Switch
+                checked={isDark}
                 onClick={() => {
                   void handleThemeToggle();
                 }}
                 disabled={savingField === "theme"}
-                className={`relative h-7 w-12 cursor-pointer rounded-full transition ${
-                  isDark ? "bg-(--primary)" : "bg-(--border)"
-                }`}
                 aria-label={t("toggleDarkMode")}
-              >
-                <span
-                  className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition ${
-                    isDark ? "left-6" : "left-0.5"
-                  }`}
-                />
-              </button>
+              />
             </div>
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-(--muted)">
+            <Text variant="sectionLabel">
               {t("general")}
-            </p>
+            </Text>
             <div className="mt-3 flex items-center justify-between rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--modal-icon-bg) text-(--modal-icon-fg)">
                   <HiOutlineTranslate className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold">{t("language")}</p>
-                  <p className="text-xs text-(--muted)">
+                  <Text variant="itemTitle">{t("language")}</Text>
+                  <Text variant="caption">
                     {t("languageDescription")}
-                  </p>
+                  </Text>
                 </div>
               </div>
-              <StyledSelect
+              <Select
                 value={language}
                 onChange={(value) => {
                   void handleLanguageChange(value as AppLocale);
                 }}
                 disabled={savingField === "language"}
-                options={Object.entries(LOCALE_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
+                options={Object.entries(LOCALE_LABELS).map(
+                  ([value, label]) => ({
+                    value,
+                    label,
+                  }),
+                )}
                 className="min-w-36"
               />
             </div>
@@ -209,12 +203,10 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           ) : null}
 
           <div>
-            <p className="text-sm font-semibold text-(--muted)">
-              {t("about")}
-            </p>
+            <Text variant="sectionLabel">{t("about")}</Text>
             <div className="mt-3 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
-              <p className="text-sm font-semibold">{t("aboutTitle")}</p>
-              <p className="text-xs text-(--muted)">{t("aboutDescription")}</p>
+              <Text variant="itemTitle">{t("aboutTitle")}</Text>
+              <Text variant="caption">{t("aboutDescription")}</Text>
             </div>
             <div className="mt-3 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
               <div className="flex items-start gap-3">
@@ -222,14 +214,14 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                   <HiOutlineCreditCard className="h-5 w-5" aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-left text-sm font-semibold">
+                  <Text variant="itemTitle" className="text-left">
                     {t("subscriptionTitle")}
-                  </p>
+                  </Text>
                   <dl className="mt-4 grid grid-cols-2 gap-3 text-left text-sm">
                     <div>
-                      <dt className="text-xs text-(--muted)">
+                      <Text as="dt" variant="caption">
                         {t("subscriptionPlan")}
-                      </dt>
+                      </Text>
                       <dd className="mt-1 font-semibold">
                         {isSubscriptionLoading
                           ? t("subscriptionLoading")
@@ -237,9 +229,9 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-xs text-(--muted)">
+                      <Text as="dt" variant="caption">
                         {t("subscriptionStatus")}
-                      </dt>
+                      </Text>
                       <dd className="mt-1 font-semibold">
                         {isSubscriptionLoading
                           ? t("subscriptionLoading")
@@ -247,18 +239,20 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-xs text-(--muted)">
+                      <Text as="dt" variant="caption">
                         {t("subscriptionNextBillingAt")}
-                      </dt>
+                      </Text>
                       <dd className="mt-1 font-semibold">
-                        {formatNullableDate(subscription?.nextBillingAt ?? null)}
+                        {formatNullableDate(
+                          subscription?.nextBillingAt ?? null,
+                        )}
                       </dd>
                     </div>
                   </dl>
                   {subscriptionError ? (
-                    <p className="mt-3 text-xs text-(--muted)">
+                    <Text variant="caption" className="mt-3">
                       {subscriptionError}
-                    </p>
+                    </Text>
                   ) : null}
                 </div>
               </div>
@@ -267,15 +261,16 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         </div>
 
         <div className="flex items-center justify-end border-t border-(--border) px-6 py-4">
-          <button
-            type="button"
+          <Button
             onClick={onClose}
-            className="cursor-pointer rounded-lg bg-(--primary) px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-(--primary-hover)"
+            variant="primary"
+            size="sm"
+            className="px-5 font-semibold"
           >
             {t("closeButton")}
-          </button>
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -15,8 +15,11 @@ import {
   hasRemainingCanceledProPeriod,
   isActiveProSubscription,
 } from "@/features/subscription/model/subscription";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
+import { Badge } from "@/shared/ui/badge/Badge";
+import { Button } from "@/shared/ui/button/Button";
+import { Modal } from "@/shared/ui/overlay/Modal";
 import { ApiError } from "@/shared/lib/apiClient";
-import { notifyError, notifySuccess } from "@/shared/lib/toast";
 
 export function PricingPlansSection() {
   const router = useRouter();
@@ -165,12 +168,13 @@ export function PricingPlansSection() {
                   </h2>
                 </div>
                 {plan.highlight ? (
-                  <span
-                    className="rounded-full px-3 py-1 text-xs font-semibold text-white"
+                  <Badge
+                    variant="featured"
+                    size="sm"
                     style={{ backgroundColor: "var(--pricing-featured-badge)" }}
                   >
                     Recommended
-                  </span>
+                  </Badge>
                 ) : null}
               </div>
 
@@ -212,57 +216,48 @@ export function PricingPlansSection() {
               </p>
 
               {isCurrentFreePlan || isCurrentProPlanCard ? (
-                <button
-                  type="button"
+                <Button
                   disabled
-                  className="mt-8 inline-flex w-full cursor-not-allowed items-center justify-center rounded-2xl border border-(--border) bg-(--surface-muted) px-5 py-3 text-sm font-semibold text-(--muted)"
+                  variant="secondaryMuted"
+                  size="lg"
+                  fullWidth
+                  className="mt-8 cursor-not-allowed rounded-2xl font-semibold text-(--muted) disabled:cursor-not-allowed disabled:opacity-100"
                 >
                   현재 플랜
-                </button>
+                </Button>
               ) : isResumeTargetPlan ? (
-                <button
-                  type="button"
+                <Button
                   onClick={() => {
                     void handleResumeSubscription();
                   }}
                   disabled={isResumingSubscription}
-                  className="mt-8 inline-flex w-full cursor-pointer items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold text-(--pricing-button-featured-fg) transition-[opacity,transform] duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                  style={{
-                    backgroundColor: "var(--pricing-button-featured-bg)",
-                  }}
+                  variant="pricingFeatured"
+                  size="lg"
+                  fullWidth
+                  className="mt-8 rounded-2xl font-semibold transition-[opacity,transform] duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isResumingSubscription ? "재개 중" : "구독 재개"}
-                </button>
+                </Button>
               ) : isAuthenticated && isFreePlan && isCurrentProPlan ? (
-                <button
-                  type="button"
+                <Button
                   onClick={() => setIsCancelModalOpen(true)}
-                  className="mt-8 inline-flex w-full cursor-pointer items-center justify-center rounded-2xl border border-(--border) bg-(--surface-muted) px-5 py-3 text-sm font-semibold text-(--foreground) transition hover:bg-(--surface-elevated)"
+                  variant="secondaryMuted"
+                  size="lg"
+                  fullWidth
+                  className="mt-8 rounded-2xl font-semibold"
                 >
                   Free로 전환하기
-                </button>
+                </Button>
               ) : (
                 <Link
                   href={plan.ctaHref}
-                  className="mt-8 inline-flex w-full cursor-pointer items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition-[opacity,transform] duration-200 hover:opacity-90"
-                  style={{
-                    backgroundColor: plan.highlight
-                      ? "var(--pricing-button-featured-bg)"
-                      : "var(--pricing-button-bg)",
-                    color: plan.highlight
-                      ? "var(--pricing-button-featured-fg)"
-                      : "var(--pricing-button-fg)",
-                  }}
+                  className={`mt-8 inline-flex w-full cursor-pointer items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition-[background-color,opacity,transform] duration-200 hover:opacity-90 ${
+                    plan.highlight
+                      ? "bg-(--pricing-button-featured-bg) text-(--pricing-button-featured-fg) hover:bg-(--pricing-button-featured-bg-hover)"
+                      : "bg-(--pricing-button-bg) text-(--pricing-button-fg) hover:bg-(--pricing-button-bg-hover)"
+                  }`}
                 >
-                  <span
-                    style={{
-                      color: plan.highlight
-                        ? "var(--pricing-button-featured-fg)"
-                        : "var(--pricing-button-fg)",
-                    }}
-                  >
-                    {plan.ctaLabel}
-                  </span>
+                  <span>{plan.ctaLabel}</span>
                 </Link>
               )}
 
@@ -315,35 +310,37 @@ export function PricingPlansSection() {
       </div>
 
       {isCancelModalOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay-strong) px-4">
-          <div className="w-full max-w-sm rounded-2xl border border-(--border) bg-(--surface-elevated) p-5 shadow-xl">
+        <Modal overlay="strong" contentClassName="w-full max-w-sm">
+          <div className="rounded-2xl border border-(--border) bg-(--surface-elevated) p-5 shadow-xl">
             <h2 className="text-lg font-semibold">Pro 구독을 취소할까요?</h2>
             <p className="mt-3 text-sm leading-6 text-(--muted)">
               확인을 누르면 Pro 구독의 자동 갱신이 중지되고 Free 플랜으로
               전환됩니다.
             </p>
             <div className="mt-6 flex gap-2">
-              <button
-                type="button"
+              <Button
                 onClick={() => setIsCancelModalOpen(false)}
                 disabled={isCancelingSubscription}
-                className="flex flex-1 cursor-pointer items-center justify-center rounded-xl border border-(--border) px-4 py-2.5 text-sm font-semibold transition hover:bg-(--surface-muted) disabled:cursor-not-allowed disabled:opacity-60"
+                variant="secondary"
+                size="lg"
+                className="min-h-0 flex-1 py-2.5 font-semibold disabled:cursor-not-allowed disabled:opacity-60"
               >
                 아니오
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
                 onClick={() => {
                   void handleCancelSubscription();
                 }}
                 disabled={isCancelingSubscription}
-                className="flex flex-1 cursor-pointer items-center justify-center rounded-xl bg-(--primary) px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-(--primary-hover) disabled:cursor-not-allowed disabled:opacity-60"
+                variant="primary"
+                size="lg"
+                className="min-h-0 flex-1 py-2.5 font-semibold disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isCancelingSubscription ? "변경 중" : "예"}
-              </button>
+              </Button>
             </div>
           </div>
-        </div>
+        </Modal>
       ) : null}
     </>
   );

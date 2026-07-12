@@ -8,7 +8,10 @@ import {
   HiOutlineSearch,
 } from "react-icons/hi";
 import { ClipType } from "@/features/clip/model/clip";
-import { StyledSelect } from "@/shared/ui/StyledSelect";
+import { Badge } from "@/shared/ui/badge/Badge";
+import { Button } from "@/shared/ui/button/Button";
+import { Select } from "@/shared/ui/input/Select";
+import { TextInput } from "@/shared/ui/input/TextInput";
 
 export type FilterType = ClipType | "all";
 
@@ -52,19 +55,14 @@ export function FilterBar({
   ];
 
   const searchField = (
-    <div className="relative">
-      <input
-        type="text"
-        placeholder={t("searchPlaceholder")}
-        value={searchQuery}
-        onChange={(event) => onSearchChange?.(event.target.value)}
-        className="text-foreground h-11 w-full rounded-xl border border-(--border) bg-(--input) pr-4 pl-10 text-sm placeholder:text-(--muted) focus:border-(--focus-ring) focus:ring-1 focus:ring-(--focus-ring) focus:outline-none min-[1200px]:h-9 min-[1200px]:w-64 min-[1200px]:rounded-lg"
-      />
-      <HiOutlineSearch
-        className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-(--muted)"
-        aria-hidden
-      />
-    </div>
+    <TextInput
+      placeholder={t("searchPlaceholder")}
+      value={searchQuery}
+      onChange={(event) => onSearchChange?.(event.target.value)}
+      className="w-full min-[1200px]:w-64"
+      inputClassName="h-11 pr-4 min-[1200px]:h-9 min-[1200px]:rounded-lg"
+      leftIcon={<HiOutlineSearch className="h-4 w-4" aria-hidden />}
+    />
   );
 
   const statusGroup = (
@@ -81,9 +79,7 @@ export function FilterBar({
         </div>
       ) : null}
       {countLabel ? (
-        <span className="rounded-full bg-(--icon-chip) px-2.5 py-1 text-xs font-semibold text-(--icon-chip-text)">
-          {countLabel}
-        </span>
+        <Badge variant="chip">{countLabel}</Badge>
       ) : null}
     </div>
   );
@@ -92,7 +88,7 @@ export function FilterBar({
     <div className="border-b border-(--border) px-4 py-4 min-[1200px]:px-6">
       <div className="flex flex-col gap-3 min-[1200px]:flex-row min-[1200px]:items-center min-[1200px]:justify-between">
         <div className="min-[1200px]:hidden">
-          <StyledSelect
+          <Select
             value={activeFilter}
             onChange={(value) => onFilterChange(value as FilterType)}
             options={filters.map((filter) => ({
@@ -104,19 +100,16 @@ export function FilterBar({
 
         <div className="hidden gap-2 min-[1200px]:flex">
           {filters.map((filter) => (
-            <button
+            <Button
               key={filter.id}
-              type="button"
               onClick={() => onFilterChange(filter.id)}
-              className={`flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                activeFilter === filter.id
-                  ? "bg-(--icon-chip) text-(--icon-chip-text)"
-                  : "bg-(--surface) text-(--muted) hover:bg-(--surface-muted)"
-              }`}
+              variant={activeFilter === filter.id ? "chip" : "surfaceGhost"}
+              size="sm"
+              className="px-4"
             >
               {filter.icon}
               {filter.label}
-            </button>
+            </Button>
           ))}
         </div>
 

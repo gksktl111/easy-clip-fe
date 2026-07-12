@@ -18,7 +18,7 @@ import {
 } from "@/features/clip/service/clipQueryCache";
 import { FilterType } from "@/features/clip/ui/FilterBar";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
-import { notifyError } from "@/shared/lib/toast";
+import { notifyError } from "@/shared/feedback/toast";
 
 export const useFavoriteClipsPage = () => {
   const queryClient = useQueryClient();
