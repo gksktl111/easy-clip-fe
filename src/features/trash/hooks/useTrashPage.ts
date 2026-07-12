@@ -4,8 +4,8 @@ import { useCallback, useRef, useState } from "react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { CLIP_QUERY_KEY } from "@/features/clip/service/clipQueryCache";
-import { FOLDER_QUERY_KEY } from "@/features/folder/hooks/useFolders";
-import { useFolders } from "@/features/folder/hooks/useFolders";
+import { useFoldersQuery } from "@/features/folder/hooks/useFoldersQuery";
+import { FOLDER_QUERY_KEY } from "@/features/folder/service/folderQueryCache";
 import {
   deleteAllTrashItems,
   deleteTrashItems,
@@ -31,7 +31,7 @@ export const useTrashPage = () => {
   const isAuthenticated = Boolean(session?.user);
   const userId = session?.user?.id ?? null;
   const queryClient = useQueryClient();
-  const { folders: activeFolders } = useFolders();
+  const { folders: activeFolders } = useFoldersQuery();
   const [actionError, setActionError] = useState<TrashPageError | null>(null);
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const pendingActionKeyRef = useRef<string | null>(null);

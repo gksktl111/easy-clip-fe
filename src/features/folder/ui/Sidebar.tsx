@@ -10,7 +10,8 @@ import { logout } from "@/features/auth/api/authApi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { clearAuthSession } from "@/features/auth/service/authSession";
 import { invalidateClipQueries } from "@/features/clip/service/clipQueryCache";
-import { useFolders } from "@/features/folder/hooks/useFolders";
+import { useFolderActions } from "@/features/folder/hooks/useFolderActions";
+import { useFoldersQuery } from "@/features/folder/hooks/useFoldersQuery";
 import type { FolderDropPosition } from "@/features/folder/model/folder";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
 import { FolderSidebarFooter } from "@/features/folder/ui/FolderSidebarFooter";
@@ -55,14 +56,9 @@ export function Sidebar({
   const queryClient = useQueryClient();
   const session = useAuthSession();
   const isAuthenticated = Boolean(session?.user);
-  const {
-    createFolder,
-    folders,
-    isLoading: isFoldersLoading,
-    removeFolder,
-    renameFolder,
-    saveFolderOrder,
-  } = useFolders();
+  const { folders, isLoading: isFoldersLoading } = useFoldersQuery();
+  const { createFolder, removeFolder, renameFolder, saveFolderOrder } =
+    useFolderActions();
   const [folderNameModal, setFolderNameModal] =
     useState<FolderNameModalState | null>(null);
   const [openOptionsFolderId, setOpenOptionsFolderId] = useState<string | null>(
