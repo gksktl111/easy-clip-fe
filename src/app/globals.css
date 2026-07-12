@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
-/* Foundation: typography */
+/* -----------------------------------------------------------------------------
+   Foundation
+----------------------------------------------------------------------------- */
+
 :root {
   --font-sans:
     "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic",
@@ -9,21 +12,22 @@
     "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
-/* Theme tokens: light */
+/* -----------------------------------------------------------------------------
+   Theme Tokens: Light
+----------------------------------------------------------------------------- */
+
 :root {
-  /* Background and surface */
+  /* Base colors */
   --background: #f8fafc;
   --foreground: #0f172a;
   --surface: #ffffff;
   --surface-muted: #f1f5f9;
   --surface-elevated: #ffffff;
-
-  /* Text and border */
   --border: #e2e8f0;
   --muted: #64748b;
   --input: #f8fafc;
 
-  /* Interactive */
+  /* Brand and state */
   --primary: #111827;
   --primary-hover: #1f2937;
   --primary-foreground: #ffffff;
@@ -39,11 +43,13 @@
   --overlay-strong: rgba(0, 0, 0, 0.7);
   --focus-ring: #9ca3af;
 
-  /* Component tokens */
+  /* Chips and icons */
   --chip-bg: #111827;
   --chip-text: #ffffff;
   --icon-chip: #e5e7eb;
   --icon-chip-text: #111827;
+
+  /* Clip cards */
   --favorite-btn-bg: rgba(255, 255, 255, 0.88);
   --favorite-btn-bg-hover: rgba(255, 255, 255, 1);
   --favorite-btn-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
@@ -51,10 +57,14 @@
   --clip-scrollbar-track: rgba(226, 232, 240, 0.72);
   --clip-scrollbar-thumb: rgba(100, 116, 139, 0.52);
   --clip-scrollbar-thumb-hover: rgba(51, 65, 85, 0.72);
+
+  /* Modal and menus */
   --modal-section-bg: #f8fafc;
   --modal-icon-bg: #e5e7eb;
   --modal-icon-fg: #4b5563;
   --dropdown-option-hover: #e2e8f0;
+
+  /* Landing */
   --landing-header-bg: rgba(255, 255, 255, 0.9);
   --landing-brand-bg: #334155;
   --landing-brand-fg: #ffffff;
@@ -65,6 +75,8 @@
   --landing-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
   --landing-brand-muted: rgba(255, 255, 255, 0.72);
   --landing-brand-soft: rgba(255, 255, 255, 0.78);
+
+  /* Pricing */
   --pricing-hero-glow: radial-gradient(
     circle at top,
     rgba(79, 70, 229, 0.16),
@@ -94,8 +106,12 @@
   --pricing-button-featured-fg: #0f172a;
 }
 
-/* Theme tokens: dark */
+/* -----------------------------------------------------------------------------
+   Theme Tokens: Dark
+----------------------------------------------------------------------------- */
+
 [data-theme="dark"] {
+  /* Base colors */
   --background: #353535;
   --foreground: #f3f4f6;
   --surface: #1e1e1f;
@@ -104,6 +120,8 @@
   --border: rgba(255, 255, 255, 0.08);
   --muted: #9ca3af;
   --input: #2a2a2b;
+
+  /* Brand and state */
   --primary: #4f46e5;
   --primary-hover: #6366f1;
   --primary-foreground: #f8fafc;
@@ -118,10 +136,14 @@
   --overlay: rgba(0, 0, 0, 0.4);
   --overlay-strong: rgba(0, 0, 0, 0.7);
   --focus-ring: #94a3b8;
+
+  /* Chips and icons */
   --chip-bg: #4f46e5;
   --chip-text: #f8fafc;
   --icon-chip: #4f46e5;
   --icon-chip-text: #f8fafc;
+
+  /* Clip cards */
   --favorite-btn-bg: rgba(30, 30, 31, 0.88);
   --favorite-btn-bg-hover: rgba(42, 42, 43, 0.96);
   --favorite-btn-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
@@ -129,10 +151,14 @@
   --clip-scrollbar-track: rgba(255, 255, 255, 0.06);
   --clip-scrollbar-thumb: rgba(148, 163, 184, 0.4);
   --clip-scrollbar-thumb-hover: rgba(203, 213, 225, 0.58);
+
+  /* Modal and menus */
   --modal-section-bg: rgba(255, 255, 255, 0.05);
   --modal-icon-bg: rgba(255, 255, 255, 0.1);
   --modal-icon-fg: #e5e7eb;
   --dropdown-option-hover: rgba(99, 102, 241, 0.22);
+
+  /* Landing */
   --landing-header-bg: rgba(30, 30, 31, 0.9);
   --landing-brand-bg: #4f46e5;
   --landing-brand-fg: #f8fafc;
@@ -143,6 +169,8 @@
   --landing-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
   --landing-brand-muted: rgba(248, 250, 252, 0.72);
   --landing-brand-soft: rgba(248, 250, 252, 0.78);
+
+  /* Pricing */
   --pricing-hero-glow: radial-gradient(
     circle at top,
     rgba(99, 102, 241, 0.28),
@@ -172,7 +200,10 @@
   --pricing-button-featured-fg: #111827;
 }
 
-/* Tailwind bridge */
+/* -----------------------------------------------------------------------------
+   Tailwind Theme Bridge
+----------------------------------------------------------------------------- */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -188,7 +219,10 @@
   --font-mono: var(--font-mono);
 }
 
-/* Foundation: base */
+/* -----------------------------------------------------------------------------
+   Base Elements
+----------------------------------------------------------------------------- */
+
 html {
   min-height: 100%;
 }
@@ -206,7 +240,10 @@ a {
   text-decoration: none;
 }
 
-/* Foundation: motion */
+/* -----------------------------------------------------------------------------
+   Motion
+----------------------------------------------------------------------------- */
+
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -245,6 +282,10 @@ a {
     background-position: -200% 0;
   }
 }
+
+/* -----------------------------------------------------------------------------
+   Utilities
+----------------------------------------------------------------------------- */
 
 .skeleton-shimmer {
   background-image: linear-gradient(
