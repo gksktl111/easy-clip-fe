@@ -1,5 +1,6 @@
 "use client";
 
+// React Query 클라이언트를 앱 전역에 제공합니다.
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 

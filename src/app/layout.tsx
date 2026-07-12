@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { getInitialUserSettings } from "@/features/settings/server/getInitialUserSettings";
-import { IntlProvider } from "@/shared/ui/IntlProvider";
-import { AppToaster } from "@/shared/ui/AppToaster";
-import { QueryProvider } from "@/shared/ui/QueryProvider";
+import { AppToaster } from "@/shared/feedback/AppToaster";
+import { IntlProvider } from "@/shared/providers/IntlProvider";
+import { QueryProvider } from "@/shared/providers/QueryProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {

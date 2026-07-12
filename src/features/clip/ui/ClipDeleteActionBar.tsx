@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { HiOutlineTrash, HiX } from "react-icons/hi";
+import { Button } from "@/shared/ui/button/Button";
 
 interface ClipDeleteActionBarProps {
   selectedCount: number;
@@ -36,33 +37,34 @@ export function ClipDeleteActionBar({
         </div>
 
         <div className="grid grid-cols-2 gap-2 min-[520px]:flex min-[520px]:items-center min-[760px]:shrink-0">
-          <button
-            type="button"
+          <Button
             disabled={isDeleting}
             onClick={onCancel}
-            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-(--border) px-3 text-sm font-medium text-(--foreground) transition hover:bg-(--surface-muted) disabled:cursor-default disabled:opacity-50"
+            variant="secondary"
+            size="md"
           >
             <HiX className="h-4 w-4" aria-hidden />
             {t("cancel")}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
             disabled={isDeleting || !hasSelection}
             onClick={onDeleteSelected}
-            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-(--danger) px-3 text-sm font-medium text-danger-foreground transition hover:bg-(--danger-hover) disabled:cursor-default disabled:opacity-50"
+            variant="danger"
+            size="md"
           >
             <HiOutlineTrash className="h-4 w-4" aria-hidden />
             {isDeleting ? t("deleting") : t("deleteSelected")}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
             disabled={isDeleting || totalCount === 0}
             onClick={onRequestDeleteAll}
-            className="col-span-2 inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-red-500/25 px-3 text-sm font-medium text-(--danger) transition hover:bg-red-500/10 disabled:cursor-default disabled:opacity-50 min-[520px]:col-span-1"
+            variant="dangerOutline"
+            size="md"
+            className="col-span-2 min-[520px]:col-span-1"
           >
             <HiOutlineTrash className="h-4 w-4" aria-hidden />
             {t("deleteAll")}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

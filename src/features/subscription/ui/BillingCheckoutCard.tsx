@@ -1,6 +1,8 @@
 import { HiOutlineRefresh } from "react-icons/hi";
 import { BillingAuthRequestResponseDto } from "@/features/subscription/model/subscription.dto";
 import { BillingUnlockedFeatureList } from "@/features/subscription/ui/BillingUnlockedFeatureList";
+import { Badge } from "@/shared/ui/badge/Badge";
+import { Button } from "@/shared/ui/button/Button";
 
 export type BillingStep = "idle" | "loading" | "redirecting" | "error";
 
@@ -32,9 +34,7 @@ export function BillingCheckoutCard({
               <span className="pb-1 text-sm text-(--muted)">/ month</span>
             </div>
           </div>
-          <span className="rounded-full bg-(--surface-muted) px-3 py-1 text-xs font-semibold text-(--muted)">
-            월간
-          </span>
+          <Badge variant="muted" size="sm">월간</Badge>
         </div>
 
         <BillingUnlockedFeatureList />
@@ -54,19 +54,21 @@ export function BillingCheckoutCard({
           </p>
         ) : null}
 
-        <button
-          type="button"
+        <Button
           onClick={() => {
             onStartBilling();
           }}
           disabled={isProcessing}
-          className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-(--primary) px-5 py-3 text-sm font-semibold text-(--primary-foreground) transition hover:bg-(--primary-hover) disabled:cursor-not-allowed disabled:opacity-60"
+          variant="primary"
+          size="lg"
+          fullWidth
+          className="mt-5 font-semibold disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isProcessing ? (
             <HiOutlineRefresh className="h-4 w-4 animate-spin" aria-hidden />
           ) : null}
           {actionLabel}
-        </button>
+        </Button>
       </div>
     </div>
   );

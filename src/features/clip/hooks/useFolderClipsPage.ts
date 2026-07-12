@@ -37,7 +37,7 @@ import { FilterType } from "@/features/clip/ui/FilterBar";
 import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
-import { notifyError } from "@/shared/lib/toast";
+import { notifyError } from "@/shared/feedback/toast";
 
 const createOptimisticClipId = () => {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
