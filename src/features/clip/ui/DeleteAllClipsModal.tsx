@@ -3,6 +3,7 @@
 import { Button } from "@/shared/ui/button/Button";
 import { Modal } from "@/shared/ui/overlay/Modal";
 
+// 현재 폴더의 모든 클립 삭제를 확인하고 요청 진행 중 액션을 잠급니다.
 interface DeleteAllClipsModalProps {
   isOpen: boolean;
   title: string;

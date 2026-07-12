@@ -11,6 +11,7 @@ import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 import { FolderClipCaptureHint } from "@/features/clip/ui/FolderClipCaptureHint";
 
+// 폴더 클립의 조회, 복사, 즐겨찾기, 컨텍스트 메뉴와 삭제 UI를 조합합니다.
 export function FolderClipsPage() {
   const t = useTranslations("clips");
   const {

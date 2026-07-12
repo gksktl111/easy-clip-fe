@@ -1,5 +1,6 @@
 import { PRICING_COMPARISON_POINTS } from "@/features/pricing/const/pricingContent";
 
+// Free와 Pro 플랜의 핵심 차이를 접근 가능한 표로 비교합니다.
 export function PricingComparisonSection() {
   return (
     <section
@@ -35,7 +36,11 @@ export function PricingComparisonSection() {
               {PRICING_COMPARISON_POINTS.map((point, index) => (
                 <tr
                   key={point.label}
-                  className={index % 2 === 0 ? "bg-(--surface)" : "bg-[var(--landing-demo-surface)]"}
+                  className={
+                    index % 2 === 0
+                      ? "bg-(--surface)"
+                      : "bg-[var(--landing-demo-surface)]"
+                  }
                 >
                   <th className="border-t border-(--border) px-5 py-4 text-left text-sm font-medium text-(--foreground)">
                     {point.label}

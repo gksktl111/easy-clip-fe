@@ -1,7 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { HiOutlineRefresh, HiOutlineReply, HiOutlineTrash } from "react-icons/hi";
+import {
+  HiOutlineRefresh,
+  HiOutlineReply,
+  HiOutlineTrash,
+} from "react-icons/hi";
 import { Badge } from "@/shared/ui/badge/Badge";
 import { Button } from "@/shared/ui/button/Button";
 import { Text } from "@/shared/ui/typography/Text";
@@ -37,6 +41,17 @@ export function TrashPageHeader({
   const t = useTranslations("trash");
   const hasSelection = selectedCount > 0;
   const areControlsDisabled = isLoading || isActionPending;
+  const statusLabel = isLoading
+    ? t("loading")
+    : isRestoringSelected
+      ? t("restoringSelected")
+      : isDeletingSelected
+        ? t("deletingSelected")
+        : isClearingAll
+          ? t("clearing")
+          : hasSelection
+            ? t("selectedCount", { count: selectedCount })
+            : null;
 
   return (
     <div className="border-b border-(--border) px-4 py-6 min-[1200px]:px-6">
@@ -52,21 +67,9 @@ export function TrashPageHeader({
           </div>
           <div className="mt-2 flex flex-col gap-1 min-[640px]:flex-row min-[640px]:items-center min-[640px]:gap-3">
             <Text variant="bodyMuted">{t("description")}</Text>
-            {isLoading ||
-            isRestoringSelected ||
-            isDeletingSelected ||
-            isClearingAll ||
-            hasSelection ? (
+            {statusLabel ? (
               <Text as="span" variant="bodyStrong">
-                {isLoading
-                  ? t("loading")
-                  : isRestoringSelected
-                    ? t("restoringSelected")
-                    : isDeletingSelected
-                      ? t("deletingSelected")
-                      : isClearingAll
-                        ? t("clearing")
-                        : t("selectedCount", { count: selectedCount })}
+                {statusLabel}
               </Text>
             ) : null}
           </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+// 랜딩 페이지 마지막에서 로그인과 데모로 이어지는 핵심 액션을 강조합니다.
 export function LandingFinalCtaSection() {
   return (
     <section className="border-t border-(--border) bg-[var(--landing-brand-bg)] py-24 text-[color:var(--landing-brand-fg)]">

@@ -1,5 +1,6 @@
 import type { IconType } from "react-icons";
 
+// 랜딩 페이지에서 제품의 핵심 기능을 반복 가능한 카드 목록으로 소개합니다.
 interface LandingFeature {
   key: string;
   title: string;
@@ -9,6 +10,22 @@ interface LandingFeature {
 
 interface LandingFeaturesSectionProps {
   features: readonly LandingFeature[];
+}
+
+function LandingFeatureCard({ feature }: { feature: LandingFeature }) {
+  const Icon = feature.icon;
+
+  return (
+    <article className="rounded-2xl border border-(--border) bg-(--surface-muted) p-6 transition-transform hover:-translate-y-1">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--landing-brand-bg)] text-[var(--landing-brand-fg)]">
+        <Icon className="h-6 w-6" aria-hidden />
+      </div>
+      <h3 className="text-lg font-semibold">{feature.title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-(--muted)">
+        {feature.description}
+      </p>
+    </article>
+  );
 }
 
 export function LandingFeaturesSection({
@@ -27,24 +44,9 @@ export function LandingFeaturesSection({
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature) => {
-            const Icon = feature.icon;
-
-            return (
-              <div
-                key={feature.key}
-                className="rounded-2xl border border-(--border) bg-(--surface-muted) p-6 transition-transform hover:-translate-y-1"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--landing-brand-bg)] text-[var(--landing-brand-fg)]">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h3 className="text-lg font-semibold">{feature.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-(--muted)">
-                  {feature.description}
-                </p>
-              </div>
-            );
-          })}
+          {features.map((feature) => (
+            <LandingFeatureCard key={feature.key} feature={feature} />
+          ))}
         </div>
       </div>
     </section>

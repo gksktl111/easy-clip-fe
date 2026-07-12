@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { HiOutlinePlay, HiOutlineSwitchHorizontal } from "react-icons/hi";
 
+// 핵심 가치와 진입 액션, 기기 간 동기화 데모를 첫 화면에 표시합니다.
 interface LandingHeroSectionProps {
   demoItems: readonly string[];
   mobileDemoItems: readonly string[];
@@ -34,7 +36,7 @@ export function LandingHeroSection({
             href="/favorites"
             className="flex items-center gap-2 rounded-xl border border-(--border) px-7 py-3.5 text-sm font-semibold transition-colors hover:bg-(--surface-muted)"
           >
-            <span aria-hidden>▷</span>
+            <HiOutlinePlay className="h-4 w-4" aria-hidden />
             <span className="text-(--foreground)">데모 보기</span>
           </Link>
         </div>
@@ -72,19 +74,10 @@ export function LandingHeroSection({
         </div>
 
         <div className="absolute top-1/2 left-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--landing-brand-bg)] shadow-[var(--landing-shadow)] md:static md:translate-x-0 md:translate-y-0">
-          <svg
+          <HiOutlineSwitchHorizontal
             className="h-6 w-6 text-[var(--landing-brand-fg)]"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-            />
-          </svg>
+            aria-hidden
+          />
         </div>
 
         <div className="hidden h-72 w-40 overflow-hidden rounded-3xl border border-(--border) bg-[var(--landing-demo-surface)] shadow-[var(--landing-shadow)] md:block">

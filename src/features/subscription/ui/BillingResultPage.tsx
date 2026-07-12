@@ -4,10 +4,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { confirmBillingAuth } from "@/features/subscription/api/subscriptionApi";
-import { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
+import type { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 import { syncMySubscriptionQueryData } from "@/features/subscription/service/subscriptionQueryCache";
 import { BillingResultCard } from "@/features/subscription/ui/BillingResultCard";
 
+// 결제 리다이렉트 결과를 서버에서 확정하고 성공 또는 실패 화면을 표시합니다.
 interface BillingResultPageProps {
   authKey?: string;
   customerKey?: string;

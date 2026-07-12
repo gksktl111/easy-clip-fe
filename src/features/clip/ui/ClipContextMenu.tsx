@@ -1,9 +1,14 @@
 "use client";
 
-import { Clip } from "@/features/clip/model/clip";
+import {
+  HiOutlineClipboardCopy,
+  HiOutlinePencil,
+  HiOutlineTrash,
+} from "react-icons/hi";
+import type { Clip } from "@/features/clip/model/clip";
 import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
-import { HiOutlineClipboardCopy, HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 
+// 선택한 클립 위치에 복사, 이름 변경, 삭제 액션 메뉴를 표시합니다.
 interface ClipContextMenuProps {
   clips: Clip[];
   contextMenu: {

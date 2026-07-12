@@ -7,7 +7,7 @@ import {
   HiOutlinePhotograph,
   HiOutlineSearch,
 } from "react-icons/hi";
-import { ClipType } from "@/features/clip/model/clip";
+import type { ClipType } from "@/features/clip/model/clip";
 import { Badge } from "@/shared/ui/badge/Badge";
 import { Button } from "@/shared/ui/button/Button";
 import { Select } from "@/shared/ui/input/Select";
@@ -15,6 +15,7 @@ import { TextInput } from "@/shared/ui/input/TextInput";
 
 export type FilterType = ClipType | "all";
 
+// 클립 유형 필터, 검색, 수집 상태와 결과 개수를 반응형으로 표시합니다.
 interface FilterBarProps {
   activeFilter: FilterType;
   onFilterChange: (filter: FilterType) => void;
@@ -78,9 +79,7 @@ export function FilterBar({
           <span>{isActive ? t("readyToPaste") : t("notActive")}</span>
         </div>
       ) : null}
-      {countLabel ? (
-        <Badge variant="chip">{countLabel}</Badge>
-      ) : null}
+      {countLabel ? <Badge variant="chip">{countLabel}</Badge> : null}
     </div>
   );
 

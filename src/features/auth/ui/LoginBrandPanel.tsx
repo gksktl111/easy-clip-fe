@@ -1,5 +1,6 @@
 "use client";
 
+// 로그인 화면의 제목과 안내 문구를 일관된 정렬로 표시합니다.
 interface LoginBrandPanelProps {
   title: string;
   subtitle: string;
