@@ -7,7 +7,10 @@ import {
   HiOutlineFolder,
   HiOutlinePhotograph,
 } from "react-icons/hi";
-import { formatDeletedAt, TrashItemRow } from "@/features/trash/ui/trashRow";
+import {
+  formatDeletedAt,
+  type TrashItemRow,
+} from "@/features/trash/ui/trashRow";
 import { Badge } from "@/shared/ui/badge/Badge";
 import { Button } from "@/shared/ui/button/Button";
 import { Checkbox } from "@/shared/ui/input/Checkbox";
@@ -22,6 +25,22 @@ interface TrashListRowProps {
   onDeleteFolder: (folderId: string) => void;
   onRestoreClip: (clipId: string) => void;
   onDeleteClip: (clipId: string) => void;
+}
+
+function TrashRowIcon({ row }: { row: TrashItemRow }) {
+  if (row.kind === "folder") {
+    return <HiOutlineFolder className="h-5 w-5" aria-hidden />;
+  }
+
+  if (row.clipType === "IMAGE") {
+    return <HiOutlinePhotograph className="h-5 w-5" aria-hidden />;
+  }
+
+  if (row.clipType === "COLOR") {
+    return <HiOutlineColorSwatch className="h-5 w-5" aria-hidden />;
+  }
+
+  return <HiOutlineDocumentText className="h-5 w-5" aria-hidden />;
 }
 
 // 휴지통 항목 하나를 파일/폴더 유형과 액션까지 포함해 한 줄로 렌더링하는 컴포넌트입니다.
@@ -57,15 +76,7 @@ export function TrashListRow({
         </div>
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-(--icon-chip) text-(--icon-chip-text)">
-            {row.kind === "folder" ? (
-              <HiOutlineFolder className="h-5 w-5" aria-hidden />
-            ) : row.clipType === "IMAGE" ? (
-              <HiOutlinePhotograph className="h-5 w-5" aria-hidden />
-            ) : row.clipType === "COLOR" ? (
-              <HiOutlineColorSwatch className="h-5 w-5" aria-hidden />
-            ) : (
-              <HiOutlineDocumentText className="h-5 w-5" aria-hidden />
-            )}
+            <TrashRowIcon row={row} />
           </div>
 
           <div className="min-w-0">
