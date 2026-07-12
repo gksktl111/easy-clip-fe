@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import { CLIP_QUERY_KEY } from "@/features/clip/hooks/useInfiniteClips";
+import { CLIP_QUERY_KEY } from "@/features/clip/service/clipQueryCache";
 import { FOLDER_QUERY_KEY } from "@/features/folder/hooks/useFolders";
 import { useFolders } from "@/features/folder/hooks/useFolders";
 import {
@@ -87,9 +87,7 @@ export const useTrashPage = () => {
           error instanceof ApiError &&
           error.status === 409;
 
-        setActionError(
-          isRestoreConflict ? "restoreConflict" : "action",
-        );
+        setActionError(isRestoreConflict ? "restoreConflict" : "action");
         await refreshRelatedData().catch(() => undefined);
         return false;
       } finally {
@@ -106,7 +104,9 @@ export const useTrashPage = () => {
         return;
       }
 
-      return runAction(`clip-restore-${clipId}`, () => restoreTrashClip(clipId));
+      return runAction(`clip-restore-${clipId}`, () =>
+        restoreTrashClip(clipId),
+      );
     },
     [isAuthenticated, runAction],
   );

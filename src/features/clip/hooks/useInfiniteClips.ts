@@ -4,15 +4,13 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { fetchClips } from "@/features/clip/api/clipApi";
-import { Clip } from "@/features/clip/model/clip";
-import { FetchClipsQueryDto } from "@/features/clip/model/clip.dto";
+import type { Clip, ClipFilter } from "@/features/clip/model/clip";
+import type { FetchClipsQueryDto } from "@/features/clip/model/clip.dto";
 import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
-import { FilterType } from "@/features/clip/ui/FilterBar";
+import { CLIP_QUERY_KEY } from "@/features/clip/service/clipQueryCache";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
-const mapFilterToApiType = (
-  filter: FilterType,
-): FetchClipsQueryDto["type"] => {
+const mapFilterToApiType = (filter: ClipFilter): FetchClipsQueryDto["type"] => {
   if (filter === "all") {
     return "ALL";
   }
@@ -24,13 +22,12 @@ interface UseInfiniteClipsOptions {
   folderId?: string;
   favorite?: boolean;
   recent?: boolean;
-  filter: FilterType;
+  filter: ClipFilter;
   searchQuery?: string;
   enabled?: boolean;
 }
 
-export const CLIP_QUERY_KEY = "clips";
-
+// 인증 상태와 조회 조건에 맞는 클립을 무한 query로 조회하고 도메인 모델로 변환합니다.
 export const useInfiniteClips = ({
   folderId,
   favorite,
@@ -95,10 +92,13 @@ export const useInfiniteClips = ({
   );
 
   return {
-    ...query,
-    isAuthenticated,
     clips,
-    isPending: isAuthenticated && enabled && query.isPending,
-    queryKey,
+    fetchNextPage: query.fetchNextPage,
+    hasNextPage: Boolean(query.hasNextPage),
+    isAuthenticated,
+    isError: query.isError,
+    isFetchingNextPage: query.isFetchingNextPage,
+    isLoading: isAuthenticated && enabled && query.isPending,
+    refetch: query.refetch,
   };
 };

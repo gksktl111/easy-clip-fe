@@ -1,12 +1,13 @@
 "use client";
 
 import { InfiniteData, QueryClient, QueryKey } from "@tanstack/react-query";
-import { CLIP_QUERY_KEY } from "@/features/clip/hooks/useInfiniteClips";
 import {
   ClipCursorPageResponseDto,
   ClipListItemResponseDto,
   ClipResponseDto,
 } from "@/features/clip/model/clip.dto";
+
+export const CLIP_QUERY_KEY = "clips";
 
 type ClipQueryOptions = {
   folderId?: string | null;

@@ -7,13 +7,13 @@ import {
   HiOutlinePhotograph,
   HiOutlineSearch,
 } from "react-icons/hi";
-import type { ClipType } from "@/features/clip/model/clip";
+import type { ClipFilter } from "@/features/clip/model/clip";
 import { Badge } from "@/shared/ui/badge/Badge";
 import { Button } from "@/shared/ui/button/Button";
 import { Select } from "@/shared/ui/input/Select";
 import { TextInput } from "@/shared/ui/input/TextInput";
 
-export type FilterType = ClipType | "all";
+export type FilterType = ClipFilter;
 
 // 클립 유형 필터, 검색, 수집 상태와 결과 개수를 반응형으로 표시합니다.
 interface FilterBarProps {

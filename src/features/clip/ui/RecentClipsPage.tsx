@@ -5,41 +5,32 @@ import { ClipCollectionPage } from "@/features/clip/ui/ClipCollectionPage";
 
 // 최근 사용한 클립 데이터를 공통 컬렉션 화면에 연결합니다.
 export function RecentClipsPage() {
-  const {
-    activeFilter,
-    copyToast,
-    fetchNextPage,
-    filteredClips,
-    handleCopy,
-    hasNextPage,
-    isError,
-    isFetchingNextPage,
-    isLoading,
-    refetchClips,
-    searchQuery,
-    setActiveFilter,
-    setSearchQuery,
-  } = useRecentClipsPage();
+  const { actions, feedback, filter, results } = useRecentClipsPage();
 
   return (
     <ClipCollectionPage
-      activeFilter={activeFilter}
-      clips={filteredClips}
-      copyToastPosition={copyToast}
-      hasNextPage={hasNextPage}
-      isError={isError}
-      isFetchingNextPage={isFetchingNextPage}
-      isLoading={isLoading}
-      onCopy={handleCopy}
+      activeFilter={filter.activeFilter}
+      clips={results.clips}
+      copyToastPosition={feedback.copyToast}
+      hasNextPage={results.hasNextPage}
+      isError={results.isError}
+      isFetchingNextPage={results.isFetchingNextPage}
+      isLoading={results.isLoading}
+      onCopy={(clip, event) => {
+        void actions.copyClip(clip, {
+          x: event.clientX,
+          y: event.clientY,
+        });
+      }}
       onFetchNextPage={() => {
-        void fetchNextPage();
+        void results.fetchNextPage();
       }}
-      onFilterChange={setActiveFilter}
+      onFilterChange={filter.changeFilter}
       onRetry={() => {
-        void refetchClips();
+        void results.refetch();
       }}
-      onSearchChange={setSearchQuery}
-      searchQuery={searchQuery}
+      onSearchChange={filter.changeSearchQuery}
+      searchQuery={filter.searchQuery}
     />
   );
 }

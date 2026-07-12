@@ -5,43 +5,33 @@ import { ClipCollectionPage } from "@/features/clip/ui/ClipCollectionPage";
 
 // 즐겨찾기 클립 데이터와 즐겨찾기 해제 액션을 공통 컬렉션 화면에 연결합니다.
 export function FavoriteClipsPage() {
-  const {
-    activeFilter,
-    copyToast,
-    fetchNextPage,
-    filteredClips,
-    handleCopy,
-    handleToggleFavorite,
-    hasNextPage,
-    isError,
-    isFetchingNextPage,
-    isLoading,
-    refetchClips,
-    searchQuery,
-    setActiveFilter,
-    setSearchQuery,
-  } = useFavoriteClipsPage();
+  const { actions, feedback, filter, results } = useFavoriteClipsPage();
 
   return (
     <ClipCollectionPage
-      activeFilter={activeFilter}
-      clips={filteredClips}
-      copyToastPosition={copyToast}
-      hasNextPage={hasNextPage}
-      isError={isError}
-      isFetchingNextPage={isFetchingNextPage}
-      isLoading={isLoading}
-      onCopy={handleCopy}
+      activeFilter={filter.activeFilter}
+      clips={results.clips}
+      copyToastPosition={feedback.copyToast}
+      hasNextPage={results.hasNextPage}
+      isError={results.isError}
+      isFetchingNextPage={results.isFetchingNextPage}
+      isLoading={results.isLoading}
+      onCopy={(clip, event) => {
+        void actions.copyClip(clip, {
+          x: event.clientX,
+          y: event.clientY,
+        });
+      }}
       onFetchNextPage={() => {
-        void fetchNextPage();
+        void results.fetchNextPage();
       }}
-      onFilterChange={setActiveFilter}
+      onFilterChange={filter.changeFilter}
       onRetry={() => {
-        void refetchClips();
+        void results.refetch();
       }}
-      onSearchChange={setSearchQuery}
-      onToggleFavorite={handleToggleFavorite}
-      searchQuery={searchQuery}
+      onSearchChange={filter.changeSearchQuery}
+      onToggleFavorite={actions.toggleFavorite}
+      searchQuery={filter.searchQuery}
     />
   );
 }

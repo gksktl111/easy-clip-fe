@@ -1,4 +1,5 @@
 export type ClipType = "text" | "color" | "image";
+export type ClipFilter = ClipType | "all";
 
 export interface Clip {
   id: string;
