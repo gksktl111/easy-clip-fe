@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { HiOutlineRefresh } from "react-icons/hi";
 
+// 클립 조회 실패 원인을 안내하고 선택적으로 재시도 액션을 제공합니다.
 interface ClipErrorStateProps {
   onRetry?: () => void;
 }

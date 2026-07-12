@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { HiOutlineTrash, HiX } from "react-icons/hi";
 import { Button } from "@/shared/ui/button/Button";
 
+// 삭제 모드에서 선택 개수와 취소, 선택 삭제, 전체 삭제 액션을 제공합니다.
 interface ClipDeleteActionBarProps {
   selectedCount: number;
   totalCount: number;

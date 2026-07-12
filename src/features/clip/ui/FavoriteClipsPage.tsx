@@ -1,13 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
-import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { useFavoriteClipsPage } from "@/features/clip/hooks/useFavoriteClipsPage";
-import { FilterBar } from "@/features/clip/ui/FilterBar";
+import { ClipCollectionPage } from "@/features/clip/ui/ClipCollectionPage";
 
+// 즐겨찾기 클립 데이터와 즐겨찾기 해제 액션을 공통 컬렉션 화면에 연결합니다.
 export function FavoriteClipsPage() {
-  const t = useTranslations("clips");
   const {
     activeFilter,
     copyToast,
@@ -24,36 +21,27 @@ export function FavoriteClipsPage() {
     setActiveFilter,
     setSearchQuery,
   } = useFavoriteClipsPage();
-  const hasClipLoadError = isError && filteredClips.length === 0;
 
   return (
-    <div className="bg-background relative flex h-full flex-col">
-      {!hasClipLoadError ? (
-        <FilterBar
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          showStatus={false}
-          countLabel={t("count", { count: filteredClips.length })}
-        />
-      ) : null}
-      <ClipResultsSection
-        clips={filteredClips}
-        hasNextPage={hasNextPage}
-        isError={isError}
-        isFetchingNextPage={isFetchingNextPage}
-        isLoading={isLoading}
-        onFetchNextPage={() => {
-          void fetchNextPage();
-        }}
-        onRetry={() => {
-          void refetchClips();
-        }}
-        onCopy={handleCopy}
-        onToggleFavorite={handleToggleFavorite}
-      />
-      <ClipCopyToast label={t("copyToast")} position={copyToast} />
-    </div>
+    <ClipCollectionPage
+      activeFilter={activeFilter}
+      clips={filteredClips}
+      copyToastPosition={copyToast}
+      hasNextPage={hasNextPage}
+      isError={isError}
+      isFetchingNextPage={isFetchingNextPage}
+      isLoading={isLoading}
+      onCopy={handleCopy}
+      onFetchNextPage={() => {
+        void fetchNextPage();
+      }}
+      onFilterChange={setActiveFilter}
+      onRetry={() => {
+        void refetchClips();
+      }}
+      onSearchChange={setSearchQuery}
+      onToggleFavorite={handleToggleFavorite}
+      searchQuery={searchQuery}
+    />
   );
 }

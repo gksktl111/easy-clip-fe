@@ -1,30 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useFolders } from "@/features/folder/hooks/useFolders";
+import { ClipEntryPage } from "@/features/clip/ui/ClipEntryPage";
 import { RecentClipsPage } from "@/features/clip/ui/RecentClipsPage";
-import { ClipListSkeleton } from "@/features/clip/ui/ClipListSkeleton";
 
+// 최근 클립 기본 경로를 폴더 기준 경로 또는 빈 폴더 대체 화면으로 연결합니다.
 export function RecentEntryPage() {
-  const router = useRouter();
-  const { folders, isLoading } = useFolders();
-
-  useEffect(() => {
-    if (!folders.length) {
-      return;
-    }
-
-    router.replace(`/${folders[0].id}/recent`);
-  }, [folders, router]);
-
-  if (isLoading) {
-    return <ClipListSkeleton />;
-  }
-
-  if (!folders.length) {
-    return <RecentClipsPage />;
-  }
-
-  return null;
+  return <ClipEntryPage section="recent" fallback={<RecentClipsPage />} />;
 }
