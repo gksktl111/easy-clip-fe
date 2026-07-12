@@ -7,6 +7,7 @@ import {
 } from "@/features/landing/ui/LandingHeader";
 import { useSettingsStore } from "@/shared/store/settingsStore";
 
+// 마케팅 페이지에 공통 헤더, 테마 제어, 푸터를 제공하는 레이아웃입니다.
 interface MarketingShellProps {
   activeTab?: LandingHeaderTab;
   children: React.ReactNode;
