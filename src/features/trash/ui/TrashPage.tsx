@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { useTrashPage } from "@/features/trash/hooks/useTrashPage";
 import { TrashListSection } from "@/features/trash/ui/TrashListSection";
 import { TrashPageEmptyState } from "@/features/trash/ui/TrashPageEmptyState";
 import { TrashPageHeader } from "@/features/trash/ui/TrashPageHeader";
 import type { TrashItemRow } from "@/features/trash/ui/trashRow";
+import { ConfirmActionModal } from "@/shared/ui/overlay/ConfirmActionModal";
 
 const getClipTypeLabel = (
   clipType: "TEXT" | "COLOR" | "IMAGE",
@@ -25,7 +25,12 @@ const getClipTypeLabel = (
 };
 
 // 휴지통 페이지의 상태에 따라 안내, 빈 상태, 리스트 섹션을 조합하는 루트 컴포넌트입니다.
-export function TrashPage() {
+interface TrashPageProps {
+  activeFolders: Array<{ id: string; name: string }>;
+  onItemsChanged?: () => void | Promise<void>;
+}
+
+export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
   const t = useTranslations("trash");
   const [deleteModal, setDeleteModal] = useState<
     "clearAll" | "selected" | null
@@ -33,7 +38,10 @@ export function TrashPage() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Set<string>>(
     () => new Set(),
   );
-  const { actions, context, results } = useTrashPage();
+  const { actions, context, results } = useTrashPage({
+    activeFolders,
+    onItemsChanged,
+  });
   const { items } = results;
   const deletedFolderIds = new Set(
     items
@@ -213,7 +221,7 @@ export function TrashPage() {
         />
       ) : null}
 
-      <DeleteAllClipsModal
+      <ConfirmActionModal
         isOpen={deleteModal !== null}
         title={
           deleteModal === "selected"

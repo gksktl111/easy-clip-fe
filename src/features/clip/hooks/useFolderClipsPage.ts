@@ -11,8 +11,14 @@ import { useFolderClipCapture } from "@/features/clip/hooks/useFolderClipCapture
 import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
 import type { Clip } from "@/features/clip/model/clip";
 
+interface UseFolderClipsPageOptions {
+  onClipsDeleted?: () => void | Promise<void>;
+}
+
 // 폴더 클립의 조회, 수집, 메뉴와 삭제 하위 훅을 페이지 영역별 계약으로 조합합니다.
-export const useFolderClipsPage = () => {
+export const useFolderClipsPage = ({
+  onClipsDeleted,
+}: UseFolderClipsPageOptions = {}) => {
   const params = useParams<{ id?: string }>();
   const folderId = params?.id ?? "";
   const filter = useClipCollectionFilter();
@@ -26,6 +32,7 @@ export const useFolderClipsPage = () => {
     clips: query.clips,
     folderId,
     isAuthenticated: query.isAuthenticated,
+    onDeleted: onClipsDeleted,
   });
   const isInteractionDisabled = deletion.isDeleteMode || deletion.isDeleting;
   const capture = useFolderClipCapture({

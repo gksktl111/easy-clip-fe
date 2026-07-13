@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   PRICING_PLANS,
@@ -11,14 +10,11 @@ import {
 import { PricingCancelModal } from "@/features/pricing/ui/PricingCancelModal";
 import { PricingPlanCard } from "@/features/pricing/ui/PricingPlanCard";
 import {
-  fetchMySubscription,
-  updateMySubscription,
-} from "@/features/subscription/api/subscriptionApi";
-import { useMySubscription } from "@/features/subscription/hooks/useMySubscription";
-import {
   hasRemainingCanceledProPeriod,
   isActiveProSubscription,
-} from "@/features/subscription/model/subscription";
+  useMySubscription,
+  useSubscriptionActions,
+} from "@/features/subscription";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { ApiError } from "@/shared/lib/apiClient";
 import { Button } from "@/shared/ui/button/Button";
@@ -37,12 +33,9 @@ const formatSubscriptionDate = (value: string | null) => {
 // 구독 상태에 맞는 요금제 카드 액션과 취소 흐름을 조합합니다.
 export function PricingPlansSection() {
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const {
-    isAuthenticated,
-    queryKey: subscriptionQueryKey,
-    subscription,
-  } = useMySubscription();
+  const { isAuthenticated, subscription } = useMySubscription();
+  const { cancelSubscription, resumeSubscription, syncSubscription } =
+    useSubscriptionActions();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isCancelingSubscription, setIsCancelingSubscription] = useState(false);
   const [isResumingSubscription, setIsResumingSubscription] = useState(false);
@@ -57,8 +50,7 @@ export function PricingPlansSection() {
     setIsCancelingSubscription(true);
 
     try {
-      const nextSubscription = await updateMySubscription({ type: "CANCEL" });
-      queryClient.setQueryData(subscriptionQueryKey, nextSubscription);
+      await cancelSubscription();
       notifySuccess("Pro 구독이 취소되었습니다.");
       setIsCancelModalOpen(false);
       router.push("/favorites");
@@ -69,12 +61,6 @@ export function PricingPlansSection() {
     }
   };
 
-  const syncSubscription = async () => {
-    const nextSubscription = await fetchMySubscription();
-    queryClient.setQueryData(subscriptionQueryKey, nextSubscription);
-    return nextSubscription;
-  };
-
   const handleResumeSubscription = async () => {
     if (isResumingSubscription) {
       return;
@@ -83,8 +69,7 @@ export function PricingPlansSection() {
     setIsResumingSubscription(true);
 
     try {
-      const nextSubscription = await updateMySubscription({ type: "RESUME" });
-      queryClient.setQueryData(subscriptionQueryKey, nextSubscription);
+      await resumeSubscription();
       notifySuccess("Pro 구독 자동갱신이 재개되었습니다.");
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {

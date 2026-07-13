@@ -1,4 +1,4 @@
-import { RecentEntryPage } from "@/features/clip/ui/RecentEntryPage";
+import { RecentEntryPage } from "@/features/clip";
 
 export default function Recent() {
   return <RecentEntryPage />;

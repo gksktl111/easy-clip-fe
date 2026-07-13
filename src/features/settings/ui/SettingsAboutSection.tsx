@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { HiOutlineCreditCard } from "react-icons/hi";
-import type { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
+import type { MySubscriptionResponseDto } from "@/features/subscription";
 import type { AppLocale } from "@/shared/config/locale";
 import { Text } from "@/shared/ui/typography/Text";
 

@@ -3,8 +3,9 @@
 import { useCallback, useState } from "react";
 import { HiOutlineMenuAlt4, HiOutlinePaperClip } from "react-icons/hi";
 import { AppSidebar } from "@/app/(app)/_components/sidebar/AppSidebar";
-import { AuthBootstrap } from "@/features/auth/ui/AuthBootstrap";
-import { SettingsModal } from "@/features/settings/ui/SettingsModal";
+import { UserSettingsSync } from "@/app/_components/UserSettingsSync";
+import { AuthBootstrap } from "@/features/auth";
+import { SettingsModal } from "@/features/settings";
 import { Button } from "@/shared/ui/button/Button";
 
 interface AppShellProps {
@@ -23,6 +24,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div className="bg-background text-foreground flex h-screen flex-col overflow-hidden">
       <AuthBootstrap />
+      <UserSettingsSync />
       <header className="bg-background border-b border-(--border) md:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Button

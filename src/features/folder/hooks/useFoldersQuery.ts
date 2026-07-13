@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { useAuthSession } from "@/features/auth";
 import { fetchFolders } from "@/features/folder/api/folderApi";
 import {
   mapFolder,

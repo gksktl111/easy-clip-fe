@@ -8,12 +8,10 @@ import { HiOutlineClock, HiOutlineStar, HiOutlineTrash } from "react-icons/hi";
 import { AppSidebarFooter } from "@/app/(app)/_components/sidebar/AppSidebarFooter";
 import { AppSidebarHeader } from "@/app/(app)/_components/sidebar/AppSidebarHeader";
 import { AppSidebarNav } from "@/app/(app)/_components/sidebar/AppSidebarNav";
-import { logout } from "@/features/auth/api/authApi";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import { clearAuthSession } from "@/features/auth/service/authSession";
-import { invalidateClipQueries } from "@/features/clip/service/clipQueryCache";
-import { useFoldersQuery } from "@/features/folder/hooks/useFoldersQuery";
-import { FolderSidebarContent } from "@/features/folder/ui/FolderSidebarContent";
+import { clearAuthSession, logout, useAuthSession } from "@/features/auth";
+import { invalidateClipQueries } from "@/features/clip";
+import { FolderSidebarContent, useFoldersQuery } from "@/features/folder";
+import { invalidateTrashQueries } from "@/features/trash";
 
 const RESERVED_PATHNAMES = new Set([
   "favorites",
@@ -80,7 +78,10 @@ export function AppSidebar({
 
   const handleFolderDeleted = useCallback(
     (redirectPath: string | null) => {
-      void invalidateClipQueries(queryClient);
+      void Promise.all([
+        invalidateClipQueries(queryClient),
+        invalidateTrashQueries(queryClient),
+      ]);
 
       if (redirectPath) {
         onCloseMobile?.();

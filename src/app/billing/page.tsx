@@ -1,4 +1,4 @@
-import { BillingPage } from "@/features/subscription/ui/BillingPage";
+import { BillingPage } from "@/features/subscription";
 
 export default function Billing() {
   return <BillingPage />;

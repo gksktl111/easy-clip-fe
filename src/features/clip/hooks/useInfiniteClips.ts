@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { useAuthSession } from "@/features/auth";
 import { fetchClips } from "@/features/clip/api/clipApi";
 import type { Clip, ClipFilter } from "@/features/clip/model/clip";
 import type { FetchClipsQueryDto } from "@/features/clip/model/clip.dto";

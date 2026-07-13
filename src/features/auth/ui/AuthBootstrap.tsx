@@ -4,8 +4,6 @@ import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { logout } from "@/features/auth/api/authApi";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import { syncUserSettings } from "@/features/settings/service/settingsService";
 import { ApiError, subscribeToAuthExpired } from "@/shared/lib/apiClient";
 import {
   clearSessionOnUnauthorized,
@@ -15,7 +13,6 @@ import { notifyError } from "@/shared/feedback/toast";
 
 // 앱 전역의 인증 세션을 복구하고 만료 상태를 라우팅 및 캐시와 동기화합니다.
 export function AuthBootstrap() {
-  const session = useAuthSession();
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -61,18 +58,6 @@ export function AuthBootstrap() {
       }
     });
   }, [queryClient, router]);
-
-  useEffect(() => {
-    if (!session?.user) {
-      return;
-    }
-
-    void syncUserSettings().catch((error: unknown) => {
-      if (error instanceof ApiError && error.status === 401) {
-        clearSessionOnUnauthorized();
-      }
-    });
-  }, [session]);
 
   return null;
 }
