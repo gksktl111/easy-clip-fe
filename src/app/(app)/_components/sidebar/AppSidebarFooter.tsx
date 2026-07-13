@@ -9,8 +9,7 @@ import {
 } from "react-icons/hi";
 import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
-// 사용자 식별 정보와 설정, 요금제, 로그아웃 액션 메뉴를 제공합니다.
-interface FolderSidebarFooterProps {
+interface AppSidebarFooterProps {
   userLabel: string;
   settingsLabel: string;
   logoutLabel: string;
@@ -20,7 +19,7 @@ interface FolderSidebarFooterProps {
   onLogout: () => void;
 }
 
-export function FolderSidebarFooter({
+export function AppSidebarFooter({
   userLabel,
   settingsLabel,
   logoutLabel,
@@ -28,7 +27,7 @@ export function FolderSidebarFooter({
   onOpenSettings,
   onUpgradePlan,
   onLogout,
-}: FolderSidebarFooterProps) {
+}: AppSidebarFooterProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const initials = userLabel.slice(0, 2).toUpperCase();

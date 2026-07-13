@@ -2,24 +2,23 @@
 
 import Link from "next/link";
 
-// 즐겨찾기, 최근 항목, 휴지통으로 이동하는 주요 탐색 링크를 표시합니다.
-interface SidebarNavItem {
+interface AppSidebarNavItem {
   href: string;
   label: string;
   icon: React.ReactNode;
 }
 
-interface SidebarPrimaryNavProps {
-  items: SidebarNavItem[];
+interface AppSidebarNavProps {
+  items: AppSidebarNavItem[];
   pathname: string;
   onNavigate?: () => void;
 }
 
-export function SidebarPrimaryNav({
+export function AppSidebarNav({
   items,
   pathname,
   onNavigate,
-}: SidebarPrimaryNavProps) {
+}: AppSidebarNavProps) {
   return (
     <ul className="space-y-2 px-2">
       {items.map((item) => (

@@ -1,36 +1,23 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HiOutlineClock, HiOutlineStar, HiOutlineTrash } from "react-icons/hi";
-import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
-import { logout } from "@/features/auth/api/authApi";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import { clearAuthSession } from "@/features/auth/service/authSession";
-import { invalidateClipQueries } from "@/features/clip/service/clipQueryCache";
 import { useFolderActions } from "@/features/folder/hooks/useFolderActions";
-import { useFoldersQuery } from "@/features/folder/hooks/useFoldersQuery";
-import type { FolderDropPosition } from "@/features/folder/model/folder";
+import type {
+  FolderDropPosition,
+  FolderItem,
+} from "@/features/folder/model/folder";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
-import { FolderSidebarFooter } from "@/features/folder/ui/FolderSidebarFooter";
-import { FolderSidebarHeader } from "@/features/folder/ui/FolderSidebarHeader";
 import { FolderSidebarSection } from "@/features/folder/ui/FolderSidebarSection";
-import { SidebarPrimaryNav } from "@/features/folder/ui/SidebarPrimaryNav";
 
-const RESERVED_PATHNAMES = new Set([
-  "favorites",
-  "recent",
-  "trash",
-  "login",
-  "pricing",
-]);
-
-interface SidebarProps {
-  onOpenSettings: () => void;
-  isMobileOpen?: boolean;
-  onCloseMobile?: () => void;
+interface FolderSidebarContentProps {
+  folders: FolderItem[];
+  isLoading?: boolean;
+  pathname: string;
+  isAuthenticated: boolean;
+  onNavigate?: () => void;
+  onAuthenticationRequired: () => void;
+  onFolderDeleted: (redirectPath: string | null) => void;
 }
 
 type FolderDropTarget = {
@@ -44,19 +31,17 @@ type FolderNameModalState =
   | { mode: "create"; value: string }
   | { mode: "rename"; folderId: string; value: string };
 
-// 앱 탐색과 폴더 생성, 이름 변경, 삭제, 순서 변경 흐름을 조합합니다.
-export function Sidebar({
-  onOpenSettings,
-  isMobileOpen = false,
-  onCloseMobile,
-}: SidebarProps) {
+// 폴더 생성, 이름 변경, 삭제와 정렬 상호작용만 관리합니다.
+export function FolderSidebarContent({
+  folders,
+  isLoading = false,
+  pathname,
+  isAuthenticated,
+  onNavigate,
+  onAuthenticationRequired,
+  onFolderDeleted,
+}: FolderSidebarContentProps) {
   const t = useTranslations("sidebar");
-  const pathname = usePathname();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const session = useAuthSession();
-  const isAuthenticated = Boolean(session?.user);
-  const { folders, isLoading: isFoldersLoading } = useFoldersQuery();
   const { createFolder, removeFolder, renameFolder, saveFolderOrder } =
     useFolderActions();
   const [folderNameModal, setFolderNameModal] =
@@ -69,30 +54,7 @@ export function Sidebar({
     useState<FolderDropTarget | null>(null);
   const folderNameInputRef = useRef<HTMLInputElement>(null);
   const folderNameModalMode = folderNameModal?.mode ?? null;
-  const pathSegments = pathname.split("/").filter(Boolean);
-  const pathnameFolderId = pathSegments[0] ?? null;
-  const currentFolderId =
-    pathnameFolderId && !RESERVED_PATHNAMES.has(pathnameFolderId)
-      ? pathnameFolderId
-      : (folders[0]?.id ?? null);
-
-  const topNavs = [
-    {
-      href: currentFolderId ? `/${currentFolderId}/favorites` : "/favorites",
-      label: t("favorites"),
-      icon: <HiOutlineStar className="h-5 w-5" aria-hidden />,
-    },
-    {
-      href: currentFolderId ? `/${currentFolderId}/recent` : "/recent",
-      label: t("recent"),
-      icon: <HiOutlineClock className="h-5 w-5" aria-hidden />,
-    },
-    {
-      href: "/trash",
-      label: t("trash"),
-      icon: <HiOutlineTrash className="h-5 w-5" aria-hidden />,
-    },
-  ];
+  const pathnameFolderId = pathname.split("/").filter(Boolean)[0] ?? null;
 
   useEffect(() => {
     if (folderNameModalMode && folderNameInputRef.current) {
@@ -118,19 +80,14 @@ export function Sidebar({
     return () => window.removeEventListener("pointerdown", handlePointerDown);
   }, [openOptionsFolderId]);
 
-  useEffect(() => {
-    onCloseMobile?.();
-  }, [onCloseMobile, pathname]);
-
   const ensureAuthenticated = useCallback(() => {
     if (isAuthenticated) {
       return true;
     }
 
-    onCloseMobile?.();
-    router.push("/login");
+    onAuthenticationRequired();
     return false;
-  }, [isAuthenticated, onCloseMobile, router]);
+  }, [isAuthenticated, onAuthenticationRequired]);
 
   const clearFolderDragState = useCallback(() => {
     setDraggingFolderId(null);
@@ -214,7 +171,7 @@ export function Sidebar({
       }
 
       void saveFolderOrder(sourceId, targetId, position).catch(() => {
-        // refresh from the server when the final order cannot be saved
+        // 최종 순서 저장 실패 시 query가 서버 순서로 다시 동기화됩니다.
       });
     },
     [clearFolderDragState, ensureAuthenticated, saveFolderOrder],
@@ -228,11 +185,7 @@ export function Sidebar({
     }
 
     const trimmedName = folderNameModal.value.trim();
-    if (!trimmedName) {
-      return;
-    }
-
-    if (!ensureAuthenticated()) {
+    if (!trimmedName || !ensureAuthenticated()) {
       return;
     }
 
@@ -242,7 +195,7 @@ export function Sidebar({
         : renameFolder(folderNameModal.folderId, trimmedName);
 
     void request.then(closeFolderNameModal).catch(() => {
-      // keep the modal open when the request fails
+      // 실패 내용을 확인하고 재시도할 수 있도록 모달을 유지합니다.
     });
   }, [createFolder, ensureAuthenticated, folderNameModal, renameFolder]);
 
@@ -355,122 +308,54 @@ export function Sidebar({
       return;
     }
 
-    const isDeletingCurrentFolder = pathnameFolderId === folderId;
-    const redirectPath = getRedirectPathAfterFolderDelete(folderId);
+    const redirectPath =
+      pathnameFolderId === folderId
+        ? getRedirectPathAfterFolderDelete(folderId)
+        : null;
 
     void removeFolder(folderId)
       .then(() => {
         setOpenOptionsFolderId(null);
-        void invalidateClipQueries(queryClient);
-
-        if (isDeletingCurrentFolder) {
-          onCloseMobile?.();
-          router.replace(redirectPath);
-        }
+        onFolderDeleted(redirectPath);
       })
       .catch(() => {
-        // keep the menu open when the request fails
+        // 실패 내용을 확인하고 재시도할 수 있도록 옵션 메뉴를 유지합니다.
       });
   };
 
-  const userLabel =
-    session?.user?.authAccounts?.[0]?.email ??
-    session?.user?.displayName ??
-    t("guest");
-
-  const handleLogout = useCallback(async () => {
-    onCloseMobile?.();
-
-    try {
-      if (isAuthenticated) {
-        await logout();
-      }
-    } catch {
-      // clear client session even when the server session is already invalid
-    } finally {
-      clearAuthSession();
-      queryClient.clear();
-      router.push("/login");
-      router.refresh();
-    }
-  }, [isAuthenticated, onCloseMobile, queryClient, router]);
-
   return (
     <>
-      {isMobileOpen ? (
-        <button
-          type="button"
-          onClick={onCloseMobile}
-          className="fixed inset-0 z-30 cursor-pointer bg-(--overlay) md:hidden"
-          aria-label="사이드바 닫기"
-        />
-      ) : null}
-
-      <aside
-        className={`fixed inset-y-0 left-0 z-40 flex h-screen w-72 max-w-[86vw] flex-col border-r border-(--border) bg-(--surface-muted) transition-transform duration-300 md:static md:z-auto md:w-64 md:max-w-none ${
-          isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
-      >
-        <FolderSidebarHeader onCloseMobile={onCloseMobile} />
-
-        <nav className="flex-1 py-4">
-          <div className="space-y-6">
-            <SidebarPrimaryNav
-              items={topNavs}
-              pathname={pathname}
-              onNavigate={onCloseMobile}
-            />
-
-            <FolderSidebarSection
-              folders={folders}
-              isLoading={isFoldersLoading}
-              pathname={pathname}
-              addFolderLabel={t("addFolder")}
-              reorderFolderLabel={t("reorderFolder")}
-              openFolderOptionsLabel={t("openFolderOptions")}
-              renameLabel={t("rename")}
-              deleteLabel={t("delete")}
-              openOptionsFolderId={openOptionsFolderId}
-              draggingFolderId={draggingFolderId}
-              dropIndicator={
-                folderDropTarget
-                  ? {
-                      folderId: folderDropTarget.indicatorFolderId,
-                      edge: folderDropTarget.indicatorEdge,
-                    }
-                  : null
+      <FolderSidebarSection
+        folders={folders}
+        isLoading={isLoading}
+        pathname={pathname}
+        addFolderLabel={t("addFolder")}
+        reorderFolderLabel={t("reorderFolder")}
+        openFolderOptionsLabel={t("openFolderOptions")}
+        renameLabel={t("rename")}
+        deleteLabel={t("delete")}
+        openOptionsFolderId={openOptionsFolderId}
+        draggingFolderId={draggingFolderId}
+        dropIndicator={
+          folderDropTarget
+            ? {
+                folderId: folderDropTarget.indicatorFolderId,
+                edge: folderDropTarget.indicatorEdge,
               }
-              onAddFolder={() => {
-                setFolderNameModal({ mode: "create", value: "" });
-              }}
-              onNavigate={onCloseMobile}
-              onDragStart={handleFolderDragStart}
-              onDragEnd={clearFolderDragState}
-              onDragOver={handleFolderDragOver}
-              onDrop={handleFolderDrop}
-              onToggleOptions={handleToggleFolderOptions}
-              onRenameFolder={handleOpenRenameFolder}
-              onDeleteFolder={handleDeleteFolder}
-            />
-          </div>
-        </nav>
-
-        <FolderSidebarFooter
-          userLabel={userLabel}
-          settingsLabel={t("settings")}
-          logoutLabel={t("logout")}
-          upgradePlanLabel={t("upgradePlan")}
-          onOpenSettings={() => {
-            onCloseMobile?.();
-            onOpenSettings();
-          }}
-          onUpgradePlan={() => {
-            onCloseMobile?.();
-            router.push("/pricing");
-          }}
-          onLogout={handleLogout}
-        />
-      </aside>
+            : null
+        }
+        onAddFolder={() => {
+          setFolderNameModal({ mode: "create", value: "" });
+        }}
+        onNavigate={onNavigate}
+        onDragStart={handleFolderDragStart}
+        onDragEnd={clearFolderDragState}
+        onDragOver={handleFolderDragOver}
+        onDrop={handleFolderDrop}
+        onToggleOptions={handleToggleFolderOptions}
+        onRenameFolder={handleOpenRenameFolder}
+        onDeleteFolder={handleDeleteFolder}
+      />
 
       {folderNameModal ? (
         <FolderNameModal
