@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getInitialUserSettings } from "@/features/settings/server/getInitialUserSettings";
+import { getInitialUserSettings } from "@/features/settings/server";
 import { AppToaster } from "@/shared/feedback/AppToaster";
 import { IntlProvider } from "@/shared/providers/IntlProvider";
 import { QueryProvider } from "@/shared/providers/QueryProvider";

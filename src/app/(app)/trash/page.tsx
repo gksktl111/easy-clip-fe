@@ -1,5 +1,5 @@
-import { TrashPage } from "@/features/trash/ui/TrashPage";
+import { TrashRoute } from "@/app/(app)/_components/TrashRoute";
 
 export default function Trash() {
-  return <TrashPage />;
+  return <TrashRoute />;
 }

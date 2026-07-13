@@ -1,7 +1,7 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { useAuthSession } from "@/features/auth";
 import { fetchTrashItems } from "@/features/trash/api/trashApi";
 import { TRASH_QUERY_KEYS } from "@/features/trash/service/trashQueryCache";
 import { waitForMinimumLoading } from "@/shared/lib/loading";

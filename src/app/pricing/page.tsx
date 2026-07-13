@@ -1,10 +1,16 @@
-import { MarketingShell } from "@/features/landing/ui/MarketingShell";
-import { PricingPage } from "@/features/pricing/ui/PricingPage";
+import { UserSettingsSync } from "@/app/_components/UserSettingsSync";
+import { AuthBootstrap } from "@/features/auth";
+import { MarketingShell } from "@/features/landing";
+import { PricingPage } from "@/features/pricing";
 
 export default function Pricing() {
   return (
-    <MarketingShell activeTab="pricing">
-      <PricingPage />
-    </MarketingShell>
+    <>
+      <AuthBootstrap />
+      <UserSettingsSync />
+      <MarketingShell activeTab="pricing">
+        <PricingPage />
+      </MarketingShell>
+    </>
   );
 }

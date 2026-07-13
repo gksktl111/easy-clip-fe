@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { useAuthSession } from "@/features/auth";
 import { fetchMySubscription } from "@/features/subscription/api/subscriptionApi";
 import { getMySubscriptionQueryKey } from "@/features/subscription/service/subscriptionQueryCache";
 
@@ -22,7 +22,6 @@ export const useMySubscription = () => {
     isAuthenticated,
     isError: isAuthenticated && query.isError,
     isPending: isAuthenticated && query.isPending,
-    queryKey,
     subscription: isAuthenticated ? (query.data ?? null) : null,
   };
 };

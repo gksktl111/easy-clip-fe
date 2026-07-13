@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { useAuthSession } from "@/features/auth";
 import {
   createFolder as createFolderRequest,
   deleteFolder as deleteFolderRequest,
@@ -19,7 +19,6 @@ import {
   sortFolders,
 } from "@/features/folder/service/folderCollection";
 import { getFolderQueryKey } from "@/features/folder/service/folderQueryCache";
-import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
 
 const createAuthRequiredError = () => new Error("AUTH_REQUIRED");
 
@@ -94,7 +93,6 @@ export const useFolderActions = () => {
       setFolders((folders) =>
         folders.filter((folder) => folder.id !== folderId),
       );
-      void invalidateTrashQueries(queryClient);
     },
   });
 

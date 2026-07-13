@@ -1,4 +1,4 @@
-import { BillingResultPage } from "@/features/subscription/ui/BillingResultPage";
+import { BillingResultPage } from "@/features/subscription";
 
 interface BillingFailProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

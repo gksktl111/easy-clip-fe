@@ -1,4 +1,4 @@
-import { RecentClipsPage } from "@/features/clip/ui/RecentClipsPage";
+import { RecentClipsPage } from "@/features/clip";
 
 export default function FolderRecent() {
   return <RecentClipsPage />;

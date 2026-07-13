@@ -8,7 +8,7 @@ import {
   fetchMySubscription,
   updateMySubscription,
 } from "@/features/subscription/api/subscriptionApi";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
+import { useAuthSession } from "@/features/auth";
 import { hasRemainingCanceledProPeriod } from "@/features/subscription/model/subscription";
 import type { BillingAuthRequestResponseDto } from "@/features/subscription/model/subscription.dto";
 import {

@@ -3,8 +3,7 @@
 import { Button } from "@/shared/ui/button/Button";
 import { Modal } from "@/shared/ui/overlay/Modal";
 
-// 현재 폴더의 모든 클립 삭제를 확인하고 요청 진행 중 액션을 잠급니다.
-interface DeleteAllClipsModalProps {
+interface ConfirmActionModalProps {
   isOpen: boolean;
   title: string;
   description: string;
@@ -15,7 +14,8 @@ interface DeleteAllClipsModalProps {
   onConfirm: () => void;
 }
 
-export function DeleteAllClipsModal({
+// 파괴적 작업의 설명과 진행 상태를 표시하는 공통 확인 모달입니다.
+export function ConfirmActionModal({
   isOpen,
   title,
   description,
@@ -24,7 +24,7 @@ export function DeleteAllClipsModal({
   isConfirming = false,
   onCancel,
   onConfirm,
-}: DeleteAllClipsModalProps) {
+}: ConfirmActionModalProps) {
   return (
     <Modal isOpen={isOpen} contentClassName="w-full max-w-sm">
       <div className="rounded-xl bg-(--surface-elevated) shadow-xl">

@@ -7,15 +7,19 @@ import { ClipContextMenu } from "@/features/clip/ui/ClipContextMenu";
 import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
 import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { ClipDeleteModeButton } from "@/features/clip/ui/ClipDeleteModeButton";
-import { DeleteAllClipsModal } from "@/features/clip/ui/DeleteAllClipsModal";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 import { FolderClipCaptureHint } from "@/features/clip/ui/FolderClipCaptureHint";
+import { ConfirmActionModal } from "@/shared/ui/overlay/ConfirmActionModal";
 
 // 폴더 클립의 조회, 복사, 즐겨찾기, 컨텍스트 메뉴와 삭제 UI를 조합합니다.
-export function FolderClipsPage() {
+interface FolderClipsPageProps {
+  onClipsDeleted?: () => void | Promise<void>;
+}
+
+export function FolderClipsPage({ onClipsDeleted }: FolderClipsPageProps) {
   const t = useTranslations("clips");
   const { capture, collection, contextMenu, deletion, feedback } =
-    useFolderClipsPage();
+    useFolderClipsPage({ onClipsDeleted });
   const { actions, filter, results } = collection;
   const hasClipLoadError = results.isError && results.clips.length === 0;
 
@@ -86,7 +90,7 @@ export function FolderClipsPage() {
         />
       ) : null}
       <ClipCopyToast label={t("copyToast")} position={feedback.copyToast} />
-      <DeleteAllClipsModal
+      <ConfirmActionModal
         isOpen={deletion.isDeleteAllOpen}
         title={t("deleteModal.title")}
         description={t("deleteModal.description")}

@@ -2,9 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
-import { CLIP_QUERY_KEY } from "@/features/clip/service/clipQueryCache";
-import { FOLDER_QUERY_KEY } from "@/features/folder/service/folderQueryCache";
+import { useAuthSession } from "@/features/auth";
 import {
   deleteAllTrashItems,
   deleteTrashClip,
@@ -20,8 +18,14 @@ import { ApiError } from "@/shared/lib/apiClient";
 
 export type TrashActionError = "action" | "restoreConflict";
 
+interface UseTrashActionsOptions {
+  onItemsChanged?: () => void | Promise<void>;
+}
+
 // 휴지통 복원과 영구 삭제 액션의 중복 실행 방지, 오류 판정, 관련 캐시 갱신을 관리합니다.
-export const useTrashActions = () => {
+export const useTrashActions = ({
+  onItemsChanged,
+}: UseTrashActionsOptions = {}) => {
   const session = useAuthSession();
   const isAuthenticated = Boolean(session?.user);
   const queryClient = useQueryClient();
@@ -30,12 +34,9 @@ export const useTrashActions = () => {
   const pendingActionKeyRef = useRef<string | null>(null);
 
   const refreshRelatedData = useCallback(async () => {
-    await Promise.all([
-      invalidateTrashQueries(queryClient),
-      queryClient.invalidateQueries({ queryKey: [FOLDER_QUERY_KEY] }),
-      queryClient.invalidateQueries({ queryKey: [CLIP_QUERY_KEY] }),
-    ]);
-  }, [queryClient]);
+    await invalidateTrashQueries(queryClient);
+    await onItemsChanged?.();
+  }, [onItemsChanged, queryClient]);
 
   const runAction = useCallback(
     async (actionKey: string, action: () => Promise<unknown>) => {

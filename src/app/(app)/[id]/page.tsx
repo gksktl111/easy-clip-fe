@@ -1,5 +1,5 @@
-import { FolderClipsPage } from "@/features/clip/ui/FolderClipsPage";
+import { FolderClipsRoute } from "@/app/(app)/_components/FolderClipsRoute";
 
 export default function Folder() {
-  return <FolderClipsPage />;
+  return <FolderClipsRoute />;
 }

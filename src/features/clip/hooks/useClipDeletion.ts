@@ -13,13 +13,13 @@ import {
   invalidateClipQueries,
   removeClipsFromCache,
 } from "@/features/clip/service/clipQueryCache";
-import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
 import { notifyError } from "@/shared/feedback/toast";
 
 interface UseClipDeletionOptions {
   clips: Clip[];
   folderId: string;
   isAuthenticated: boolean;
+  onDeleted?: () => void | Promise<void>;
 }
 
 // 클립 삭제 모드, 선택 상태, 확인 모달과 단건·선택·전체 삭제 흐름을 관리합니다.
@@ -27,6 +27,7 @@ export const useClipDeletion = ({
   clips,
   folderId,
   isAuthenticated,
+  onDeleted,
 }: UseClipDeletionOptions) => {
   const queryClient = useQueryClient();
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
@@ -115,11 +116,11 @@ export const useClipDeletion = ({
         setIsDeleting(false);
         void invalidateClipQueries(queryClient);
         if (isDeleted) {
-          void invalidateTrashQueries(queryClient);
+          void onDeleted?.();
         }
       }
     },
-    [isAuthenticated, isDeleting, queryClient],
+    [isAuthenticated, isDeleting, onDeleted, queryClient],
   );
 
   const deleteClipsByIds = useCallback(
@@ -153,11 +154,11 @@ export const useClipDeletion = ({
         setIsDeleting(false);
         void invalidateClipQueries(queryClient);
         if (isDeleted) {
-          void invalidateTrashQueries(queryClient);
+          void onDeleted?.();
         }
       }
     },
-    [isAuthenticated, isDeleting, queryClient],
+    [isAuthenticated, isDeleting, onDeleted, queryClient],
   );
 
   const deleteSelected = useCallback(async () => {
@@ -239,7 +240,7 @@ export const useClipDeletion = ({
       setIsDeleting(false);
       void invalidateClipQueries(queryClient);
       if (isDeleted) {
-        void invalidateTrashQueries(queryClient);
+        void onDeleted?.();
       }
     }
   }, [
@@ -247,6 +248,7 @@ export const useClipDeletion = ({
     folderId,
     isAuthenticated,
     isDeleting,
+    onDeleted,
     queryClient,
   ]);
 
