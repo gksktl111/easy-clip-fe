@@ -17,6 +17,7 @@ import {
 } from "@/features/subscription";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { ApiError } from "@/shared/lib/apiClient";
+import { useSession } from "@/shared/session/useSession";
 import { Button } from "@/shared/ui/button/Button";
 
 const formatSubscriptionDate = (value: string | null) => {
@@ -33,6 +34,7 @@ const formatSubscriptionDate = (value: string | null) => {
 // 구독 상태에 맞는 요금제 카드 액션과 취소 흐름을 조합합니다.
 export function PricingPlansSection() {
   const router = useRouter();
+  const { status } = useSession();
   const { isAuthenticated, subscription } = useMySubscription();
   const { cancelSubscription, resumeSubscription, syncSubscription } =
     useSubscriptionActions();
@@ -141,9 +143,14 @@ export function PricingPlansSection() {
       );
     }
 
+    const planHref =
+      status !== "unauthenticated" && plan.ctaHref === "/login"
+        ? "/favorites"
+        : plan.ctaHref;
+
     return (
       <Link
-        href={plan.ctaHref}
+        href={planHref}
         className={`mt-8 inline-flex w-full cursor-pointer items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition-[background-color,opacity,transform] duration-200 hover:opacity-90 ${
           plan.highlight
             ? "bg-(--pricing-button-featured-bg) text-(--pricing-button-featured-fg) hover:bg-(--pricing-button-featured-bg-hover)"

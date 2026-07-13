@@ -12,12 +12,14 @@ interface LandingHeaderProps {
   activeTab?: LandingHeaderTab;
   isDarkMode: boolean;
   onToggleTheme: () => void;
+  primaryActionHref: "/favorites" | "/login";
 }
 
 export function LandingHeader({
   activeTab = "home",
   isDarkMode,
   onToggleTheme,
+  primaryActionHref,
 }: LandingHeaderProps) {
   return (
     <header className="sticky top-0 z-20 border-b border-(--border) bg-[var(--landing-header-bg)] backdrop-blur-md transition-colors duration-300">
@@ -65,7 +67,7 @@ export function LandingHeader({
           </button>
 
           <Link
-            href="/login"
+            href={primaryActionHref}
             className="rounded-xl bg-(--primary) px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-(--primary-hover)"
           >
             <span className="text-(--primary-foreground)">시작하기</span>
