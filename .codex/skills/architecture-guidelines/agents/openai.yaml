@@ -1,0 +1,4 @@
+interface:
+  display_name: "프론트엔드 아키텍처 지침"
+  short_description: "Easy Clip 프론트엔드 구조와 구현·리뷰 규칙"
+  default_prompt: "$architecture-guidelines를 사용해 프론트엔드 변경을 저장소 아키텍처 규칙에 맞춰 검토해 주세요."
