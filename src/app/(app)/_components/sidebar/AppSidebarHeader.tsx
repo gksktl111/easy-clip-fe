@@ -2,14 +2,11 @@
 
 import { HiOutlinePaperClip, HiX } from "react-icons/hi";
 
-// 사이드바 상단에 브랜드와 모바일 닫기 액션을 표시합니다.
-interface FolderSidebarHeaderProps {
+interface AppSidebarHeaderProps {
   onCloseMobile?: () => void;
 }
 
-export function FolderSidebarHeader({
-  onCloseMobile,
-}: FolderSidebarHeaderProps) {
+export function AppSidebarHeader({ onCloseMobile }: AppSidebarHeaderProps) {
   return (
     <div className="border-b border-(--border) px-4 py-5">
       <div className="flex items-center justify-between gap-2">

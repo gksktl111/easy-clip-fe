@@ -1,17 +1,17 @@
 "use client";
 
-// 앱 내부 화면의 공통 레이아웃과 사이드바/설정 모달 진입점을 구성합니다.
 import { useCallback, useState } from "react";
+import { HiOutlineMenuAlt4, HiOutlinePaperClip } from "react-icons/hi";
+import { AppSidebar } from "@/app/(app)/_components/sidebar/AppSidebar";
 import { AuthBootstrap } from "@/features/auth/ui/AuthBootstrap";
 import { SettingsModal } from "@/features/settings/ui/SettingsModal";
-import { HiOutlineMenuAlt4, HiOutlinePaperClip } from "react-icons/hi";
-import { Sidebar } from "@/features/folder/ui/Sidebar";
 import { Button } from "@/shared/ui/button/Button";
 
 interface AppShellProps {
   children: React.ReactNode;
 }
 
+// 인증된 앱 화면의 전역 탐색과 설정 진입점을 조합합니다.
 export function AppShell({ children }: AppShellProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -45,7 +45,7 @@ export function AppShell({ children }: AppShellProps) {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar
+        <AppSidebar
           onOpenSettings={openSettings}
           isMobileOpen={isSidebarOpen}
           onCloseMobile={closeSidebar}
@@ -54,9 +54,7 @@ export function AppShell({ children }: AppShellProps) {
           {children}
         </main>
       </div>
-      {isSettingsOpen ? (
-        <SettingsModal onClose={closeSettings} />
-      ) : null}
+      {isSettingsOpen ? <SettingsModal onClose={closeSettings} /> : null}
     </div>
   );
 }
