@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { UserSettingsSync } from "@/app/_components/UserSettingsSync";
+import { SessionProvider } from "@/app/providers/session/SessionProvider";
+import { hasAuthSessionCookie } from "@/features/auth/server";
 import { getInitialUserSettings } from "@/features/settings/server";
 import { AppToaster } from "@/shared/feedback/AppToaster";
 import { IntlProvider } from "@/shared/providers/IntlProvider";
@@ -16,7 +19,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialSettings = await getInitialUserSettings();
+  const [initialSettings, shouldRestoreSession] = await Promise.all([
+    getInitialUserSettings(),
+    hasAuthSessionCookie(),
+  ]);
 
   return (
     <html
@@ -31,8 +37,13 @@ export default async function RootLayout({
             initialTheme={initialSettings.theme}
             preferServerSettings={initialSettings.source === "server"}
           >
-            {children}
-            <AppToaster />
+            <SessionProvider shouldRestoreSession={shouldRestoreSession}>
+              <UserSettingsSync
+                enabled={initialSettings.source === "fallback"}
+              />
+              {children}
+              <AppToaster />
+            </SessionProvider>
           </IntlProvider>
         </QueryProvider>
       </body>

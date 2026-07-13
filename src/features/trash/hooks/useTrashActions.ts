@@ -2,7 +2,6 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth";
 import {
   deleteAllTrashItems,
   deleteTrashClip,
@@ -15,6 +14,7 @@ import {
 import type { TrashItemMutationDto } from "@/features/trash/model/trash.dto";
 import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
 import { ApiError } from "@/shared/lib/apiClient";
+import { useSession } from "@/shared/session/useSession";
 
 export type TrashActionError = "action" | "restoreConflict";
 
@@ -26,8 +26,8 @@ interface UseTrashActionsOptions {
 export const useTrashActions = ({
   onItemsChanged,
 }: UseTrashActionsOptions = {}) => {
-  const session = useAuthSession();
-  const isAuthenticated = Boolean(session?.user);
+  const { user } = useSession();
+  const isAuthenticated = Boolean(user);
   const queryClient = useQueryClient();
   const [error, setError] = useState<TrashActionError | null>(null);
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);

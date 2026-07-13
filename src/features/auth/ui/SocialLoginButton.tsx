@@ -7,19 +7,19 @@ interface SocialLoginButtonProps {
   label: string;
   icon: React.ReactNode;
   onClick: () => void;
-  isLoading: boolean;
+  disabled: boolean;
 }
 
 export function SocialLoginButton({
   label,
   icon,
   onClick,
-  isLoading,
+  disabled,
 }: SocialLoginButtonProps) {
   return (
     <Button
       onClick={onClick}
-      disabled={isLoading}
+      disabled={disabled}
       variant="secondarySurface"
       size="lg"
       fullWidth

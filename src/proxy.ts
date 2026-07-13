@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AUTH_COOKIE_NAMES } from "@/features/auth";
 
-const ACCESS_TOKEN_COOKIE_NAME = "easy_clip_access_token";
-const REFRESH_TOKEN_COOKIE_NAME = "easy_clip_refresh_token";
 const MAIN_APP_PATH = "/favorites";
 const LOGIN_PATH = "/login";
 
 const PUBLIC_PATHS = new Set(["/", LOGIN_PATH, "/pricing"]);
-const AUTH_REDIRECT_PATHS = new Set(["/", LOGIN_PATH]);
+const AUTH_REDIRECT_PATHS = new Set(["/"]);
 
 const hasAuthCookie = (request: NextRequest) =>
-  request.cookies.has(ACCESS_TOKEN_COOKIE_NAME) ||
-  request.cookies.has(REFRESH_TOKEN_COOKIE_NAME);
+  AUTH_COOKIE_NAMES.some((cookieName) => request.cookies.has(cookieName));
 
 const redirectTo = (request: NextRequest, path: string) => {
   const redirectUrl = request.nextUrl.clone();
@@ -23,14 +21,14 @@ const redirectTo = (request: NextRequest, path: string) => {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublicPath = PUBLIC_PATHS.has(pathname);
-  const isAuthenticated = hasAuthCookie(request);
+  const hasAuthenticationCookie = hasAuthCookie(request);
 
-  if (isAuthenticated && AUTH_REDIRECT_PATHS.has(pathname)) {
-    // 로그인된 사용자는 랜딩/로그인 페이지 대신 메인 앱 도메인에서 활동한다.
+  if (hasAuthenticationCookie && AUTH_REDIRECT_PATHS.has(pathname)) {
+    // 인증 쿠키가 있으면 실제 세션 검증을 수행할 앱 경로로 먼저 보냅니다.
     return redirectTo(request, MAIN_APP_PATH);
   }
 
-  if (!isAuthenticated && !isPublicPath) {
+  if (!hasAuthenticationCookie && !isPublicPath) {
     // 쿠키가 전혀 없으면 앱 라우트 진입 전에 로그인 화면으로 보낸다.
     return redirectTo(request, LOGIN_PATH);
   }
@@ -39,7 +37,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };

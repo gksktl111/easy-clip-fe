@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cookies } from "next/headers";
 import type { UserSettingsResponseDto } from "@/features/settings/model/settings.dto";
 import { buildApiUrl } from "@/shared/config/env";

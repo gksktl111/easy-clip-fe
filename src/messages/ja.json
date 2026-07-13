@@ -50,6 +50,11 @@
     "privacy": "プライバシーポリシー",
     "agreementSuffix": "に同意したものとみなされます。"
   },
+  "authGuard": {
+    "loading": "認証情報を確認しています。",
+    "error": "認証情報を確認できませんでした。しばらくしてから再試行してください。",
+    "retry": "再試行"
+  },
   "sidebar": {
     "favorites": "お気に入り",
     "recent": "最近",
@@ -83,6 +88,7 @@
     "general": "一般",
     "language": "言語",
     "languageDescription": "希望する言語を選択してください。",
+    "loadError": "ユーザー設定を読み込めませんでした。しばらくしてから再試行してください。",
     "saveError": "設定を保存できませんでした。しばらくしてからもう一度お試しください。",
     "subscriptionTitle": "現在のサブスクリプション",
     "subscriptionPlan": "プラン",
