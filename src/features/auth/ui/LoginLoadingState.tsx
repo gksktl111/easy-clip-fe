@@ -1,5 +1,6 @@
 "use client";
 
+// OAuth 제공자로 이동하는 동안 진행 상태와 안내 문구를 표시합니다.
 interface LoginLoadingStateProps {
   label: string;
   isVisible: boolean;
@@ -14,8 +15,16 @@ export function LoginLoadingState({
   }
 
   return (
-    <div className="mt-6 flex items-center justify-center gap-2 text-sm text-(--muted)">
-      <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+    <div
+      className="mt-6 flex items-center justify-center gap-2 text-sm text-(--muted)"
+      role="status"
+    >
+      <svg
+        className="h-4 w-4 animate-spin"
+        fill="none"
+        viewBox="0 0 24 24"
+        aria-hidden
+      >
         <circle
           className="opacity-25"
           cx="12"

@@ -7,7 +7,9 @@ import {
   HiOutlineCreditCard,
   HiOutlineLogout,
 } from "react-icons/hi";
+import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
+// 사용자 식별 정보와 설정, 요금제, 로그아웃 액션 메뉴를 제공합니다.
 interface FolderSidebarFooterProps {
   userLabel: string;
   settingsLabel: string;
@@ -68,38 +70,42 @@ export function FolderSidebarFooter({
     <div className="border-t border-(--border) px-4 py-4">
       <div ref={menuRef} className="relative">
         {isMenuOpen ? (
-          <div className="absolute right-0 bottom-full left-0 z-20 mb-2 overflow-hidden rounded-xl border border-(--border) bg-(--surface-elevated) shadow-xl">
-            <button
-              type="button"
-              onClick={() => handleMenuAction(onOpenSettings)}
-              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors duration-150 ease-out motion-reduce:transition-none"
-            >
-              <HiOutlineCog className="h-5 w-5 text-(--muted)" aria-hidden />
-              {settingsLabel}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleMenuAction(onUpgradePlan)}
-              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors duration-150 ease-out motion-reduce:transition-none"
-            >
-              <HiOutlineCreditCard
-                className="h-5 w-5 text-(--muted)"
-                aria-hidden
-              />
-              {upgradePlanLabel}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleMenuAction(onLogout)}
-              className="text-foreground hover:bg-(--dropdown-option-hover) flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left text-sm font-medium transition-colors duration-150 ease-out motion-reduce:transition-none"
-            >
-              <HiOutlineLogout
-                className="h-5 w-5 text-(--muted)"
-                aria-hidden
-              />
-              {logoutLabel}
-            </button>
-          </div>
+          <ActionMenu
+            className="right-0 bottom-full left-0 mb-2 w-auto rounded-xl bg-(--surface-elevated) shadow-xl"
+            itemClassName="gap-3 px-3 py-2.5 font-medium transition-colors duration-150 ease-out hover:bg-(--dropdown-option-hover) motion-reduce:transition-none"
+            items={[
+              {
+                label: settingsLabel,
+                icon: (
+                  <HiOutlineCog
+                    className="h-5 w-5 text-(--muted)"
+                    aria-hidden
+                  />
+                ),
+                onClick: () => handleMenuAction(onOpenSettings),
+              },
+              {
+                label: upgradePlanLabel,
+                icon: (
+                  <HiOutlineCreditCard
+                    className="h-5 w-5 text-(--muted)"
+                    aria-hidden
+                  />
+                ),
+                onClick: () => handleMenuAction(onUpgradePlan),
+              },
+              {
+                label: logoutLabel,
+                icon: (
+                  <HiOutlineLogout
+                    className="h-5 w-5 text-(--muted)"
+                    aria-hidden
+                  />
+                ),
+                onClick: () => handleMenuAction(onLogout),
+              },
+            ]}
+          />
         ) : null}
 
         <button
@@ -107,6 +113,7 @@ export function FolderSidebarFooter({
           onClick={() => setIsMenuOpen((previous) => !previous)}
           className="flex w-full cursor-pointer items-center justify-between rounded-lg bg-(--surface) px-3 py-2 transition-colors hover:bg-(--surface-elevated)"
           aria-expanded={isMenuOpen}
+          aria-haspopup="menu"
         >
           <span className="flex min-w-0 items-center gap-2">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-(--icon-chip) text-[10px] font-semibold text-(--icon-chip-text)">

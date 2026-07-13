@@ -2,6 +2,7 @@
 
 const SKELETON_CARD_COUNT = 8;
 
+// 클립 목록을 불러오는 동안 실제 그리드와 같은 형태의 로딩 카드를 표시합니다.
 export function ClipListSkeleton() {
   return (
     <div className="clip-scrollbar flex-1 overflow-auto px-4 py-4 md:px-6">

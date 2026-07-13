@@ -8,9 +8,10 @@ const PRO_UNLOCKED_FEATURES = [
   "AI 기능 우선 제공 예정",
 ] as const;
 
+// Pro 구독으로 사용할 수 있는 기능을 체크 목록으로 안내합니다.
 export function BillingUnlockedFeatureList() {
   return (
-    <div className="mt-5 rounded-xl border border-(--border) bg-(--surface-muted) p-4">
+    <section className="mt-5 rounded-xl border border-(--border) bg-(--surface-muted) p-4">
       <p className="text-sm font-semibold">Pro 구독 시 해금되는 기능</p>
       <ul className="mt-4 space-y-3">
         {PRO_UNLOCKED_FEATURES.map((feature) => (
@@ -22,6 +23,6 @@ export function BillingUnlockedFeatureList() {
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }

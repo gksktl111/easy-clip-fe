@@ -1,28 +1,29 @@
 "use client";
 
+// 공통 선택 입력 UI를 커스텀 드롭다운 형태로 제공합니다.
 import { useEffect, useRef, useState } from "react";
 import { HiChevronDown } from "react-icons/hi";
 
-interface StyledSelectOption {
+interface SelectOption {
   value: string;
   label: string;
 }
 
-interface StyledSelectProps {
+interface SelectProps {
   value: string;
   onChange: (value: string) => void;
-  options: readonly StyledSelectOption[];
+  options: readonly SelectOption[];
   className?: string;
   disabled?: boolean;
 }
 
-export function StyledSelect({
+export function Select({
   value,
   onChange,
   options,
   className = "",
   disabled = false,
-}: StyledSelectProps) {
+}: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const selectedOption =

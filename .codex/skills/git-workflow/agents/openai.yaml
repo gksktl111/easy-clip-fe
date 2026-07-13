@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git/GitHub 워크플로"
+  short_description: "Easy Clip 이슈·브랜치·커밋·PR 운영 규칙"
+  default_prompt: "$git-workflow를 사용해 이 변경의 이슈·브랜치·커밋·PR 작업을 진행해 주세요."

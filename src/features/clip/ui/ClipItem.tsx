@@ -10,8 +10,9 @@ import {
   HiOutlineStar,
   HiStar,
 } from "react-icons/hi";
-import { Clip } from "@/features/clip/model/clip";
+import type { Clip } from "@/features/clip/model/clip";
 
+// 클립 하나의 미리보기, 유형 정보, 복사, 즐겨찾기와 삭제 선택 상태를 표시합니다.
 interface ClipItemProps {
   clip: Clip;
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
@@ -21,6 +22,71 @@ interface ClipItemProps {
   isInteractionDisabled?: boolean;
   isSelected?: boolean;
   onToggleSelected?: (clipId: string) => void;
+}
+
+function ClipTypeIcon({ type }: { type: Clip["type"] }) {
+  switch (type) {
+    case "text":
+      return <HiOutlineDocumentText className="h-5 w-5" aria-hidden />;
+    case "color":
+      return <HiOutlineColorSwatch className="h-5 w-5" aria-hidden />;
+    case "image":
+      return <HiOutlinePhotograph className="h-5 w-5" aria-hidden />;
+    default:
+      return null;
+  }
+}
+
+function ClipContentPreview({
+  clip,
+  isOptimistic,
+}: {
+  clip: Clip;
+  isOptimistic: boolean;
+}) {
+  if (clip.type === "color") {
+    return (
+      <div
+        className="h-full w-full rounded-xl border border-(--border)"
+        style={{ backgroundColor: clip.content }}
+        aria-hidden
+      />
+    );
+  }
+
+  if (clip.type === "image") {
+    return (
+      <div
+        className="relative h-full w-full rounded-xl bg-(--surface-muted)"
+        style={
+          isOptimistic && clip.content
+            ? {
+                backgroundImage: `url(${clip.content})`,
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "contain",
+              }
+            : undefined
+        }
+      >
+        {isOptimistic ? null : (
+          <Image
+            src={clip.content}
+            alt={clip.name}
+            fill
+            sizes="(min-width: 1200px) 18vw, (min-width: 1024px) 22vw, (min-width: 768px) 28vw, 90vw"
+            className="rounded-xl object-contain"
+          />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <p className="text-foreground line-clamp-4 text-sm leading-relaxed">
+      {clip.content}
+    </p>
+  );
 }
 
 export function ClipItem({
@@ -37,68 +103,9 @@ export function ClipItem({
   const isOptimistic = Boolean(clip.isOptimistic);
   const isDisabled = isOptimistic || isInteractionDisabled;
 
-  const getIcon = () => {
-    switch (clip.type) {
-      case "text":
-        return <HiOutlineDocumentText className="h-5 w-5" aria-hidden />;
-      case "color":
-        return <HiOutlineColorSwatch className="h-5 w-5" aria-hidden />;
-      case "image":
-        return <HiOutlinePhotograph className="h-5 w-5" aria-hidden />;
-      default:
-        return null;
-    }
-  };
-
-  const renderContent = () => {
-    if (clip.type === "color") {
-      return (
-        <div
-          className="h-full w-full rounded-xl border border-(--border)"
-          style={{ backgroundColor: clip.content }}
-          aria-hidden
-        />
-      );
-    }
-
-    if (clip.type === "image") {
-      return (
-        <div
-          className="relative h-full w-full rounded-xl bg-(--surface-muted)"
-          style={
-            isOptimistic && clip.content
-              ? {
-                  backgroundImage: `url(${clip.content})`,
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                  backgroundSize: "contain",
-                }
-              : undefined
-          }
-        >
-          {isOptimistic ? null : (
-            <Image
-              src={clip.content}
-              alt={clip.name}
-              fill
-              sizes="(min-width: 1200px) 18vw, (min-width: 1024px) 22vw, (min-width: 768px) 28vw, 90vw"
-              className="rounded-xl object-contain"
-            />
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <p className="text-foreground line-clamp-4 text-sm leading-relaxed">
-        {clip.content}
-      </p>
-    );
-  };
-
   return (
     <div
-      className="group relative flex h-52 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[disabled=true]:cursor-wait data-[disabled=true]:opacity-75 data-[delete-mode=true]:cursor-pointer data-[selected=true]:border-(--danger) data-[selected=true]:ring-2 data-[selected=true]:ring-(--danger-border)"
+      className="group relative flex h-52 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[delete-mode=true]:cursor-pointer data-[disabled=true]:cursor-wait data-[disabled=true]:opacity-75 data-[selected=true]:border-(--danger) data-[selected=true]:ring-2 data-[selected=true]:ring-(--danger-border)"
       data-optimistic={isOptimistic}
       data-disabled={isDisabled}
       data-delete-mode={isDeleteMode}
@@ -139,7 +146,7 @@ export function ClipItem({
             }}
             className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border shadow-sm backdrop-blur-sm transition-all duration-150 ease-out disabled:cursor-default disabled:opacity-50 ${
               isSelected
-                ? "border-(--danger) bg-(--danger) text-danger-foreground"
+                ? "text-danger-foreground border-(--danger) bg-(--danger)"
                 : "border-(--border) bg-(--surface-elevated) text-transparent hover:border-(--danger-border) hover:text-(--danger)"
             }`}
             aria-pressed={isSelected}
@@ -178,10 +185,12 @@ export function ClipItem({
           />
         )}
       </button>
-      <div className="flex-1 overflow-hidden px-4 py-3">{renderContent()}</div>
+      <div className="flex-1 overflow-hidden px-4 py-3">
+        <ClipContentPreview clip={clip} isOptimistic={isOptimistic} />
+      </div>
       <div className="flex items-center gap-2 border-t border-(--border) px-4 py-2.5 text-xs text-(--muted)">
         <span className="flex h-6 w-6 items-center justify-center rounded-md bg-(--icon-chip) text-(--icon-chip-text)">
-          {getIcon()}
+          <ClipTypeIcon type={clip.type} />
         </span>
         <span className="text-foreground truncate font-medium">
           {clip.type === "color" ? clip.content : clip.name}

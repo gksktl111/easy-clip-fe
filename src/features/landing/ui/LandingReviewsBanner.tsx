@@ -1,3 +1,4 @@
+// 사용자 후기를 연속 배너 형태로 반복 노출합니다.
 interface LandingReview {
   quote: string;
   name: string;
@@ -7,6 +8,28 @@ interface LandingReview {
 
 interface LandingReviewsBannerProps {
   reviews: readonly LandingReview[];
+}
+
+function LandingReviewCard({ review }: { review: LandingReview }) {
+  return (
+    <article className="flex min-h-52 w-[20rem] shrink-0 flex-col justify-between rounded-[1.75rem] border border-(--border) bg-(--surface) p-6 md:w-[22rem]">
+      <p className="text-base leading-8 font-medium tracking-[-0.01em] text-(--foreground)">
+        &ldquo;{review.quote}&rdquo;
+      </p>
+
+      <div className="mt-6 flex items-center gap-4">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-(--surface-muted) text-sm font-semibold text-(--foreground)">
+          {review.avatar}
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-(--foreground)">
+            {review.name}
+          </p>
+          <p className="mt-1 text-xs text-(--muted)">{review.role}</p>
+        </div>
+      </div>
+    </article>
+  );
 }
 
 export function LandingReviewsBanner({ reviews }: LandingReviewsBannerProps) {
@@ -35,28 +58,10 @@ export function LandingReviewsBanner({ reviews }: LandingReviewsBannerProps) {
                 className="flex shrink-0 gap-[var(--marquee-gap)]"
               >
                 {reviews.map((review, reviewIndex) => (
-                  <article
+                  <LandingReviewCard
                     key={`${groupIndex}-${review.name}-${reviewIndex}`}
-                    className="flex min-h-52 w-[20rem] shrink-0 flex-col justify-between rounded-[1.75rem] border border-(--border) bg-(--surface) p-6 md:w-[22rem]"
-                  >
-                    <p className="text-base leading-8 font-medium tracking-[-0.01em] text-(--foreground)">
-                      &ldquo;{review.quote}&rdquo;
-                    </p>
-
-                    <div className="mt-6 flex items-center gap-4">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-(--surface-muted) text-sm font-semibold text-(--foreground)">
-                        {review.avatar}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-(--foreground)">
-                          {review.name}
-                        </p>
-                        <p className="mt-1 text-xs text-(--muted)">
-                          {review.role}
-                        </p>
-                      </div>
-                    </div>
-                  </article>
+                    review={review}
+                  />
                 ))}
               </div>
             ))}

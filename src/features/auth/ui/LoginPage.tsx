@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getAuthStartPath } from "@/features/auth/api/authApi";
+import type { AuthProvider } from "@/features/auth/model/auth";
 import { restoreSessionFromRefreshCookie } from "@/features/auth/service/authService";
 import { buildApiUrl } from "@/shared/config/env";
 import { LoginAgreementNotice } from "@/features/auth/ui/LoginAgreementNotice";
@@ -12,13 +13,14 @@ import { LoginBrandPanel } from "@/features/auth/ui/LoginBrandPanel";
 import { LoginLoadingState } from "@/features/auth/ui/LoginLoadingState";
 import { LoginSocialActions } from "@/features/auth/ui/LoginSocialActions";
 
+// 세션 복구와 OAuth 진입 상태를 관리하며 로그인 UI를 조합하는 페이지입니다.
 export function LoginPage() {
   const t = useTranslations("login");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingProvider, setLoadingProvider] = useState<
-    "google" | "github" | null
-  >(null);
+  const [loadingProvider, setLoadingProvider] = useState<AuthProvider | null>(
+    null,
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const hasTriedCookieRestoreRef = useRef(false);
 
@@ -37,7 +39,7 @@ export function LoginPage() {
       });
   }, [router]);
 
-  const handleLogin = async (provider: "google" | "github") => {
+  const handleLogin = async (provider: AuthProvider) => {
     try {
       setErrorMessage(null);
       setIsLoading(true);
@@ -63,7 +65,10 @@ export function LoginPage() {
 
         <LoginLoadingState label={t("loading")} isVisible={isLoading} />
         {errorMessage ? (
-          <p className="mt-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+          <p
+            className="mt-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200"
+            role="alert"
+          >
             {errorMessage}
           </p>
         ) : null}

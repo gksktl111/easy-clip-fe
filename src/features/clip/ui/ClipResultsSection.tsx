@@ -2,12 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
-import { Clip } from "@/features/clip/model/clip";
+import type { Clip } from "@/features/clip/model/clip";
 import { ClipErrorState } from "@/features/clip/ui/ClipErrorState";
 import { ClipList } from "@/features/clip/ui/ClipList";
 import { ClipListSkeleton } from "@/features/clip/ui/ClipListSkeleton";
 import { EmptyState } from "@/features/clip/ui/EmptyState";
 
+const EMPTY_SELECTED_CLIP_IDS = new Set<string>();
+
+// 클립 조회 상태에 따라 로딩, 오류, 빈 상태 또는 페이지네이션 목록을 표시합니다.
 interface ClipResultsSectionProps {
   clips: Clip[];
   isError?: boolean;
@@ -38,7 +41,7 @@ export function ClipResultsSection({
   onContextMenu,
   isDeleteMode = false,
   isInteractionDisabled = false,
-  selectedClipIds = new Set(),
+  selectedClipIds = EMPTY_SELECTED_CLIP_IDS,
   onToggleSelected,
 }: ClipResultsSectionProps) {
   const hasTriggeredInViewRef = useRef(false);

@@ -4,7 +4,10 @@ import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useInView } from "react-intersection-observer";
 import { TrashListRow } from "@/features/trash/ui/TrashListRow";
-import { TrashItemRow } from "@/features/trash/ui/trashRow";
+import type { TrashItemRow } from "@/features/trash/ui/trashRow";
+import { Checkbox } from "@/shared/ui/input/Checkbox";
+
+const SKELETON_ROWS = Array.from({ length: 6 }, (_, index) => index);
 
 interface TrashListSectionProps {
   rows: TrashItemRow[];
@@ -39,7 +42,6 @@ export function TrashListSection({
   onDeleteClip,
 }: TrashListSectionProps) {
   const t = useTranslations("trash");
-  const skeletonRows = Array.from({ length: 6 }, (_, index) => index);
   const hasTriggeredInViewRef = useRef(false);
   const { ref: loadMoreRef, inView } = useInView({
     rootMargin: "240px 0px",
@@ -70,24 +72,20 @@ export function TrashListSection({
     <section className="flex min-h-0 flex-1 flex-col overflow-hidden bg-(--surface)">
       <div className="flex items-center justify-between border-y border-(--border) bg-(--surface-muted) px-4 py-3 min-[1200px]:hidden">
         <label className="flex min-w-0 items-center gap-3 text-sm font-medium text-(--foreground)">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={allRowsSelected}
             disabled={isLoading || rows.length === 0}
             onChange={onToggleAllRows}
-            className="h-4 w-4 cursor-pointer rounded border-(--border) accent-(--primary) disabled:cursor-default"
           />
           <span>{t("selectAll")}</span>
         </label>
       </div>
 
       <div className="hidden grid-cols-[2rem_minmax(0,1.5fr)_180px_220px_220px] items-center gap-4 border-y border-(--border) bg-(--surface-muted) px-4 py-3 text-xs font-semibold tracking-wide text-(--muted) uppercase min-[1200px]:grid min-[1200px]:px-6">
-        <input
-          type="checkbox"
+        <Checkbox
           checked={allRowsSelected}
           disabled={isLoading || rows.length === 0}
           onChange={onToggleAllRows}
-          className="h-4 w-4 cursor-pointer rounded border-(--border) accent-(--primary) disabled:cursor-default"
           aria-label={t("selectAll")}
         />
         <span>{t("columns.name")}</span>
@@ -98,7 +96,7 @@ export function TrashListSection({
 
       <div className="clip-scrollbar min-h-0 flex-1 divide-y divide-(--border) overflow-y-auto">
         {isLoading
-          ? skeletonRows.map((row) => <TrashListSkeletonRow key={row} />)
+          ? SKELETON_ROWS.map((row) => <TrashListSkeletonRow key={row} />)
           : rows.map((row) => (
               <TrashListRow
                 key={`${row.kind}-${row.id}`}

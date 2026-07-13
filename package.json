@@ -1,12 +1,14 @@
 {
   "name": "easy-clip-fe",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.0",
@@ -21,6 +23,8 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@storybook/addon-docs": "^10.5.0",
+    "@storybook/nextjs": "^10.5.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -29,6 +33,7 @@
     "eslint-config-next": "16.1.1",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "storybook": "^10.5.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

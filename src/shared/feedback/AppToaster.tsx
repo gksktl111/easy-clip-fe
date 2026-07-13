@@ -1,5 +1,6 @@
 "use client";
 
+// 앱 전역에서 사용하는 토스트 알림 렌더러입니다.
 import { Toaster } from "sonner";
 
 export function AppToaster() {

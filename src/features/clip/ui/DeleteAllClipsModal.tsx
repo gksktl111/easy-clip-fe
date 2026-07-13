@@ -1,5 +1,9 @@
 "use client";
 
+import { Button } from "@/shared/ui/button/Button";
+import { Modal } from "@/shared/ui/overlay/Modal";
+
+// 현재 폴더의 모든 클립 삭제를 확인하고 요청 진행 중 액션을 잠급니다.
 interface DeleteAllClipsModalProps {
   isOpen: boolean;
   title: string;
@@ -21,36 +25,32 @@ export function DeleteAllClipsModal({
   onCancel,
   onConfirm,
 }: DeleteAllClipsModalProps) {
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-(--overlay) px-4">
-      <div className="w-full max-w-sm rounded-xl bg-(--surface-elevated) shadow-xl">
+    <Modal isOpen={isOpen} contentClassName="w-full max-w-sm">
+      <div className="rounded-xl bg-(--surface-elevated) shadow-xl">
         <div className="border-b border-(--border) px-5 py-4">
           <p className="text-foreground text-sm font-semibold">{title}</p>
           <p className="text-muted mt-1 text-xs">{description}</p>
         </div>
         <div className="flex justify-end gap-2 px-5 py-4">
-          <button
-            type="button"
+          <Button
             disabled={isConfirming}
             onClick={onCancel}
-            className="hover:text-foreground rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--muted) transition disabled:cursor-default disabled:opacity-50"
+            variant="secondary"
+            size="sm"
           >
             {cancelLabel}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
             disabled={isConfirming}
             onClick={onConfirm}
-            className="rounded-lg bg-(--danger) px-4 py-2 text-sm font-medium text-danger-foreground transition hover:bg-(--danger-hover) disabled:cursor-default disabled:opacity-50"
+            variant="danger"
+            size="sm"
           >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

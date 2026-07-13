@@ -1,15 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import type { FolderItem } from "@/features/folder/model/folder";
-import {
-  HiOutlineDotsVertical,
-  HiOutlineFolder,
-  HiOutlineMenuAlt4,
-  HiOutlinePlus,
-} from "react-icons/hi";
-import { FolderOptionsMenu } from "@/features/folder/ui/FolderOptionsMenu";
+import { HiOutlinePlus } from "react-icons/hi";
+import { FolderSidebarItem } from "@/features/folder/ui/FolderSidebarItem";
 
+// 폴더 추가 액션과 로딩 또는 폴더 목록 상태를 사이드바 섹션으로 조합합니다.
 interface FolderSidebarSectionProps {
   folders: FolderItem[];
   isLoading?: boolean;
@@ -77,92 +72,32 @@ export function FolderSidebarSection({
       <ul className="space-y-1 px-2">
         {isLoading
           ? skeletonRows.map((row) => <FolderSidebarSkeletonRow key={row} />)
-          : folders.map((folder) => {
-              const isDragging = Boolean(draggingFolderId);
-              const isActiveFolder = pathname === `/${folder.id}`;
-              const isDropTarget = dropIndicator?.folderId === folder.id;
-
-              return (
-                <li
-                  key={folder.id}
-                  onDragOver={(event) => onDragOver(folder.id, event)}
-                  onDrop={(event) => onDrop(folder.id, event)}
-                  className={`relative rounded-lg ${
-                    draggingFolderId === folder.id ? "opacity-50" : ""
-                  }`}
-                >
-                  {isDropTarget ? (
-                    <span
-                      className={`pointer-events-none absolute right-2 left-2 z-10 h-0.5 rounded-full bg-(--focus-ring) opacity-100 shadow-[0_0_0_1px_var(--surface-muted)] transition-[opacity,transform] duration-150 ${
-                        dropIndicator.edge === "top"
-                          ? "top-0 -translate-y-1/2"
-                          : "bottom-0 translate-y-1/2"
-                      }`}
-                      aria-hidden
-                    />
-                  ) : null}
-
-                  <div
-                    className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium ${
-                      isDragging
-                        ? "transition-colors duration-150"
-                        : "transition-colors"
-                    } ${
-                      isDropTarget
-                        ? "text-foreground bg-(--surface-elevated)"
-                        : isActiveFolder
-                        ? "text-foreground bg-(--surface)"
-                        : isDragging
-                          ? "text-muted"
-                          : "text-muted hover:text-foreground hover:bg-(--surface)"
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      draggable
-                      onDragStart={(event) => onDragStart(folder.id, event)}
-                      onDragEnd={onDragEnd}
-                      className={`text-muted cursor-grab rounded p-1 ${
-                        isDragging ? "" : "hover:text-foreground"
-                      }`}
-                      aria-label={reorderFolderLabel}
-                    >
-                      <HiOutlineMenuAlt4 className="h-4 w-4" aria-hidden />
-                    </button>
-
-                    <Link
-                      href={`/${folder.id}`}
-                      onClick={onNavigate}
-                      className="flex flex-1 items-center gap-2 truncate"
-                    >
-                      <HiOutlineFolder className="h-5 w-5" aria-hidden />
-                      <span className="truncate">{folder.name}</span>
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => onToggleOptions(folder.id)}
-                      className={`text-muted cursor-pointer rounded p-1 ${
-                        isDragging ? "" : "transition hover:text-foreground"
-                      }`}
-                      aria-label={openFolderOptionsLabel}
-                      data-folder-options
-                    >
-                      <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />
-                    </button>
-                  </div>
-
-                  {openOptionsFolderId === folder.id ? (
-                    <FolderOptionsMenu
-                      renameLabel={renameLabel}
-                      deleteLabel={deleteLabel}
-                      onRename={() => onRenameFolder(folder.id)}
-                      onDelete={() => onDeleteFolder(folder.id)}
-                    />
-                  ) : null}
-                </li>
-              );
-            })}
+          : folders.map((folder) => (
+              <FolderSidebarItem
+                key={folder.id}
+                folder={folder}
+                pathname={pathname}
+                reorderFolderLabel={reorderFolderLabel}
+                openFolderOptionsLabel={openFolderOptionsLabel}
+                renameLabel={renameLabel}
+                deleteLabel={deleteLabel}
+                draggingFolderId={draggingFolderId}
+                dropIndicatorEdge={
+                  dropIndicator?.folderId === folder.id
+                    ? dropIndicator.edge
+                    : null
+                }
+                isOptionsOpen={openOptionsFolderId === folder.id}
+                onNavigate={onNavigate}
+                onDragStart={(event) => onDragStart(folder.id, event)}
+                onDragEnd={onDragEnd}
+                onDragOver={(event) => onDragOver(folder.id, event)}
+                onDrop={(event) => onDrop(folder.id, event)}
+                onToggleOptions={() => onToggleOptions(folder.id)}
+                onRename={() => onRenameFolder(folder.id)}
+                onDelete={() => onDeleteFolder(folder.id)}
+              />
+            ))}
       </ul>
     </div>
   );

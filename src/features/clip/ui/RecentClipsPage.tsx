@@ -1,57 +1,36 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
-import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { useRecentClipsPage } from "@/features/clip/hooks/useRecentClipsPage";
-import { FilterBar } from "@/features/clip/ui/FilterBar";
+import { ClipCollectionPage } from "@/features/clip/ui/ClipCollectionPage";
 
+// 최근 사용한 클립 데이터를 공통 컬렉션 화면에 연결합니다.
 export function RecentClipsPage() {
-  const t = useTranslations("clips");
-  const {
-    activeFilter,
-    copyToast,
-    fetchNextPage,
-    filteredClips,
-    handleCopy,
-    hasNextPage,
-    isError,
-    isFetchingNextPage,
-    isLoading,
-    refetchClips,
-    searchQuery,
-    setActiveFilter,
-    setSearchQuery,
-  } = useRecentClipsPage();
-  const hasClipLoadError = isError && filteredClips.length === 0;
+  const { actions, feedback, filter, results } = useRecentClipsPage();
 
   return (
-    <div className="bg-background relative flex h-full flex-col">
-      {!hasClipLoadError ? (
-        <FilterBar
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          showStatus={false}
-          countLabel={t("count", { count: filteredClips.length })}
-        />
-      ) : null}
-      <ClipResultsSection
-        clips={filteredClips}
-        hasNextPage={hasNextPage}
-        isError={isError}
-        isFetchingNextPage={isFetchingNextPage}
-        isLoading={isLoading}
-        onFetchNextPage={() => {
-          void fetchNextPage();
-        }}
-        onRetry={() => {
-          void refetchClips();
-        }}
-        onCopy={handleCopy}
-      />
-      <ClipCopyToast label={t("copyToast")} position={copyToast} />
-    </div>
+    <ClipCollectionPage
+      activeFilter={filter.activeFilter}
+      clips={results.clips}
+      copyToastPosition={feedback.copyToast}
+      hasNextPage={results.hasNextPage}
+      isError={results.isError}
+      isFetchingNextPage={results.isFetchingNextPage}
+      isLoading={results.isLoading}
+      onCopy={(clip, event) => {
+        void actions.copyClip(clip, {
+          x: event.clientX,
+          y: event.clientY,
+        });
+      }}
+      onFetchNextPage={() => {
+        void results.fetchNextPage();
+      }}
+      onFilterChange={filter.changeFilter}
+      onRetry={() => {
+        void results.refetch();
+      }}
+      onSearchChange={filter.changeSearchQuery}
+      searchQuery={filter.searchQuery}
+    />
   );
 }

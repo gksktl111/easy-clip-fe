@@ -10,7 +10,7 @@ import {
 } from "@/features/subscription/api/subscriptionApi";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { hasRemainingCanceledProPeriod } from "@/features/subscription/model/subscription";
-import { BillingAuthRequestResponseDto } from "@/features/subscription/model/subscription.dto";
+import type { BillingAuthRequestResponseDto } from "@/features/subscription/model/subscription.dto";
 import {
   invalidateMySubscriptionQueries,
   syncMySubscriptionQueryData,
@@ -81,6 +81,7 @@ const mapBillingAuthMethod = (
   method: BillingAuthRequestResponseDto["method"],
 ) => (method === "CARD" ? "카드" : method);
 
+// 구독 상태를 확인하고 Toss 카드 인증 진입과 오류 복구 UI를 조합합니다.
 export function BillingPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -104,11 +105,7 @@ export function BillingPage() {
 
       if (hasRemainingCanceledProPeriod(currentSubscription)) {
         const nextSubscription = await updateMySubscription({ type: "RESUME" });
-        syncMySubscriptionQueryData(
-          queryClient,
-          nextSubscription,
-          userId,
-        );
+        syncMySubscriptionQueryData(queryClient, nextSubscription, userId);
         setStep("idle");
         setMessage("Pro 구독 자동갱신이 재개되었습니다.");
         router.push("/pricing");
@@ -143,7 +140,9 @@ export function BillingPage() {
       }
 
       if (error instanceof ApiError && error.status === 409) {
-        const latestSubscription = await fetchMySubscription().catch(() => null);
+        const latestSubscription = await fetchMySubscription().catch(
+          () => null,
+        );
 
         if (latestSubscription) {
           syncMySubscriptionQueryData(queryClient, latestSubscription, userId);

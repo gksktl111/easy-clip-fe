@@ -1,21 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { fetchMySubscription } from "@/features/subscription/api/subscriptionApi";
 import { getMySubscriptionQueryKey } from "@/features/subscription/service/subscriptionQueryCache";
 
-export {
-  getMySubscriptionQueryKey,
-  MY_SUBSCRIPTION_QUERY_KEY,
-} from "@/features/subscription/service/subscriptionQueryCache";
-
+// 인증된 사용자의 현재 구독을 조회하고 화면에 필요한 상태만 제공합니다.
 export const useMySubscription = () => {
   const session = useAuthSession();
   const isAuthenticated = Boolean(session?.user);
   const userId = session?.user?.id ?? null;
-  const queryKey = useMemo(() => getMySubscriptionQueryKey(userId), [userId]);
+  const queryKey = getMySubscriptionQueryKey(userId);
   const query = useQuery({
     queryKey,
     enabled: isAuthenticated,
@@ -24,8 +19,9 @@ export const useMySubscription = () => {
   });
 
   return {
-    ...query,
     isAuthenticated,
+    isError: isAuthenticated && query.isError,
+    isPending: isAuthenticated && query.isPending,
     queryKey,
     subscription: isAuthenticated ? (query.data ?? null) : null,
   };

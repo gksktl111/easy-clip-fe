@@ -1,7 +1,14 @@
 "use client";
 
-import { Clip } from "@/features/clip/model/clip";
+import {
+  HiOutlineClipboardCopy,
+  HiOutlinePencil,
+  HiOutlineTrash,
+} from "react-icons/hi";
+import type { Clip } from "@/features/clip/model/clip";
+import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
+// 선택한 클립 위치에 복사, 이름 변경, 삭제 액션 메뉴를 표시합니다.
 interface ClipContextMenuProps {
   clips: Clip[];
   contextMenu: {
@@ -37,37 +44,32 @@ export function ClipContextMenu({
   }
 
   return (
-    <div
-      className="fixed z-50 w-36 rounded-lg border border-(--border) bg-(--surface) p-1 text-xs text-(--muted) shadow-lg"
+    <ActionMenu
+      position="fixed"
       style={{ left: contextMenu.x, top: contextMenu.y }}
-      data-clip-menu
-    >
-      <button
-        type="button"
-        onClick={() => onCopy(targetClip)}
-        className="hover:text-foreground flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--muted) hover:bg-(--surface-muted)"
-        data-clip-menu
-      >
-        {copyLabel}
-      </button>
-      {renameLabel && onRename ? (
-        <button
-          type="button"
-          onClick={() => onRename(targetClip)}
-          className="hover:text-foreground flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--muted) hover:bg-(--surface-muted)"
-          data-clip-menu
-        >
-          {renameLabel}
-        </button>
-      ) : null}
-      <button
-        type="button"
-        onClick={() => onDelete(targetClip.id)}
-        className="flex w-full items-center justify-start rounded px-2 py-1.5 text-left text-(--danger) hover:bg-(--surface-muted)"
-        data-clip-menu
-      >
-        {deleteLabel}
-      </button>
-    </div>
+      dataAttribute="data-clip-menu"
+      items={[
+        {
+          label: copyLabel,
+          icon: <HiOutlineClipboardCopy className="h-4 w-4" aria-hidden />,
+          onClick: () => onCopy(targetClip),
+        },
+        ...(renameLabel && onRename
+          ? [
+              {
+                label: renameLabel,
+                icon: <HiOutlinePencil className="h-4 w-4" aria-hidden />,
+                onClick: () => onRename(targetClip),
+              },
+            ]
+          : []),
+        {
+          label: deleteLabel,
+          icon: <HiOutlineTrash className="h-4 w-4" aria-hidden />,
+          tone: "danger",
+          onClick: () => onDelete(targetClip.id),
+        },
+      ]}
+    />
   );
 }
