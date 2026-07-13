@@ -2,13 +2,13 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { useAuthSession } from "@/features/auth";
 import { fetchClips } from "@/features/clip/api/clipApi";
 import type { Clip, ClipFilter } from "@/features/clip/model/clip";
 import type { FetchClipsQueryDto } from "@/features/clip/model/clip.dto";
 import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
 import { CLIP_QUERY_KEY } from "@/features/clip/service/clipQueryCache";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
+import { useSession } from "@/shared/session/useSession";
 
 const mapFilterToApiType = (filter: ClipFilter): FetchClipsQueryDto["type"] => {
   if (filter === "all") {
@@ -36,8 +36,8 @@ export const useInfiniteClips = ({
   searchQuery = "",
   enabled = true,
 }: UseInfiniteClipsOptions) => {
-  const session = useAuthSession();
-  const isAuthenticated = Boolean(session?.user);
+  const { user } = useSession();
+  const isAuthenticated = Boolean(user);
   const normalizedSearchQuery = searchQuery.trim();
   const queryKey = [
     CLIP_QUERY_KEY,

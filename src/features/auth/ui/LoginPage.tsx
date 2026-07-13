@@ -2,66 +2,32 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { getAuthStartPath } from "@/features/auth/api/authApi";
 import type { AuthProvider } from "@/features/auth/model/auth";
-import { restoreSessionFromRefreshCookie } from "@/features/auth/service/authService";
-import { buildApiUrl } from "@/shared/config/env";
 import { LoginAgreementNotice } from "@/features/auth/ui/LoginAgreementNotice";
 import { LoginBrandPanel } from "@/features/auth/ui/LoginBrandPanel";
 import { LoginLoadingState } from "@/features/auth/ui/LoginLoadingState";
 import { LoginSocialActions } from "@/features/auth/ui/LoginSocialActions";
 
-// 세션 복구와 OAuth 진입 상태를 관리하며 로그인 UI를 조합하는 페이지입니다.
-export function LoginPage() {
+interface LoginPageProps {
+  errorMessage: string | null;
+  isLoading: boolean;
+  onLogin: (provider: AuthProvider) => void;
+}
+
+// 로그인 상태와 사용자 동작을 전달받아 로그인 화면을 렌더링합니다.
+export function LoginPage({
+  errorMessage,
+  isLoading,
+  onLogin,
+}: LoginPageProps) {
   const t = useTranslations("login");
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingProvider, setLoadingProvider] = useState<AuthProvider | null>(
-    null,
-  );
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const hasTriedCookieRestoreRef = useRef(false);
-
-  useEffect(() => {
-    if (hasTriedCookieRestoreRef.current) {
-      return;
-    }
-
-    hasTriedCookieRestoreRef.current = true;
-
-    // OAuth redirect 이후에도 URL 토큰을 저장하지 않고 쿠키 기반 내 정보 조회로 세션을 복구한다.
-    void restoreSessionFromRefreshCookie()
-      .then(() => router.replace("/favorites"))
-      .catch(() => {
-        // Stay on the login page when there is no active OAuth cookie session.
-      });
-  }, [router]);
-
-  const handleLogin = async (provider: AuthProvider) => {
-    try {
-      setErrorMessage(null);
-      setIsLoading(true);
-      setLoadingProvider(provider);
-      window.location.assign(buildApiUrl(getAuthStartPath(provider)));
-    } catch {
-      setIsLoading(false);
-      setLoadingProvider(null);
-      setErrorMessage(t("configError"));
-    }
-  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-(--background) px-4">
       <div className="w-full max-w-sm">
         <LoginBrandPanel title={t("title")} subtitle={t("subtitle")} />
 
-        <LoginSocialActions
-          isLoading={isLoading}
-          loadingProvider={loadingProvider}
-          onLogin={handleLogin}
-        />
+        <LoginSocialActions disabled={isLoading} onLogin={onLogin} />
 
         <LoginLoadingState label={t("loading")} isVisible={isLoading} />
         {errorMessage ? (

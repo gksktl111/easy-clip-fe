@@ -50,6 +50,11 @@
     "privacy": "Privacy Policy",
     "agreementSuffix": "."
   },
+  "authGuard": {
+    "loading": "Checking your session.",
+    "error": "We could not verify your session. Please try again shortly.",
+    "retry": "Try again"
+  },
   "sidebar": {
     "favorites": "Favorites",
     "recent": "Recent",
@@ -83,6 +88,7 @@
     "general": "General",
     "language": "Language",
     "languageDescription": "Select your preferred language.",
+    "loadError": "Failed to load your settings. Please try again shortly.",
     "saveError": "Failed to save settings. Please try again shortly.",
     "subscriptionTitle": "Current subscription",
     "subscriptionPlan": "Plan",

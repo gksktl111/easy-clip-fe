@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth";
 import {
   createFolder as createFolderRequest,
   deleteFolder as deleteFolderRequest,
@@ -19,17 +18,18 @@ import {
   sortFolders,
 } from "@/features/folder/service/folderCollection";
 import { getFolderQueryKey } from "@/features/folder/service/folderQueryCache";
+import { useSession } from "@/shared/session/useSession";
 
 const createAuthRequiredError = () => new Error("AUTH_REQUIRED");
 
 // 폴더 생성, 이름 변경, 삭제와 optimistic 순서 변경 액션을 관리합니다.
 export const useFolderActions = () => {
-  const session = useAuthSession();
-  const isAuthenticated = Boolean(session?.user);
+  const { user } = useSession();
+  const isAuthenticated = Boolean(user);
   const queryClient = useQueryClient();
   const folderQueryKey = useMemo(
-    () => getFolderQueryKey(session?.user?.id ?? null),
-    [session?.user?.id],
+    () => getFolderQueryKey(user?.id ?? null),
+    [user?.id],
   );
   const setFolders = useCallback(
     (updater: (currentFolders: FolderItem[]) => FolderItem[]) => {

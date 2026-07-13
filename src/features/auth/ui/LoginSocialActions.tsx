@@ -8,14 +8,12 @@ import { SocialLoginButton } from "@/features/auth/ui/SocialLoginButton";
 
 // 지원하는 OAuth 제공자별 로그인 액션을 동일한 버튼 구성으로 제공합니다.
 interface LoginSocialActionsProps {
-  isLoading: boolean;
-  loadingProvider: AuthProvider | null;
+  disabled: boolean;
   onLogin: (provider: AuthProvider) => void;
 }
 
 export function LoginSocialActions({
-  isLoading,
-  loadingProvider,
+  disabled,
   onLogin,
 }: LoginSocialActionsProps) {
   const t = useTranslations("login");
@@ -26,13 +24,13 @@ export function LoginSocialActions({
         label={t("continueWithGoogle")}
         icon={<FcGoogle className="h-5 w-5" aria-hidden />}
         onClick={() => onLogin("google")}
-        isLoading={isLoading && loadingProvider === "google"}
+        disabled={disabled}
       />
       <SocialLoginButton
         label={t("continueWithGithub")}
         icon={<FaGithub className="h-5 w-5" aria-hidden />}
         onClick={() => onLogin("github")}
-        isLoading={isLoading && loadingProvider === "github"}
+        disabled={disabled}
       />
     </div>
   );

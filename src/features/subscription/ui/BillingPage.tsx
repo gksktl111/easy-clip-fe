@@ -8,7 +8,6 @@ import {
   fetchMySubscription,
   updateMySubscription,
 } from "@/features/subscription/api/subscriptionApi";
-import { useAuthSession } from "@/features/auth";
 import { hasRemainingCanceledProPeriod } from "@/features/subscription/model/subscription";
 import type { BillingAuthRequestResponseDto } from "@/features/subscription/model/subscription.dto";
 import {
@@ -21,6 +20,7 @@ import {
 } from "@/features/subscription/ui/BillingCheckoutCard";
 import { BillingHeroSection } from "@/features/subscription/ui/BillingHeroSection";
 import { ApiError } from "@/shared/lib/apiClient";
+import { useSession } from "@/shared/session/useSession";
 
 interface TossPaymentsClient {
   requestBillingAuth: (
@@ -85,8 +85,8 @@ const mapBillingAuthMethod = (
 export function BillingPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const session = useAuthSession();
-  const userId = session?.user?.id ?? null;
+  const { user } = useSession();
+  const userId = user?.id ?? null;
   const [billingAuth, setBillingAuth] =
     useState<BillingAuthRequestResponseDto | null>(null);
   const [step, setStep] = useState<BillingStep>("idle");

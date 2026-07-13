@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { LoginPage } from "@/features/auth";
+import { LoginPageController } from "@/app/login/_components/LoginPageController";
 
 export default function Login() {
   return (
     <Suspense>
-      <LoginPage />
+      <LoginPageController />
     </Suspense>
   );
 }

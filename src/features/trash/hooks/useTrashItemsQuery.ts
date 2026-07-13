@@ -1,17 +1,17 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth";
 import { fetchTrashItems } from "@/features/trash/api/trashApi";
 import { TRASH_QUERY_KEYS } from "@/features/trash/service/trashQueryCache";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
+import { useSession } from "@/shared/session/useSession";
 
 // 인증 사용자의 휴지통 항목을 cursor 기반으로 조회하고 평탄화된 목록을 제공합니다.
 export const useTrashItemsQuery = () => {
-  const session = useAuthSession();
-  const isAuthenticated = Boolean(session?.user);
+  const { user } = useSession();
+  const isAuthenticated = Boolean(user);
   const trashItemsQuery = useInfiniteQuery({
-    queryKey: TRASH_QUERY_KEYS.items(session?.user?.id ?? null),
+    queryKey: TRASH_QUERY_KEYS.items(user?.id ?? null),
     enabled: isAuthenticated,
     initialPageParam: null as string | null,
     queryFn: async ({ pageParam }) => {

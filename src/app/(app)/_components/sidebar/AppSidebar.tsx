@@ -8,10 +8,10 @@ import { HiOutlineClock, HiOutlineStar, HiOutlineTrash } from "react-icons/hi";
 import { AppSidebarFooter } from "@/app/(app)/_components/sidebar/AppSidebarFooter";
 import { AppSidebarHeader } from "@/app/(app)/_components/sidebar/AppSidebarHeader";
 import { AppSidebarNav } from "@/app/(app)/_components/sidebar/AppSidebarNav";
-import { clearAuthSession, logout, useAuthSession } from "@/features/auth";
 import { invalidateClipQueries } from "@/features/clip";
 import { FolderSidebarContent, useFoldersQuery } from "@/features/folder";
 import { invalidateTrashQueries } from "@/features/trash";
+import { useSession } from "@/shared/session/useSession";
 
 const RESERVED_PATHNAMES = new Set([
   "favorites",
@@ -37,8 +37,8 @@ export function AppSidebar({
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const session = useAuthSession();
-  const isAuthenticated = Boolean(session?.user);
+  const { logout, user } = useSession();
+  const isAuthenticated = Boolean(user);
   const { folders, isLoading: isFoldersLoading } = useFoldersQuery();
   const pathnameFolderId = pathname.split("/").filter(Boolean)[0] ?? null;
   const currentFolderId =
@@ -62,10 +62,7 @@ export function AppSidebar({
       icon: <HiOutlineTrash className="h-5 w-5" aria-hidden />,
     },
   ];
-  const userLabel =
-    session?.user?.authAccounts?.[0]?.email ??
-    session?.user?.displayName ??
-    t("guest");
+  const userLabel = user?.email ?? user?.displayName ?? t("guest");
 
   useEffect(() => {
     onCloseMobile?.();
@@ -93,20 +90,8 @@ export function AppSidebar({
 
   const handleLogout = useCallback(async () => {
     onCloseMobile?.();
-
-    try {
-      if (isAuthenticated) {
-        await logout();
-      }
-    } catch {
-      // 서버 세션이 이미 만료된 경우에도 로컬 인증 상태는 정리합니다.
-    } finally {
-      clearAuthSession();
-      queryClient.clear();
-      router.push("/login");
-      router.refresh();
-    }
-  }, [isAuthenticated, onCloseMobile, queryClient, router]);
+    await logout();
+  }, [logout, onCloseMobile]);
 
   return (
     <>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { HiOutlineCog, HiOutlineX } from "react-icons/hi";
-import { useAuthSession } from "@/features/auth";
 import { persistUserSettings } from "@/features/settings/service/settingsService";
 import { SettingsAboutSection } from "@/features/settings/ui/SettingsAboutSection";
 import { SettingsPreferencesSection } from "@/features/settings/ui/SettingsPreferencesSection";
@@ -12,6 +11,7 @@ import type { AppLocale } from "@/shared/config/locale";
 import { useSettingsStore } from "@/shared/store/settingsStore";
 import { Button } from "@/shared/ui/button/Button";
 import { Modal } from "@/shared/ui/overlay/Modal";
+import { useSession } from "@/shared/session/useSession";
 
 // 사용자 설정 저장 상태를 관리하고 환경 설정과 구독 정보 섹션을 조합합니다.
 interface SettingsModalProps {
@@ -20,7 +20,7 @@ interface SettingsModalProps {
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
   const t = useTranslations("settings");
-  const session = useAuthSession();
+  const { user } = useSession();
   const subscriptionQuery = useMySubscription();
   const { theme, language, setLanguage, setTheme } = useSettingsStore();
   const [savingField, setSavingField] = useState<"theme" | "language" | null>(
@@ -28,9 +28,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const isDark = theme === "dark";
-  const isSubscriptionLoading = Boolean(
-    session?.user && subscriptionQuery.isPending,
-  );
+  const isSubscriptionLoading = Boolean(user && subscriptionQuery.isPending);
   const subscriptionError = subscriptionQuery.isError
     ? t("subscriptionLoadError")
     : null;
@@ -42,7 +40,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     setErrorMessage(null);
     setTheme(nextTheme);
 
-    if (!session?.user) {
+    if (!user) {
       return;
     }
 
@@ -64,7 +62,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     setErrorMessage(null);
     setLanguage(nextLanguage);
 
-    if (!session?.user) {
+    if (!user) {
       return;
     }
 

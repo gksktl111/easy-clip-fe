@@ -2,18 +2,18 @@
 
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth";
 import {
   fetchMySubscription,
   updateMySubscription,
 } from "@/features/subscription/api/subscriptionApi";
 import { syncMySubscriptionQueryData } from "@/features/subscription/service/subscriptionQueryCache";
+import { useSession } from "@/shared/session/useSession";
 
 // 구독 변경 요청과 현재 사용자 구독 캐시 동기화를 하나의 공개 액션으로 제공합니다.
 export const useSubscriptionActions = () => {
   const queryClient = useQueryClient();
-  const session = useAuthSession();
-  const userId = session?.user?.id ?? null;
+  const { user } = useSession();
+  const userId = user?.id ?? null;
 
   const syncSubscription = useCallback(async () => {
     const subscription = await fetchMySubscription();
