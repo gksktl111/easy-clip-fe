@@ -1,24 +1,19 @@
 import { HiOutlineRefresh } from "react-icons/hi";
-import type { BillingAuthRequestResponseDto } from "@/features/subscription/model/subscription.dto";
 import { BillingUnlockedFeatureList } from "@/features/subscription/ui/BillingUnlockedFeatureList";
 import { Badge } from "@/shared/ui/badge/Badge";
 import { Button } from "@/shared/ui/button/Button";
 
 export type BillingStep = "idle" | "loading" | "redirecting" | "error";
 
-// Pro 요금과 제공 기능, 인증 정보, 결제 시작 상태를 하나의 카드로 표시합니다.
+// Pro 요금, 제공 기능과 결제 시작 상태를 하나의 카드로 표시합니다.
 interface BillingCheckoutCardProps {
   actionLabel: string;
-  billingAuth: BillingAuthRequestResponseDto | null;
-  message: string | null;
   onStartBilling: () => void;
   step: BillingStep;
 }
 
 export function BillingCheckoutCard({
   actionLabel,
-  billingAuth,
-  message,
   onStartBilling,
   step,
 }: BillingCheckoutCardProps) {
@@ -40,24 +35,6 @@ export function BillingCheckoutCard({
       </div>
 
       <BillingUnlockedFeatureList />
-
-      {billingAuth ? (
-        <div className="mt-4 rounded-xl border border-(--border) px-4 py-3 text-sm text-(--muted)">
-          <p className="font-medium text-(--foreground)">결제 인증 정보</p>
-          <p className="mt-1 break-all">
-            customerKey: {billingAuth.customerKey}
-          </p>
-        </div>
-      ) : null}
-
-      {message ? (
-        <p
-          className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300"
-          role="alert"
-        >
-          {message}
-        </p>
-      ) : null}
 
       <Button
         onClick={onStartBilling}
