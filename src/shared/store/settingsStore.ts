@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { DEFAULT_LOCALE } from "@/shared/config/locale";
 import {
   DEFAULT_THEME,
+  LANGUAGE_COOKIE_NAME,
   THEME_COOKIE_MAX_AGE_SECONDS,
   THEME_COOKIE_NAME,
   type LanguageCode,
@@ -26,9 +27,12 @@ interface SettingsState {
   }) => void;
 }
 
-const writeThemeCookie = (theme: ThemeMode) => {
+const writeSettingsCookie = (
+  name: typeof THEME_COOKIE_NAME | typeof LANGUAGE_COOKIE_NAME,
+  value: ThemeMode | LanguageCode,
+) => {
   document.cookie = [
-    `${THEME_COOKIE_NAME}=${theme}`,
+    `${name}=${value}`,
     `Max-Age=${THEME_COOKIE_MAX_AGE_SECONDS}`,
     "Path=/",
     "SameSite=Lax",
@@ -39,19 +43,29 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   theme: DEFAULT_THEME,
   language: DEFAULT_LOCALE,
   setTheme: (theme) => {
-    writeThemeCookie(theme);
+    writeSettingsCookie(THEME_COOKIE_NAME, theme);
     set({ theme });
   },
   toggleTheme: () => {
     const theme = get().theme === "dark" ? "light" : "dark";
-    writeThemeCookie(theme);
+    writeSettingsCookie(THEME_COOKIE_NAME, theme);
     set({ theme });
   },
-  setLanguage: (language) => set({ language }),
-  syncLanguage: (language) => set({ language }),
+  setLanguage: (language) => {
+    writeSettingsCookie(LANGUAGE_COOKIE_NAME, language);
+    set({ language });
+  },
+  syncLanguage: (language) => {
+    writeSettingsCookie(LANGUAGE_COOKIE_NAME, language);
+    set({ language });
+  },
   hydrateFromServer: ({ theme, language }) => {
     if (theme) {
-      writeThemeCookie(theme);
+      writeSettingsCookie(THEME_COOKIE_NAME, theme);
+    }
+
+    if (language) {
+      writeSettingsCookie(LANGUAGE_COOKIE_NAME, language);
     }
 
     set((state) => ({

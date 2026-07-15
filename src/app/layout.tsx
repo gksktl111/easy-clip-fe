@@ -32,7 +32,7 @@ export default async function RootLayout({
     >
       <body className="bg-background text-foreground antialiased">
         <QueryProvider>
-          {/* 서버 설정 또는 theme cookie 초기값을 런타임 설정 store와 next-intl provider에 연결합니다. */}
+          {/* 서버 설정 또는 settings cookie 초기값을 런타임 설정 store와 next-intl provider에 연결합니다. */}
           <AppSettingsProvider
             initialLocale={initialSettings.language}
             initialTheme={initialSettings.theme}

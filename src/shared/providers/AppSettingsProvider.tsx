@@ -42,7 +42,7 @@ export function AppSettingsProvider({
   const language = isSettingsReady ? storeLanguage : initialLocale;
 
   useIsomorphicLayoutEffect(() => {
-    // 서버가 결정한 초기 설정을 현재 런타임 store와 theme cookie에 반영합니다.
+    // 서버가 결정한 초기 설정을 현재 런타임 store와 settings cookie에 반영합니다.
     useSettingsStore.getState().hydrateFromServer({
       language: initialLocale,
       theme: initialTheme,

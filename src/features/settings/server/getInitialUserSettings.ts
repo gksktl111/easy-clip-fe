@@ -10,6 +10,7 @@ import {
 } from "@/shared/config/locale";
 import {
   DEFAULT_THEME,
+  LANGUAGE_COOKIE_NAME,
   THEME_COOKIE_NAME,
   isThemeMode,
   type ThemeMode,
@@ -23,8 +24,11 @@ export interface InitialUserSettings {
   theme: ThemeMode;
 }
 
-const buildFallbackSettings = (theme: ThemeMode): InitialUserSettings => ({
-  language: DEFAULT_LOCALE,
+const buildFallbackSettings = (
+  theme: ThemeMode,
+  language: AppLocale,
+): InitialUserSettings => ({
+  language,
   source: "fallback",
   theme,
 });
@@ -60,8 +64,12 @@ export async function getInitialUserSettings({
 }: GetInitialUserSettingsOptions = {}): Promise<InitialUserSettings> {
   const cookieStore = await cookies();
   const storedTheme = cookieStore.get(THEME_COOKIE_NAME)?.value;
+  const storedLanguage = cookieStore.get(LANGUAGE_COOKIE_NAME)?.value;
   const fallbackSettings = buildFallbackSettings(
     isThemeMode(storedTheme) ? storedTheme : DEFAULT_THEME,
+    storedLanguage && isAppLocale(storedLanguage)
+      ? storedLanguage
+      : DEFAULT_LOCALE,
   );
 
   if (!shouldFetchServerSettings) {
