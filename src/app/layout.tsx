@@ -4,7 +4,7 @@ import { SessionProvider } from "@/app/providers/session/SessionProvider";
 import { hasAuthSessionCookie } from "@/features/auth/server";
 import { getInitialUserSettings } from "@/features/settings/server";
 import { AppToaster } from "@/shared/feedback/AppToaster";
-import { IntlProvider } from "@/shared/providers/IntlProvider";
+import { AppSettingsProvider } from "@/shared/providers/AppSettingsProvider";
 import { QueryProvider } from "@/shared/providers/QueryProvider";
 import "./globals.css";
 
@@ -19,10 +19,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [initialSettings, shouldRestoreSession] = await Promise.all([
-    getInitialUserSettings(),
-    hasAuthSessionCookie(),
-  ]);
+  const shouldRestoreSession = await hasAuthSessionCookie();
+  const initialSettings = await getInitialUserSettings({
+    shouldFetchServerSettings: shouldRestoreSession,
+  });
 
   return (
     <html
@@ -32,10 +32,10 @@ export default async function RootLayout({
     >
       <body className="bg-background text-foreground antialiased">
         <QueryProvider>
-          <IntlProvider
+          {/* 서버 설정 또는 settings cookie 초기값을 런타임 설정 store와 next-intl provider에 연결합니다. */}
+          <AppSettingsProvider
             initialLocale={initialSettings.language}
             initialTheme={initialSettings.theme}
-            preferServerSettings={initialSettings.source === "server"}
           >
             <SessionProvider shouldRestoreSession={shouldRestoreSession}>
               <UserSettingsSync
@@ -44,7 +44,7 @@ export default async function RootLayout({
               {children}
               <AppToaster />
             </SessionProvider>
-          </IntlProvider>
+          </AppSettingsProvider>
         </QueryProvider>
       </body>
     </html>
