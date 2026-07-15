@@ -14,11 +14,10 @@ import {
   useSettingsStore,
 } from "@/shared/store/settingsStore";
 
-interface IntlProviderProps {
+interface AppSettingsProviderProps {
   children: React.ReactNode;
   initialLocale: AppLocale;
   initialTheme: ThemeMode;
-  preferServerSettings: boolean;
 }
 
 const messagesByLocale = {
@@ -31,12 +30,11 @@ const messagesByLocale = {
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-export function IntlProvider({
+export function AppSettingsProvider({
   children,
   initialLocale,
   initialTheme,
-  preferServerSettings,
-}: IntlProviderProps) {
+}: AppSettingsProviderProps) {
   const [isSettingsReady, setIsSettingsReady] = useState(false);
   const storeTheme = useSettingsStore((state) => state.theme);
   const storeLanguage = useSettingsStore((state) => state.language);
@@ -44,30 +42,13 @@ export function IntlProvider({
   const language = isSettingsReady ? storeLanguage : initialLocale;
 
   useIsomorphicLayoutEffect(() => {
-    let isMounted = true;
-
-    useSettingsStore.setState({
+    // 서버가 결정한 초기 설정을 현재 런타임 store와 theme cookie에 반영합니다.
+    useSettingsStore.getState().hydrateFromServer({
       language: initialLocale,
       theme: initialTheme,
     });
-
-    if (preferServerSettings) {
-      setIsSettingsReady(true);
-      return () => {
-        isMounted = false;
-      };
-    }
-
-    void Promise.resolve(useSettingsStore.persist.rehydrate()).finally(() => {
-      if (isMounted) {
-        setIsSettingsReady(true);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [initialLocale, initialTheme, preferServerSettings]);
+    setIsSettingsReady(true);
+  }, [initialLocale, initialTheme]);
 
   useEffect(() => {
     applySettings(theme, language);

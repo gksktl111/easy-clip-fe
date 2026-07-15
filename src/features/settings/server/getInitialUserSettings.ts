@@ -8,7 +8,12 @@ import {
   isAppLocale,
   type AppLocale,
 } from "@/shared/config/locale";
-import { DEFAULT_THEME, type ThemeMode } from "@/shared/config/settings";
+import {
+  DEFAULT_THEME,
+  THEME_COOKIE_NAME,
+  isThemeMode,
+  type ThemeMode,
+} from "@/shared/config/settings";
 
 type InitialUserSettingsSource = "server" | "fallback";
 
@@ -18,11 +23,11 @@ export interface InitialUserSettings {
   theme: ThemeMode;
 }
 
-const FALLBACK_SETTINGS: InitialUserSettings = {
+const buildFallbackSettings = (theme: ThemeMode): InitialUserSettings => ({
   language: DEFAULT_LOCALE,
   source: "fallback",
-  theme: DEFAULT_THEME,
-};
+  theme,
+});
 
 const mapThemeFromServer = (
   theme: UserSettingsResponseDto["theme"],
@@ -34,10 +39,9 @@ const mapThemeFromServer = (
   return "dark";
 };
 
-const buildCookieHeader = async () => {
-  const cookieStore = await cookies();
-  const requestCookies = cookieStore.getAll();
-
+const buildCookieHeader = (
+  requestCookies: Array<{ name: string; value: string }>,
+) => {
   if (requestCookies.length === 0) {
     return null;
   }
@@ -47,11 +51,27 @@ const buildCookieHeader = async () => {
     .join("; ");
 };
 
-export async function getInitialUserSettings(): Promise<InitialUserSettings> {
-  const cookieHeader = await buildCookieHeader();
+interface GetInitialUserSettingsOptions {
+  shouldFetchServerSettings?: boolean;
+}
+
+export async function getInitialUserSettings({
+  shouldFetchServerSettings = true,
+}: GetInitialUserSettingsOptions = {}): Promise<InitialUserSettings> {
+  const cookieStore = await cookies();
+  const storedTheme = cookieStore.get(THEME_COOKIE_NAME)?.value;
+  const fallbackSettings = buildFallbackSettings(
+    isThemeMode(storedTheme) ? storedTheme : DEFAULT_THEME,
+  );
+
+  if (!shouldFetchServerSettings) {
+    return fallbackSettings;
+  }
+
+  const cookieHeader = buildCookieHeader(cookieStore.getAll());
 
   if (!cookieHeader) {
-    return FALLBACK_SETTINGS;
+    return fallbackSettings;
   }
 
   try {
@@ -63,7 +83,7 @@ export async function getInitialUserSettings(): Promise<InitialUserSettings> {
     });
 
     if (!response.ok) {
-      return FALLBACK_SETTINGS;
+      return fallbackSettings;
     }
 
     const settings = (await response.json()) as UserSettingsResponseDto;
@@ -71,11 +91,11 @@ export async function getInitialUserSettings(): Promise<InitialUserSettings> {
     return {
       language: isAppLocale(settings.language)
         ? settings.language
-        : FALLBACK_SETTINGS.language,
+        : fallbackSettings.language,
       source: "server",
       theme: mapThemeFromServer(settings.theme),
     };
   } catch {
-    return FALLBACK_SETTINGS;
+    return fallbackSettings;
   }
 }

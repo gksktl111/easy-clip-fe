@@ -1,14 +1,11 @@
 "use client";
 
 import { create } from "zustand";
-import {
-  createJSONStorage,
-  persist,
-  type StateStorage,
-} from "zustand/middleware";
 import { DEFAULT_LOCALE } from "@/shared/config/locale";
 import {
   DEFAULT_THEME,
+  THEME_COOKIE_MAX_AGE_SECONDS,
+  THEME_COOKIE_NAME,
   type LanguageCode,
   type ThemeMode,
 } from "@/shared/config/settings";
@@ -29,36 +26,40 @@ interface SettingsState {
   }) => void;
 }
 
-const noopStorage: StateStorage = {
-  getItem: () => null,
-  setItem: () => undefined,
-  removeItem: () => undefined,
+const writeThemeCookie = (theme: ThemeMode) => {
+  document.cookie = [
+    `${THEME_COOKIE_NAME}=${theme}`,
+    `Max-Age=${THEME_COOKIE_MAX_AGE_SECONDS}`,
+    "Path=/",
+    "SameSite=Lax",
+  ].join("; ");
 };
-export const useSettingsStore = create<SettingsState>()(
-  persist(
-    (set, get) => ({
-      theme: DEFAULT_THEME,
-      language: DEFAULT_LOCALE,
-      setTheme: (theme) => set({ theme }),
-      toggleTheme: () =>
-        set({ theme: get().theme === "dark" ? "light" : "dark" }),
-      setLanguage: (language) => set({ language }),
-      syncLanguage: (language) => set({ language }),
-      hydrateFromServer: ({ theme, language }) =>
-        set((state) => ({
-          theme: theme ?? state.theme,
-          language: language ?? state.language,
-        })),
-    }),
-    {
-      name: "easy-clip-settings",
-      skipHydration: true,
-      storage: createJSONStorage(() =>
-        typeof window === "undefined" ? noopStorage : localStorage,
-      ),
-    },
-  ),
-);
+
+export const useSettingsStore = create<SettingsState>()((set, get) => ({
+  theme: DEFAULT_THEME,
+  language: DEFAULT_LOCALE,
+  setTheme: (theme) => {
+    writeThemeCookie(theme);
+    set({ theme });
+  },
+  toggleTheme: () => {
+    const theme = get().theme === "dark" ? "light" : "dark";
+    writeThemeCookie(theme);
+    set({ theme });
+  },
+  setLanguage: (language) => set({ language }),
+  syncLanguage: (language) => set({ language }),
+  hydrateFromServer: ({ theme, language }) => {
+    if (theme) {
+      writeThemeCookie(theme);
+    }
+
+    set((state) => ({
+      theme: theme ?? state.theme,
+      language: language ?? state.language,
+    }));
+  },
+}));
 
 export const applySettings = (theme: ThemeMode, language: LanguageCode) => {
   document.documentElement.dataset.theme = theme;
