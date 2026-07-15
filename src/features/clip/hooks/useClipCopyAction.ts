@@ -48,9 +48,13 @@ export const useClipCopyAction = ({
       }
 
       if (isAuthenticated) {
-        await recordClipView(clip.id);
-        moveClipToRecentCache(queryClient, clip.id);
-        void invalidateClipQueries(queryClient);
+        try {
+          await recordClipView(clip.id);
+          moveClipToRecentCache(queryClient, clip.id);
+          void invalidateClipQueries(queryClient);
+        } catch {
+          // 복사는 이미 성공했으므로 조회 기록 실패는 사용자에게 노출하지 않습니다.
+        }
       }
     },
     [isAuthenticated, isDisabled, queryClient, showCopyToast],
