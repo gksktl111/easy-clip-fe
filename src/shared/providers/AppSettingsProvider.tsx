@@ -1,7 +1,7 @@
 "use client";
 
 // 초기 사용자 설정을 반영해 다국어 메시지와 테마 상태를 제공합니다.
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import enMessages from "@/messages/en.json";
 import jaMessages from "@/messages/ja.json";
@@ -35,29 +35,39 @@ export function AppSettingsProvider({
   initialLocale,
   initialTheme,
 }: AppSettingsProviderProps) {
-  const [isSettingsReady, setIsSettingsReady] = useState(false);
+  const initialSettingsRef = useRef<{
+    language: AppLocale;
+    theme: ThemeMode;
+  } | null>(null);
+
+  // 자식이 첫 렌더에서 DEFAULT 설정을 읽지 않도록 SSR 초기값을 한 번만 먼저 주입합니다.
+  if (initialSettingsRef.current === null) {
+    initialSettingsRef.current = {
+      language: initialLocale,
+      theme: initialTheme,
+    };
+    useSettingsStore.getState().applyInitialSettings(initialSettingsRef.current);
+  }
+
   const storeTheme = useSettingsStore((state) => state.theme);
   const storeLanguage = useSettingsStore((state) => state.language);
-  const theme = isSettingsReady ? storeTheme : initialTheme;
-  const language = isSettingsReady ? storeLanguage : initialLocale;
 
   useIsomorphicLayoutEffect(() => {
-    // 서버가 결정한 초기 설정을 현재 런타임 store와 settings cookie에 반영합니다.
+    // 서버가 결정한 초기 설정을 settings cookie에도 반영합니다.
     useSettingsStore.getState().hydrateFromServer({
       language: initialLocale,
       theme: initialTheme,
     });
-    setIsSettingsReady(true);
   }, [initialLocale, initialTheme]);
 
   useEffect(() => {
-    applySettings(theme, language);
-  }, [language, theme]);
+    applySettings(storeTheme, storeLanguage);
+  }, [storeLanguage, storeTheme]);
 
   return (
     <NextIntlClientProvider
-      locale={language ?? initialLocale}
-      messages={messagesByLocale[language]}
+      locale={storeLanguage}
+      messages={messagesByLocale[storeLanguage]}
       timeZone={DEFAULT_TIME_ZONE}
     >
       {children}

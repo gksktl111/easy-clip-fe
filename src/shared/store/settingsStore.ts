@@ -21,6 +21,10 @@ interface SettingsState {
   toggleTheme: () => void;
   setLanguage: (language: LanguageCode) => void;
   syncLanguage: (language: LanguageCode) => void;
+  applyInitialSettings: (settings: {
+    theme: ThemeMode;
+    language: LanguageCode;
+  }) => void;
   hydrateFromServer: (settings: {
     theme?: ThemeMode;
     language?: LanguageCode;
@@ -59,6 +63,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     writeSettingsCookie(LANGUAGE_COOKIE_NAME, language);
     set({ language });
   },
+  applyInitialSettings: ({ theme, language }) => set({ theme, language }),
   hydrateFromServer: ({ theme, language }) => {
     if (theme) {
       writeSettingsCookie(THEME_COOKIE_NAME, theme);
