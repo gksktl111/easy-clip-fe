@@ -3,6 +3,7 @@
 import type { FolderItem } from "@/features/folder/model/folder";
 import { HiOutlinePlus } from "react-icons/hi";
 import { FolderSidebarItem } from "@/features/folder/ui/FolderSidebarItem";
+import type { ContextMenuState } from "@/shared/hooks/useContextMenu";
 
 // 폴더 추가 액션과 로딩 또는 폴더 목록 상태를 사이드바 섹션으로 조합합니다.
 interface FolderSidebarSectionProps {
@@ -11,10 +12,13 @@ interface FolderSidebarSectionProps {
   pathname: string;
   addFolderLabel: string;
   reorderFolderLabel: string;
+  moveFolderUpLabel: string;
+  moveFolderDownLabel: string;
   openFolderOptionsLabel: string;
   renameLabel: string;
   deleteLabel: string;
-  openOptionsFolderId: string | null;
+  folderOrderStatus: string;
+  optionsMenu: ContextMenuState<string> | null;
   draggingFolderId: string | null;
   dropIndicator: {
     folderId: string;
@@ -29,7 +33,13 @@ interface FolderSidebarSectionProps {
   onDragEnd: () => void;
   onDragOver: (folderId: string, event: React.DragEvent<HTMLLIElement>) => void;
   onDrop: (folderId: string, event: React.DragEvent<HTMLLIElement>) => void;
-  onToggleOptions: (folderId: string) => void;
+  onMoveFolderUp: (folderId: string) => void;
+  onMoveFolderDown: (folderId: string) => void;
+  onToggleOptions: (
+    folderId: string,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => void;
+  onOpenOptionsMenu: (event: React.MouseEvent, folderId: string) => void;
   onRenameFolder: (folderId: string) => void;
   onDeleteFolder: (folderId: string) => void;
 }
@@ -40,10 +50,13 @@ export function FolderSidebarSection({
   pathname,
   addFolderLabel,
   reorderFolderLabel,
+  moveFolderUpLabel,
+  moveFolderDownLabel,
   openFolderOptionsLabel,
   renameLabel,
   deleteLabel,
-  openOptionsFolderId,
+  folderOrderStatus,
+  optionsMenu,
   draggingFolderId,
   dropIndicator,
   onAddFolder,
@@ -52,7 +65,10 @@ export function FolderSidebarSection({
   onDragEnd,
   onDragOver,
   onDrop,
+  onMoveFolderUp,
+  onMoveFolderDown,
   onToggleOptions,
+  onOpenOptionsMenu,
   onRenameFolder,
   onDeleteFolder,
 }: FolderSidebarSectionProps) {
@@ -72,33 +88,50 @@ export function FolderSidebarSection({
       <ul className="space-y-1 px-2">
         {isLoading
           ? skeletonRows.map((row) => <FolderSidebarSkeletonRow key={row} />)
-          : folders.map((folder) => (
+          : folders.map((folder, index) => (
               <FolderSidebarItem
                 key={folder.id}
                 folder={folder}
                 pathname={pathname}
                 reorderFolderLabel={reorderFolderLabel}
+                moveFolderUpLabel={moveFolderUpLabel}
+                moveFolderDownLabel={moveFolderDownLabel}
                 openFolderOptionsLabel={openFolderOptionsLabel}
                 renameLabel={renameLabel}
                 deleteLabel={deleteLabel}
+                canMoveUp={index > 0}
+                canMoveDown={index < folders.length - 1}
                 draggingFolderId={draggingFolderId}
                 dropIndicatorEdge={
                   dropIndicator?.folderId === folder.id
                     ? dropIndicator.edge
                     : null
                 }
-                isOptionsOpen={openOptionsFolderId === folder.id}
+                isOptionsOpen={optionsMenu?.id === folder.id}
+                optionsMenuPosition={
+                  optionsMenu?.id === folder.id &&
+                  optionsMenu.x !== null &&
+                  optionsMenu.y !== null
+                    ? { x: optionsMenu.x, y: optionsMenu.y }
+                    : null
+                }
                 onNavigate={onNavigate}
                 onDragStart={(event) => onDragStart(folder.id, event)}
                 onDragEnd={onDragEnd}
                 onDragOver={(event) => onDragOver(folder.id, event)}
                 onDrop={(event) => onDrop(folder.id, event)}
-                onToggleOptions={() => onToggleOptions(folder.id)}
+                onMoveUp={() => onMoveFolderUp(folder.id)}
+                onMoveDown={() => onMoveFolderDown(folder.id)}
+                onToggleOptions={(event) => onToggleOptions(folder.id, event)}
+                onOpenOptionsMenu={(event) => onOpenOptionsMenu(event, folder.id)}
                 onRename={() => onRenameFolder(folder.id)}
                 onDelete={() => onDeleteFolder(folder.id)}
               />
             ))}
       </ul>
+      <p className="sr-only" role="status" aria-live="polite">
+        {folderOrderStatus}
+      </p>
     </div>
   );
 }

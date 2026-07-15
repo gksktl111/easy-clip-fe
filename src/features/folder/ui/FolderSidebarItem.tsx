@@ -11,19 +11,27 @@ import { FolderOptionsMenu } from "@/features/folder/ui/FolderOptionsMenu";
 
 // 폴더 하나의 탐색, 순서 변경, 옵션 메뉴와 드롭 위치를 렌더링합니다.
 interface FolderSidebarItemProps {
+  canMoveDown: boolean;
+  canMoveUp: boolean;
   deleteLabel: string;
   draggingFolderId: string | null;
   dropIndicatorEdge: "top" | "bottom" | null;
   folder: FolderItem;
   isOptionsOpen: boolean;
+  optionsMenuPosition: { x: number; y: number } | null;
   onDelete: () => void;
   onDragEnd: () => void;
   onDragOver: (event: React.DragEvent<HTMLLIElement>) => void;
   onDragStart: (event: React.DragEvent<HTMLButtonElement>) => void;
   onDrop: (event: React.DragEvent<HTMLLIElement>) => void;
+  onMoveDown: () => void;
+  onMoveUp: () => void;
   onNavigate?: () => void;
+  onOpenOptionsMenu: (event: React.MouseEvent<HTMLDivElement>) => void;
   onRename: () => void;
-  onToggleOptions: () => void;
+  onToggleOptions: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  moveFolderDownLabel: string;
+  moveFolderUpLabel: string;
   openFolderOptionsLabel: string;
   pathname: string;
   renameLabel: string;
@@ -31,19 +39,27 @@ interface FolderSidebarItemProps {
 }
 
 export function FolderSidebarItem({
+  canMoveDown,
+  canMoveUp,
   deleteLabel,
   draggingFolderId,
   dropIndicatorEdge,
   folder,
   isOptionsOpen,
+  optionsMenuPosition,
   onDelete,
   onDragEnd,
   onDragOver,
   onDragStart,
   onDrop,
+  onMoveDown,
+  onMoveUp,
   onNavigate,
+  onOpenOptionsMenu,
   onRename,
   onToggleOptions,
+  moveFolderDownLabel,
+  moveFolderUpLabel,
   openFolderOptionsLabel,
   pathname,
   renameLabel,
@@ -53,11 +69,31 @@ export function FolderSidebarItem({
   const isDraggedItem = draggingFolderId === folder.id;
   const isActiveFolder = pathname === `/${folder.id}`;
   const isDropTarget = dropIndicatorEdge !== null;
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
+    // 링크나 옵션 버튼에 포커스가 있어도 폴더 항목 단위 단축키로 순서를 바꿀 수 있게 버블링을 받습니다.
+    if (!event.ctrlKey || (event.key !== "ArrowUp" && event.key !== "ArrowDown")) {
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      if (canMoveUp) {
+        onMoveUp();
+      }
+      return;
+    }
+
+    event.preventDefault();
+    if (canMoveDown) {
+      onMoveDown();
+    }
+  };
 
   return (
     <li
       onDragOver={onDragOver}
       onDrop={onDrop}
+      onKeyDown={handleKeyDown}
       className={`relative rounded-lg ${isDraggedItem ? "opacity-50" : ""}`}
     >
       {dropIndicatorEdge ? (
@@ -72,6 +108,7 @@ export function FolderSidebarItem({
       ) : null}
 
       <div
+        onContextMenu={onOpenOptionsMenu}
         className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium ${
           isDragging ? "transition-colors duration-150" : "transition-colors"
         } ${
@@ -124,8 +161,16 @@ export function FolderSidebarItem({
 
       {isOptionsOpen ? (
         <FolderOptionsMenu
+          canMoveUp={canMoveUp}
+          canMoveDown={canMoveDown}
+          moveFolderUpLabel={moveFolderUpLabel}
+          moveFolderDownLabel={moveFolderDownLabel}
+          // 우클릭 메뉴는 커서 좌표에 fixed로 띄우고, 옵션 버튼 메뉴는 기존 위치에 absolute로 띄웁니다.
+          position={optionsMenuPosition}
           renameLabel={renameLabel}
           deleteLabel={deleteLabel}
+          onMoveUp={onMoveUp}
+          onMoveDown={onMoveDown}
           onRename={onRename}
           onDelete={onDelete}
         />

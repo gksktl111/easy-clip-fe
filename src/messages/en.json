@@ -61,6 +61,11 @@
     "trash": "Trash",
     "addFolder": "Add Folder",
     "reorderFolder": "Reorder folder",
+    "moveFolderUp": "Move up",
+    "moveFolderDown": "Move down",
+    "folderMovedUp": "Moved {name} up.",
+    "folderMovedDown": "Moved {name} down.",
+    "folderOrderChanged": "Folder order updated.",
     "openFolderOptions": "Open folder options",
     "rename": "Rename",
     "delete": "Delete",
@@ -191,6 +196,7 @@
     },
     "item": {
       "saving": "Saving",
+      "copy": "Copy {name}",
       "toggleFavorite": "Toggle favorite",
       "selectForDelete": "Select {name} for deletion"
     },
