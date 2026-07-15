@@ -10,9 +10,12 @@ interface ClipListProps {
   clips: Clip[];
   loadMoreRef?: React.Ref<HTMLDivElement>;
   isFetchingNextPage?: boolean;
-  onCopy?: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
+  onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
-  onContextMenu?: (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => void;
+  onContextMenu?: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    clip: Clip,
+  ) => void;
   isDeleteMode?: boolean;
   isInteractionDisabled?: boolean;
   selectedClipIds?: Set<string>;

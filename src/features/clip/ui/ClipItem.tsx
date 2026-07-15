@@ -15,9 +15,12 @@ import type { Clip } from "@/features/clip/model/clip";
 // 클립 하나의 미리보기, 유형 정보, 복사, 즐겨찾기와 삭제 선택 상태를 표시합니다.
 interface ClipItemProps {
   clip: Clip;
-  onCopy?: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
+  onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
-  onContextMenu?: (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => void;
+  onContextMenu?: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    clip: Clip,
+  ) => void;
   isDeleteMode?: boolean;
   isInteractionDisabled?: boolean;
   isSelected?: boolean;
@@ -46,8 +49,8 @@ function ClipContentPreview({
 }) {
   if (clip.type === "color") {
     return (
-      <div
-        className="h-full w-full rounded-xl border border-(--border)"
+      <span
+        className="block h-full w-full rounded-xl border border-(--border)"
         style={{ backgroundColor: clip.content }}
         aria-hidden
       />
@@ -56,8 +59,8 @@ function ClipContentPreview({
 
   if (clip.type === "image") {
     return (
-      <div
-        className="relative h-full w-full rounded-xl bg-(--surface-muted)"
+      <span
+        className="relative block h-full w-full rounded-xl bg-(--surface-muted)"
         style={
           isOptimistic && clip.content
             ? {
@@ -78,14 +81,14 @@ function ClipContentPreview({
             className="rounded-xl object-contain"
           />
         )}
-      </div>
+      </span>
     );
   }
 
   return (
-    <p className="text-foreground line-clamp-4 text-sm leading-relaxed">
+    <span className="text-foreground line-clamp-4 text-sm leading-relaxed">
       {clip.content}
-    </p>
+    </span>
   );
 }
 
@@ -102,39 +105,53 @@ export function ClipItem({
   const t = useTranslations("clips.item");
   const isOptimistic = Boolean(clip.isOptimistic);
   const isDisabled = isOptimistic || isInteractionDisabled;
+  const primaryActionLabel = isDeleteMode
+    ? t("selectForDelete", { name: clip.name })
+    : t("copy", { name: clip.name });
 
   return (
-    <div
-      className="group relative flex h-52 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[delete-mode=true]:cursor-pointer data-[disabled=true]:cursor-wait data-[disabled=true]:opacity-75 data-[selected=true]:border-(--danger) data-[selected=true]:ring-2 data-[selected=true]:ring-(--danger-border)"
+    <article
+      className="group relative h-52 w-full overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[disabled=true]:opacity-75 data-[selected=true]:border-(--danger) data-[selected=true]:ring-2 data-[selected=true]:ring-(--danger-border)"
       data-optimistic={isOptimistic}
       data-disabled={isDisabled}
       data-delete-mode={isDeleteMode}
       data-selected={isSelected}
-      onClick={(event) => {
-        if (isDeleteMode) {
-          if (!isDisabled) {
-            onToggleSelected?.(clip.id);
-          }
-          return;
-        }
-
-        if (!isDisabled) {
-          onCopy?.(clip, event);
-        }
-      }}
-      onContextMenu={(event) => {
-        if (isDeleteMode) {
-          event.preventDefault();
-          return;
-        }
-
-        if (!isDisabled && !isDeleteMode) {
-          onContextMenu?.(event, clip);
-        }
-      }}
-      role="button"
-      tabIndex={0}
     >
+      <button
+        type="button"
+        disabled={isDisabled}
+        aria-label={primaryActionLabel}
+        aria-pressed={isDeleteMode ? isSelected : undefined}
+        onClick={(event) => {
+          if (isDeleteMode) {
+            onToggleSelected?.(clip.id);
+            return;
+          }
+
+          onCopy?.(clip, event);
+        }}
+        onContextMenu={(event) => {
+          if (isDeleteMode) {
+            event.preventDefault();
+            return;
+          }
+
+          onContextMenu?.(event, clip);
+        }}
+        className="flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) disabled:cursor-wait"
+      >
+        <span className="flex-1 overflow-hidden px-4 py-3">
+          <ClipContentPreview clip={clip} isOptimistic={isOptimistic} />
+        </span>
+        <span className="flex items-center gap-2 border-t border-(--border) px-4 py-2.5 text-xs text-(--muted)">
+          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-(--icon-chip) text-(--icon-chip-text)">
+            <ClipTypeIcon type={clip.type} />
+          </span>
+          <span className="text-foreground truncate font-medium">
+            {clip.type === "color" ? clip.content : clip.name}
+          </span>
+        </span>
+      </button>
       {isDeleteMode ? (
         <div className="absolute top-3 left-3 z-20">
           <button
@@ -185,17 +202,6 @@ export function ClipItem({
           />
         )}
       </button>
-      <div className="flex-1 overflow-hidden px-4 py-3">
-        <ClipContentPreview clip={clip} isOptimistic={isOptimistic} />
-      </div>
-      <div className="flex items-center gap-2 border-t border-(--border) px-4 py-2.5 text-xs text-(--muted)">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-(--icon-chip) text-(--icon-chip-text)">
-          <ClipTypeIcon type={clip.type} />
-        </span>
-        <span className="text-foreground truncate font-medium">
-          {clip.type === "color" ? clip.content : clip.name}
-        </span>
-      </div>
-    </div>
+    </article>
   );
 }

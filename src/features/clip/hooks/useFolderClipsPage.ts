@@ -87,7 +87,7 @@ export const useFolderClipsPage = ({
   }, [closeContextMenu, deactivate, startDeleteMode]);
 
   const copyClip = useCallback(
-    (clip: Clip, event: React.MouseEvent<HTMLDivElement>) =>
+    (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) =>
       copyClipAction(clip, { x: event.clientX, y: event.clientY }),
     [copyClipAction],
   );

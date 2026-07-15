@@ -61,6 +61,11 @@
     "trash": "휴지통",
     "addFolder": "폴더 추가",
     "reorderFolder": "폴더 순서 변경",
+    "moveFolderUp": "위로 이동",
+    "moveFolderDown": "아래로 이동",
+    "folderMovedUp": "{name} 폴더를 위로 이동했습니다.",
+    "folderMovedDown": "{name} 폴더를 아래로 이동했습니다.",
+    "folderOrderChanged": "폴더 순서를 변경했습니다.",
     "openFolderOptions": "폴더 옵션 열기",
     "rename": "이름 변경",
     "delete": "삭제",
@@ -191,6 +196,7 @@
     },
     "item": {
       "saving": "저장 중",
+      "copy": "{name} 복사",
       "toggleFavorite": "즐겨찾기 전환",
       "selectForDelete": "{name} 삭제 선택"
     },

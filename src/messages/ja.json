@@ -61,6 +61,11 @@
     "trash": "ゴミ箱",
     "addFolder": "フォルダ追加",
     "reorderFolder": "フォルダの並び替え",
+    "moveFolderUp": "上へ移動",
+    "moveFolderDown": "下へ移動",
+    "folderMovedUp": "{name}フォルダを上へ移動しました。",
+    "folderMovedDown": "{name}フォルダを下へ移動しました。",
+    "folderOrderChanged": "フォルダの順序を変更しました。",
     "openFolderOptions": "フォルダオプションを開く",
     "rename": "名前を変更",
     "delete": "削除",
@@ -191,6 +196,7 @@
     },
     "item": {
       "saving": "保存中",
+      "copy": "{name}をコピー",
       "toggleFavorite": "お気に入りを切り替え",
       "selectForDelete": "{name}を削除対象として選択"
     },

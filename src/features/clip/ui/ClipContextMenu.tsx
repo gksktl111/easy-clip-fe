@@ -5,17 +5,14 @@ import {
   HiOutlinePencil,
   HiOutlineTrash,
 } from "react-icons/hi";
+import type { ClipContextMenuState } from "@/features/clip/hooks/useClipContextMenu";
 import type { Clip } from "@/features/clip/model/clip";
 import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
 // 선택한 클립 위치에 복사, 이름 변경, 삭제 액션 메뉴를 표시합니다.
 interface ClipContextMenuProps {
   clips: Clip[];
-  contextMenu: {
-    id: string;
-    x: number;
-    y: number;
-  } | null;
+  contextMenu: ClipContextMenuState | null;
   copyLabel: string;
   renameLabel?: string;
   deleteLabel: string;
@@ -39,13 +36,14 @@ export function ClipContextMenu({
   }
 
   const targetClip = clips.find((clip) => clip.id === contextMenu.id);
-  if (!targetClip) {
+  if (!targetClip || contextMenu.x === null || contextMenu.y === null) {
     return null;
   }
 
   return (
     <ActionMenu
       position="fixed"
+      portal
       style={{ left: contextMenu.x, top: contextMenu.y }}
       dataAttribute="data-clip-menu"
       items={[

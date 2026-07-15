@@ -7,8 +7,10 @@ import type {
   FolderDropPosition,
   FolderItem,
 } from "@/features/folder/model/folder";
+import { getFolderKeyboardMoveTarget } from "@/features/folder/service/folderCollection";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
 import { FolderSidebarSection } from "@/features/folder/ui/FolderSidebarSection";
+import { useContextMenu } from "@/shared/hooks/useContextMenu";
 
 interface FolderSidebarContentProps {
   folders: FolderItem[];
@@ -31,6 +33,8 @@ type FolderNameModalState =
   | { mode: "create"; value: string }
   | { mode: "rename"; folderId: string; value: string };
 
+const FOLDER_OPTIONS_MENU_WIDTH = 192;
+
 // 폴더 생성, 이름 변경, 삭제와 정렬 상호작용만 관리합니다.
 export function FolderSidebarContent({
   folders,
@@ -46,12 +50,13 @@ export function FolderSidebarContent({
     useFolderActions();
   const [folderNameModal, setFolderNameModal] =
     useState<FolderNameModalState | null>(null);
-  const [openOptionsFolderId, setOpenOptionsFolderId] = useState<string | null>(
-    null,
-  );
+  const folderOptionsMenu = useContextMenu<string>({
+    dataAttribute: "data-folder-options",
+  });
   const [draggingFolderId, setDraggingFolderId] = useState<string | null>(null);
   const [folderDropTarget, setFolderDropTarget] =
     useState<FolderDropTarget | null>(null);
+  const [folderOrderStatus, setFolderOrderStatus] = useState("");
   const folderNameInputRef = useRef<HTMLInputElement>(null);
   const folderNameModalMode = folderNameModal?.mode ?? null;
   const pathnameFolderId = pathname.split("/").filter(Boolean)[0] ?? null;
@@ -61,24 +66,6 @@ export function FolderSidebarContent({
       folderNameInputRef.current.focus();
     }
   }, [folderNameModalMode]);
-
-  useEffect(() => {
-    if (!openOptionsFolderId) {
-      return;
-    }
-
-    const handlePointerDown = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target || target.closest("[data-folder-options]")) {
-        return;
-      }
-
-      setOpenOptionsFolderId(null);
-    };
-
-    window.addEventListener("pointerdown", handlePointerDown);
-    return () => window.removeEventListener("pointerdown", handlePointerDown);
-  }, [openOptionsFolderId]);
 
   const ensureAuthenticated = useCallback(() => {
     if (isAuthenticated) {
@@ -170,11 +157,13 @@ export function FolderSidebarContent({
         return;
       }
 
-      void saveFolderOrder(sourceId, targetId, position).catch(() => {
-        // 최종 순서 저장 실패 시 query가 서버 순서로 다시 동기화됩니다.
-      });
+      void saveFolderOrder(sourceId, targetId, position)
+        .then(() => setFolderOrderStatus(t("folderOrderChanged")))
+        .catch(() => {
+          // 최종 순서 저장 실패 시 query가 서버 순서로 다시 동기화됩니다.
+        });
     },
-    [clearFolderDragState, ensureAuthenticated, saveFolderOrder],
+    [clearFolderDragState, ensureAuthenticated, saveFolderOrder, t],
   );
 
   const closeFolderNameModal = () => setFolderNameModal(null);
@@ -283,10 +272,46 @@ export function FolderSidebarContent({
     );
   };
 
-  const handleToggleFolderOptions = (folderId: string) => {
-    setOpenOptionsFolderId((previous) =>
-      previous === folderId ? null : folderId,
-    );
+  const handleMoveFolder = (
+    folderId: string,
+    direction: "up" | "down",
+  ) => {
+    if (!ensureAuthenticated()) {
+      return;
+    }
+
+    const moveTarget = getFolderKeyboardMoveTarget(folders, folderId, direction);
+    const sourceFolder = folders.find((folder) => folder.id === folderId);
+
+    if (!moveTarget || !sourceFolder) {
+      return;
+    }
+
+    // 버튼 메뉴와 우클릭 메뉴 모두 같은 순서 저장 경로를 타도록 여기서만 메뉴를 닫고 저장합니다.
+    folderOptionsMenu.closeMenu();
+    void saveFolderOrder(folderId, moveTarget.targetId, moveTarget.position)
+      .then(() => {
+        setFolderOrderStatus(
+          t(direction === "up" ? "folderMovedUp" : "folderMovedDown", {
+            name: sourceFolder.name,
+          }),
+        );
+      })
+      .catch(() => {
+        // 실패 시 optimistic 순서가 롤백되며, 기존 목록 상태를 유지합니다.
+      });
+  };
+
+  const handleToggleFolderOptions = (
+    folderId: string,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    const { bottom, right } = event.currentTarget.getBoundingClientRect();
+
+    folderOptionsMenu.toggleMenu(folderId, {
+      x: Math.max(8, right - FOLDER_OPTIONS_MENU_WIDTH),
+      y: bottom + 4,
+    });
   };
 
   const handleOpenRenameFolder = (folderId: string) => {
@@ -295,7 +320,7 @@ export function FolderSidebarContent({
       return;
     }
 
-    setOpenOptionsFolderId(null);
+    folderOptionsMenu.closeMenu();
     setFolderNameModal({
       mode: "rename",
       folderId,
@@ -315,7 +340,7 @@ export function FolderSidebarContent({
 
     void removeFolder(folderId)
       .then(() => {
-        setOpenOptionsFolderId(null);
+        folderOptionsMenu.closeMenu();
         onFolderDeleted(redirectPath);
       })
       .catch(() => {
@@ -331,10 +356,13 @@ export function FolderSidebarContent({
         pathname={pathname}
         addFolderLabel={t("addFolder")}
         reorderFolderLabel={t("reorderFolder")}
+        moveFolderUpLabel={t("moveFolderUp")}
+        moveFolderDownLabel={t("moveFolderDown")}
         openFolderOptionsLabel={t("openFolderOptions")}
         renameLabel={t("rename")}
         deleteLabel={t("delete")}
-        openOptionsFolderId={openOptionsFolderId}
+        folderOrderStatus={folderOrderStatus}
+        optionsMenu={folderOptionsMenu.menu}
         draggingFolderId={draggingFolderId}
         dropIndicator={
           folderDropTarget
@@ -352,7 +380,10 @@ export function FolderSidebarContent({
         onDragEnd={clearFolderDragState}
         onDragOver={handleFolderDragOver}
         onDrop={handleFolderDrop}
+        onMoveFolderUp={(folderId) => handleMoveFolder(folderId, "up")}
+        onMoveFolderDown={(folderId) => handleMoveFolder(folderId, "down")}
         onToggleOptions={handleToggleFolderOptions}
+        onOpenOptionsMenu={folderOptionsMenu.openContextMenu}
         onRenameFolder={handleOpenRenameFolder}
         onDeleteFolder={handleDeleteFolder}
       />

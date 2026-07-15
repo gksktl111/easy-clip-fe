@@ -15,7 +15,7 @@ interface ClipCollectionPageProps {
   isError?: boolean;
   isFetchingNextPage?: boolean;
   isLoading?: boolean;
-  onCopy: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
+  onCopy: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onFetchNextPage: () => void;
   onFilterChange: (filter: FilterType) => void;
   onRetry: () => void;

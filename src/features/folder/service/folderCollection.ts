@@ -64,3 +64,28 @@ export const reorderFolderItems = (
     order: index,
   }));
 };
+
+export const getFolderKeyboardMoveTarget = (
+  folders: FolderItem[],
+  sourceId: string,
+  direction: "up" | "down",
+): { targetId: string; position: FolderDropPosition } | null => {
+  // 키보드 이동도 드래그 정렬 API와 같은 targetId + before/after 계약으로 변환합니다.
+  const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
+
+  if (sourceIndex === -1) {
+    return null;
+  }
+
+  const targetIndex = direction === "up" ? sourceIndex - 1 : sourceIndex + 1;
+  const targetFolder = folders[targetIndex];
+
+  if (!targetFolder) {
+    return null;
+  }
+
+  return {
+    targetId: targetFolder.id,
+    position: direction === "up" ? "before" : "after",
+  };
+};

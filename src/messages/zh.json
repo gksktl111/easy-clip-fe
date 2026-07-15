@@ -61,6 +61,11 @@
     "trash": "回收站",
     "addFolder": "添加文件夹",
     "reorderFolder": "调整文件夹顺序",
+    "moveFolderUp": "上移",
+    "moveFolderDown": "下移",
+    "folderMovedUp": "已将 {name} 文件夹上移。",
+    "folderMovedDown": "已将 {name} 文件夹下移。",
+    "folderOrderChanged": "文件夹顺序已更新。",
     "openFolderOptions": "打开文件夹选项",
     "rename": "重命名",
     "delete": "删除",
@@ -191,6 +196,7 @@
     },
     "item": {
       "saving": "保存中",
+      "copy": "复制 {name}",
       "toggleFavorite": "切换收藏",
       "selectForDelete": "选择删除 {name}"
     },

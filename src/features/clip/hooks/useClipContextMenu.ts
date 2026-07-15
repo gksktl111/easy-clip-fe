@@ -1,13 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import type { Clip } from "@/features/clip/model/clip";
+import {
+  type ContextMenuState,
+  useContextMenu,
+} from "@/shared/hooks/useContextMenu";
 
-export interface ClipContextMenuState {
-  id: string;
-  x: number;
-  y: number;
-}
+export type ClipContextMenuState = ContextMenuState<string>;
 
 interface UseClipContextMenuOptions {
   isDisabled?: boolean;
@@ -17,50 +16,21 @@ interface UseClipContextMenuOptions {
 export const useClipContextMenu = ({
   isDisabled = false,
 }: UseClipContextMenuOptions = {}) => {
-  const [contextMenu, setContextMenu] = useState<ClipContextMenuState | null>(
-    null,
-  );
+  const contextMenu = useContextMenu<string>({
+    dataAttribute: "data-clip-menu",
+    isDisabled,
+  });
 
-  const closeContextMenu = useCallback(() => setContextMenu(null), []);
-
-  const openContextMenu = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => {
-      event.preventDefault();
-
-      if (isDisabled) {
-        return;
-      }
-
-      setContextMenu({
-        id: clip.id,
-        x: event.clientX,
-        y: event.clientY,
-      });
-    },
-    [isDisabled],
-  );
-
-  useEffect(() => {
-    if (!contextMenu) {
-      return;
-    }
-
-    const handlePointerDown = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target || target.closest("[data-clip-menu]")) {
-        return;
-      }
-
-      closeContextMenu();
-    };
-
-    window.addEventListener("pointerdown", handlePointerDown);
-    return () => window.removeEventListener("pointerdown", handlePointerDown);
-  }, [closeContextMenu, contextMenu]);
+  const openClipContextMenu = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    clip: Clip,
+  ) => {
+    contextMenu.openContextMenu(event, clip.id);
+  };
 
   return {
-    closeContextMenu,
-    contextMenu,
-    openContextMenu,
+    closeContextMenu: contextMenu.closeMenu,
+    contextMenu: contextMenu.menu,
+    openContextMenu: openClipContextMenu,
   };
 };
