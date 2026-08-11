@@ -14,6 +14,7 @@ interface ClipCollectionPageProps {
   hasNextPage?: boolean;
   isError?: boolean;
   isFetchingNextPage?: boolean;
+  isFavoriteMutationPending?: boolean;
   isLoading?: boolean;
   onCopy: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onFetchNextPage: () => void;
@@ -21,6 +22,7 @@ interface ClipCollectionPageProps {
   onRetry: () => void;
   onSearchChange: (value: string) => void;
   onToggleFavorite?: (clip: Clip) => void;
+  pendingFavoriteClipId?: string | null;
   searchQuery: string;
 }
 
@@ -31,6 +33,7 @@ export function ClipCollectionPage({
   hasNextPage,
   isError,
   isFetchingNextPage,
+  isFavoriteMutationPending,
   isLoading,
   onCopy,
   onFetchNextPage,
@@ -38,6 +41,7 @@ export function ClipCollectionPage({
   onRetry,
   onSearchChange,
   onToggleFavorite,
+  pendingFavoriteClipId,
   searchQuery,
 }: ClipCollectionPageProps) {
   const t = useTranslations("clips");
@@ -65,6 +69,8 @@ export function ClipCollectionPage({
         onRetry={onRetry}
         onCopy={onCopy}
         onToggleFavorite={onToggleFavorite}
+        isFavoriteMutationPending={isFavoriteMutationPending}
+        pendingFavoriteClipId={pendingFavoriteClipId}
       />
       <ClipCopyToast label={t("copyToast")} position={copyToastPosition} />
     </div>

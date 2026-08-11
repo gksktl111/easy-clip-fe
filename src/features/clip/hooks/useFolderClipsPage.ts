@@ -6,9 +6,9 @@ import { useClipCollectionFilter } from "@/features/clip/hooks/useClipCollection
 import { useClipContextMenu } from "@/features/clip/hooks/useClipContextMenu";
 import { useClipCopyAction } from "@/features/clip/hooks/useClipCopyAction";
 import { useClipDeletion } from "@/features/clip/hooks/useClipDeletion";
-import { useClipFavoriteAction } from "@/features/clip/hooks/useClipFavoriteAction";
 import { useFolderClipCapture } from "@/features/clip/hooks/useFolderClipCapture";
-import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
+import { useClipFavoriteMutation } from "@/features/clip/mutations/useClipFavoriteMutation";
+import { useInfiniteClipsQuery } from "@/features/clip/queries/useInfiniteClipsQuery";
 import type { Clip } from "@/features/clip/model/clip";
 
 interface UseFolderClipsPageOptions {
@@ -22,7 +22,7 @@ export const useFolderClipsPage = ({
   const params = useParams<{ id?: string }>();
   const folderId = params?.id ?? "";
   const filter = useClipCollectionFilter();
-  const query = useInfiniteClips({
+  const query = useInfiniteClipsQuery({
     folderId,
     filter: filter.activeFilter,
     searchQuery: filter.debouncedSearchQuery,
@@ -47,18 +47,24 @@ export const useFolderClipsPage = ({
     isAuthenticated: query.isAuthenticated,
     isDisabled: isInteractionDisabled,
   });
-  const favorite = useClipFavoriteAction({
+  const favorite = useClipFavoriteMutation({
     isAuthenticated: query.isAuthenticated,
-    isDisabled: isInteractionDisabled,
   });
-  const { activate, deactivate, isActive } = capture;
+  const { activate, deactivate, isActive, isCreating } = capture;
   const {
     closeContextMenu,
     contextMenu: contextMenuState,
     openContextMenu,
   } = contextMenu;
   const { copyClip: copyClipAction, copyToast } = copy;
-  const { toggleFavorite } = favorite;
+  const toggleFavorite = useCallback(
+    (clip: Clip) => {
+      if (!isInteractionDisabled) {
+        void favorite.toggleFavorite(clip);
+      }
+    },
+    [favorite, isInteractionDisabled],
+  );
   const {
     cancelDeleteMode,
     closeDeleteAllModal,
@@ -112,9 +118,10 @@ export const useFolderClipsPage = ({
     capture: {
       activatePage,
       isActive,
+      isCreating,
     },
     collection: {
-      actions: {
+      commands: {
         copyClip,
         toggleFavorite,
       },
@@ -124,6 +131,8 @@ export const useFolderClipsPage = ({
         changeSearchQuery: filter.changeSearchQuery,
         searchQuery: filter.searchQuery,
       },
+      isFavoritePending: favorite.isPending,
+      pendingFavoriteClipId: favorite.pendingClipId,
       results: {
         clips: query.clips,
         fetchNextPage: query.fetchNextPage,

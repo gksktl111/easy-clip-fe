@@ -1,11 +1,18 @@
 "use client";
 
-import { useFavoriteClipsPage } from "@/features/clip/hooks/useFavoriteClipsPage";
+import { useClipCollection } from "@/features/clip/hooks/useClipCollection";
 import { ClipCollectionPage } from "@/features/clip/ui/ClipCollectionPage";
 
 // 즐겨찾기 클립 데이터와 즐겨찾기 해제 액션을 공통 컬렉션 화면에 연결합니다.
 export function FavoriteClipsPage() {
-  const { actions, feedback, filter, results } = useFavoriteClipsPage();
+  const {
+    commands,
+    feedback,
+    filter,
+    isFavoritePending,
+    pendingFavoriteClipId,
+    results,
+  } = useClipCollection({ favorite: true, supportsFavoriteToggle: true });
 
   return (
     <ClipCollectionPage
@@ -17,7 +24,7 @@ export function FavoriteClipsPage() {
       isFetchingNextPage={results.isFetchingNextPage}
       isLoading={results.isLoading}
       onCopy={(clip, event) => {
-        void actions.copyClip(clip, {
+        void commands.copyClip(clip, {
           x: event.clientX,
           y: event.clientY,
         });
@@ -30,7 +37,9 @@ export function FavoriteClipsPage() {
         void results.refetch();
       }}
       onSearchChange={filter.changeSearchQuery}
-      onToggleFavorite={actions.toggleFavorite}
+      onToggleFavorite={commands.toggleFavorite}
+      isFavoriteMutationPending={isFavoritePending}
+      pendingFavoriteClipId={pendingFavoriteClipId}
       searchQuery={filter.searchQuery}
     />
   );

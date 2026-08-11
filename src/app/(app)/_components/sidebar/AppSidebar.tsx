@@ -8,7 +8,7 @@ import { HiOutlineClock, HiOutlineStar, HiOutlineTrash } from "react-icons/hi";
 import { AppSidebarFooter } from "@/app/(app)/_components/sidebar/AppSidebarFooter";
 import { AppSidebarHeader } from "@/app/(app)/_components/sidebar/AppSidebarHeader";
 import { AppSidebarNav } from "@/app/(app)/_components/sidebar/AppSidebarNav";
-import { invalidateClipQueries } from "@/features/clip";
+import { clipQueryKeys } from "@/features/clip";
 import { FolderSidebarContent, useFoldersQuery } from "@/features/folder";
 import { invalidateTrashQueries } from "@/features/trash";
 import { useSession } from "@/shared/session/useSession";
@@ -76,7 +76,7 @@ export function AppSidebar({
   const handleFolderDeleted = useCallback(
     (redirectPath: string | null) => {
       void Promise.all([
-        invalidateClipQueries(queryClient),
+        queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
         invalidateTrashQueries(queryClient),
       ]);
 

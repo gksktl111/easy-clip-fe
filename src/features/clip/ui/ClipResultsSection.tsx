@@ -17,10 +17,13 @@ interface ClipResultsSectionProps {
   isLoading?: boolean;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  isCreatingClip?: boolean;
+  isFavoriteMutationPending?: boolean;
   onFetchNextPage?: () => void;
   onRetry?: () => void;
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
+  pendingFavoriteClipId?: string | null;
   onContextMenu?: (
     event: React.MouseEvent<HTMLButtonElement>,
     clip: Clip,
@@ -37,10 +40,13 @@ export function ClipResultsSection({
   isLoading = false,
   hasNextPage = false,
   isFetchingNextPage = false,
+  isCreatingClip = false,
+  isFavoriteMutationPending = false,
   onFetchNextPage,
   onRetry,
   onCopy,
   onToggleFavorite,
+  pendingFavoriteClipId,
   onContextMenu,
   isDeleteMode = false,
   isInteractionDisabled = false,
@@ -78,7 +84,7 @@ export function ClipResultsSection({
     return <ClipErrorState onRetry={onRetry} />;
   }
 
-  if (!clips.length) {
+  if (!clips.length && !isCreatingClip) {
     return <EmptyState />;
   }
 
@@ -87,6 +93,8 @@ export function ClipResultsSection({
       clips={clips}
       loadMoreRef={ref}
       isFetchingNextPage={isFetchingNextPage}
+      isCreatingClip={isCreatingClip}
+      isFavoriteMutationPending={isFavoriteMutationPending}
       onCopy={onCopy}
       onToggleFavorite={onToggleFavorite}
       onContextMenu={onContextMenu}
@@ -94,6 +102,7 @@ export function ClipResultsSection({
       isInteractionDisabled={isInteractionDisabled}
       selectedClipIds={selectedClipIds}
       onToggleSelected={onToggleSelected}
+      pendingFavoriteClipId={pendingFavoriteClipId}
     />
   );
 }
