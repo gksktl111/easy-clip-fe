@@ -35,6 +35,109 @@
       }
     }
   },
+  "pricing": {
+    "hero": {
+      "eyebrow": "集中して作業する人のためのシンプルなプラン",
+      "titleLine1": "あなたの働き方に合う",
+      "titleLine2": "EasyClipプランを選びましょう。"
+    },
+    "plans": {
+      "recommended": "おすすめ",
+      "currentPlan": "現在のプラン",
+      "free": {
+        "name": "Free",
+        "badge": "個人のスタート向け",
+        "description": "基本機能と検索でクリップを整理できるシンプルなプランです。",
+        "priceSuffix": "/月",
+        "billingNote": "月額料金なしですぐに利用できます",
+        "cta": "無料で始める",
+        "features": {
+          "projects": "1つのプロジェクトを利用可能",
+          "clips": "最大50件のクリップを作成可能",
+          "devices": "デスクトップ1台、モバイル1台を連携可能",
+          "organization": "検索機能を利用可能",
+          "ai": ""
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "badge": "集中作業向け",
+        "description": "複数のプロジェクトを運用し、タグで整理したい人のためのプランです。",
+        "priceSuffix": "/月",
+        "billingNote": "月額₩3,900でPro機能を利用できます",
+        "cta": "Proにアップグレード",
+        "features": {
+          "projects": "プロジェクトを無制限に作成可能",
+          "clips": "プロジェクトごとに最大500件のクリップを作成可能",
+          "devices": "デバイスを無制限に連携可能",
+          "organization": "タグ機能を利用可能",
+          "ai": "AI機能は近日追加予定"
+        }
+      }
+    },
+    "subscription": {
+      "currentPro": "現在Proを利用中",
+      "renewalEnabled": "自動更新が有効です。",
+      "renewalDisabled": "自動更新が無効です。",
+      "renewalStopped": "自動更新を停止しました。利用終了日までPro機能を引き続き利用できます。",
+      "nextBillingAt": "次回請求日",
+      "currentPeriodEnd": "利用終了日",
+      "date": "{label}: {value}",
+      "emptyValue": "-",
+      "downgrade": "Freeに切り替える",
+      "resume": "サブスクリプションを再開",
+      "resuming": "再開中",
+      "cancelModal": {
+        "title": "Proサブスクリプションを解約しますか？",
+        "description": "確認すると自動更新が停止され、現在の請求期間が終わった後にFreeプランへ切り替わります。",
+        "dismiss": "いいえ",
+        "confirm": "はい",
+        "confirming": "変更中"
+      }
+    },
+    "comparison": {
+      "eyebrow": "クイック比較",
+      "title": "主な違いを比較",
+      "description": "主な違いを項目ごとにすぐ比較できます。",
+      "columns": {
+        "feature": "項目",
+        "free": "Free",
+        "pro": "Pro"
+      },
+      "points": {
+        "projects": {
+          "label": "プロジェクト数",
+          "freeValue": "1件",
+          "proValue": "無制限"
+        },
+        "clips": {
+          "label": "クリップ数",
+          "freeValue": "最大50件",
+          "proValue": "プロジェクトごとに最大500件"
+        },
+        "devices": {
+          "label": "デバイス連携",
+          "freeValue": "デスクトップ1台 + モバイル1台",
+          "proValue": "無制限のデバイス連携"
+        },
+        "organization": {
+          "label": "整理方法",
+          "freeValue": "検索",
+          "proValue": "検索 + タグ"
+        },
+        "ai": {
+          "label": "AI機能",
+          "freeValue": "未対応",
+          "proValue": "近日追加予定"
+        }
+      }
+    },
+    "toasts": {
+      "cancelSuccess": "Proサブスクリプションを解約しました。",
+      "resumeSuccess": "Proの自動更新を再開しました。",
+      "updateError": "サブスクリプションを変更できませんでした。しばらくしてから再試行してください。"
+    }
+  },
   "login": {
     "title": "EasyClip にログイン",
     "subtitle": "どこでもコピーして、どこでも貼り付け",

@@ -35,6 +35,109 @@
       }
     }
   },
+  "pricing": {
+    "hero": {
+      "eyebrow": "Simple plans for focused work",
+      "titleLine1": "Choose the EasyClip plan",
+      "titleLine2": "that fits how you work."
+    },
+    "plans": {
+      "recommended": "Recommended",
+      "currentPlan": "Current plan",
+      "free": {
+        "name": "Free",
+        "badge": "For getting started",
+        "description": "A simple plan for organizing clips with the essentials and fast search.",
+        "priceSuffix": "/ month",
+        "billingNote": "Start right away with no monthly fee",
+        "cta": "Start for free",
+        "features": {
+          "projects": "Use 1 project",
+          "clips": "Create up to 50 clips",
+          "devices": "Connect 1 desktop and 1 mobile device",
+          "organization": "Use search",
+          "ai": ""
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "badge": "For focused work",
+        "description": "For managing multiple projects with tag-based organization.",
+        "priceSuffix": "/ month",
+        "billingNote": "Unlock Pro features for ₩3,900 per month",
+        "cta": "Upgrade to Pro",
+        "features": {
+          "projects": "Create unlimited projects",
+          "clips": "Create up to 500 clips per project",
+          "devices": "Connect unlimited devices",
+          "organization": "Use tags",
+          "ai": "AI features coming soon"
+        }
+      }
+    },
+    "subscription": {
+      "currentPro": "You are currently on Pro",
+      "renewalEnabled": "Auto-renewal is on.",
+      "renewalDisabled": "Auto-renewal is off.",
+      "renewalStopped": "Auto-renewal has stopped. You can keep using Pro until your access ends.",
+      "nextBillingAt": "Next billing date",
+      "currentPeriodEnd": "Access ends",
+      "date": "{label}: {value}",
+      "emptyValue": "-",
+      "downgrade": "Switch to Free",
+      "resume": "Resume subscription",
+      "resuming": "Resuming",
+      "cancelModal": {
+        "title": "Cancel your Pro subscription?",
+        "description": "This stops auto-renewal. Your plan will switch to Free after the current billing period ends.",
+        "dismiss": "No",
+        "confirm": "Yes",
+        "confirming": "Updating"
+      }
+    },
+    "comparison": {
+      "eyebrow": "Quick comparison",
+      "title": "Compare the essentials",
+      "description": "Compare the main differences side by side.",
+      "columns": {
+        "feature": "Feature",
+        "free": "Free",
+        "pro": "Pro"
+      },
+      "points": {
+        "projects": {
+          "label": "Projects",
+          "freeValue": "1",
+          "proValue": "Unlimited"
+        },
+        "clips": {
+          "label": "Clips",
+          "freeValue": "Up to 50",
+          "proValue": "Up to 500 per project"
+        },
+        "devices": {
+          "label": "Devices",
+          "freeValue": "1 desktop + 1 mobile",
+          "proValue": "Unlimited devices"
+        },
+        "organization": {
+          "label": "Organization",
+          "freeValue": "Search",
+          "proValue": "Search + tags"
+        },
+        "ai": {
+          "label": "AI features",
+          "freeValue": "Not available",
+          "proValue": "Coming soon"
+        }
+      }
+    },
+    "toasts": {
+      "cancelSuccess": "Your Pro subscription has been canceled.",
+      "resumeSuccess": "Pro auto-renewal has resumed.",
+      "updateError": "We could not update your subscription. Please try again shortly."
+    }
+  },
   "login": {
     "title": "Sign in to EasyClip",
     "subtitle": "Copy anywhere, paste everywhere",

@@ -101,8 +101,8 @@
   --pricing-button-bg: #111827;
   --pricing-button-bg-hover: #1f2937;
   --pricing-button-fg: #ffffff;
-  --pricing-button-featured-bg: #ffffff;
-  --pricing-button-featured-bg-hover: #e2e8f0;
+  --pricing-button-featured-bg: #b7bec9;
+  --pricing-button-featured-bg-hover: #d5dae2;
   --pricing-button-featured-fg: #0f172a;
 }
 
@@ -195,9 +195,9 @@
   --pricing-button-bg: #6366f1;
   --pricing-button-bg-hover: #818cf8;
   --pricing-button-fg: #f8fafc;
-  --pricing-button-featured-bg: #f8fafc;
-  --pricing-button-featured-bg-hover: #e2e8f0;
-  --pricing-button-featured-fg: #111827;
+  --pricing-button-featured-bg: #c5ccd6;
+  --pricing-button-featured-bg-hover: #e1e5eb;
+  --pricing-button-featured-fg: #0f172a;
 }
 
 /* -----------------------------------------------------------------------------
