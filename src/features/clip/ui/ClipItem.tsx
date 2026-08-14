@@ -7,6 +7,7 @@ import {
   HiOutlineColorSwatch,
   HiOutlineDocumentText,
   HiOutlinePhotograph,
+  HiOutlineRefresh,
   HiOutlineStar,
   HiStar,
 } from "react-icons/hi";
@@ -22,9 +23,11 @@ interface ClipItemProps {
     clip: Clip,
   ) => void;
   isDeleteMode?: boolean;
+  isFavoriteMutationPending?: boolean;
   isInteractionDisabled?: boolean;
   isSelected?: boolean;
   onToggleSelected?: (clipId: string) => void;
+  pendingFavoriteClipId?: string | null;
 }
 
 function ClipTypeIcon({ type }: { type: Clip["type"] }) {
@@ -40,13 +43,7 @@ function ClipTypeIcon({ type }: { type: Clip["type"] }) {
   }
 }
 
-function ClipContentPreview({
-  clip,
-  isOptimistic,
-}: {
-  clip: Clip;
-  isOptimistic: boolean;
-}) {
+function ClipContentPreview({ clip }: { clip: Clip }) {
   if (clip.type === "color") {
     return (
       <span
@@ -59,28 +56,14 @@ function ClipContentPreview({
 
   if (clip.type === "image") {
     return (
-      <span
-        className="relative block h-full w-full rounded-xl bg-(--surface-muted)"
-        style={
-          isOptimistic && clip.content
-            ? {
-                backgroundImage: `url(${clip.content})`,
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "contain",
-              }
-            : undefined
-        }
-      >
-        {isOptimistic ? null : (
-          <Image
-            src={clip.content}
-            alt={clip.name}
-            fill
-            sizes="(min-width: 1200px) 18vw, (min-width: 1024px) 22vw, (min-width: 768px) 28vw, 90vw"
-            className="rounded-xl object-contain"
-          />
-        )}
+      <span className="relative block h-full w-full rounded-xl bg-(--surface-muted)">
+        <Image
+          src={clip.content}
+          alt={clip.name}
+          fill
+          sizes="(min-width: 1200px) 18vw, (min-width: 1024px) 22vw, (min-width: 768px) 28vw, 90vw"
+          className="rounded-xl object-contain"
+        />
       </span>
     );
   }
@@ -98,13 +81,17 @@ export function ClipItem({
   onToggleFavorite,
   onContextMenu,
   isDeleteMode = false,
+  isFavoriteMutationPending = false,
   isInteractionDisabled = false,
   isSelected = false,
   onToggleSelected,
+  pendingFavoriteClipId,
 }: ClipItemProps) {
   const t = useTranslations("clips.item");
-  const isOptimistic = Boolean(clip.isOptimistic);
-  const isDisabled = isOptimistic || isInteractionDisabled;
+  const isDisabled = isInteractionDisabled;
+  const isFavoritePending = pendingFavoriteClipId === clip.id;
+  const isFavoriteDisabled =
+    isDisabled || isDeleteMode || isFavoriteMutationPending;
   const primaryActionLabel = isDeleteMode
     ? t("selectForDelete", { name: clip.name })
     : t("copy", { name: clip.name });
@@ -112,7 +99,6 @@ export function ClipItem({
   return (
     <article
       className="group relative h-52 w-full overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[disabled=true]:opacity-75 data-[selected=true]:border-(--danger) data-[selected=true]:ring-2 data-[selected=true]:ring-(--danger-border)"
-      data-optimistic={isOptimistic}
       data-disabled={isDisabled}
       data-delete-mode={isDeleteMode}
       data-selected={isSelected}
@@ -141,7 +127,7 @@ export function ClipItem({
         className="flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) disabled:cursor-wait"
       >
         <span className="flex-1 overflow-hidden px-4 py-3">
-          <ClipContentPreview clip={clip} isOptimistic={isOptimistic} />
+          <ClipContentPreview clip={clip} />
         </span>
         <span className="flex items-center gap-2 border-t border-(--border) px-4 py-2.5 text-xs text-(--muted)">
           <span className="flex h-6 w-6 items-center justify-center rounded-md bg-(--icon-chip) text-(--icon-chip-text)">
@@ -173,27 +159,26 @@ export function ClipItem({
           </button>
         </div>
       ) : null}
-      {isOptimistic ? (
-        <div className="absolute inset-x-3 top-3 z-20 flex justify-start">
-          <span className="rounded-full bg-(--primary) px-2.5 py-1 text-[11px] font-semibold text-(--primary-foreground) shadow-sm">
-            {t("saving")}
-          </span>
-        </div>
-      ) : null}
       <button
         type="button"
         onClick={(event) => {
           event.stopPropagation();
-          if (!isDisabled && !isDeleteMode) {
+          if (!isFavoriteDisabled) {
             onToggleFavorite?.(clip);
           }
         }}
-        disabled={isDisabled || isDeleteMode}
+        disabled={isFavoriteDisabled}
         className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-(--favorite-btn-bg-hover) disabled:cursor-wait disabled:opacity-50"
         style={{ boxShadow: "var(--favorite-btn-shadow)" }}
         aria-label={t("toggleFavorite")}
+        aria-busy={isFavoritePending}
       >
-        {clip.isFavorite ? (
+        {isFavoritePending ? (
+          <HiOutlineRefresh
+            className="h-4 w-4 animate-spin text-(--favorite-icon-muted)"
+            aria-hidden
+          />
+        ) : clip.isFavorite ? (
           <HiStar className="h-4 w-4 text-(--warning)" aria-hidden />
         ) : (
           <HiOutlineStar

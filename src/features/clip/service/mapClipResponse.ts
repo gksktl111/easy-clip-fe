@@ -16,5 +16,4 @@ export const mapClipResponse = (clip: ClipListItemResponseDto): Clip => ({
   createdAt: new Date(clip.createdAt),
   updatedAt: new Date(clip.updatedAt),
   isFavorite: clip.likeByMe,
-  isOptimistic: clip.isOptimistic,
 });

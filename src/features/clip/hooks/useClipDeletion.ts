@@ -1,18 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import {
-  fetchClips,
-  removeClip,
-  removeClips,
-} from "@/features/clip/api/clipApi";
+import { useCallback, useMemo, useState } from "react";
+import { useClipDeletionMutation } from "@/features/clip/mutations/useClipDeletionMutation";
 import type { Clip } from "@/features/clip/model/clip";
-import {
-  cancelClipQueries,
-  invalidateClipQueries,
-  removeClipsFromCache,
-} from "@/features/clip/service/clipQueryCache";
 import { notifyError } from "@/shared/feedback/toast";
 
 interface UseClipDeletionOptions {
@@ -29,25 +19,32 @@ export const useClipDeletion = ({
   isAuthenticated,
   onDeleted,
 }: UseClipDeletionOptions) => {
-  const queryClient = useQueryClient();
+  const {
+    deleteAll: deleteAllMutation,
+    deleteClip: deleteClipMutation,
+    deleteClips: deleteClipsMutation,
+    isDeleting,
+  } = useClipDeletionMutation({
+    folderId,
+    isAuthenticated,
+    onDeleted,
+  });
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedClipIds, setSelectedClipIds] = useState<Set<string>>(
     () => new Set(),
   );
-
-  useEffect(() => {
-    const availableClipIds = new Set(clips.map((clip) => clip.id));
-
-    setSelectedClipIds((currentIds) => {
-      const nextIds = new Set(
-        [...currentIds].filter((clipId) => availableClipIds.has(clipId)),
-      );
-
-      return nextIds.size === currentIds.size ? currentIds : nextIds;
-    });
-  }, [clips]);
+  const availableClipIds = useMemo(
+    () => new Set(clips.map((clip) => clip.id)),
+    [clips],
+  );
+  const selectedAvailableClipIds = useMemo(
+    () =>
+      new Set(
+        [...selectedClipIds].filter((clipId) => availableClipIds.has(clipId)),
+      ),
+    [availableClipIds, selectedClipIds],
+  );
 
   const closeDeleteAllModal = useCallback(() => {
     if (!isDeleting) {
@@ -101,100 +98,34 @@ export const useClipDeletion = ({
         return;
       }
 
-      setIsDeleting(true);
-      await cancelClipQueries(queryClient);
-      const rollbackDeletedClip = removeClipsFromCache(queryClient, [clipId]);
-      let isDeleted = false;
-
       try {
-        await removeClip(clipId);
-        isDeleted = true;
+        await deleteClipMutation(clipId);
       } catch {
-        rollbackDeletedClip();
         notifyError("클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
-      } finally {
-        setIsDeleting(false);
-        void invalidateClipQueries(queryClient);
-        if (isDeleted) {
-          void onDeleted?.();
-        }
       }
     },
-    [isAuthenticated, isDeleting, onDeleted, queryClient],
-  );
-
-  const deleteClipsByIds = useCallback(
-    async (clipIds: string[], errorMessage: string) => {
-      if (!isAuthenticated || isDeleting) {
-        return false;
-      }
-
-      const uniqueClipIds = [...new Set(clipIds)];
-      if (uniqueClipIds.length === 0) {
-        return false;
-      }
-
-      setIsDeleting(true);
-      await cancelClipQueries(queryClient);
-      const rollbackDeletedClips = removeClipsFromCache(
-        queryClient,
-        uniqueClipIds,
-      );
-      let isDeleted = false;
-
-      try {
-        await removeClips({ clipIds: uniqueClipIds });
-        isDeleted = true;
-        return true;
-      } catch {
-        rollbackDeletedClips();
-        notifyError(errorMessage);
-        return false;
-      } finally {
-        setIsDeleting(false);
-        void invalidateClipQueries(queryClient);
-        if (isDeleted) {
-          void onDeleted?.();
-        }
-      }
-    },
-    [isAuthenticated, isDeleting, onDeleted, queryClient],
+    [deleteClipMutation, isAuthenticated, isDeleting],
   );
 
   const deleteSelected = useCallback(async () => {
-    const clipIds = [...selectedClipIds];
+    const clipIds = [...selectedAvailableClipIds];
     if (clipIds.length === 0) {
       return;
     }
 
-    const isDeleted = await deleteClipsByIds(
-      clipIds,
-      "선택한 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
-    );
+    let isDeleted = false;
+
+    try {
+      isDeleted = await deleteClipsMutation(clipIds);
+    } catch {
+      notifyError("선택한 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
 
     if (isDeleted) {
       setSelectedClipIds(new Set());
       setIsDeleteMode(false);
     }
-  }, [deleteClipsByIds, selectedClipIds]);
-
-  const fetchAllFolderClipIds = useCallback(async () => {
-    const clipIds: string[] = [];
-    let cursor: string | null = null;
-
-    do {
-      const response = await fetchClips({
-        folderId,
-        type: "ALL",
-        cursor,
-      });
-
-      clipIds.push(...response.items.map((clip) => clip.id));
-      cursor = response.hasMore ? response.nextCursor : null;
-    } while (cursor);
-
-    return clipIds;
-  }, [folderId]);
+  }, [deleteClipsMutation, selectedAvailableClipIds]);
 
   const deleteAll = useCallback(async () => {
     if (!isAuthenticated || isDeleting || !folderId) {
@@ -202,55 +133,20 @@ export const useClipDeletion = ({
     }
 
     setIsDeleteAllOpen(false);
-    setIsDeleting(true);
-    let isDeleted = false;
 
     try {
-      const clipIds = await fetchAllFolderClipIds();
+      const result = await deleteAllMutation();
 
-      if (clipIds.length === 0) {
-        setIsDeleteMode(false);
-        setSelectedClipIds(new Set());
-        return;
-      }
-
-      const uniqueClipIds = [...new Set(clipIds)];
-      await cancelClipQueries(queryClient);
-      const rollbackDeletedClips = removeClipsFromCache(
-        queryClient,
-        uniqueClipIds,
-      );
-
-      try {
-        await removeClips({ clipIds: uniqueClipIds });
-        isDeleted = true;
+      if (result === "deleted" || result === "empty") {
         setSelectedClipIds(new Set());
         setIsDeleteMode(false);
-      } catch {
-        rollbackDeletedClips();
-        notifyError(
-          "현재 폴더의 모든 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
-        );
       }
     } catch {
       notifyError(
         "현재 폴더의 모든 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
       );
-    } finally {
-      setIsDeleting(false);
-      void invalidateClipQueries(queryClient);
-      if (isDeleted) {
-        void onDeleted?.();
-      }
     }
-  }, [
-    fetchAllFolderClipIds,
-    folderId,
-    isAuthenticated,
-    isDeleting,
-    onDeleted,
-    queryClient,
-  ]);
+  }, [deleteAllMutation, folderId, isAuthenticated, isDeleting]);
 
   return {
     cancelDeleteMode,
@@ -263,8 +159,8 @@ export const useClipDeletion = ({
     isDeleteMode,
     isDeleting,
     openDeleteAllModal,
-    selectedClipCount: selectedClipIds.size,
-    selectedClipIds,
+    selectedClipCount: selectedAvailableClipIds.size,
+    selectedClipIds: selectedAvailableClipIds,
     toggleClipSelected,
   };
 };

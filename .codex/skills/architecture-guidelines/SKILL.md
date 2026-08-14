@@ -9,9 +9,11 @@ description: Easy Clip Next.js 프론트엔드의 구조, 의존성, 상태 관�
 
 1. 변경 대상과 인접 모듈을 먼저 읽고 현재 책임과 데이터 흐름을 파악한다.
 2. 라우팅, 기능 도메인, 공통 코드 중 변경이 속할 레이어를 결정한다.
-3. 기존 공개 계약과 import 방향을 유지하며 가장 좁은 범위를 수정한다.
-4. 로딩, 오류, 빈 상태, 접근성, 반응형과 다국어 영향을 확인한다.
-5. 변경 위험에 맞는 정적 검사, 빌드와 실행 검증을 수행한다.
+3. 프레임워크·라이브러리의 설계나 API를 바꾸기 전 현재 사용 버전과 공식 문서를 확인한다. `context7`을 우선 사용하고, 사용할 수 없으면 해당 프로젝트의 공식 문서만 조회한다.
+4. 공식 문서의 권장 사항, 프로젝트의 제약, 팀의 명명·폴더 규칙을 구분해 결정한다. 문서에 없는 이름·반환 형태·추상화는 라이브러리 규칙처럼 표현하지 않는다.
+5. 기존 공개 계약과 import 방향을 유지하며 가장 좁은 범위를 수정한다.
+6. 로딩, 오류, 빈 상태, 접근성, 반응형과 다국어 영향을 확인한다.
+7. 변경 위험에 맞는 정적 검사, 빌드와 실행 검증을 수행한다.
 
 ## 프로젝트 구조
 
@@ -37,10 +39,28 @@ description: Easy Clip Next.js 프론트엔드의 구조, 의존성, 상태 관�
 - `api`: HTTP 요청 함수와 transport 수준 처리를 둔다. 공통 요청 처리는 `src/shared/lib/apiClient.ts`를 사용한다.
 - `model`: 도메인 타입과 `*.dto.ts` 서버 계약을 둔다. DTO를 UI 상태 타입으로 직접 확장하지 않는다.
 - `service`: 프레임워크 의존이 적은 변환, 정책, 브라우저 서비스, 쿼리 키와 캐시 조작을 둔다.
-- `hooks`: React와 TanStack Query를 사용하는 조회, mutation, 페이지 상태와 사용자 액션을 둔다. 훅 하나가 조회·UI 상태·모든 액션을 동시에 소유하지 않게 분리한다.
+- `queries`: `useQuery`, `useInfiniteQuery` 기반의 서버 상태 조회 훅을 둔다.
+- `mutations`: `useMutation` 기반의 서버 변경 요청 훅을 둔다.
+- `hooks`: 서버 요청을 직접 수행하지 않는 UI 상태, 브라우저 이벤트와 페이지 조합 훅을 둔다.
 - `ui`: 표현과 사용자 상호작용을 둔다. API 호출 세부 사항과 복잡한 캐시 갱신을 컴포넌트에 넣지 않는다.
 - `server`: 서버 전용 초기화나 조회가 필요한 feature에서만 사용한다. 클라이언트 모듈에서 import하지 않는다.
 - `const`: 정적 표시 데이터가 큰 feature에서 사용한다. 서버 응답이나 가변 상태를 두지 않는다.
+
+## Feature hooks 설계
+
+- `queries/`는 조회 조건, feature `service`의 query key, `queryFn`, DTO에서 화면 모델로의 변환과 조회 상태만 소유한다. mutation, toast, 모달, 선택 상태, router와 브라우저 이벤트를 섞지 않는다.
+- `mutations/`는 API 요청, `pending` 상태, optimistic update, rollback, 성공 후 invalidate를 하나의 mutation 생명주기로 관리한다. 각 mutation은 갱신·제외·invalidate할 query를 이름과 타입으로 명시한다.
+- 기본 캐시 정책은 서버 요청 성공 후 관련 query invalidation이다. 즉시 반응이 필요한 경우에만 정확한 query key를 대상으로 optimistic update하며, 서버 필터를 클라이언트에서 임의로 재구현해 여러 목록에 삽입하지 않는다.
+- `hooks/`는 필터, 선택, 모달, 컨텍스트 메뉴, clipboard/paste처럼 서버 요청과 무관한 상태를 소유한다. 페이지 훅은 `queries/`와 `mutations/`을 조합하고 이벤트를 연결할 수 있지만 API, `QueryClient`, 캐시 변환을 직접 다루지 않는다.
+- `ui/`는 `queries/`, `mutations/`, `hooks/`가 제공하는 상태와 이벤트만 소비한다. `api` import, `useQueryClient`, query key와 캐시 세부 사항을 UI에 넣지 않는다.
+- query key와 반복되는 캐시 변환은 `service/*QueryCache.ts` 또는 같은 책임의 명시적 service 모듈에 단일화한다. 조회 훅, mutation 훅, 테스트가 동일한 key factory와 타입을 사용한다.
+
+## TanStack Query 공식 지침
+
+- `queries/`의 공통 조회 조건은 `queryOptions` 또는 `infiniteQueryOptions` 팩토리로 추출해 query key와 `queryFn`을 함께 둔다. `useQuery`, prefetch, 캐시 접근과 테스트는 같은 팩토리 또는 key factory를 사용한다.
+- `mutationOptions`는 같은 mutation 옵션을 `useMutation`, `useIsMutating`, `QueryClient` 등 여러 위치에서 재사용할 때만 추출한다. 한 훅 안에서만 쓰는 mutation을 형식적으로 분리하지 않는다.
+- mutation의 `onMutate`, `onError`, `onSuccess`, `onSettled` 안에서 optimistic update, rollback, 응답 기반 캐시 갱신과 query invalidation을 함께 관리한다. 캐시를 갱신할 때는 기존 데이터를 직접 변경하지 않고 불변 업데이트한다.
+- `queryOptions`와 `mutationOptions`는 TanStack Query의 공식 API이지만, `commands`, `results`, `feedback` 같은 페이지 훅 반환 이름은 프로젝트 내부 계약이다. UI 의도를 가장 분명히 드러내는 이름을 선택하고 라이브러리 권장 사항으로 오인하지 않는다.
 
 ## Shared 내부 책임
 

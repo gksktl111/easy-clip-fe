@@ -22,6 +22,7 @@ interface FilterBarProps {
   searchQuery?: string;
   onSearchChange?: (value: string) => void;
   isActive?: boolean;
+  isSaving?: boolean;
   showStatus?: boolean;
   countLabel?: string;
 }
@@ -32,10 +33,12 @@ export function FilterBar({
   searchQuery = "",
   onSearchChange,
   isActive = false,
+  isSaving = false,
   showStatus = true,
   countLabel,
 }: FilterBarProps) {
   const t = useTranslations("clips.filter");
+  const tItem = useTranslations("clips.item");
   const filters = [
     { id: "all" as const, label: t("all") },
     {
@@ -72,11 +75,21 @@ export function FilterBar({
         <div className="flex items-center gap-2 text-xs text-(--muted)">
           <span
             className={`h-2 w-2 rounded-full ${
-              isActive ? "bg-(--success)" : "bg-(--danger)"
+              isSaving
+                ? "animate-pulse bg-(--primary)"
+                : isActive
+                  ? "bg-(--success)"
+                  : "bg-(--danger)"
             }`}
             aria-hidden
           />
-          <span>{isActive ? t("readyToPaste") : t("notActive")}</span>
+          <span>
+            {isSaving
+              ? tItem("saving")
+              : isActive
+                ? t("readyToPaste")
+                : t("notActive")}
+          </span>
         </div>
       ) : null}
       {countLabel ? <Badge variant="chip">{countLabel}</Badge> : null}

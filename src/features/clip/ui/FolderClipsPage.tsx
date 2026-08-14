@@ -20,7 +20,7 @@ export function FolderClipsPage({ onClipsDeleted }: FolderClipsPageProps) {
   const t = useTranslations("clips");
   const { capture, collection, contextMenu, deletion, feedback } =
     useFolderClipsPage({ onClipsDeleted });
-  const { actions, filter, results } = collection;
+  const { commands, filter, results } = collection;
   const hasClipLoadError = results.isError && results.clips.length === 0;
 
   return (
@@ -35,6 +35,7 @@ export function FolderClipsPage({ onClipsDeleted }: FolderClipsPageProps) {
           searchQuery={filter.searchQuery}
           onSearchChange={filter.changeSearchQuery}
           isActive={capture.isActive}
+          isSaving={capture.isCreating}
           countLabel={t("count", { count: results.clips.length })}
         />
       ) : null}
@@ -47,17 +48,20 @@ export function FolderClipsPage({ onClipsDeleted }: FolderClipsPageProps) {
         isError={results.isError}
         isFetchingNextPage={results.isFetchingNextPage}
         isLoading={results.isLoading}
+        isCreatingClip={capture.isCreating}
         onFetchNextPage={() => {
           void results.fetchNextPage();
         }}
         onRetry={() => {
           void results.refetch();
         }}
-        onCopy={actions.copyClip}
-        onToggleFavorite={actions.toggleFavorite}
+        onCopy={commands.copyClip}
+        onToggleFavorite={commands.toggleFavorite}
         onContextMenu={contextMenu.open}
         isDeleteMode={deletion.isDeleteMode}
         isInteractionDisabled={deletion.isDeleting}
+        isFavoriteMutationPending={collection.isFavoritePending}
+        pendingFavoriteClipId={collection.pendingFavoriteClipId}
         selectedClipIds={deletion.selectedClipIds}
         onToggleSelected={deletion.toggleClipSelected}
       />

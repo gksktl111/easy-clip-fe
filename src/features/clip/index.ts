@@ -1,4 +1,4 @@
-export { invalidateClipQueries } from "@/features/clip/service/clipQueryCache";
+export { clipQueryKeys } from "@/features/clip/queries/clipQueryKey";
 export { FavoriteClipsPage } from "@/features/clip/ui/FavoriteClipsPage";
 export { FavoritesEntryPage } from "@/features/clip/ui/FavoritesEntryPage";
 export { FolderClipsPage } from "@/features/clip/ui/FolderClipsPage";

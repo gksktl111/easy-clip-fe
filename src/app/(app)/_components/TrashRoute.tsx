@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { invalidateClipQueries } from "@/features/clip";
+import { clipQueryKeys } from "@/features/clip";
 import { invalidateFolderQueries, useFoldersQuery } from "@/features/folder";
 import { TrashPage } from "@/features/trash";
 
@@ -15,7 +15,7 @@ export function TrashRoute() {
       activeFolders={folders}
       onItemsChanged={async () => {
         await Promise.all([
-          invalidateClipQueries(queryClient),
+          queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
           invalidateFolderQueries(queryClient),
         ]);
       }}

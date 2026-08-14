@@ -77,6 +77,11 @@ export const removeClips = (payload: DeleteClipsRequestDto) =>
     body: JSON.stringify(payload),
   });
 
+export const removeAllClipsInFolder = (folderId: string) =>
+  apiRequest<DeleteClipsResponseDto>(`/clips/all/${folderId}`, {
+    method: "DELETE",
+  });
+
 export const likeClip = (clipId: string) =>
   apiRequest<LikeClipResponseDto>(`/clips/${clipId}/likes`, {
     method: "POST",
