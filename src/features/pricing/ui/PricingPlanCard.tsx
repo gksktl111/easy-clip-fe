@@ -3,16 +3,30 @@ import { HiCheck } from "react-icons/hi";
 import type { PricingPlan } from "@/features/pricing/const/pricingContent";
 import { Badge } from "@/shared/ui/badge/Badge";
 
+export interface PricingPlanContent {
+  badge: string;
+  billingNote: string;
+  description: string;
+  features: readonly string[];
+  name: string;
+  price: string;
+  priceSuffix: string;
+}
+
 // 요금제의 가격, 기능 목록, 현재 상태와 액션을 하나의 비교 카드로 표시합니다.
 interface PricingPlanCardProps {
   action: ReactNode;
+  content: PricingPlanContent;
   plan: PricingPlan;
+  recommendedLabel: string;
   status?: ReactNode;
 }
 
 export function PricingPlanCard({
   action,
+  content,
   plan,
+  recommendedLabel,
   status,
 }: PricingPlanCardProps) {
   return (
@@ -40,10 +54,10 @@ export function PricingPlanCard({
                 : "text-(--muted)"
             }`}
           >
-            {plan.badge}
+            {content.badge}
           </p>
           <h2 className="mt-3 text-2xl font-semibold sm:text-3xl">
-            {plan.name}
+            {content.name}
           </h2>
         </div>
         {plan.highlight ? (
@@ -52,7 +66,7 @@ export function PricingPlanCard({
             size="sm"
             style={{ backgroundColor: "var(--pricing-featured-badge)" }}
           >
-            Recommended
+            {recommendedLabel}
           </Badge>
         ) : null}
       </div>
@@ -64,14 +78,14 @@ export function PricingPlanCard({
             : "text-(--muted)"
         }`}
       >
-        {plan.description}
+        {content.description}
       </p>
 
       <div className="mt-8 flex items-end gap-2">
         <span className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          {plan.price}
+          {content.price}
         </span>
-        {plan.priceSuffix ? (
+        {content.priceSuffix ? (
           <span
             className={`pb-1 text-sm ${
               plan.highlight
@@ -79,7 +93,7 @@ export function PricingPlanCard({
                 : "text-(--muted)"
             }`}
           >
-            {plan.priceSuffix}
+            {content.priceSuffix}
           </span>
         ) : null}
       </div>
@@ -91,14 +105,14 @@ export function PricingPlanCard({
             : "text-(--muted)"
         }`}
       >
-        {plan.billingNote}
+        {content.billingNote}
       </p>
 
       {action}
       {status}
 
       <ul className="mt-8 space-y-4">
-        {plan.features.map((feature) => (
+        {content.features.map((feature) => (
           <li key={feature} className="flex items-start gap-3">
             <span
               className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${

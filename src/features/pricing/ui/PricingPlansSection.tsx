@@ -1,14 +1,22 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   PRICING_PLANS,
   type PricingPlan,
 } from "@/features/pricing/const/pricingContent";
 import { PricingCancelModal } from "@/features/pricing/ui/PricingCancelModal";
-import { PricingPlanCard } from "@/features/pricing/ui/PricingPlanCard";
+import {
+  PricingPlanCard,
+  type PricingPlanContent,
+} from "@/features/pricing/ui/PricingPlanCard";
+import { PricingPlanAction } from "@/features/pricing/ui/PricingPlanAction";
+import {
+  formatPricingAmount,
+  formatSubscriptionDate,
+} from "@/features/pricing/service/pricingFormatters";
 import {
   hasRemainingCanceledProPeriod,
   isActiveProSubscription,
@@ -17,23 +25,15 @@ import {
 } from "@/features/subscription";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { ApiError } from "@/shared/lib/apiClient";
+import { DEFAULT_LOCALE, isAppLocale } from "@/shared/config/locale";
 import { useSession } from "@/shared/session/useSession";
-import { Button } from "@/shared/ui/button/Button";
-
-const formatSubscriptionDate = (value: string | null) => {
-  if (!value) {
-    return "-";
-  }
-
-  return new Intl.DateTimeFormat("ko-KR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-};
 
 // 구독 상태에 맞는 요금제 카드 액션과 취소 흐름을 조합합니다.
 export function PricingPlansSection() {
   const router = useRouter();
+  const t = useTranslations("pricing");
+  const currentLocale = useLocale();
+  const locale = isAppLocale(currentLocale) ? currentLocale : DEFAULT_LOCALE;
   const { status } = useSession();
   const { isAuthenticated, subscription } = useMySubscription();
   const { cancelSubscription, resumeSubscription, syncSubscription } =
@@ -53,11 +53,11 @@ export function PricingPlansSection() {
 
     try {
       await cancelSubscription();
-      notifySuccess("Pro 구독이 취소되었습니다.");
+      notifySuccess(t("toasts.cancelSuccess"));
       setIsCancelModalOpen(false);
       router.push("/favorites");
     } catch {
-      notifyError("구독 변경에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      notifyError(t("toasts.updateError"));
     } finally {
       setIsCancelingSubscription(false);
     }
@@ -72,18 +72,18 @@ export function PricingPlansSection() {
 
     try {
       await resumeSubscription();
-      notifySuccess("Pro 구독 자동갱신이 재개되었습니다.");
+      notifySuccess(t("toasts.resumeSuccess"));
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
         const latestSubscription = await syncSubscription().catch(() => null);
 
         if (isActiveProSubscription(latestSubscription)) {
-          notifySuccess("Pro 구독 자동갱신이 재개되었습니다.");
+          notifySuccess(t("toasts.resumeSuccess"));
           return;
         }
       }
 
-      notifyError("구독 변경에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      notifyError(t("toasts.updateError"));
     } finally {
       setIsResumingSubscription(false);
     }
@@ -100,46 +100,36 @@ export function PricingPlansSection() {
 
     if (isCurrentFreePlan || isCurrentProPlanCard) {
       return (
-        <Button
-          disabled
-          variant="secondaryMuted"
-          size="lg"
-          fullWidth
-          className="mt-8 cursor-not-allowed rounded-2xl font-semibold text-(--muted) disabled:cursor-not-allowed disabled:opacity-100"
-        >
-          현재 플랜
-        </Button>
+        <PricingPlanAction disabled kind="button">
+          {t("plans.currentPlan")}
+        </PricingPlanAction>
       );
     }
 
     if (isResumeTargetPlan) {
       return (
-        <Button
+        <PricingPlanAction
           onClick={() => {
             void handleResumeSubscription();
           }}
           disabled={isResumingSubscription}
-          variant="pricingFeatured"
-          size="lg"
-          fullWidth
-          className="mt-8 rounded-2xl font-semibold transition-[opacity,transform] duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          kind="button"
         >
-          {isResumingSubscription ? "재개 중" : "구독 재개"}
-        </Button>
+          {isResumingSubscription
+            ? t("subscription.resuming")
+            : t("subscription.resume")}
+        </PricingPlanAction>
       );
     }
 
     if (isAuthenticated && isFreePlan && isCurrentProPlan) {
       return (
-        <Button
+        <PricingPlanAction
           onClick={() => setIsCancelModalOpen(true)}
-          variant="secondaryMuted"
-          size="lg"
-          fullWidth
-          className="mt-8 rounded-2xl font-semibold"
+          kind="button"
         >
-          Free로 전환하기
-        </Button>
+          {t("subscription.downgrade")}
+        </PricingPlanAction>
       );
     }
 
@@ -149,16 +139,9 @@ export function PricingPlansSection() {
         : plan.ctaHref;
 
     return (
-      <Link
-        href={planHref}
-        className={`mt-8 inline-flex w-full cursor-pointer items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition-[background-color,opacity,transform] duration-200 hover:opacity-90 ${
-          plan.highlight
-            ? "bg-(--pricing-button-featured-bg) text-(--pricing-button-featured-fg) hover:bg-(--pricing-button-featured-bg-hover)"
-            : "bg-(--pricing-button-bg) text-(--pricing-button-fg) hover:bg-(--pricing-button-bg-hover)"
-        }`}
-      >
-        <span>{plan.ctaLabel}</span>
-      </Link>
+      <PricingPlanAction href={planHref} kind="link">
+        {t(`plans.${plan.id}.cta`)}
+      </PricingPlanAction>
     );
   };
 
@@ -169,34 +152,57 @@ export function PricingPlansSection() {
 
     const renewalLabel = isCurrentProPlan
       ? subscription?.autoRenew
-        ? "자동갱신 활성화됨"
-        : "자동갱신 비활성화됨"
-      : "자동갱신 중지됨";
-    const billingDateLabel = isCurrentProPlan ? "다음 결제일" : "이용 종료일";
+        ? t("subscription.renewalEnabled")
+        : t("subscription.renewalDisabled")
+      : t("subscription.renewalStopped");
+    const billingDateLabel = isCurrentProPlan
+      ? t("subscription.nextBillingAt")
+      : t("subscription.currentPeriodEnd");
     const billingDateValue = isCurrentProPlan
       ? subscription?.nextBillingAt
       : subscription?.currentPeriodEnd;
 
     return (
       <div className="mt-4 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white">
-        <p className="font-semibold">현재 PRO 이용 중</p>
+        <p className="font-semibold">{t("subscription.currentPro")}</p>
         <p className="mt-1 text-[var(--pricing-featured-text)]">
           {renewalLabel}
         </p>
         <p className="mt-1 text-[var(--pricing-featured-text)]">
-          {billingDateLabel}: {formatSubscriptionDate(billingDateValue ?? null)}
+          {t("subscription.date", {
+            label: billingDateLabel,
+            value: formatSubscriptionDate(
+              billingDateValue ?? null,
+              locale,
+              t("subscription.emptyValue"),
+            ),
+          })}
         </p>
       </div>
     );
   };
+
+  const getPlanContent = (plan: PricingPlan): PricingPlanContent => ({
+    badge: t(`plans.${plan.id}.badge`),
+    billingNote: t(`plans.${plan.id}.billingNote`),
+    description: t(`plans.${plan.id}.description`),
+    features: plan.featureIds.map((featureId) =>
+      t(`plans.${plan.id}.features.${featureId}`),
+    ),
+    name: t(`plans.${plan.id}.name`),
+    price: formatPricingAmount(plan.price, locale),
+    priceSuffix: t(`plans.${plan.id}.priceSuffix`),
+  });
 
   return (
     <>
       <div className="mt-10 grid gap-4 sm:mt-12 sm:gap-6 lg:mt-16 lg:grid-cols-[0.95fr_1.05fr]">
         {PRICING_PLANS.map((plan) => (
           <PricingPlanCard
-            key={plan.name}
+            key={plan.id}
+            content={getPlanContent(plan)}
             plan={plan}
+            recommendedLabel={t("plans.recommended")}
             action={renderPlanAction(plan)}
             status={renderPlanStatus(plan)}
           />
@@ -210,6 +216,11 @@ export function PricingPlansSection() {
           onConfirm={() => {
             void handleCancelSubscription();
           }}
+          cancelLabel={t("subscription.cancelModal.dismiss")}
+          confirmLabel={t("subscription.cancelModal.confirm")}
+          confirmingLabel={t("subscription.cancelModal.confirming")}
+          description={t("subscription.cancelModal.description")}
+          title={t("subscription.cancelModal.title")}
         />
       ) : null}
     </>

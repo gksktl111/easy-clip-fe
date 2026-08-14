@@ -35,6 +35,109 @@
       }
     }
   },
+  "pricing": {
+    "hero": {
+      "eyebrow": "为专注工作打造的简洁套餐",
+      "titleLine1": "选择适合你的",
+      "titleLine2": "EasyClip 套餐。"
+    },
+    "plans": {
+      "recommended": "推荐",
+      "currentPlan": "当前套餐",
+      "free": {
+        "name": "Free",
+        "badge": "适合个人起步",
+        "description": "使用基础功能和搜索整理剪贴内容的入门套餐。",
+        "priceSuffix": "/月",
+        "billingNote": "无需月费，立即开始使用",
+        "cta": "免费开始",
+        "features": {
+          "projects": "可使用 1 个项目",
+          "clips": "最多创建 50 条剪贴内容",
+          "devices": "可连接 1 台桌面设备和 1 台移动设备",
+          "organization": "可使用搜索功能",
+          "ai": ""
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "badge": "适合专注工作",
+        "description": "适合管理多个项目并使用标签整理内容的用户。",
+        "priceSuffix": "/月",
+        "billingNote": "每月 ₩3,900，解锁 Pro 功能",
+        "cta": "升级到 Pro",
+        "features": {
+          "projects": "可创建无限项目",
+          "clips": "每个项目最多创建 500 条剪贴内容",
+          "devices": "可连接无限设备",
+          "organization": "可使用标签功能",
+          "ai": "AI 功能即将推出"
+        }
+      }
+    },
+    "subscription": {
+      "currentPro": "当前正在使用 Pro",
+      "renewalEnabled": "已开启自动续订。",
+      "renewalDisabled": "已关闭自动续订。",
+      "renewalStopped": "自动续订已停止。在使用结束日期前，你仍可继续使用 Pro 功能。",
+      "nextBillingAt": "下次扣费日期",
+      "currentPeriodEnd": "使用结束日期",
+      "date": "{label}：{value}",
+      "emptyValue": "-",
+      "downgrade": "切换到 Free",
+      "resume": "恢复订阅",
+      "resuming": "正在恢复",
+      "cancelModal": {
+        "title": "要取消 Pro 订阅吗？",
+        "description": "确认后将停止自动续订，并会在当前计费周期结束后切换到 Free 套餐。",
+        "dismiss": "否",
+        "confirm": "是",
+        "confirming": "正在更新"
+      }
+    },
+    "comparison": {
+      "eyebrow": "快速比较",
+      "title": "核心功能比较",
+      "description": "按项目快速比较主要差异。",
+      "columns": {
+        "feature": "项目",
+        "free": "Free",
+        "pro": "Pro"
+      },
+      "points": {
+        "projects": {
+          "label": "项目数量",
+          "freeValue": "1 个",
+          "proValue": "无限"
+        },
+        "clips": {
+          "label": "剪贴内容数量",
+          "freeValue": "最多 50 条",
+          "proValue": "每个项目最多 500 条"
+        },
+        "devices": {
+          "label": "设备连接",
+          "freeValue": "1 台桌面设备 + 1 台移动设备",
+          "proValue": "无限设备连接"
+        },
+        "organization": {
+          "label": "整理方式",
+          "freeValue": "搜索",
+          "proValue": "搜索 + 标签"
+        },
+        "ai": {
+          "label": "AI 功能",
+          "freeValue": "暂不支持",
+          "proValue": "即将推出"
+        }
+      }
+    },
+    "toasts": {
+      "cancelSuccess": "已取消 Pro 订阅。",
+      "resumeSuccess": "已恢复 Pro 自动续订。",
+      "updateError": "无法更新订阅，请稍后重试。"
+    }
+  },
   "login": {
     "title": "登录 EasyClip",
     "subtitle": "随处复制，随处粘贴",
