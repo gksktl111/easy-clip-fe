@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  fetchClips,
+  removeAllClipsInFolder,
   removeClip,
   removeClips,
 } from "@/features/clip/api/clipApi";
@@ -24,7 +24,7 @@ export type DeleteAllClipsResult = "deleted" | "empty" | "ignored";
 
 const getUniqueClipIds = (clipIds: string[]) => [...new Set(clipIds)];
 
-// 단건·다건 삭제 요청과 완료 후 목록 갱신을 관리합니다.
+// 단건·다건·현재 폴더 전체 삭제 요청과 완료 후 목록 갱신을 관리합니다.
 export const useClipDeletionMutation = ({
   folderId,
   isAuthenticated,
@@ -46,29 +46,18 @@ export const useClipDeletionMutation = ({
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
   });
-  const fetchAllFolderClipIdsMutation = useMutation({
-    mutationFn: async () => {
-      const clipIds: string[] = [];
-      let cursor: string | null = null;
-
-      do {
-        const response = await fetchClips({
-          folderId,
-          type: "ALL",
-          cursor,
-        });
-
-        clipIds.push(...response.items.map((clip) => clip.id));
-        cursor = response.hasMore ? response.nextCursor : null;
-      } while (cursor);
-
-      return getUniqueClipIds(clipIds);
+  const deleteAllMutation = useMutation({
+    mutationFn: (targetFolderId: string) =>
+      removeAllClipsInFolder(targetFolderId),
+    onSuccess: () => {
+      void onDeleted?.();
     },
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
   });
-  const isDeleting =
-    deleteMutation.isPending || fetchAllFolderClipIdsMutation.isPending;
+  const isDeleting = deleteMutation.isPending || deleteAllMutation.isPending;
   const { mutateAsync: deleteMutateAsync } = deleteMutation;
-  const { mutateAsync: fetchAllFolderClipIds } = fetchAllFolderClipIdsMutation;
+  const { mutateAsync: deleteAllMutateAsync } = deleteAllMutation;
 
   const deleteClip = useCallback(
     async (clipId: string) => {
@@ -107,16 +96,10 @@ export const useClipDeletionMutation = ({
       return "ignored";
     }
 
-    const clipIds = await fetchAllFolderClipIds();
-    if (clipIds.length === 0) {
-      return "empty";
-    }
-
-    await deleteMutateAsync({ clipIds, kind: "multiple" });
-    return "deleted";
+    const { deletedCount } = await deleteAllMutateAsync(folderId);
+    return deletedCount > 0 ? "deleted" : "empty";
   }, [
-    deleteMutateAsync,
-    fetchAllFolderClipIds,
+    deleteAllMutateAsync,
     folderId,
     isAuthenticated,
     isDeleting,
