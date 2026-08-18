@@ -3,30 +3,16 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useTrashPage } from "@/features/trash/hooks/useTrashPage";
+import { useTrashSelection } from "@/features/trash/hooks/useTrashSelection";
 import { TrashListSection } from "@/features/trash/ui/TrashListSection";
 import { TrashPageEmptyState } from "@/features/trash/ui/TrashPageEmptyState";
 import { TrashPageHeader } from "@/features/trash/ui/TrashPageHeader";
-import type { TrashItemRow } from "@/features/trash/ui/trashRow";
+import type { TrashFolderReference } from "@/features/trash/service/trashRowMapper";
 import { ConfirmActionModal } from "@/shared/ui/overlay/ConfirmActionModal";
-
-const getClipTypeLabel = (
-  clipType: "TEXT" | "COLOR" | "IMAGE",
-  t: ReturnType<typeof useTranslations<"trash">>,
-) => {
-  if (clipType === "TEXT") {
-    return t("clipKinds.text");
-  }
-
-  if (clipType === "COLOR") {
-    return t("clipKinds.color");
-  }
-
-  return t("clipKinds.image");
-};
 
 // 휴지통 페이지의 상태에 따라 안내, 빈 상태, 리스트 섹션을 조합하는 루트 컴포넌트입니다.
 interface TrashPageProps {
-  activeFolders: Array<{ id: string; name: string }>;
+  activeFolders: TrashFolderReference[];
   onItemsChanged?: () => void | Promise<void>;
 }
 
@@ -35,61 +21,25 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
   const [deleteModal, setDeleteModal] = useState<
     "clearAll" | "selected" | null
   >(null);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<Set<string>>(
-    () => new Set(),
-  );
-  const { actions, context, results } = useTrashPage({
+  const { actions, results } = useTrashPage({
     activeFolders,
     onItemsChanged,
   });
-  const { items } = results;
-  const deletedFolderIds = new Set(
-    items
-      .filter((item) => item.itemType === "FOLDER")
-      .map((folder) => folder.id),
-  );
-  const folderNameById = new Map([
-    ...context.activeFolders.map((folder) => [folder.id, folder.name] as const),
-    ...items
-      .filter((item) => item.itemType === "FOLDER")
-      .map((folder) => [folder.id, folder.name] as const),
-  ]);
-
-  const rows: TrashItemRow[] = items
-    .filter(
-      (item) =>
-        item.itemType === "FOLDER" || !deletedFolderIds.has(item.folderId),
-    )
-    .map((item) => {
-      if (item.itemType === "FOLDER") {
-        return {
-          kind: "folder",
-          id: item.id,
-          name: item.name,
-          deletedAt: item.deletedAt,
-          typeLabel: t("folderType"),
-        };
-      }
-
-      return {
-        kind: "clip",
-        id: item.id,
-        name: item.title,
-        deletedAt: item.deletedAt,
-        typeLabel: `${t("fileType")} · ${getClipTypeLabel(item.type, t)}`,
-        clipType: item.type,
-        parentFolderName:
-          folderNameById.get(item.folderId) ?? t("unknownParentFolder"),
-      };
-    });
+  const { rows } = results;
+  const {
+    clearSelection,
+    selectedItems,
+    selectedRowKeys,
+    selectedRows,
+    toggleAllRows,
+    toggleRow,
+  } = useTrashSelection(rows);
   const isClearingAll = actions.pendingActionKey === "trash-clear-all";
   const isRestoringSelected =
     actions.pendingActionKey === "trash-restore-selected";
   const isDeletingSelected =
     actions.pendingActionKey === "trash-delete-selected";
   const isActionPending = actions.pendingActionKey !== null;
-  const rowKey = (row: TrashItemRow) => `${row.kind}-${row.id}`;
-  const selectedRows = rows.filter((row) => selectedRowKeys.has(rowKey(row)));
   const hasRows = rows.length > 0;
   const errorMessage =
     results.error === "restoreConflict"
@@ -98,65 +48,27 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
         ? t("actionError")
         : t("error");
 
-  const handleToggleRow = (row: TrashItemRow) => {
-    setSelectedRowKeys((currentKeys) => {
-      const nextKeys = new Set(currentKeys);
-      const key = rowKey(row);
-
-      if (nextKeys.has(key)) {
-        nextKeys.delete(key);
-      } else {
-        nextKeys.add(key);
-      }
-
-      return nextKeys;
-    });
-  };
-
-  const handleToggleAllRows = () => {
-    setSelectedRowKeys((currentKeys) => {
-      const areAllRowsSelected =
-        rows.length > 0 && rows.every((row) => currentKeys.has(rowKey(row)));
-
-      if (areAllRowsSelected) {
-        return new Set();
-      }
-
-      return new Set(rows.map(rowKey));
-    });
-  };
-
   const handleDeleteSelected = async () => {
-    if (selectedRows.length === 0) {
+    if (selectedItems.length === 0) {
       return;
     }
 
-    const isDeleted = await actions.deleteItems(
-      selectedRows.map((row) => ({
-        itemType: row.kind === "clip" ? "CLIP" : "FOLDER",
-        id: row.id,
-      })),
-    );
+    const isDeleted = await actions.deleteItems(selectedItems);
 
     if (isDeleted) {
-      setSelectedRowKeys(new Set());
+      clearSelection();
     }
   };
 
   const handleRestoreSelected = async () => {
-    if (selectedRows.length === 0) {
+    if (selectedItems.length === 0) {
       return;
     }
 
-    const isRestored = await actions.restoreItems(
-      selectedRows.map((row) => ({
-        itemType: row.kind === "clip" ? "CLIP" : "FOLDER",
-        id: row.id,
-      })),
-    );
+    const isRestored = await actions.restoreItems(selectedItems);
 
     if (isRestored) {
-      setSelectedRowKeys(new Set());
+      clearSelection();
     }
   };
 
@@ -204,8 +116,8 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
           onFetchNextPage={() => {
             void results.fetchNextPage();
           }}
-          onToggleRow={handleToggleRow}
-          onToggleAllRows={handleToggleAllRows}
+          onToggleRow={toggleRow}
+          onToggleAllRows={toggleAllRows}
           onRestoreFolder={(folderId) => {
             void actions.restoreFolder(folderId);
           }}

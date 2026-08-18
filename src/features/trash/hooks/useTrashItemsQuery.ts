@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchTrashItems } from "@/features/trash/api/trashApi";
 import { TRASH_QUERY_KEYS } from "@/features/trash/service/trashQueryCache";
@@ -27,6 +28,13 @@ export const useTrashItemsQuery = () => {
       lastPage.hasNextPage ? lastPage.nextCursor : undefined,
     placeholderData: (previousData) => previousData,
   });
+  const items = useMemo(
+    () =>
+      isAuthenticated
+        ? (trashItemsQuery.data?.pages.flatMap((page) => page.items) ?? [])
+        : [],
+    [isAuthenticated, trashItemsQuery.data],
+  );
 
   return {
     fetchNextPage: trashItemsQuery.fetchNextPage,
@@ -34,9 +42,7 @@ export const useTrashItemsQuery = () => {
     isError: trashItemsQuery.isError,
     isFetchingNextPage: trashItemsQuery.isFetchingNextPage,
     isLoading: isAuthenticated && trashItemsQuery.isPending,
-    items: isAuthenticated
-      ? (trashItemsQuery.data?.pages.flatMap((page) => page.items) ?? [])
-      : [],
+    items,
     refetch: trashItemsQuery.refetch,
   };
 };

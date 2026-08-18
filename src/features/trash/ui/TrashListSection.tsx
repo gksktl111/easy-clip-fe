@@ -3,8 +3,11 @@
 import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useInView } from "react-intersection-observer";
+import {
+  getTrashRowKey,
+  type TrashItemRow,
+} from "@/features/trash/model/trashRow";
 import { TrashListRow } from "@/features/trash/ui/TrashListRow";
-import type { TrashItemRow } from "@/features/trash/ui/trashRow";
 import { Checkbox } from "@/shared/ui/input/Checkbox";
 
 const SKELETON_ROWS = Array.from({ length: 6 }, (_, index) => index);
@@ -48,7 +51,7 @@ export function TrashListSection({
   });
   const allRowsSelected =
     rows.length > 0 &&
-    rows.every((row) => selectedRowKeys.has(`${row.kind}-${row.id}`));
+    rows.every((row) => selectedRowKeys.has(getTrashRowKey(row)));
 
   useEffect(() => {
     if (!inView) {
@@ -99,9 +102,9 @@ export function TrashListSection({
           ? SKELETON_ROWS.map((row) => <TrashListSkeletonRow key={row} />)
           : rows.map((row) => (
               <TrashListRow
-                key={`${row.kind}-${row.id}`}
+                key={getTrashRowKey(row)}
                 row={row}
-                isSelected={selectedRowKeys.has(`${row.kind}-${row.id}`)}
+                isSelected={selectedRowKeys.has(getTrashRowKey(row))}
                 pendingActionKey={pendingActionKey}
                 onToggleSelected={onToggleRow}
                 onRestoreFolder={onRestoreFolder}
