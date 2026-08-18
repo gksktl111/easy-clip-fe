@@ -35,9 +35,9 @@ export function PricingPlansSection() {
   const currentLocale = useLocale();
   const locale = isAppLocale(currentLocale) ? currentLocale : DEFAULT_LOCALE;
   const { status } = useSession();
-  const { isAuthenticated, subscription } = useMySubscription();
-  const { cancelSubscription, resumeSubscription, syncSubscription } =
-    useSubscriptionActions();
+  const { isAuthenticated, refetchSubscription, subscription } =
+    useMySubscription();
+  const { cancelSubscription, resumeSubscription } = useSubscriptionActions();
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isCancelingSubscription, setIsCancelingSubscription] = useState(false);
   const [isResumingSubscription, setIsResumingSubscription] = useState(false);
@@ -75,7 +75,7 @@ export function PricingPlansSection() {
       notifySuccess(t("toasts.resumeSuccess"));
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
-        const latestSubscription = await syncSubscription().catch(() => null);
+        const latestSubscription = await refetchSubscription().catch(() => null);
 
         if (isActiveProSubscription(latestSubscription)) {
           notifySuccess(t("toasts.resumeSuccess"));
