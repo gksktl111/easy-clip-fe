@@ -1,9 +1,8 @@
 import { HiOutlineRefresh } from "react-icons/hi";
+import type { BillingStep } from "@/features/subscription/model/billing";
 import { BillingUnlockedFeatureList } from "@/features/subscription/ui/BillingUnlockedFeatureList";
 import { Badge } from "@/shared/ui/badge/Badge";
 import { Button } from "@/shared/ui/button/Button";
-
-export type BillingStep = "idle" | "loading" | "redirecting" | "error";
 
 // Pro 요금, 제공 기능과 결제 시작 상태를 하나의 카드로 표시합니다.
 interface BillingCheckoutCardProps {

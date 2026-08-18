@@ -1,4 +1,4 @@
-import { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
+import type { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 
 export const isActiveProSubscription = (
   subscription: MySubscriptionResponseDto | null,
