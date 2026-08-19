@@ -1,11 +1,17 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useTrashActions } from "@/features/trash/hooks/useTrashActions";
 import { useTrashItemsQuery } from "@/features/trash/hooks/useTrashItemsQuery";
+import type { TrashFolderReference } from "@/features/trash/service/trashRowMapper";
+import {
+  createTrashFolderNameById,
+  mapTrashItemsToRows,
+} from "@/features/trash/service/trashRowMapper";
 
 interface UseTrashPageOptions {
-  activeFolders: Array<{ id: string; name: string }>;
+  activeFolders: TrashFolderReference[];
   onItemsChanged?: () => void | Promise<void>;
 }
 
@@ -14,10 +20,36 @@ export const useTrashPage = ({
   activeFolders,
   onItemsChanged,
 }: UseTrashPageOptions) => {
+  const t = useTranslations("trash");
   const query = useTrashItemsQuery();
   const trashActions = useTrashActions({ onItemsChanged });
   const { refetch } = query;
   const { clearError, error: actionError, ...actions } = trashActions;
+  const labels = useMemo(
+    () => ({
+      folderType: t("folderType"),
+      fileType: t("fileType"),
+      unknownParentFolder: t("unknownParentFolder"),
+      clipTypes: {
+        TEXT: t("clipKinds.text"),
+        COLOR: t("clipKinds.color"),
+        IMAGE: t("clipKinds.image"),
+      },
+    }),
+    [t],
+  );
+  const folderNameById = useMemo(
+    () => createTrashFolderNameById(activeFolders, query.items),
+    [activeFolders, query.items],
+  );
+  const rows = useMemo(
+    () =>
+      mapTrashItemsToRows(query.items, {
+        folderNameById,
+        labels,
+      }),
+    [folderNameById, labels, query.items],
+  );
 
   const reload = useCallback(async () => {
     clearError();
@@ -29,16 +61,13 @@ export const useTrashPage = ({
       ...actions,
       reload,
     },
-    context: {
-      activeFolders,
-    },
     results: {
       error: actionError ?? (query.isError ? "load" : null),
       fetchNextPage: query.fetchNextPage,
       hasNextPage: query.hasNextPage,
       isFetchingNextPage: query.isFetchingNextPage,
       isLoading: query.isLoading,
-      items: query.items,
+      rows,
     },
   };
 };

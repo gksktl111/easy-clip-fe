@@ -9,8 +9,8 @@ import {
 } from "react-icons/hi";
 import {
   formatDeletedAt,
-  type TrashItemRow,
 } from "@/features/trash/ui/trashRow";
+import type { TrashItemRow } from "@/features/trash/model/trashRow";
 import { Badge } from "@/shared/ui/badge/Badge";
 import { Button } from "@/shared/ui/button/Button";
 import { Checkbox } from "@/shared/ui/input/Checkbox";
