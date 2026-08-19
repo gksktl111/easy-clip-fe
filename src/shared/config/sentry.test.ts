@@ -22,8 +22,8 @@ describe("Sentry 설정", () => {
     ).toBe(false);
   });
 
-  it("환경별로 낮은 Performance Trace 표본 비율을 사용한다", () => {
-    expect(getSentryTraceSampleRate("preview")).toBe(0.2);
+  it("Preview 검증 기간에는 모든 Performance Trace를 수집한다", () => {
+    expect(getSentryTraceSampleRate("preview")).toBe(1);
     expect(getSentryTraceSampleRate("production")).toBe(0.1);
     expect(getSentryTraceSampleRate(undefined)).toBe(0);
   });

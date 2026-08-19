@@ -329,5 +329,20 @@
       "label": "剪贴名称",
       "placeholder": "例如：剪贴"
     }
+  },
+  "sentryExample": {
+    "eyebrow": "仅限 Preview 的验证",
+    "title": "确认 Sentry 错误与性能数据发送",
+    "description": "通过应用代码而不是浏览器控制台验证 Sentry 事件发送。",
+    "clientTitle": "客户端错误",
+    "clientDescription": "浏览器 SDK 会发送一个预期的错误事件。",
+    "clientButton": "发送客户端错误",
+    "serverTitle": "服务器错误",
+    "serverDescription": "Preview 服务器会发送错误事件，并有意返回 HTTP 500。",
+    "serverButton": "发送服务器错误",
+    "sending": "正在发送...",
+    "sent": "发送请求已完成。请在 Sentry 中查看 Issue。",
+    "failed": "无法确认发送状态。请检查 Preview 环境变量和网络请求。",
+    "notice": "这是仅限 Preview 的临时验证工具，确认后应将其移除。"
   }
 }

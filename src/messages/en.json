@@ -329,5 +329,20 @@
       "label": "Clip name",
       "placeholder": "e.g. Clip"
     }
+  },
+  "sentryExample": {
+    "eyebrow": "Preview-only verification",
+    "title": "Verify Sentry error and performance delivery",
+    "description": "Verify Sentry delivery from application code instead of the browser console.",
+    "clientTitle": "Client error",
+    "clientDescription": "The browser SDK sends an intentional error event.",
+    "clientButton": "Send client error",
+    "serverTitle": "Server error",
+    "serverDescription": "The Preview server sends an error event and intentionally returns HTTP 500.",
+    "serverButton": "Send server error",
+    "sending": "Sending...",
+    "sent": "The send request completed. Check the Issue in Sentry.",
+    "failed": "The delivery status could not be confirmed. Check Preview environment variables and network requests.",
+    "notice": "This is a temporary Preview-only verification tool and should be removed after confirmation."
   }
 }

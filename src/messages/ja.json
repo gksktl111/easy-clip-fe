@@ -329,5 +329,20 @@
       "label": "クリップ名",
       "placeholder": "例: クリップ"
     }
+  },
+  "sentryExample": {
+    "eyebrow": "Preview 専用の検証",
+    "title": "Sentry のエラーとパフォーマンス送信を確認",
+    "description": "ブラウザーコンソールではなく、アプリケーションコードで Sentry イベント送信を検証します。",
+    "clientTitle": "クライアントエラー",
+    "clientDescription": "ブラウザー SDK が意図的なエラーイベントを送信します。",
+    "clientButton": "クライアントエラーを送信",
+    "serverTitle": "サーバーエラー",
+    "serverDescription": "Preview サーバーがエラーイベントを送信し、意図的に HTTP 500 を返します。",
+    "serverButton": "サーバーエラーを送信",
+    "sending": "送信中...",
+    "sent": "送信リクエストが完了しました。Sentry で Issue を確認してください。",
+    "failed": "送信状態を確認できませんでした。Preview 環境変数とネットワークリクエストを確認してください。",
+    "notice": "このパスは Preview 専用の一時的な検証ツールであり、確認後に削除する必要があります。"
   }
 }

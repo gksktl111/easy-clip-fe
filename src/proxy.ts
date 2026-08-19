@@ -5,6 +5,10 @@ const MAIN_APP_PATH = "/favorites";
 const LOGIN_PATH = "/login";
 
 const PUBLIC_PATHS = new Set(["/", LOGIN_PATH, "/pricing"]);
+const SENTRY_PREVIEW_PATHS = new Set([
+  "/sentry-example-page",
+  "/api/sentry-example-api",
+]);
 const AUTH_REDIRECT_PATHS = new Set(["/"]);
 
 const hasAuthCookie = (request: NextRequest) =>
@@ -20,7 +24,10 @@ const redirectTo = (request: NextRequest, path: string) => {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicPath = PUBLIC_PATHS.has(pathname);
+  const isSentryPreviewPath =
+    process.env.VERCEL_ENV === "preview" &&
+    SENTRY_PREVIEW_PATHS.has(pathname);
+  const isPublicPath = PUBLIC_PATHS.has(pathname) || isSentryPreviewPath;
   const hasAuthenticationCookie = hasAuthCookie(request);
 
   if (hasAuthenticationCookie && AUTH_REDIRECT_PATHS.has(pathname)) {

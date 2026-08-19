@@ -59,7 +59,7 @@ export const getSentryTraceSampleRate = (
   environment: SentryEnvironment | undefined,
 ) => {
   if (environment === "preview") {
-    return 0.2;
+    return 1;
   }
 
   if (environment === "production") {

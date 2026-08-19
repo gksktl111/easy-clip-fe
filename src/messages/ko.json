@@ -329,5 +329,20 @@
       "label": "클립 이름",
       "placeholder": "예: 클립"
     }
+  },
+  "sentryExample": {
+    "eyebrow": "Preview 전용 검증",
+    "title": "Sentry 오류 및 성능 전송 확인",
+    "description": "콘솔 입력이 아닌 애플리케이션 코드로 Sentry 이벤트 전송을 검증합니다.",
+    "clientTitle": "클라이언트 오류",
+    "clientDescription": "브라우저 SDK가 의도적인 오류 이벤트를 전송합니다.",
+    "clientButton": "클라이언트 오류 전송",
+    "serverTitle": "서버 오류",
+    "serverDescription": "Preview 서버가 오류 이벤트를 전송하고 의도적으로 500 응답을 반환합니다.",
+    "serverButton": "서버 오류 전송",
+    "sending": "전송 중...",
+    "sent": "전송 요청이 완료되었습니다. Sentry에서 Issue를 확인하세요.",
+    "failed": "전송 상태를 확인하지 못했습니다. Preview 환경변수와 네트워크 요청을 확인하세요.",
+    "notice": "이 경로는 Preview에서만 제공하는 임시 검증 도구이며, 확인 후 제거해야 합니다."
   }
 }
