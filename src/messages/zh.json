@@ -156,7 +156,8 @@
   "authGuard": {
     "loading": "正在验证身份信息。",
     "error": "无法验证身份信息，请稍后重试。",
-    "retry": "重试"
+    "retry": "重试",
+    "backHome": "前往首页"
   },
   "sidebar": {
     "favorites": "收藏",

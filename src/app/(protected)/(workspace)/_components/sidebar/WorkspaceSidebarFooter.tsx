@@ -8,7 +8,7 @@ import {
   HiOutlineCreditCard,
   HiOutlineLogout,
 } from "react-icons/hi";
-import { useSession } from "@/shared/session/useSession";
+import { useAuth } from "@/shared/auth/useAuth";
 import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
 interface WorkspaceSidebarFooterProps {
@@ -23,7 +23,7 @@ export function WorkspaceSidebarFooter({
   onUpgradePlan,
 }: WorkspaceSidebarFooterProps) {
   const t = useTranslations("sidebar");
-  const { logout, user } = useSession();
+  const { logout, user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const userLabel = user?.email ?? user?.displayName ?? t("guest");

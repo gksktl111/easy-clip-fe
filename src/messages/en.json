@@ -156,7 +156,8 @@
   "authGuard": {
     "loading": "Checking your session.",
     "error": "We could not verify your session. Please try again shortly.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "backHome": "Go to home"
   },
   "sidebar": {
     "favorites": "Favorites",

@@ -18,13 +18,13 @@ import {
   sortFolders,
 } from "@/features/folder/service/folderCollection";
 import { getFolderQueryKey } from "@/features/folder/service/folderQueryCache";
-import { useSession } from "@/shared/session/useSession";
+import { useAuth } from "@/shared/auth/useAuth";
 
 const createAuthRequiredError = () => new Error("AUTH_REQUIRED");
 
 // 폴더 생성, 이름 변경, 삭제와 optimistic 순서 변경 액션을 관리합니다.
 export const useFolderActions = () => {
-  const { user } = useSession();
+  const { user } = useAuth();
   const isAuthenticated = Boolean(user);
   const queryClient = useQueryClient();
   const folderQueryKey = useMemo(

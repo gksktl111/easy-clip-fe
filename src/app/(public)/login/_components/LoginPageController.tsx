@@ -6,16 +6,16 @@ import { useRouter } from "next/navigation";
 import {
   getAuthStartPath,
   LoginPage,
-  type AuthProvider as AuthProviderName,
+  type OAuthProvider,
 } from "@/features/auth";
 import { buildApiUrl } from "@/shared/config/env";
-import { useSession } from "@/shared/session/useSession";
+import { useAuth } from "@/shared/auth/useAuth";
 
 // 전역 인증 상태에 따른 redirect와 OAuth 이동을 조정하고 표시 상태만 UI에 전달합니다.
 export function LoginPageController() {
   const t = useTranslations("login");
   const router = useRouter();
-  const { status } = useSession();
+  const { status } = useAuth();
   const [isLoginPending, setIsLoginPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -25,7 +25,7 @@ export function LoginPageController() {
     }
   }, [router, status]);
 
-  const handleLogin = (provider: AuthProviderName) => {
+  const handleLogin = (provider: OAuthProvider) => {
     try {
       setErrorMessage(null);
       setIsLoginPending(true);

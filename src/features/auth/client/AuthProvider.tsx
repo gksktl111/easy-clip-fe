@@ -3,20 +3,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  logout as requestLogout,
-  restoreSessionFromRefreshCookie,
-} from "@/features/auth";
+import { logout as requestLogout } from "@/features/auth/api/authApi";
+import { AuthContext, type AuthContextValue } from "@/shared/auth/AuthContext";
+import type { AuthSession, AuthStatus } from "@/shared/auth/authSession";
+import { restoreSessionFromRefreshCookie } from "@/features/auth/service/authService";
 import { notifyError } from "@/shared/feedback/toast";
 import { ApiError, subscribeToAuthExpired } from "@/shared/lib/apiClient";
-import type { SessionStatus, UserSession } from "@/shared/session/session";
-import {
-  SessionContext,
-  type SessionContextValue,
-} from "@/shared/session/sessionContext";
 
-// 앱 전체에서 하나의 사용자 세션 복구 상태와 만료·로그아웃 생명주기를 관리합니다.
-export function SessionProvider({
+// 앱 전체에서 하나의 사용자 인증 상태와 만료·로그아웃 생명주기를 관리합니다.
+export function AuthProvider({
   children,
   shouldRestoreSession,
 }: {
@@ -25,13 +20,13 @@ export function SessionProvider({
 }) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [session, setSession] = useState<UserSession | null>(null);
-  const [status, setStatus] = useState<SessionStatus>(() =>
+  const [session, setSession] = useState<AuthSession | null>(null);
+  const [status, setStatus] = useState<AuthStatus>(() =>
     shouldRestoreSession ? "idle" : "unauthenticated",
   );
   const [error, setError] = useState<Error | null>(null);
   // 동시에 들어오는 세션 복구 요청은 하나의 /users/me 요청으로 합칩니다.
-  const restorePromiseRef = useRef<Promise<UserSession | null> | null>(null);
+  const restorePromiseRef = useRef<Promise<AuthSession | null> | null>(null);
 
   // 인증 정보가 사라질 때 사용자별 서버 상태를 담은 Query cache도 폐기합니다.
   const clearClientSession = useCallback(() => {
@@ -105,7 +100,7 @@ export function SessionProvider({
   }, [clearClientSession, router]);
 
   useEffect(() => {
-    // 최상위 Provider가 쿠키 기반 세션 복구를 한 번만 시작합니다.
+    // 최상위 AuthProvider가 쿠키 기반 세션 복구를 한 번만 시작합니다.
     if (status === "idle") {
       void restoreSession();
     }
@@ -120,7 +115,7 @@ export function SessionProvider({
     [clearClientSession],
   );
 
-  const value = useMemo<SessionContextValue>(
+  const value = useMemo<AuthContextValue>(
     () => ({
       status,
       user: session?.user ?? null,
@@ -131,7 +126,5 @@ export function SessionProvider({
     [error, logout, restoreSession, session?.user, status],
   );
 
-  return (
-    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

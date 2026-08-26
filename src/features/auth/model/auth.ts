@@ -1,1 +1,1 @@
-export type AuthProvider = "google" | "github";
+export type OAuthProvider = "google" | "github";

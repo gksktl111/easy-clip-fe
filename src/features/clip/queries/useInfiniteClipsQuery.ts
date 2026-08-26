@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import type { Clip, ClipFilter } from "@/features/clip/model/clip";
 import { clipInfiniteQueryOptions } from "@/features/clip/queries/clipInfiniteQueryOptions";
 import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
-import { useSession } from "@/shared/session/useSession";
+import { useAuth } from "@/shared/auth/useAuth";
 
 interface UseInfiniteClipsQueryOptions {
   folderId?: string;
@@ -25,7 +25,7 @@ export const useInfiniteClipsQuery = ({
   searchQuery = "",
   enabled = true,
 }: UseInfiniteClipsQueryOptions) => {
-  const { user } = useSession();
+  const { user } = useAuth();
   const isAuthenticated = Boolean(user);
   const isQueryEnabled = isAuthenticated && enabled;
   const query = useInfiniteQuery(

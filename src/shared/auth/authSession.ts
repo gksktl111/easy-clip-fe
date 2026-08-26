@@ -5,11 +5,11 @@ export interface CurrentUser {
   email: string | null;
 }
 
-export interface UserSession {
+export interface AuthSession {
   user: CurrentUser | null;
 }
 
-export type SessionStatus =
+export type AuthStatus =
   | "idle"
   | "initializing"
   | "authenticated"

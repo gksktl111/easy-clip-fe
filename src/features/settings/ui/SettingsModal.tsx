@@ -8,10 +8,10 @@ import { SettingsAboutSection } from "@/features/settings/ui/SettingsAboutSectio
 import { SettingsPreferencesSection } from "@/features/settings/ui/SettingsPreferencesSection";
 import { useMySubscription } from "@/features/subscription";
 import type { AppLocale } from "@/shared/config/locale";
+import { useAuth } from "@/shared/auth/useAuth";
 import { useSettingsStore } from "@/shared/store/settingsStore";
 import { Button } from "@/shared/ui/button/Button";
 import { Modal } from "@/shared/ui/overlay/Modal";
-import { useSession } from "@/shared/session/useSession";
 
 // 사용자 설정 저장 상태를 관리하고 환경 설정과 구독 정보 섹션을 조합합니다.
 interface SettingsModalProps {
@@ -20,7 +20,7 @@ interface SettingsModalProps {
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
   const t = useTranslations("settings");
-  const { user } = useSession();
+  const { user } = useAuth();
   const subscriptionQuery = useMySubscription();
   const { theme, language, setLanguage, setTheme } = useSettingsStore();
   const [savingField, setSavingField] = useState<"theme" | "language" | null>(

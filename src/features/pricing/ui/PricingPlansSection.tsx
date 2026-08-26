@@ -24,9 +24,9 @@ import {
   useSubscriptionActions,
 } from "@/features/subscription";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
+import { useAuth } from "@/shared/auth/useAuth";
 import { ApiError } from "@/shared/lib/apiClient";
 import { DEFAULT_LOCALE, isAppLocale } from "@/shared/config/locale";
-import { useSession } from "@/shared/session/useSession";
 
 // 구독 상태에 맞는 요금제 카드 액션과 취소 흐름을 조합합니다.
 export function PricingPlansSection() {
@@ -34,7 +34,7 @@ export function PricingPlansSection() {
   const t = useTranslations("pricing");
   const currentLocale = useLocale();
   const locale = isAppLocale(currentLocale) ? currentLocale : DEFAULT_LOCALE;
-  const { status } = useSession();
+  const { status } = useAuth();
   const { isAuthenticated, refetchSubscription, subscription } =
     useMySubscription();
   const { cancelSubscription, resumeSubscription } = useSubscriptionActions();
@@ -75,7 +75,9 @@ export function PricingPlansSection() {
       notifySuccess(t("toasts.resumeSuccess"));
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
-        const latestSubscription = await refetchSubscription().catch(() => null);
+        const latestSubscription = await refetchSubscription().catch(
+          () => null,
+        );
 
         if (isActiveProSubscription(latestSubscription)) {
           notifySuccess(t("toasts.resumeSuccess"));

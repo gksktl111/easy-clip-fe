@@ -156,7 +156,8 @@
   "authGuard": {
     "loading": "認証情報を確認しています。",
     "error": "認証情報を確認できませんでした。しばらくしてから再試行してください。",
-    "retry": "再試行"
+    "retry": "再試行",
+    "backHome": "ホームへ移動"
   },
   "sidebar": {
     "favorites": "お気に入り",

@@ -13,8 +13,8 @@ import {
 } from "@/features/trash/api/trashApi";
 import type { TrashItemMutationDto } from "@/features/trash/model/trash.dto";
 import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
+import { useAuth } from "@/shared/auth/useAuth";
 import { ApiError } from "@/shared/lib/apiClient";
-import { useSession } from "@/shared/session/useSession";
 
 export type TrashActionError = "action" | "restoreConflict";
 
@@ -26,7 +26,7 @@ interface UseTrashActionsOptions {
 export const useTrashActions = ({
   onItemsChanged,
 }: UseTrashActionsOptions = {}) => {
-  const { user } = useSession();
+  const { user } = useAuth();
   const isAuthenticated = Boolean(user);
   const queryClient = useQueryClient();
   const [error, setError] = useState<TrashActionError | null>(null);

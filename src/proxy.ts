@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_COOKIE_NAMES } from "@/features/auth";
+import { AUTH_COOKIE_NAMES } from "@/features/auth/model/authCookie";
 
 const MAIN_APP_PATH = "/favorites";
 const LOGIN_PATH = "/login";

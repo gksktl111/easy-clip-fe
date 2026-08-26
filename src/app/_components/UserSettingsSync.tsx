@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { syncUserSettings } from "@/features/settings";
 import { notifyError } from "@/shared/feedback/toast";
+import { useAuth } from "@/shared/auth/useAuth";
 import { ApiError } from "@/shared/lib/apiClient";
-import { useSession } from "@/shared/session/useSession";
 
 interface UserSettingsSyncProps {
   enabled: boolean;
@@ -23,7 +23,7 @@ const isRetryableSettingsError = (error: unknown) => {
 // 서버 Settings 초기화가 실패한 경우에만 인증 복구 뒤 설정을 보완합니다.
 export function UserSettingsSync({ enabled }: UserSettingsSyncProps) {
   const t = useTranslations("settings");
-  const { status, user } = useSession();
+  const { status, user } = useAuth();
   const notifiedErrorRef = useRef<unknown>(null);
   const shouldSync = enabled && status === "authenticated" && Boolean(user);
   const settingsQuery = useQuery({

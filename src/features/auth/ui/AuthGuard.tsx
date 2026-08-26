@@ -3,15 +3,15 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { HiOutlineRefresh } from "react-icons/hi";
-import { useSession } from "@/shared/session/useSession";
+import { HiOutlineHome, HiOutlineRefresh } from "react-icons/hi";
+import { useAuth } from "@/shared/auth/useAuth";
 import { Button } from "@/shared/ui/button/Button";
 
 // 인증이 필요한 경로에서 검증 결과에 따라 렌더링, redirect와 재시도를 결정합니다.
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const t = useTranslations("authGuard");
   const router = useRouter();
-  const { status, restoreSession } = useSession();
+  const { status, restoreSession } = useAuth();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -39,6 +39,15 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           >
             <HiOutlineRefresh className="h-4 w-4" aria-hidden />
             {t("retry")}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="mt-2"
+            onClick={() => router.push("/")}
+          >
+            <HiOutlineHome className="h-4 w-4" aria-hidden />
+            {t("backHome")}
           </Button>
         </div>
       </main>
