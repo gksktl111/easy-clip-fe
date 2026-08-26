@@ -28,7 +28,13 @@ export function WorkspaceSidebar({
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { folders, isLoading: isFoldersLoading } = useFoldersQuery();
+  const {
+    folders,
+    isError: isFoldersError,
+    isLoading: isFoldersLoading,
+    isRetrying: isFoldersRetrying,
+    refetch: refetchFolders,
+  } = useFoldersQuery();
 
   const topNavs = [
     {
@@ -90,9 +96,14 @@ export function WorkspaceSidebar({
             <FolderSidebarContent
               folders={folders}
               isLoading={isFoldersLoading}
+              isError={isFoldersError}
+              isRetrying={isFoldersRetrying}
               pathname={pathname}
               activeFolderId={params.id ?? null}
               onNavigate={closeMobile}
+              onRetry={() => {
+                void refetchFolders();
+              }}
               onFolderDeleted={handleFolderDeleted}
             />
           </div>

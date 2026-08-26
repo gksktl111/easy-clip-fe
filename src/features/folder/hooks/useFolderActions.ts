@@ -40,74 +40,82 @@ export const useFolderActions = () => {
     [folderQueryKey, queryClient],
   );
 
-  const { mutateAsync: createFolder } = useMutation({
-    mutationFn: async (name: string) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: createFolder, isPending: isCreatingFolder } =
+    useMutation({
+      mutationFn: async (name: string) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      return createFolderRequest({ name });
-    },
-    onSuccess: (createdFolder) => {
-      setFolders((folders) =>
-        sortFolders([...folders, mapFolder(createdFolder)]),
-      );
-    },
-  });
+        return createFolderRequest({ name });
+      },
+      onSuccess: (createdFolder) => {
+        setFolders((folders) =>
+          sortFolders([...folders, mapFolder(createdFolder)]),
+        );
+      },
+    });
 
-  const { mutateAsync: renameFolderMutation } = useMutation({
-    mutationFn: async ({
-      folderId,
-      name,
-    }: {
-      folderId: string;
-      name: string;
-    }) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: renameFolderMutation, isPending: isRenamingFolder } =
+    useMutation({
+      mutationFn: async ({
+        folderId,
+        name,
+      }: {
+        folderId: string;
+        name: string;
+      }) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      return updateFolderRequest(folderId, { name });
-    },
-    onSuccess: (updatedFolder) => {
-      setFolders((folders) =>
-        sortFolders(
-          folders.map((folder) =>
-            folder.id === updatedFolder.id ? mapFolder(updatedFolder) : folder,
+        return updateFolderRequest(folderId, { name });
+      },
+      onSuccess: (updatedFolder) => {
+        setFolders((folders) =>
+          sortFolders(
+            folders.map((folder) =>
+              folder.id === updatedFolder.id
+                ? mapFolder(updatedFolder)
+                : folder,
+            ),
           ),
-        ),
-      );
-    },
-  });
+        );
+      },
+    });
 
-  const { mutateAsync: removeFolder } = useMutation({
-    mutationFn: async (folderId: string) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: removeFolder, isPending: isRemovingFolder } =
+    useMutation({
+      mutationFn: async (folderId: string) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      await deleteFolderRequest(folderId);
-      return folderId;
-    },
-    onSuccess: (folderId) => {
-      setFolders((folders) =>
-        folders.filter((folder) => folder.id !== folderId),
-      );
-    },
-  });
+        await deleteFolderRequest(folderId);
+        return folderId;
+      },
+      onSuccess: (folderId) => {
+        setFolders((folders) =>
+          folders.filter((folder) => folder.id !== folderId),
+        );
+      },
+    });
 
-  const { mutateAsync: reorderFolder } = useMutation({
-    mutationFn: async (payload: Parameters<typeof reorderFolderRequest>[0]) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: reorderFolder, isPending: isReorderingFolder } =
+    useMutation({
+      mutationFn: async (
+        payload: Parameters<typeof reorderFolderRequest>[0],
+      ) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      return reorderFolderRequest(payload);
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: folderQueryKey });
-    },
-  });
+        return reorderFolderRequest(payload);
+      },
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: folderQueryKey });
+      },
+    });
 
   const renameFolder = useCallback(
     (folderId: string, name: string) =>
@@ -158,6 +166,10 @@ export const useFolderActions = () => {
 
   return {
     createFolder,
+    isCreatingFolder,
+    isRemovingFolder,
+    isRenamingFolder,
+    isReorderingFolder,
     removeFolder,
     renameFolder,
     saveFolderOrder,

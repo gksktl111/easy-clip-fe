@@ -11,14 +11,18 @@ import { getFolderKeyboardMoveTarget } from "@/features/folder/service/folderCol
 import { getFolderPath } from "@/features/folder/service/folderRoute";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
 import { FolderSidebarSection } from "@/features/folder/ui/FolderSidebarSection";
+import { notifyError } from "@/shared/feedback/toast";
 import { useContextMenu } from "@/shared/hooks/useContextMenu";
 
 interface FolderSidebarContentProps {
   activeFolderId: string | null;
   folders: FolderItem[];
+  isError?: boolean;
   isLoading?: boolean;
+  isRetrying?: boolean;
   pathname: string;
   onNavigate?: () => void;
+  onRetry?: () => void;
   onFolderDeleted: (redirectPath: string | null) => void;
 }
 
@@ -39,14 +43,25 @@ const FOLDER_OPTIONS_MENU_WIDTH = 192;
 export function FolderSidebarContent({
   activeFolderId,
   folders,
+  isError = false,
   isLoading = false,
+  isRetrying = false,
   pathname,
   onNavigate,
+  onRetry,
   onFolderDeleted,
 }: FolderSidebarContentProps) {
   const t = useTranslations("sidebar");
-  const { createFolder, removeFolder, renameFolder, saveFolderOrder } =
-    useFolderActions();
+  const {
+    createFolder,
+    isCreatingFolder,
+    isRemovingFolder,
+    isRenamingFolder,
+    isReorderingFolder,
+    removeFolder,
+    renameFolder,
+    saveFolderOrder,
+  } = useFolderActions();
   const [folderNameModal, setFolderNameModal] =
     useState<FolderNameModalState | null>(null);
   const folderOptionsMenu = useContextMenu<string>({
@@ -58,6 +73,13 @@ export function FolderSidebarContent({
   const [folderOrderStatus, setFolderOrderStatus] = useState("");
   const folderNameInputRef = useRef<HTMLInputElement>(null);
   const folderNameModalMode = folderNameModal?.mode ?? null;
+  const isFolderNameSubmitting =
+    folderNameModal?.mode === "create"
+      ? isCreatingFolder
+      : folderNameModal?.mode === "rename"
+        ? isRenamingFolder
+        : false;
+
   useEffect(() => {
     if (folderNameModalMode && folderNameInputRef.current) {
       folderNameInputRef.current.focus();
@@ -79,9 +101,7 @@ export function FolderSidebarContent({
     }
 
     const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
-    const hoveredIndex = folders.findIndex(
-      (folder) => folder.id === folderId,
-    );
+    const hoveredIndex = folders.findIndex((folder) => folder.id === folderId);
 
     if (sourceIndex === -1 || hoveredIndex === -1) {
       return null;
@@ -137,21 +157,21 @@ export function FolderSidebarContent({
   ) => {
     clearFolderDragState();
 
-    if (!sourceId || sourceId === targetId) {
+    if (isReorderingFolder || !sourceId || sourceId === targetId) {
       return;
     }
 
     void saveFolderOrder(sourceId, targetId, position)
       .then(() => setFolderOrderStatus(t("folderOrderChanged")))
       .catch(() => {
-        // 최종 순서 저장 실패 시 query가 서버 순서로 다시 동기화됩니다.
+        notifyError(t("folderActionError"));
       });
   };
 
   const closeFolderNameModal = () => setFolderNameModal(null);
 
   const handleSubmitFolderName = () => {
-    if (!folderNameModal) {
+    if (!folderNameModal || isFolderNameSubmitting) {
       return;
     }
 
@@ -166,7 +186,7 @@ export function FolderSidebarContent({
         : renameFolder(folderNameModal.folderId, trimmedName);
 
     void request.then(closeFolderNameModal).catch(() => {
-      // 실패 내용을 확인하고 재시도할 수 있도록 모달을 유지합니다.
+      notifyError(t("folderActionError"));
     });
   };
 
@@ -188,6 +208,11 @@ export function FolderSidebarContent({
     folderId: string,
     event: React.DragEvent<HTMLButtonElement>,
   ) => {
+    if (isReorderingFolder) {
+      event.preventDefault();
+      return;
+    }
+
     setDraggingFolderId(folderId);
     setFolderDropTarget(null);
     event.dataTransfer.effectAllowed = "move";
@@ -241,11 +266,16 @@ export function FolderSidebarContent({
     );
   };
 
-  const handleMoveFolder = (
-    folderId: string,
-    direction: "up" | "down",
-  ) => {
-    const moveTarget = getFolderKeyboardMoveTarget(folders, folderId, direction);
+  const handleMoveFolder = (folderId: string, direction: "up" | "down") => {
+    if (isReorderingFolder) {
+      return;
+    }
+
+    const moveTarget = getFolderKeyboardMoveTarget(
+      folders,
+      folderId,
+      direction,
+    );
     const sourceFolder = folders.find((folder) => folder.id === folderId);
 
     if (!moveTarget || !sourceFolder) {
@@ -263,7 +293,7 @@ export function FolderSidebarContent({
         );
       })
       .catch(() => {
-        // 실패 시 optimistic 순서가 롤백되며, 기존 목록 상태를 유지합니다.
+        notifyError(t("folderActionError"));
       });
   };
 
@@ -294,6 +324,10 @@ export function FolderSidebarContent({
   };
 
   const handleDeleteFolder = (folderId: string) => {
+    if (isRemovingFolder || isReorderingFolder) {
+      return;
+    }
+
     const redirectPath =
       activeFolderId === folderId
         ? getRedirectPathAfterFolderDelete(folderId)
@@ -305,7 +339,7 @@ export function FolderSidebarContent({
         onFolderDeleted(redirectPath);
       })
       .catch(() => {
-        // 실패 내용을 확인하고 재시도할 수 있도록 옵션 메뉴를 유지합니다.
+        notifyError(t("folderActionError"));
       });
   };
 
@@ -313,7 +347,9 @@ export function FolderSidebarContent({
     <>
       <FolderSidebarSection
         folders={folders}
+        isError={isError}
         isLoading={isLoading}
+        isRetrying={isRetrying}
         pathname={pathname}
         addFolderLabel={t("addFolder")}
         reorderFolderLabel={t("reorderFolder")}
@@ -337,6 +373,7 @@ export function FolderSidebarContent({
           setFolderNameModal({ mode: "create", value: "" });
         }}
         onNavigate={onNavigate}
+        onRetry={onRetry}
         onDragStart={handleFolderDragStart}
         onDragEnd={clearFolderDragState}
         onDragOver={handleFolderDragOver}
@@ -365,6 +402,7 @@ export function FolderSidebarContent({
             folderNameModal.mode === "create" ? "create" : "change",
           )}
           cancelLabel={t("cancel")}
+          isSubmitting={isFolderNameSubmitting}
           value={folderNameModal.value}
           inputRef={folderNameInputRef}
           onChange={(value) =>

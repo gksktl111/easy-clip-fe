@@ -31,6 +31,9 @@ export const useFoldersQuery = () => {
 
   return {
     folders: isAuthenticated ? (folderQuery.data ?? []) : [],
+    isError: isAuthenticated && folderQuery.isError,
     isLoading: isAuthenticated && folderQuery.isPending,
+    isRetrying: isAuthenticated && folderQuery.isRefetching,
+    refetch: folderQuery.refetch,
   };
 };
