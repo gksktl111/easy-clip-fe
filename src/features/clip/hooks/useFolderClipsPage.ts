@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback } from "react";
-import { useParams } from "next/navigation";
 import { useClipCollectionFilter } from "@/features/clip/hooks/useClipCollectionFilter";
 import { useClipContextMenu } from "@/features/clip/hooks/useClipContextMenu";
 import { useClipCopyAction } from "@/features/clip/hooks/useClipCopyAction";
@@ -12,15 +11,15 @@ import { useInfiniteClipsQuery } from "@/features/clip/queries/useInfiniteClipsQ
 import type { Clip } from "@/features/clip/model/clip";
 
 interface UseFolderClipsPageOptions {
+  folderId: string;
   onClipsDeleted?: () => void | Promise<void>;
 }
 
 // 폴더 클립의 조회, 수집, 메뉴와 삭제 하위 훅을 페이지 영역별 계약으로 조합합니다.
 export const useFolderClipsPage = ({
+  folderId,
   onClipsDeleted,
-}: UseFolderClipsPageOptions = {}) => {
-  const params = useParams<{ id?: string }>();
-  const folderId = params?.id ?? "";
+}: UseFolderClipsPageOptions) => {
   const filter = useClipCollectionFilter();
   const query = useInfiniteClipsQuery({
     folderId,

@@ -5,7 +5,7 @@ import { clipQueryKeys } from "@/features/clip";
 import { invalidateFolderQueries, useFoldersQuery } from "@/features/folder";
 import { TrashPage } from "@/features/trash";
 
-// 휴지통 변경 결과를 폴더와 클립 캐시 갱신에 연결합니다.
+// 휴지통 변경 결과를 워크스페이스의 폴더·클립 캐시 갱신과 연결합니다.
 export function TrashRoute() {
   const queryClient = useQueryClient();
   const { folders } = useFoldersQuery();

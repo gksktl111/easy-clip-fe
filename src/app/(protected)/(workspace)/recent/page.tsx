@@ -1,5 +1,5 @@
 import { RecentClipsPage } from "@/features/clip";
 
-export default function FolderRecent() {
+export default function Recent() {
   return <RecentClipsPage />;
 }

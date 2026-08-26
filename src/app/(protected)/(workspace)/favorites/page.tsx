@@ -1,5 +1,5 @@
 import { FavoriteClipsPage } from "@/features/clip";
 
-export default function FolderFavorites() {
+export default function Favorites() {
   return <FavoriteClipsPage />;
 }

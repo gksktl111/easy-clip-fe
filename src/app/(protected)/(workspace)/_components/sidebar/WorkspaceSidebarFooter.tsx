@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import {
   HiChevronDown,
@@ -7,29 +8,25 @@ import {
   HiOutlineCreditCard,
   HiOutlineLogout,
 } from "react-icons/hi";
+import { useSession } from "@/shared/session/useSession";
 import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
-interface AppSidebarFooterProps {
-  userLabel: string;
-  settingsLabel: string;
-  logoutLabel: string;
-  upgradePlanLabel: string;
+interface WorkspaceSidebarFooterProps {
+  onCloseMobile?: () => void;
   onOpenSettings: () => void;
   onUpgradePlan: () => void;
-  onLogout: () => void;
 }
 
-export function AppSidebarFooter({
-  userLabel,
-  settingsLabel,
-  logoutLabel,
-  upgradePlanLabel,
+export function WorkspaceSidebarFooter({
+  onCloseMobile,
   onOpenSettings,
   onUpgradePlan,
-  onLogout,
-}: AppSidebarFooterProps) {
+}: WorkspaceSidebarFooterProps) {
+  const t = useTranslations("sidebar");
+  const { logout, user } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const userLabel = user?.email ?? user?.displayName ?? t("guest");
   const initials = userLabel.slice(0, 2).toUpperCase();
 
   useEffect(() => {
@@ -65,6 +62,11 @@ export function AppSidebarFooter({
     action();
   };
 
+  const handleLogout = () => {
+    onCloseMobile?.();
+    void logout();
+  };
+
   return (
     <div className="border-t border-(--border) px-4 py-4">
       <div ref={menuRef} className="relative">
@@ -74,7 +76,7 @@ export function AppSidebarFooter({
             itemClassName="gap-3 px-3 py-2.5 font-medium transition-colors duration-150 ease-out hover:bg-(--dropdown-option-hover) motion-reduce:transition-none"
             items={[
               {
-                label: settingsLabel,
+                label: t("settings"),
                 icon: (
                   <HiOutlineCog
                     className="h-5 w-5 text-(--muted)"
@@ -84,7 +86,7 @@ export function AppSidebarFooter({
                 onClick: () => handleMenuAction(onOpenSettings),
               },
               {
-                label: upgradePlanLabel,
+                label: t("upgradePlan"),
                 icon: (
                   <HiOutlineCreditCard
                     className="h-5 w-5 text-(--muted)"
@@ -94,14 +96,14 @@ export function AppSidebarFooter({
                 onClick: () => handleMenuAction(onUpgradePlan),
               },
               {
-                label: logoutLabel,
+                label: t("logout"),
                 icon: (
                   <HiOutlineLogout
                     className="h-5 w-5 text-(--muted)"
                     aria-hidden
                   />
                 ),
-                onClick: () => handleMenuAction(onLogout),
+                onClick: () => handleMenuAction(handleLogout),
               },
             ]}
           />
@@ -112,7 +114,6 @@ export function AppSidebarFooter({
           onClick={() => setIsMenuOpen((previous) => !previous)}
           className="flex w-full cursor-pointer items-center justify-between rounded-lg bg-(--surface) px-3 py-2 transition-colors hover:bg-(--surface-elevated)"
           aria-expanded={isMenuOpen}
-          aria-haspopup="menu"
         >
           <span className="flex min-w-0 items-center gap-2">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-(--icon-chip) text-[10px] font-semibold text-(--icon-chip-text)">

@@ -129,7 +129,7 @@ export function FolderSidebarSection({
               />
             ))}
       </ul>
-      <p className="sr-only" role="status" aria-live="polite">
+      <p className="sr-only" role="status">
         {folderOrderStatus}
       </p>
     </div>

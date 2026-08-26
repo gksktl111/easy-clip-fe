@@ -7,6 +7,7 @@ import {
   HiOutlineMenuAlt4,
 } from "react-icons/hi";
 import type { FolderItem } from "@/features/folder/model/folder";
+import { getFolderPath } from "@/features/folder/service/folderRoute";
 import { FolderOptionsMenu } from "@/features/folder/ui/FolderOptionsMenu";
 
 // 폴더 하나의 탐색, 순서 변경, 옵션 메뉴와 드롭 위치를 렌더링합니다.
@@ -67,7 +68,7 @@ export function FolderSidebarItem({
 }: FolderSidebarItemProps) {
   const isDragging = Boolean(draggingFolderId);
   const isDraggedItem = draggingFolderId === folder.id;
-  const isActiveFolder = pathname === `/${folder.id}`;
+  const isActiveFolder = pathname === getFolderPath(folder.id);
   const isDropTarget = dropIndicatorEdge !== null;
   const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
     // 링크나 옵션 버튼에 포커스가 있어도 폴더 항목 단위 단축키로 순서를 바꿀 수 있게 버블링을 받습니다.
@@ -135,7 +136,7 @@ export function FolderSidebarItem({
         </button>
 
         <Link
-          href={`/${folder.id}`}
+          href={getFolderPath(folder.id)}
           onClick={onNavigate}
           className="flex flex-1 items-center gap-2 truncate"
           aria-current={isActiveFolder ? "page" : undefined}
@@ -152,7 +153,6 @@ export function FolderSidebarItem({
           }`}
           aria-label={openFolderOptionsLabel}
           aria-expanded={isOptionsOpen}
-          aria-haspopup="menu"
           data-folder-options
         >
           <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />

@@ -2,23 +2,23 @@
 
 import Link from "next/link";
 
-interface AppSidebarNavItem {
+interface WorkspaceSidebarNavItem {
   href: string;
   label: string;
   icon: React.ReactNode;
 }
 
-interface AppSidebarNavProps {
-  items: AppSidebarNavItem[];
+interface WorkspaceSidebarNavProps {
+  items: WorkspaceSidebarNavItem[];
   pathname: string;
   onNavigate?: () => void;
 }
 
-export function AppSidebarNav({
+export function WorkspaceSidebarNav({
   items,
   pathname,
   onNavigate,
-}: AppSidebarNavProps) {
+}: WorkspaceSidebarNavProps) {
   return (
     <ul className="space-y-2 px-2">
       {items.map((item) => (
