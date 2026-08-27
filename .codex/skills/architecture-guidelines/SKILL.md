@@ -32,6 +32,7 @@ description: Easy Clip Next.js 프론트엔드의 구조, 의존성, 상태 관�
 - `shared`에서 `features`나 `app`을 import하지 않는다.
 - feature에서 `app`을 import하지 않는다.
 - feature 간 직접 import를 기본적으로 추가하지 않는다. 조합은 `app`에서 처리하고, 진짜 공통 계약은 `shared`로 올린다.
+- 인증은 앱 전역의 횡단 관심사이므로 예외로 둔다. `AuthContext`, `useAuth`, 인증 모델은 `features/auth`에 두며, 다른 feature와 `app`은 인증 feature가 제공하는 공개 entrypoint를 import할 수 있다.
 - 도메인 간 캐시 무효화처럼 불가피한 협력은 최소 공개 함수나 타입에만 의존하고 순환 의존을 만들지 않는다.
 - 현재 존재하는 역방향·교차 feature import는 마이그레이션 부채이지 새 코드의 선례가 아니다. 요청 범위 밖에서 일괄 이동하지 말고, 관련 변경 시 단계적으로 해소한다.
 

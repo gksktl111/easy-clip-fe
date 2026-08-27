@@ -8,7 +8,7 @@ import {
   HiOutlineCreditCard,
   HiOutlineLogout,
 } from "react-icons/hi";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth, useLogout } from "@/features/auth";
 import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
 interface WorkspaceSidebarFooterProps {
@@ -23,7 +23,8 @@ export function WorkspaceSidebarFooter({
   onUpgradePlan,
 }: WorkspaceSidebarFooterProps) {
   const t = useTranslations("sidebar");
-  const { logout, user } = useAuth();
+  const { user } = useAuth();
+  const { handleLogout, isPending: isLogoutPending } = useLogout();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const userLabel = user?.email ?? user?.displayName ?? t("guest");
@@ -62,9 +63,9 @@ export function WorkspaceSidebarFooter({
     action();
   };
 
-  const handleLogout = () => {
+  const handleLogoutAction = () => {
     onCloseMobile?.();
-    void logout();
+    void handleLogout();
   };
 
   return (
@@ -103,7 +104,8 @@ export function WorkspaceSidebarFooter({
                     aria-hidden
                   />
                 ),
-                onClick: () => handleMenuAction(handleLogout),
+                disabled: isLogoutPending,
+                onClick: () => handleMenuAction(handleLogoutAction),
               },
             ]}
           />

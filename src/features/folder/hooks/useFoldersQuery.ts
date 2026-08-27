@@ -7,7 +7,7 @@ import {
   sortFolders,
 } from "@/features/folder/service/folderCollection";
 import { getFolderQueryKey } from "@/features/folder/service/folderQueryCache";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 // 인증 사용자에 해당하는 폴더 목록을 조회하고 정렬된 도메인 모델로 제공합니다.

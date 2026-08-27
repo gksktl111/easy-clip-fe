@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { syncUserSettings } from "@/features/settings";
 import { notifyError } from "@/shared/feedback/toast";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth";
 import { ApiError } from "@/shared/lib/apiClient";
 
 interface UserSettingsSyncProps {

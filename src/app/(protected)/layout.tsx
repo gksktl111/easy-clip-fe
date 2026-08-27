@@ -1,4 +1,4 @@
-import { AuthGuard } from "@/features/auth/ui/AuthGuard";
+import { AuthGuard } from "@/features/auth";
 
 export default function ProtectedLayout({
   children,

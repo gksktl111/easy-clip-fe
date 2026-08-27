@@ -24,7 +24,7 @@ import {
   useSubscriptionActions,
 } from "@/features/subscription";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth";
 import { ApiError } from "@/shared/lib/apiClient";
 import { DEFAULT_LOCALE, isAppLocale } from "@/shared/config/locale";
 

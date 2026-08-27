@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchTrashItems } from "@/features/trash/api/trashApi";
 import { TRASH_QUERY_KEYS } from "@/features/trash/service/trashQueryCache";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 // 인증 사용자의 휴지통 항목을 cursor 기반으로 조회하고 평탄화된 목록을 제공합니다.

@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import type { Clip, ClipFilter } from "@/features/clip/model/clip";
 import { clipInfiniteQueryOptions } from "@/features/clip/queries/clipInfiniteQueryOptions";
 import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth";
 
 interface UseInfiniteClipsQueryOptions {
   folderId?: string;

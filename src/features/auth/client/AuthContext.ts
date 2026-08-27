@@ -5,7 +5,7 @@ import type {
   AuthSession,
   AuthStatus,
   CurrentUser,
-} from "@/shared/auth/authSession";
+} from "@/features/auth/model/auth";
 
 export interface AuthContextValue {
   status: AuthStatus;

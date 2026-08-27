@@ -8,7 +8,7 @@ import { SettingsAboutSection } from "@/features/settings/ui/SettingsAboutSectio
 import { SettingsPreferencesSection } from "@/features/settings/ui/SettingsPreferencesSection";
 import { useMySubscription } from "@/features/subscription";
 import type { AppLocale } from "@/shared/config/locale";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth";
 import { useSettingsStore } from "@/shared/store/settingsStore";
 import { Button } from "@/shared/ui/button/Button";
 import { Modal } from "@/shared/ui/overlay/Modal";

@@ -1,13 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { logout as requestLogout } from "@/features/auth/api/authApi";
-import { AuthContext, type AuthContextValue } from "@/shared/auth/AuthContext";
-import type { AuthSession, AuthStatus } from "@/shared/auth/authSession";
-import { restoreSessionFromRefreshCookie } from "@/features/auth/service/authService";
-import { notifyError } from "@/shared/feedback/toast";
+import { useCurrentUserQuery } from "@/features/auth/queries/useCurrentUserQuery";
+import { currentUserQueryOptions } from "@/features/auth/queries/currentUserQueryOptions";
+import {
+  getAuthError,
+  getAuthStatus,
+} from "@/features/auth/service/authSessionState";
+import {
+  AuthContext,
+  type AuthContextValue,
+} from "@/features/auth/client/AuthContext";
 import { ApiError, subscribeToAuthExpired } from "@/shared/lib/apiClient";
 
 // 앱 전체에서 하나의 사용자 인증 상태와 만료·로그아웃 생명주기를 관리합니다.
@@ -18,94 +23,80 @@ export function AuthProvider({
   children: React.ReactNode;
   shouldRestoreSession: boolean;
 }) {
-  const router = useRouter();
   const queryClient = useQueryClient();
-  const [session, setSession] = useState<AuthSession | null>(null);
-  const [status, setStatus] = useState<AuthStatus>(() =>
-    shouldRestoreSession ? "idle" : "unauthenticated",
+
+  // 접속후 토근 존재시 로그인 유지 시도
+  const [isAuthQueryEnabled, setIsAuthQueryEnabled] = useState(
+    () => shouldRestoreSession,
   );
-  const [error, setError] = useState<Error | null>(null);
-  // 동시에 들어오는 세션 복구 요청은 하나의 /users/me 요청으로 합칩니다.
-  const restorePromiseRef = useRef<Promise<AuthSession | null> | null>(null);
+
+  // 유저 정보 호출
+  const currentUserQuery = useCurrentUserQuery({
+    enabled: isAuthQueryEnabled,
+  });
+
+  // 별칭
+  const session = currentUserQuery.data;
+
+  // 현재 auth상태
+  const status = getAuthStatus({
+    error: currentUserQuery.error,
+    isError: currentUserQuery.isError,
+    isFetching: currentUserQuery.isFetching,
+    isPending: currentUserQuery.isPending,
+    isAuthQueryEnabled,
+    session,
+  });
+
+  const shouldClearClientSession =
+    isAuthQueryEnabled && status === "unauthenticated";
+
+  // 현재 에러 상태
+  const error = getAuthError(status, currentUserQuery.error);
 
   // 인증 정보가 사라질 때 사용자별 서버 상태를 담은 Query cache도 폐기합니다.
+  // 현재 단일 유저를 위한 서비스이기에 쿼리 clear함수를 사용해 session 정리시 전체 캐시가 확실히 제거될 수 있도록 합니다.
   const clearClientSession = useCallback(() => {
+    setIsAuthQueryEnabled(false);
     queryClient.clear();
-    setSession(null);
-    setError(null);
-    setStatus("unauthenticated");
   }, [queryClient]);
 
-  const restoreSession = useCallback(() => {
-    if (restorePromiseRef.current) {
-      return restorePromiseRef.current;
+  const restoreSession = async () => {
+    try {
+      return await queryClient.fetchQuery(currentUserQueryOptions());
+    } catch {
+      return null;
     }
+  };
 
-    setError(null);
-    setStatus("initializing");
-
-    const restorePromise = restoreSessionFromRefreshCookie()
-      .then((nextSession) => {
-        setSession(nextSession);
-        setStatus("authenticated");
-        return nextSession;
-      })
-      .catch(async (restoreError: unknown) => {
-        if (
-          restoreError instanceof ApiError &&
-          (restoreError.status === 401 || restoreError.status === 404)
-        ) {
-          clearClientSession();
-
-          if (restoreError.status === 404) {
-            // 유효하지 않은 사용자 쿠키 제거를 시도해 Proxy redirect 반복을 방지합니다.
-            notifyError("존재하지 않는 유저입니다.");
-            await requestLogout().catch(() => undefined);
-            router.replace("/login");
-          }
-
-          return null;
-        }
-
-        setSession(null);
-        setError(
-          restoreError instanceof Error
-            ? restoreError
-            : new Error("사용자 세션을 확인하지 못했습니다."),
-        );
-        setStatus("error");
-        return null;
-      });
-
-    restorePromiseRef.current = restorePromise;
-    void restorePromise.finally(() => {
-      if (restorePromiseRef.current === restorePromise) {
-        restorePromiseRef.current = null;
-      }
-    });
-
-    return restorePromise;
-  }, [clearClientSession, router]);
-
-  const logout = useCallback(async () => {
+  const logout = async () => {
     try {
       await requestLogout();
     } catch {
       // 서버 세션 상태와 무관하게 클라이언트 사용자 상태는 정리합니다.
     } finally {
       clearClientSession();
-      router.replace("/login");
-      router.refresh();
     }
-  }, [clearClientSession, router]);
+  };
 
+  // user/me 조회 결과 감시
   useEffect(() => {
-    // 최상위 AuthProvider가 쿠키 기반 세션 복구를 한 번만 시작합니다.
-    if (status === "idle") {
-      void restoreSession();
+    if (!shouldClearClientSession) {
+      return;
     }
-  }, [restoreSession, status]);
 
+    if (
+      currentUserQuery.error instanceof ApiError &&
+      currentUserQuery.error.status === 404
+    ) {
+      // 유효하지 않은 사용자 쿠키 제거를 시도하되, 경로 이동은 AuthGuard가 결정합니다.
+      void requestLogout().catch(() => undefined);
+    }
+
+    clearClientSession();
+  }, [clearClientSession, currentUserQuery.error, shouldClearClientSession]);
+
+  // API Client가 인증 만료 이벤트를 알리면 클라이언트 세션을 정리합니다.
   useEffect(
     () =>
       subscribeToAuthExpired(() => {
@@ -115,16 +106,13 @@ export function AuthProvider({
     [clearClientSession],
   );
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
-      status,
-      user: session?.user ?? null,
-      error,
-      restoreSession,
-      logout,
-    }),
-    [error, logout, restoreSession, session?.user, status],
-  );
+  const value: AuthContextValue = {
+    user: session?.user ?? null,
+    status,
+    error,
+    restoreSession,
+    logout,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

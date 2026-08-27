@@ -5,7 +5,7 @@ import {
   LandingHeader,
   type LandingHeaderTab,
 } from "@/features/landing/ui/LandingHeader";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth";
 import { useSettingsStore } from "@/shared/store/settingsStore";
 
 // 마케팅 페이지에 공통 헤더, 테마 제어, 푸터를 제공하는 레이아웃입니다.

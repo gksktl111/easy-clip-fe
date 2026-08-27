@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { HiOutlineHome, HiOutlineRefresh } from "react-icons/hi";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Button } from "@/shared/ui/button/Button";
 
 // 인증이 필요한 경로에서 검증 결과에 따라 렌더링, redirect와 재시도를 결정합니다.
@@ -52,6 +52,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         </div>
       </main>
     );
+  }
+
+  if (status === "unauthenticated") {
+    // redirect effect가 실행될 때까지 일반 인증 대기 화면을 다시 보여 주지 않습니다.
+    return null;
   }
 
   return (

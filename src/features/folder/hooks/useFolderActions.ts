@@ -18,7 +18,7 @@ import {
   sortFolders,
 } from "@/features/folder/service/folderCollection";
 import { getFolderQueryKey } from "@/features/folder/service/folderQueryCache";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth";
 
 const createAuthRequiredError = () => new Error("AUTH_REQUIRED");
 

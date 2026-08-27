@@ -13,7 +13,7 @@ import {
 } from "@/features/trash/api/trashApi";
 import type { TrashItemMutationDto } from "@/features/trash/model/trash.dto";
 import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
-import { useAuth } from "@/shared/auth/useAuth";
+import { useAuth } from "@/features/auth";
 import { ApiError } from "@/shared/lib/apiClient";
 
 export type TrashActionError = "action" | "restoreConflict";

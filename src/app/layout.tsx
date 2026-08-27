@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { UserSettingsSync } from "@/app/_components/UserSettingsSync";
-import { AuthProvider } from "@/features/auth/client/AuthProvider";
+import { AuthProvider } from "@/features/auth";
 import { hasAuthSessionCookie } from "@/features/auth/server";
 import { getInitialUserSettings } from "@/features/settings/server";
 import { AppToaster } from "@/shared/feedback/AppToaster";

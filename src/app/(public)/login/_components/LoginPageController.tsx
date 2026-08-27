@@ -7,9 +7,9 @@ import {
   getAuthStartPath,
   LoginPage,
   type OAuthProvider,
+  useAuth,
 } from "@/features/auth";
 import { buildApiUrl } from "@/shared/config/env";
-import { useAuth } from "@/shared/auth/useAuth";
 
 // 전역 인증 상태에 따른 redirect와 OAuth 이동을 조정하고 표시 상태만 UI에 전달합니다.
 export function LoginPageController() {
