@@ -13,13 +13,17 @@ import { ConfirmActionModal } from "@/shared/ui/overlay/ConfirmActionModal";
 
 // 폴더 클립의 조회, 복사, 즐겨찾기, 컨텍스트 메뉴와 삭제 UI를 조합합니다.
 interface FolderClipsPageProps {
+  folderId: string;
   onClipsDeleted?: () => void | Promise<void>;
 }
 
-export function FolderClipsPage({ onClipsDeleted }: FolderClipsPageProps) {
+export function FolderClipsPage({
+  folderId,
+  onClipsDeleted,
+}: FolderClipsPageProps) {
   const t = useTranslations("clips");
   const { capture, collection, contextMenu, deletion, feedback } =
-    useFolderClipsPage({ onClipsDeleted });
+    useFolderClipsPage({ folderId, onClipsDeleted });
   const { commands, filter, results } = collection;
   const hasClipLoadError = results.isError && results.clips.length === 0;
 

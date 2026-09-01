@@ -156,7 +156,8 @@
   "authGuard": {
     "loading": "Checking your session.",
     "error": "We could not verify your session. Please try again shortly.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "backHome": "Go to home"
   },
   "sidebar": {
     "favorites": "Favorites",
@@ -176,6 +177,11 @@
     "guest": "Guest",
     "settings": "Settings",
     "upgradePlan": "Upgrade plan",
+    "closeSidebar": "Close sidebar",
+    "folderLoadError": "Unable to load folders.",
+    "retry": "Try again",
+    "retrying": "Retrying...",
+    "folderActionError": "Unable to complete the folder action. Please try again shortly.",
     "closeCreateFolder": "Close create folder",
     "createFolder": "Create folder",
     "folderName": "Folder name",

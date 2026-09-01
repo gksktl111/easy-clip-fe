@@ -21,7 +21,7 @@ let refreshPromise: Promise<void> | null = null;
 const AUTH_EXPIRED_EVENT = "auth-session:expired";
 const REFRESH_RETRY_DELAYS_MS = [300, 800] as const;
 
-const dispatchAuthExpired = () => {
+const notifyAuthExpired = () => {
   if (typeof window === "undefined") {
     return;
   }
@@ -65,7 +65,11 @@ const isRetryableRefreshError = (error: unknown) => {
 };
 
 const refreshWithRetry = async () => {
-  for (let attempt = 0; attempt <= REFRESH_RETRY_DELAYS_MS.length; attempt += 1) {
+  for (
+    let attempt = 0;
+    attempt <= REFRESH_RETRY_DELAYS_MS.length;
+    attempt += 1
+  ) {
     try {
       await apiRequest<unknown>("/auth/refresh", {
         method: "POST",
@@ -90,7 +94,8 @@ const requestTokenRefresh = async () => {
     // 동시에 여러 요청이 401을 받아도 refresh 호출은 이 Promise 하나로 합친다.
     refreshPromise = refreshWithRetry()
       .catch((error) => {
-        dispatchAuthExpired();
+        // refresh가 최종 실패하면 이 요청 묶음의 인증 만료를 한 번 알립니다.
+        notifyAuthExpired();
         throw error;
       })
       .finally(() => {
@@ -136,8 +141,9 @@ export const apiRequest = async <T>(
       });
     }
 
-    if (response.status === 401 && (hasRetriedAuth || skipAuthRefresh)) {
-      dispatchAuthExpired();
+    if (response.status === 401 && hasRetriedAuth) {
+      // refresh 성공 후에도 원래 요청이 401이면 세션이 더는 유효하지 않습니다.
+      notifyAuthExpired();
     }
 
     const message = await readErrorMessage(response);

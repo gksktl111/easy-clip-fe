@@ -13,6 +13,7 @@ interface FolderNameModalProps {
   placeholder: string;
   confirmLabel: string;
   cancelLabel: string;
+  isSubmitting?: boolean;
   value: string;
   inputRef?: React.RefObject<HTMLInputElement | null>;
   onChange: (value: string) => void;
@@ -27,6 +28,7 @@ export function FolderNameModal({
   placeholder,
   confirmLabel,
   cancelLabel,
+  isSubmitting = false,
   value,
   inputRef,
   onChange,
@@ -75,7 +77,12 @@ export function FolderNameModal({
           <Button onClick={onClose} variant="secondary" size="sm">
             {cancelLabel}
           </Button>
-          <Button onClick={onConfirm} variant="primary" size="sm">
+          <Button
+            disabled={isSubmitting}
+            onClick={onConfirm}
+            variant="primary"
+            size="sm"
+          >
             {confirmLabel}
           </Button>
         </div>

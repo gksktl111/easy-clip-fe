@@ -18,13 +18,13 @@ import {
   sortFolders,
 } from "@/features/folder/service/folderCollection";
 import { getFolderQueryKey } from "@/features/folder/service/folderQueryCache";
-import { useSession } from "@/shared/session/useSession";
+import { useAuth } from "@/features/auth";
 
 const createAuthRequiredError = () => new Error("AUTH_REQUIRED");
 
 // 폴더 생성, 이름 변경, 삭제와 optimistic 순서 변경 액션을 관리합니다.
 export const useFolderActions = () => {
-  const { user } = useSession();
+  const { user } = useAuth();
   const isAuthenticated = Boolean(user);
   const queryClient = useQueryClient();
   const folderQueryKey = useMemo(
@@ -40,74 +40,82 @@ export const useFolderActions = () => {
     [folderQueryKey, queryClient],
   );
 
-  const { mutateAsync: createFolder } = useMutation({
-    mutationFn: async (name: string) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: createFolder, isPending: isCreatingFolder } =
+    useMutation({
+      mutationFn: async (name: string) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      return createFolderRequest({ name });
-    },
-    onSuccess: (createdFolder) => {
-      setFolders((folders) =>
-        sortFolders([...folders, mapFolder(createdFolder)]),
-      );
-    },
-  });
+        return createFolderRequest({ name });
+      },
+      onSuccess: (createdFolder) => {
+        setFolders((folders) =>
+          sortFolders([...folders, mapFolder(createdFolder)]),
+        );
+      },
+    });
 
-  const { mutateAsync: renameFolderMutation } = useMutation({
-    mutationFn: async ({
-      folderId,
-      name,
-    }: {
-      folderId: string;
-      name: string;
-    }) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: renameFolderMutation, isPending: isRenamingFolder } =
+    useMutation({
+      mutationFn: async ({
+        folderId,
+        name,
+      }: {
+        folderId: string;
+        name: string;
+      }) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      return updateFolderRequest(folderId, { name });
-    },
-    onSuccess: (updatedFolder) => {
-      setFolders((folders) =>
-        sortFolders(
-          folders.map((folder) =>
-            folder.id === updatedFolder.id ? mapFolder(updatedFolder) : folder,
+        return updateFolderRequest(folderId, { name });
+      },
+      onSuccess: (updatedFolder) => {
+        setFolders((folders) =>
+          sortFolders(
+            folders.map((folder) =>
+              folder.id === updatedFolder.id
+                ? mapFolder(updatedFolder)
+                : folder,
+            ),
           ),
-        ),
-      );
-    },
-  });
+        );
+      },
+    });
 
-  const { mutateAsync: removeFolder } = useMutation({
-    mutationFn: async (folderId: string) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: removeFolder, isPending: isRemovingFolder } =
+    useMutation({
+      mutationFn: async (folderId: string) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      await deleteFolderRequest(folderId);
-      return folderId;
-    },
-    onSuccess: (folderId) => {
-      setFolders((folders) =>
-        folders.filter((folder) => folder.id !== folderId),
-      );
-    },
-  });
+        await deleteFolderRequest(folderId);
+        return folderId;
+      },
+      onSuccess: (folderId) => {
+        setFolders((folders) =>
+          folders.filter((folder) => folder.id !== folderId),
+        );
+      },
+    });
 
-  const { mutateAsync: reorderFolder } = useMutation({
-    mutationFn: async (payload: Parameters<typeof reorderFolderRequest>[0]) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: reorderFolder, isPending: isReorderingFolder } =
+    useMutation({
+      mutationFn: async (
+        payload: Parameters<typeof reorderFolderRequest>[0],
+      ) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      return reorderFolderRequest(payload);
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: folderQueryKey });
-    },
-  });
+        return reorderFolderRequest(payload);
+      },
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: folderQueryKey });
+      },
+    });
 
   const renameFolder = useCallback(
     (folderId: string, name: string) =>
@@ -158,6 +166,10 @@ export const useFolderActions = () => {
 
   return {
     createFolder,
+    isCreatingFolder,
+    isRemovingFolder,
+    isRenamingFolder,
+    isReorderingFolder,
     removeFolder,
     renameFolder,
     saveFolderOrder,

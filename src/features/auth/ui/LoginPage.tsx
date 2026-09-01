@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import type { AuthProvider } from "@/features/auth/model/auth";
+import type { OAuthProvider } from "@/features/auth/model/auth";
 import { LoginAgreementNotice } from "@/features/auth/ui/LoginAgreementNotice";
 import { LoginBrandPanel } from "@/features/auth/ui/LoginBrandPanel";
 import { LoginLoadingState } from "@/features/auth/ui/LoginLoadingState";
@@ -11,7 +11,7 @@ import { LoginSocialActions } from "@/features/auth/ui/LoginSocialActions";
 interface LoginPageProps {
   errorMessage: string | null;
   isLoading: boolean;
-  onLogin: (provider: AuthProvider) => void;
+  onLogin: (provider: OAuthProvider) => void;
 }
 
 // 로그인 상태와 사용자 동작을 전달받아 로그인 화면을 렌더링합니다.

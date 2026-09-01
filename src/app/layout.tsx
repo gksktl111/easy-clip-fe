@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { UserSettingsSync } from "@/app/_components/UserSettingsSync";
-import { SessionProvider } from "@/app/providers/session/SessionProvider";
+import { AuthProvider } from "@/features/auth";
 import { hasAuthSessionCookie } from "@/features/auth/server";
 import { getInitialUserSettings } from "@/features/settings/server";
 import { AppToaster } from "@/shared/feedback/AppToaster";
@@ -37,13 +37,13 @@ export default async function RootLayout({
             initialLocale={initialSettings.language}
             initialTheme={initialSettings.theme}
           >
-            <SessionProvider shouldRestoreSession={shouldRestoreSession}>
+            <AuthProvider shouldRestoreSession={shouldRestoreSession}>
               <UserSettingsSync
                 enabled={initialSettings.source === "fallback"}
               />
               {children}
               <AppToaster />
-            </SessionProvider>
+            </AuthProvider>
           </AppSettingsProvider>
         </QueryProvider>
       </body>

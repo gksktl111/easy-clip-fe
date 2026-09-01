@@ -7,12 +7,12 @@ import {
   sortFolders,
 } from "@/features/folder/service/folderCollection";
 import { getFolderQueryKey } from "@/features/folder/service/folderQueryCache";
+import { useAuth } from "@/features/auth";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
-import { useSession } from "@/shared/session/useSession";
 
 // 인증 사용자에 해당하는 폴더 목록을 조회하고 정렬된 도메인 모델로 제공합니다.
 export const useFoldersQuery = () => {
-  const { user } = useSession();
+  const { user } = useAuth();
   const isAuthenticated = Boolean(user);
   const folderQuery = useQuery({
     queryKey: getFolderQueryKey(user?.id ?? null),
@@ -31,6 +31,9 @@ export const useFoldersQuery = () => {
 
   return {
     folders: isAuthenticated ? (folderQuery.data ?? []) : [],
+    isError: isAuthenticated && folderQuery.isError,
     isLoading: isAuthenticated && folderQuery.isPending,
+    isRetrying: isAuthenticated && folderQuery.isRefetching,
+    refetch: folderQuery.refetch,
   };
 };

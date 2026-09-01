@@ -7,12 +7,12 @@ import {
   invalidateMySubscriptionQueries,
   syncMySubscriptionQueryData,
 } from "@/features/subscription/service/subscriptionQueryCache";
-import { useSession } from "@/shared/session/useSession";
+import { useAuth } from "@/features/auth";
 
 // 구독 변경 요청과 현재 사용자 구독 캐시 동기화를 하나의 공개 액션으로 제공합니다.
 export const useSubscriptionActions = () => {
   const queryClient = useQueryClient();
-  const { user } = useSession();
+  const { user } = useAuth();
   const userId = user?.id ?? null;
 
   const syncQueryData = useCallback(

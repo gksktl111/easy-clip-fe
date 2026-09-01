@@ -1,9 +1,9 @@
 import { fetchMyProfile } from "@/features/auth/api/authApi";
-import type { UserSession } from "@/shared/session/session";
+import type { AuthSession } from "@/features/auth/model/auth";
 
 export const syncSessionProfile = async () => {
   const profile = await fetchMyProfile();
-  const nextSession: UserSession = {
+  const nextSession: AuthSession = {
     user: {
       id: profile.id,
       displayName: profile.displayName,

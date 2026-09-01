@@ -156,7 +156,8 @@
   "authGuard": {
     "loading": "正在验证身份信息。",
     "error": "无法验证身份信息，请稍后重试。",
-    "retry": "重试"
+    "retry": "重试",
+    "backHome": "前往首页"
   },
   "sidebar": {
     "favorites": "收藏",
@@ -176,6 +177,11 @@
     "guest": "访客",
     "settings": "设置",
     "upgradePlan": "升级套餐",
+    "closeSidebar": "关闭侧边栏",
+    "folderLoadError": "无法加载文件夹列表。",
+    "retry": "重试",
+    "retrying": "重试中...",
+    "folderActionError": "无法完成文件夹操作，请稍后重试。",
     "closeCreateFolder": "关闭新建文件夹",
     "createFolder": "新建文件夹",
     "folderName": "文件夹名称",

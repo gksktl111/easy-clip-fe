@@ -3,13 +3,13 @@
 import { useTranslations } from "next-intl";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import type { AuthProvider } from "@/features/auth/model/auth";
+import type { OAuthProvider } from "@/features/auth/model/auth";
 import { SocialLoginButton } from "@/features/auth/ui/SocialLoginButton";
 
 // 지원하는 OAuth 제공자별 로그인 액션을 동일한 버튼 구성으로 제공합니다.
 interface LoginSocialActionsProps {
   disabled: boolean;
-  onLogin: (provider: AuthProvider) => void;
+  onLogin: (provider: OAuthProvider) => void;
 }
 
 export function LoginSocialActions({

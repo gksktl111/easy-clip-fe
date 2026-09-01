@@ -1,24 +1,28 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFolderActions } from "@/features/folder/hooks/useFolderActions";
 import type {
   FolderDropPosition,
   FolderItem,
 } from "@/features/folder/model/folder";
 import { getFolderKeyboardMoveTarget } from "@/features/folder/service/folderCollection";
+import { getFolderPath } from "@/features/folder/service/folderRoute";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
 import { FolderSidebarSection } from "@/features/folder/ui/FolderSidebarSection";
+import { notifyError } from "@/shared/feedback/toast";
 import { useContextMenu } from "@/shared/hooks/useContextMenu";
 
 interface FolderSidebarContentProps {
+  activeFolderId: string | null;
   folders: FolderItem[];
+  isError?: boolean;
   isLoading?: boolean;
+  isRetrying?: boolean;
   pathname: string;
-  isAuthenticated: boolean;
   onNavigate?: () => void;
-  onAuthenticationRequired: () => void;
+  onRetry?: () => void;
   onFolderDeleted: (redirectPath: string | null) => void;
 }
 
@@ -37,17 +41,27 @@ const FOLDER_OPTIONS_MENU_WIDTH = 192;
 
 // 폴더 생성, 이름 변경, 삭제와 정렬 상호작용만 관리합니다.
 export function FolderSidebarContent({
+  activeFolderId,
   folders,
+  isError = false,
   isLoading = false,
+  isRetrying = false,
   pathname,
-  isAuthenticated,
   onNavigate,
-  onAuthenticationRequired,
+  onRetry,
   onFolderDeleted,
 }: FolderSidebarContentProps) {
   const t = useTranslations("sidebar");
-  const { createFolder, removeFolder, renameFolder, saveFolderOrder } =
-    useFolderActions();
+  const {
+    createFolder,
+    isCreatingFolder,
+    isRemovingFolder,
+    isRenamingFolder,
+    isReorderingFolder,
+    removeFolder,
+    renameFolder,
+    saveFolderOrder,
+  } = useFolderActions();
   const [folderNameModal, setFolderNameModal] =
     useState<FolderNameModalState | null>(null);
   const folderOptionsMenu = useContextMenu<string>({
@@ -59,7 +73,12 @@ export function FolderSidebarContent({
   const [folderOrderStatus, setFolderOrderStatus] = useState("");
   const folderNameInputRef = useRef<HTMLInputElement>(null);
   const folderNameModalMode = folderNameModal?.mode ?? null;
-  const pathnameFolderId = pathname.split("/").filter(Boolean)[0] ?? null;
+  const isFolderNameSubmitting =
+    folderNameModal?.mode === "create"
+      ? isCreatingFolder
+      : folderNameModal?.mode === "rename"
+        ? isRenamingFolder
+        : false;
 
   useEffect(() => {
     if (folderNameModalMode && folderNameInputRef.current) {
@@ -67,114 +86,97 @@ export function FolderSidebarContent({
     }
   }, [folderNameModalMode]);
 
-  const ensureAuthenticated = useCallback(() => {
-    if (isAuthenticated) {
-      return true;
-    }
-
-    onAuthenticationRequired();
-    return false;
-  }, [isAuthenticated, onAuthenticationRequired]);
-
-  const clearFolderDragState = useCallback(() => {
+  const clearFolderDragState = () => {
     setDraggingFolderId(null);
     setFolderDropTarget(null);
-  }, []);
+  };
 
-  const getFolderDropTarget = useCallback(
-    (
-      sourceId: string | null,
-      folderId: string,
-      event: React.DragEvent<HTMLLIElement>,
-    ): FolderDropTarget | null => {
-      if (!sourceId || sourceId === folderId) {
-        return null;
-      }
+  const getFolderDropTarget = (
+    sourceId: string | null,
+    folderId: string,
+    event: React.DragEvent<HTMLLIElement>,
+  ): FolderDropTarget | null => {
+    if (!sourceId || sourceId === folderId) {
+      return null;
+    }
 
-      const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
-      const hoveredIndex = folders.findIndex(
-        (folder) => folder.id === folderId,
-      );
+    const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
+    const hoveredIndex = folders.findIndex((folder) => folder.id === folderId);
 
-      if (sourceIndex === -1 || hoveredIndex === -1) {
-        return null;
-      }
+    if (sourceIndex === -1 || hoveredIndex === -1) {
+      return null;
+    }
 
-      const { top, height } = event.currentTarget.getBoundingClientRect();
-      const isBeforeHovered = event.clientY < top + height / 2;
+    const { top, height } = event.currentTarget.getBoundingClientRect();
+    const isBeforeHovered = event.clientY < top + height / 2;
 
-      if (!isBeforeHovered) {
-        if (sourceIndex === hoveredIndex + 1) {
-          return null;
-        }
-
-        return {
-          targetId: folderId,
-          position: "after",
-          indicatorFolderId: folderId,
-          indicatorEdge: "bottom",
-        };
-      }
-
-      const previousFolder = folders[hoveredIndex - 1] ?? null;
-
-      if (!previousFolder) {
-        if (sourceIndex === 0) {
-          return null;
-        }
-
-        return {
-          targetId: folderId,
-          position: "before",
-          indicatorFolderId: folderId,
-          indicatorEdge: "top",
-        };
-      }
-
-      if (previousFolder.id === sourceId || sourceIndex === hoveredIndex - 1) {
+    if (!isBeforeHovered) {
+      if (sourceIndex === hoveredIndex + 1) {
         return null;
       }
 
       return {
-        targetId: previousFolder.id,
+        targetId: folderId,
         position: "after",
-        indicatorFolderId: previousFolder.id,
+        indicatorFolderId: folderId,
         indicatorEdge: "bottom",
       };
-    },
-    [folders],
-  );
+    }
 
-  const handleDropFolder = useCallback(
-    (
-      sourceId: string | null,
-      targetId: string,
-      position: FolderDropPosition,
-    ) => {
-      clearFolderDragState();
+    const previousFolder = folders[hoveredIndex - 1] ?? null;
 
-      if (!sourceId || sourceId === targetId || !ensureAuthenticated()) {
-        return;
+    if (!previousFolder) {
+      if (sourceIndex === 0) {
+        return null;
       }
 
-      void saveFolderOrder(sourceId, targetId, position)
-        .then(() => setFolderOrderStatus(t("folderOrderChanged")))
-        .catch(() => {
-          // 최종 순서 저장 실패 시 query가 서버 순서로 다시 동기화됩니다.
-        });
-    },
-    [clearFolderDragState, ensureAuthenticated, saveFolderOrder, t],
-  );
+      return {
+        targetId: folderId,
+        position: "before",
+        indicatorFolderId: folderId,
+        indicatorEdge: "top",
+      };
+    }
+
+    if (previousFolder.id === sourceId || sourceIndex === hoveredIndex - 1) {
+      return null;
+    }
+
+    return {
+      targetId: previousFolder.id,
+      position: "after",
+      indicatorFolderId: previousFolder.id,
+      indicatorEdge: "bottom",
+    };
+  };
+
+  const handleDropFolder = (
+    sourceId: string | null,
+    targetId: string,
+    position: FolderDropPosition,
+  ) => {
+    clearFolderDragState();
+
+    if (isReorderingFolder || !sourceId || sourceId === targetId) {
+      return;
+    }
+
+    void saveFolderOrder(sourceId, targetId, position)
+      .then(() => setFolderOrderStatus(t("folderOrderChanged")))
+      .catch(() => {
+        notifyError(t("folderActionError"));
+      });
+  };
 
   const closeFolderNameModal = () => setFolderNameModal(null);
 
-  const handleSubmitFolderName = useCallback(() => {
-    if (!folderNameModal) {
+  const handleSubmitFolderName = () => {
+    if (!folderNameModal || isFolderNameSubmitting) {
       return;
     }
 
     const trimmedName = folderNameModal.value.trim();
-    if (!trimmedName || !ensureAuthenticated()) {
+    if (!trimmedName) {
       return;
     }
 
@@ -184,41 +186,33 @@ export function FolderSidebarContent({
         : renameFolder(folderNameModal.folderId, trimmedName);
 
     void request.then(closeFolderNameModal).catch(() => {
-      // 실패 내용을 확인하고 재시도할 수 있도록 모달을 유지합니다.
+      notifyError(t("folderActionError"));
     });
-  }, [createFolder, ensureAuthenticated, folderNameModal, renameFolder]);
+  };
 
-  const getRedirectPathAfterFolderDelete = useCallback(
-    (deletedFolderId: string) => {
-      const deletedFolderIndex = folders.findIndex(
-        (folder) => folder.id === deletedFolderId,
-      );
-      const remainingFolders = folders.filter(
-        (folder) => folder.id !== deletedFolderId,
-      );
-      const nextFolder =
-        remainingFolders[
-          Math.min(Math.max(deletedFolderIndex, 0), remainingFolders.length - 1)
-        ] ?? null;
-      const [, section] = pathname.split("/").filter(Boolean);
-
-      if (section === "favorites") {
-        return nextFolder ? `/${nextFolder.id}/favorites` : "/favorites";
-      }
-
-      if (section === "recent") {
-        return nextFolder ? `/${nextFolder.id}/recent` : "/recent";
-      }
-
-      return nextFolder ? `/${nextFolder.id}` : "/recent";
-    },
-    [folders, pathname],
-  );
+  const getRedirectPathAfterFolderDelete = (deletedFolderId: string) => {
+    const deletedFolderIndex = folders.findIndex(
+      (folder) => folder.id === deletedFolderId,
+    );
+    const remainingFolders = folders.filter(
+      (folder) => folder.id !== deletedFolderId,
+    );
+    const nextFolder =
+      remainingFolders[
+        Math.min(Math.max(deletedFolderIndex, 0), remainingFolders.length - 1)
+      ] ?? null;
+    return nextFolder ? getFolderPath(nextFolder.id) : "/recent";
+  };
 
   const handleFolderDragStart = (
     folderId: string,
     event: React.DragEvent<HTMLButtonElement>,
   ) => {
+    if (isReorderingFolder) {
+      event.preventDefault();
+      return;
+    }
+
     setDraggingFolderId(folderId);
     setFolderDropTarget(null);
     event.dataTransfer.effectAllowed = "move";
@@ -272,15 +266,16 @@ export function FolderSidebarContent({
     );
   };
 
-  const handleMoveFolder = (
-    folderId: string,
-    direction: "up" | "down",
-  ) => {
-    if (!ensureAuthenticated()) {
+  const handleMoveFolder = (folderId: string, direction: "up" | "down") => {
+    if (isReorderingFolder) {
       return;
     }
 
-    const moveTarget = getFolderKeyboardMoveTarget(folders, folderId, direction);
+    const moveTarget = getFolderKeyboardMoveTarget(
+      folders,
+      folderId,
+      direction,
+    );
     const sourceFolder = folders.find((folder) => folder.id === folderId);
 
     if (!moveTarget || !sourceFolder) {
@@ -298,7 +293,7 @@ export function FolderSidebarContent({
         );
       })
       .catch(() => {
-        // 실패 시 optimistic 순서가 롤백되며, 기존 목록 상태를 유지합니다.
+        notifyError(t("folderActionError"));
       });
   };
 
@@ -329,12 +324,12 @@ export function FolderSidebarContent({
   };
 
   const handleDeleteFolder = (folderId: string) => {
-    if (!ensureAuthenticated()) {
+    if (isRemovingFolder || isReorderingFolder) {
       return;
     }
 
     const redirectPath =
-      pathnameFolderId === folderId
+      activeFolderId === folderId
         ? getRedirectPathAfterFolderDelete(folderId)
         : null;
 
@@ -344,7 +339,7 @@ export function FolderSidebarContent({
         onFolderDeleted(redirectPath);
       })
       .catch(() => {
-        // 실패 내용을 확인하고 재시도할 수 있도록 옵션 메뉴를 유지합니다.
+        notifyError(t("folderActionError"));
       });
   };
 
@@ -352,7 +347,9 @@ export function FolderSidebarContent({
     <>
       <FolderSidebarSection
         folders={folders}
+        isError={isError}
         isLoading={isLoading}
+        isRetrying={isRetrying}
         pathname={pathname}
         addFolderLabel={t("addFolder")}
         reorderFolderLabel={t("reorderFolder")}
@@ -376,6 +373,7 @@ export function FolderSidebarContent({
           setFolderNameModal({ mode: "create", value: "" });
         }}
         onNavigate={onNavigate}
+        onRetry={onRetry}
         onDragStart={handleFolderDragStart}
         onDragEnd={clearFolderDragState}
         onDragOver={handleFolderDragOver}
@@ -404,6 +402,7 @@ export function FolderSidebarContent({
             folderNameModal.mode === "create" ? "create" : "change",
           )}
           cancelLabel={t("cancel")}
+          isSubmitting={isFolderNameSubmitting}
           value={folderNameModal.value}
           inputRef={folderNameInputRef}
           onChange={(value) =>

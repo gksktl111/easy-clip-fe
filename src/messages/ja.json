@@ -156,7 +156,8 @@
   "authGuard": {
     "loading": "認証情報を確認しています。",
     "error": "認証情報を確認できませんでした。しばらくしてから再試行してください。",
-    "retry": "再試行"
+    "retry": "再試行",
+    "backHome": "ホームへ移動"
   },
   "sidebar": {
     "favorites": "お気に入り",
@@ -176,6 +177,11 @@
     "guest": "ゲスト",
     "settings": "設定",
     "upgradePlan": "プランをアップグレード",
+    "closeSidebar": "サイドバーを閉じる",
+    "folderLoadError": "フォルダ一覧を読み込めませんでした。",
+    "retry": "再試行",
+    "retrying": "再試行中...",
+    "folderActionError": "フォルダの操作を完了できませんでした。しばらくしてからもう一度お試しください。",
     "closeCreateFolder": "フォルダ作成を閉じる",
     "createFolder": "新しいフォルダを作成",
     "folderName": "フォルダ名",
