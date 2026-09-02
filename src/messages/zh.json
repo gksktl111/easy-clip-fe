@@ -2,38 +2,52 @@
   "landing": {
     "themeToggle": "切换深色模式",
     "start": "开始使用",
-    "heroTitleLine1": "随处复制。",
-    "heroTitleLine2": "随处粘贴。",
-    "heroDescription": "在所有设备上保持剪贴板完美同步。为高效率的开发者、设计师和创意团队而打造。",
-    "startFree": "免费开始",
-    "viewDemo": "查看演示",
-    "demoWindowTitle": "Easy Clip - 剪贴板管理",
-    "demoDeviceTitle": "Easy Clip",
-    "demoItem1": "设计规范",
-    "demoItem2": "API 接口",
-    "demoItem3": "会议记录",
-    "demoMobileItem1": "设计指南",
-    "demoMobileItem2": "API 接口",
-    "sectionTitle": "不中断工作流的剪贴板",
-    "sectionDescription": "把复制、整理和复用集中到一个地方管理。",
+    "navigationLabel": "落地页导航",
+    "pricing": "定价",
+    "heroTitleLine1": "将复制的文本和图片",
+    "heroTitleLine2": "集中保存到一处。",
+    "heroDescription": "EasyClip 是一个网页剪贴内容库：把需要的内容粘贴到文件夹中保存，再通过搜索和收藏重新找到它。",
+    "workflowTitle": "保存、查找、再次使用，如此简单。",
+    "workflowDescription": "将内容粘贴到正在使用的文件夹中保存，整理后便可在需要时搜索并再次复制。",
+    "workflow": {
+      "capture": {
+        "title": "粘贴即可保存",
+        "description": "在当前文件夹中粘贴文本或图片，即可将其保存为一条剪贴内容。"
+      },
+      "organize": {
+        "title": "用文件夹和收藏整理",
+        "description": "按项目归类剪贴内容，并将常用内容加入收藏。"
+      },
+      "reuse": {
+        "title": "搜索后再次复制",
+        "description": "通过关键词找到需要的剪贴内容，点击一次即可重新复制到剪贴板。"
+      }
+    },
+    "sectionTitle": "快速找到已保存内容的剪贴内容库",
+    "sectionDescription": "保存文本和图片，再通过文件夹、收藏和搜索进行管理。",
     "features": {
-      "sync": {
-        "title": "即时同步",
-        "description": "复制的内容会立即实时同步到所有设备。"
+      "capture": {
+        "title": "保存为剪贴内容",
+        "description": "将文本和图片粘贴到当前文件夹中保存。"
       },
       "folder": {
-        "title": "文件夹整理",
-        "description": "按项目归类剪贴内容，让工作区更有条理。"
+        "title": "按文件夹整理",
+        "description": "按项目归类剪贴内容，在一处管理需要的信息。"
       },
       "favorite": {
         "title": "收藏",
-        "description": "把常用内容加入收藏，随时快速访问。"
+        "description": "将反复使用的内容加入收藏，方便快速找到。"
       },
       "search": {
         "title": "快速搜索",
-        "description": "输入关键词即可立即找到需要的剪贴内容。"
+        "description": "通过关键词搜索已保存的剪贴内容，并立即复制所需内容。"
       }
-    }
+    },
+    "reviewsTitle": "用户为何改变了工作方式",
+    "reviewsDescription": "看看保存和复用内容如何让日常工作变得更简单。",
+    "closingTitleLine1": "别让复制过的信息丢失。",
+    "closingTitleLine2": "把它们集中保存到一处。",
+    "closingDescription": "将散落在聊天和笔记中的文本与图片保存到 EasyClip，需要时搜索并再次复制。"
   },
   "pricing": {
     "hero": {

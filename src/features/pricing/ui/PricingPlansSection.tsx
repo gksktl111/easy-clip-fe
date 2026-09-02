@@ -102,7 +102,7 @@ export function PricingPlansSection() {
 
     if (isCurrentFreePlan || isCurrentProPlanCard) {
       return (
-        <PricingPlanAction disabled kind="button">
+        <PricingPlanAction disabled featured={plan.highlight} kind="button">
           {t("plans.currentPlan")}
         </PricingPlanAction>
       );
@@ -115,6 +115,7 @@ export function PricingPlansSection() {
             void handleResumeSubscription();
           }}
           disabled={isResumingSubscription}
+          featured={plan.highlight}
           kind="button"
         >
           {isResumingSubscription
@@ -127,6 +128,7 @@ export function PricingPlansSection() {
     if (isAuthenticated && isFreePlan && isCurrentProPlan) {
       return (
         <PricingPlanAction
+          featured={plan.highlight}
           onClick={() => setIsCancelModalOpen(true)}
           kind="button"
         >
@@ -141,7 +143,7 @@ export function PricingPlansSection() {
         : plan.ctaHref;
 
     return (
-      <PricingPlanAction href={planHref} kind="link">
+      <PricingPlanAction featured={plan.highlight} href={planHref} kind="link">
         {t(`plans.${plan.id}.cta`)}
       </PricingPlanAction>
     );

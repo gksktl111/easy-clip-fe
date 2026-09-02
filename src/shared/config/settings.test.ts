@@ -9,7 +9,7 @@ describe("isThemeMode", () => {
     expect(isThemeMode(undefined)).toBe(false);
   });
 
-  it("기본 테마는 지원하는 테마 값이다", () => {
-    expect(isThemeMode(DEFAULT_THEME)).toBe(true);
+  it("기본 테마는 라이트 모드다", () => {
+    expect(DEFAULT_THEME).toBe("light");
   });
 });

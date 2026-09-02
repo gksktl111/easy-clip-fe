@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   HiOutlineMoon,
   HiOutlinePaperClip,
@@ -21,6 +24,8 @@ export function LandingHeader({
   onToggleTheme,
   primaryActionHref,
 }: LandingHeaderProps) {
+  const t = useTranslations("landing");
+
   return (
     <header className="sticky top-0 z-20 border-b border-(--border) bg-[var(--landing-header-bg)] backdrop-blur-md transition-colors duration-300">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
@@ -33,7 +38,7 @@ export function LandingHeader({
 
         <nav
           className="order-3 flex w-full justify-center md:order-2 md:w-auto"
-          aria-label="랜딩 페이지 탐색"
+          aria-label={t("navigationLabel")}
         >
           <Link
             href="/pricing"
@@ -47,7 +52,7 @@ export function LandingHeader({
                   : "border-transparent text-(--muted) hover:text-(--foreground)"
               }`}
             >
-              요금제
+              {t("pricing")}
             </span>
           </Link>
         </nav>
@@ -57,7 +62,7 @@ export function LandingHeader({
             type="button"
             onClick={onToggleTheme}
             className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-(--muted) transition-colors hover:bg-(--surface-muted) hover:text-(--foreground)"
-            aria-label="다크 모드 전환"
+            aria-label={t("themeToggle")}
           >
             {isDarkMode ? (
               <HiOutlineSun className="h-5 w-5" aria-hidden />
@@ -70,7 +75,7 @@ export function LandingHeader({
             href={primaryActionHref}
             className="rounded-xl bg-(--primary) px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-(--primary-hover)"
           >
-            <span className="text-(--primary-foreground)">시작하기</span>
+            <span className="text-(--primary-foreground)">{t("start")}</span>
           </Link>
         </div>
       </div>

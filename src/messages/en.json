@@ -2,38 +2,52 @@
   "landing": {
     "themeToggle": "Toggle dark mode",
     "start": "Get Started",
-    "heroTitleLine1": "Copy anywhere.",
-    "heroTitleLine2": "Paste everywhere.",
-    "heroDescription": "Keep your clipboard perfectly synced across every device. Built for fast-moving developers, designers, and creative teams.",
-    "startFree": "Start for free",
-    "viewDemo": "View demo",
-    "demoWindowTitle": "Easy Clip - Clipboard Manager",
-    "demoDeviceTitle": "Easy Clip",
-    "demoItem1": "Design guidelines",
-    "demoItem2": "API endpoints",
-    "demoItem3": "Meeting notes",
-    "demoMobileItem1": "Design guide",
-    "demoMobileItem2": "API endpoints",
-    "sectionTitle": "A clipboard that keeps your flow moving",
-    "sectionDescription": "Manage copying, organizing, and reusing in one place.",
+    "navigationLabel": "Landing page navigation",
+    "pricing": "Pricing",
+    "heroTitleLine1": "Keep copied text and images",
+    "heroTitleLine2": "in one place.",
+    "heroDescription": "EasyClip is a web clip library where you paste content into folders, then find it again with search and favorites.",
+    "workflowTitle": "Save it, find it, and use it again.",
+    "workflowDescription": "Paste content into the folder you are working in, organize it, then search and copy it whenever you need it.",
+    "workflow": {
+      "capture": {
+        "title": "Paste to save",
+        "description": "Paste text or an image into the current folder to save it as a clip."
+      },
+      "organize": {
+        "title": "Organize with folders and favorites",
+        "description": "Group clips by project, and favorite the content you use often."
+      },
+      "reuse": {
+        "title": "Search and copy again",
+        "description": "Find the clip you need by keyword and click it once to copy it back to your clipboard."
+      }
+    },
+    "sectionTitle": "Find saved content in seconds",
+    "sectionDescription": "Save text and images, then manage them with folders, favorites, and search.",
     "features": {
-      "sync": {
-        "title": "Instant sync",
-        "description": "Everything you copy is reflected across your devices in real time."
+      "capture": {
+        "title": "Save as a clip",
+        "description": "Paste text and images into the current folder to keep them."
       },
       "folder": {
-        "title": "Folder organization",
-        "description": "Group clips by project and keep your workspace structured."
+        "title": "Organize by folder",
+        "description": "Group clips by project and keep needed information in one place."
       },
       "favorite": {
         "title": "Favorites",
-        "description": "Pin your most-used snippets for quick access."
+        "description": "Favorite content you reuse often so it is easy to find."
       },
       "search": {
         "title": "Fast search",
-        "description": "Find the clip you need the moment you type a keyword."
+        "description": "Search saved clips by keyword and copy the one you need right away."
       }
-    }
+    },
+    "reviewsTitle": "Why users changed their workflow",
+    "reviewsDescription": "See how saving and reusing content makes everyday work simpler.",
+    "closingTitleLine1": "Do not lose copied information.",
+    "closingTitleLine2": "Keep it in one place.",
+    "closingDescription": "Save text and images scattered across chats and notes in EasyClip. Search for them and copy them again whenever you need them."
   },
   "pricing": {
     "hero": {
