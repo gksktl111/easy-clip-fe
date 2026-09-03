@@ -104,7 +104,7 @@ git switch -c refactor/97
 
 1. `git diff`, `git diff --cached`, `git status`로 범위를 확인한다.
 2. 관련 파일만 명시적으로 stage한다.
-3. 검증 결과를 확인한다.
+3. 아래의 로컬 CI 검증을 모두 통과시킨다.
 4. 제목 형식에 맞춰 커밋한다.
 5. 커밋과 원격 대상 브랜치를 확인한 뒤 push한다.
 
@@ -113,6 +113,22 @@ git add AGENTS.md .codex/skills
 git commit -m "#97 / refactor(config) : 저장소 지침을 로컬 스킬로 분리"
 git push -u origin refactor/97
 ```
+
+### Push 전 로컬 CI 검증
+
+모든 브랜치 push 전 `.github/workflows/ci.yml`의 `verify` job과 같은 검증 명령을 로컬에서 순서대로 실행한다.
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+npm run test
+npm run test:e2e
+```
+
+- 하나라도 실패하면 원인을 해결하고 전체 검증을 다시 통과시킨 뒤 push한다.
+- 로컬 환경 제약으로 실행할 수 없는 명령이 있으면 사유와 미검증 항목을 사용자에게 알리고, 사용자의 명시적 지시 없이는 push하지 않는다.
+- CI 워크플로 또는 npm 스크립트가 바뀌면 이 검증 목록도 함께 갱신한다.
 
 ## PR 생성
 
@@ -126,15 +142,6 @@ git push -u origin refactor/97
 ```bash
 gh pr create --base dev --title "#97 / refactor(config) : 저장소 지침을 로컬 스킬로 분리" --body "..."
 ```
-
-현재 검증 명령:
-
-- `npm run lint`
-- `npm run build`
-- build 후 필요 시 `npm run start`
-- 공통 UI/story 변경 시 `npm run build-storybook`
-
-존재하지 않는 `npm run package`, `npm run test:e2e`, `npm run typecheck`를 실행 결과에 포함하지 않는다.
 
 ## 리뷰와 병합
 

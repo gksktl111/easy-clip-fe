@@ -11,7 +11,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "EasyClip",
   description:
-    "EasyClip is a clipboard manager that allows you to sync your clipboard across all your devices.",
+    "EasyClip is a web clip library for saving, organizing, and reusing text and images.",
 };
 
 export default async function RootLayout({

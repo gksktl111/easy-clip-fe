@@ -1,105 +1,160 @@
-import Link from "next/link";
-import { HiOutlinePlay, HiOutlineSwitchHorizontal } from "react-icons/hi";
+"use client";
 
-// 핵심 가치와 진입 액션, 기기 간 동기화 데모를 첫 화면에 표시합니다.
-interface LandingHeroSectionProps {
-  demoItems: readonly string[];
-  mobileDemoItems: readonly string[];
+import Image, { type StaticImageData } from "next/image";
+import blackMainDesktop from "../../../../public/landing/black_main_desktop.png";
+import blackMainPhone from "../../../../public/landing/black_main_phone.png";
+import whiteMainDesktop from "../../../../public/landing/white_main_desktop.png";
+import whiteMainPhone from "../../../../public/landing/white_main_phone.png";
+import { useSettingsStore } from "@/shared/store/settingsStore";
+
+const PRODUCT_SCREENSHOTS = {
+  dark: {
+    desktop: blackMainDesktop,
+    phone: blackMainPhone,
+  },
+  light: {
+    desktop: whiteMainDesktop,
+    phone: whiteMainPhone,
+  },
+} as const;
+
+interface ProductPreviewProps {
+  image: StaticImageData;
 }
 
-export function LandingHeroSection({
-  demoItems,
-  mobileDemoItems,
-}: LandingHeroSectionProps) {
+interface LandingHeroSectionProps {
+  titleLine1: string;
+  titleLine2: string;
+  description: string;
+}
+
+function LaptopProductPreview({ image }: ProductPreviewProps) {
   return (
-    <section className="mx-auto max-w-6xl px-6 pt-24 pb-20">
-      <div className="flex flex-col items-center text-center">
-        <h1 className="text-4xl leading-tight font-bold tracking-tight md:text-6xl md:leading-tight">
-          어디서든 복사하고.
-          <br />
-          어디서나 붙여넣기.
-        </h1>
-
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-(--muted)">
-          모든 기기에서 클립보드를 완벽하게 동기화하세요. 빠르게 움직이는
-          개발자, 디자이너, 크리에이티브 팀을 위해 설계되었습니다.
-        </p>
-
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/login"
-            className="flex items-center gap-2 rounded-xl bg-(--primary) px-7 py-3.5 text-sm font-semibold transition-colors hover:bg-(--primary-hover)"
-          >
-            <span className="text-primary-foreground">무료로 시작하기</span>
-          </Link>
-          <Link
-            href="/favorites"
-            className="flex items-center gap-2 rounded-xl border border-(--border) px-7 py-3.5 text-sm font-semibold transition-colors hover:bg-(--surface-muted)"
-          >
-            <HiOutlinePlay className="h-4 w-4" aria-hidden />
-            <span className="text-(--foreground)">데모 보기</span>
-          </Link>
+    <div className="relative mx-auto w-full">
+      <div className="relative rounded-[1.05rem_1.05rem_0.4rem_0.4rem] border border-black/70 bg-gradient-to-b from-slate-400 via-neutral-700 to-neutral-950 p-[0.65%] pb-[1.05%] shadow-[var(--landing-shadow)]">
+        <span
+          aria-hidden
+          className="absolute top-[0.55%] right-[2%] left-[2%] h-px bg-white/35"
+        />
+        <span
+          aria-hidden
+          className="absolute top-0 left-1/2 z-10 flex h-[4.1%] w-[10.5%] -translate-x-1/2 items-center justify-center rounded-b-[0.4rem] bg-neutral-950"
+        >
+          <span className="aspect-square w-[13%] rounded-full bg-slate-500/80" />
+        </span>
+        <div
+          className="relative overflow-hidden rounded-[0.75rem_0.75rem_0.18rem_0.18rem] bg-black ring-1 ring-black/55"
+          style={{ aspectRatio: image.width / image.height }}
+        >
+          <Image
+            src={image}
+            alt=""
+            fill
+            className="object-cover object-center"
+            sizes="(min-width: 848px) 40rem, (min-width: 640px) calc(80vw - 2.4rem), (max-width: 367px) calc(80vw - 2.4rem), 16rem"
+            preload
+          />
         </div>
       </div>
 
-      <div className="relative mt-20 flex items-center justify-center gap-6">
-        <div className="relative h-64 w-full max-w-lg overflow-hidden rounded-3xl border border-(--border) bg-[var(--landing-demo-surface)] shadow-[var(--landing-shadow)] md:h-80">
-          <div className="absolute inset-0 flex flex-col">
-            <div className="flex items-center gap-2 border-b border-(--border) px-4 py-3">
-              <div className="flex gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-[#ef4444]" />
-                <span className="h-3 w-3 rounded-full bg-[#eab308]" />
-                <span className="h-3 w-3 rounded-full bg-[#22c55e]" />
-              </div>
-              <span className="ml-4 text-xs text-(--muted)">
-                Easy Clip - 클립보드 관리
-              </span>
-            </div>
-
-            <div className="flex-1 p-4">
-              <div className="space-y-3">
-                {demoItems.map((item, index) => (
-                  <div
-                    key={item}
-                    className="flex items-center gap-3 rounded-xl bg-[var(--landing-demo-card)] p-3"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <div className="h-2 w-2 rounded-full bg-[#3b82f6]" />
-                    <span className="text-sm font-medium">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+      <div
+        aria-hidden
+        className="relative z-10 -mt-[0.35%] w-[108%] -translate-x-[4%]"
+      >
+        <div
+          className="relative aspect-[25/1] overflow-hidden bg-gradient-to-b from-neutral-400 via-neutral-600 to-neutral-800 shadow-[0_0.35rem_0.7rem_rgba(0,0,0,0.18)]"
+          style={{ clipPath: "polygon(4% 0, 96% 0, 100% 100%, 0 100%)" }}
+        >
+          <span className="absolute top-0 right-[6%] left-[6%] h-px bg-white/40" />
+          <span className="absolute top-[32%] left-1/2 h-[42%] w-[18%] -translate-x-1/2 rounded-[0.25rem_0.25rem_0.45rem_0.45rem] border border-black/20 bg-neutral-950/20" />
         </div>
+        <div className="relative aspect-[70/1] rounded-b-[0.85rem] border border-t-0 border-black/35 bg-gradient-to-b from-neutral-600 to-neutral-800">
+          <span className="absolute right-[2%] bottom-0 left-[2%] h-px bg-black/35" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
-        <div className="absolute top-1/2 left-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--landing-brand-bg)] shadow-[var(--landing-shadow)] md:static md:translate-x-0 md:translate-y-0">
-          <HiOutlineSwitchHorizontal
-            className="h-6 w-6 text-[var(--landing-brand-fg)]"
-            aria-hidden
+function PhoneProductPreview({ image }: ProductPreviewProps) {
+  return (
+    <div className="relative isolate">
+      <span
+        aria-hidden
+        className="absolute top-[25%] -right-[2.2%] h-[7%] w-[3%] rounded-r-sm bg-gradient-to-b from-neutral-300 to-neutral-800"
+      />
+      <span
+        aria-hidden
+        className="absolute top-[35%] -right-[2.2%] h-[10%] w-[3%] rounded-r-sm bg-gradient-to-b from-neutral-300 to-neutral-800"
+      />
+
+      <div className="relative rounded-[14%] border border-black/75 bg-gradient-to-br from-slate-300 via-neutral-600 to-neutral-900 p-[5.5%] shadow-[0_1rem_1.8rem_rgba(15,23,42,0.28)]">
+        <div
+          className="relative overflow-hidden rounded-[9%] bg-black ring-1 ring-black/90"
+          style={{ aspectRatio: image.width / image.height }}
+        >
+          <Image
+            src={image}
+            alt=""
+            fill
+            className="object-cover object-center"
+            loading="eager"
+            sizes="(min-width: 848px) 9rem, (min-width: 640px) 18vw, 3.6rem"
           />
         </div>
+        <span
+          aria-hidden
+          className="absolute top-[7.3%] left-1/2 z-10 aspect-square w-[5%] -translate-x-1/2 rounded-full bg-neutral-950 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.15)]"
+        />
+      </div>
+    </div>
+  );
+}
 
-        <div className="hidden h-72 w-40 overflow-hidden rounded-3xl border border-(--border) bg-[var(--landing-demo-surface)] shadow-[var(--landing-shadow)] md:block">
-          <div className="flex h-full flex-col">
-            <div className="flex items-center justify-center border-b border-(--border) py-2">
-              <span className="text-xs font-medium text-(--muted)">
-                Easy Clip
-              </span>
+// 핵심 가치와 현재 제공하는 웹 워크스페이스 캡처를 첫 화면에 표시합니다.
+export function LandingHeroSection({
+  titleLine1,
+  titleLine2,
+  description,
+}: LandingHeroSectionProps) {
+  const theme = useSettingsStore((state) => state.theme);
+  const screenshot = PRODUCT_SCREENSHOTS[theme];
+
+  return (
+    <section className="relative isolate overflow-hidden border-b border-(--border)">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-90"
+        style={{ backgroundImage: "var(--landing-hero-glow)" }}
+      />
+
+      <div className="relative mx-auto flex max-w-7xl flex-col items-center px-6 pt-20 pb-6 text-center sm:pt-28 sm:pb-8">
+        <div className="max-w-4xl">
+          <h1 className="text-4xl leading-[1.08] font-bold tracking-[-0.045em] sm:text-5xl md:text-6xl lg:text-7xl">
+            {titleLine1}
+            <span className="block text-[var(--landing-workspace-accent)]">
+              {titleLine2}
+            </span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-(--muted) sm:text-lg sm:leading-8">
+            {description}
+          </p>
+        </div>
+
+        <div
+          aria-hidden
+          className="relative mt-12 w-full max-w-[20rem] sm:mt-16 sm:max-w-[50rem]"
+        >
+          <div className="absolute -inset-x-4 bottom-0 h-2/3 rounded-[3rem] bg-[var(--landing-workspace-accent)] opacity-12 blur-3xl" />
+
+          <div className="relative">
+            <div className="mx-auto w-4/5">
+              <LaptopProductPreview image={screenshot.desktop} />
             </div>
 
-            <div className="flex-1 p-3">
-              <div className="space-y-2">
-                {mobileDemoItems.map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-center gap-2 rounded-lg bg-[var(--landing-demo-card)] p-2"
-                  >
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#3b82f6]" />
-                    <span className="text-[10px] font-medium">{item}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="absolute right-0 bottom-[2%] z-10 w-[18%] sm:w-[14%] lg:-right-6">
+              <PhoneProductPreview image={screenshot.phone} />
             </div>
           </div>
         </div>

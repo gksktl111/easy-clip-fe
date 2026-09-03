@@ -3,7 +3,7 @@ import type { AppLocale } from "@/shared/config/locale";
 export type ThemeMode = "light" | "dark";
 export type LanguageCode = AppLocale;
 
-export const DEFAULT_THEME: ThemeMode = "dark";
+export const DEFAULT_THEME: ThemeMode = "light";
 
 // 서버 렌더링에서도 읽을 수 있도록 사용자 theme/language는 cookie에 저장합니다.
 export const THEME_COOKIE_NAME = "easy_clip_theme";

@@ -2,38 +2,52 @@
   "landing": {
     "themeToggle": "ダークモードを切り替え",
     "start": "はじめる",
-    "heroTitleLine1": "どこでもコピー。",
-    "heroTitleLine2": "どこでも貼り付け。",
-    "heroDescription": "すべてのデバイスでクリップボードを完全に同期します。素早く動く開発者、デザイナー、クリエイティブチームのために設計されています。",
-    "startFree": "無料で始める",
-    "viewDemo": "デモを見る",
-    "demoWindowTitle": "Easy Clip - クリップボード管理",
-    "demoDeviceTitle": "Easy Clip",
-    "demoItem1": "デザインガイドライン",
-    "demoItem2": "API エンドポイント",
-    "demoItem3": "会議メモ",
-    "demoMobileItem1": "デザインガイド",
-    "demoMobileItem2": "API エンドポイント",
-    "sectionTitle": "作業の流れを止めないクリップボード",
-    "sectionDescription": "コピー、整理、再利用までを一か所で管理します。",
+    "navigationLabel": "ランディングページのナビゲーション",
+    "pricing": "料金プラン",
+    "heroTitleLine1": "コピーしたテキストと画像を",
+    "heroTitleLine2": "ひとつの場所にまとめましょう。",
+    "heroDescription": "EasyClipは、必要な内容をフォルダに貼り付けて保存し、検索やお気に入りから再び見つけられるWebクリップ保管庫です。",
+    "workflowTitle": "保存して、探して、もう一度使う。",
+    "workflowDescription": "作業中のフォルダに貼り付けて保存し、整理してから、必要なときに検索・コピーできます。",
+    "workflow": {
+      "capture": {
+        "title": "貼り付けて保存",
+        "description": "作業中のフォルダにテキストや画像を貼り付けると、ひとつのクリップとして保存されます。"
+      },
+      "organize": {
+        "title": "フォルダとお気に入りで整理",
+        "description": "プロジェクトごとにまとめ、よく使う内容はお気に入りに登録しましょう。"
+      },
+      "reuse": {
+        "title": "検索してもう一度コピー",
+        "description": "キーワードで必要なクリップを探し、1回クリックするとクリップボードに再コピーされます。"
+      }
+    },
+    "sectionTitle": "必要な情報をすぐに見つけられるクリップ保管庫",
+    "sectionDescription": "テキストと画像を保存し、フォルダ・お気に入り・検索で管理しましょう。",
     "features": {
-      "sync": {
-        "title": "即時同期",
-        "description": "コピーした内容がすぐにすべてのデバイスへリアルタイムで反映されます。"
+      "capture": {
+        "title": "クリップとして保存",
+        "description": "テキストと画像を現在のフォルダに貼り付けて保管できます。"
       },
       "folder": {
-        "title": "フォルダ整理",
-        "description": "プロジェクトごとにクリップをまとめて、すっきり管理できます。"
+        "title": "フォルダで整理",
+        "description": "プロジェクトごとにクリップをまとめ、必要な情報を一か所で管理できます。"
       },
       "favorite": {
         "title": "お気に入り",
-        "description": "よく使う文言はお気に入りにしてすぐにアクセスできます。"
+        "description": "繰り返し使う内容をお気に入りにして、すぐに見つけられます。"
       },
       "search": {
-        "title": "高速検索",
-        "description": "キーワードを入力すると必要なクリップをすぐに見つけられます。"
+        "title": "すばやく検索",
+        "description": "保存したクリップをキーワードで検索し、すぐにコピーできます。"
       }
-    }
+    },
+    "reviewsTitle": "作業の流れが変わったユーザーの声",
+    "reviewsDescription": "保存と再利用を繰り返す作業がどう変わるかをご覧ください。",
+    "closingTitleLine1": "コピーした情報を、",
+    "closingTitleLine2": "ひとつの場所に残しましょう。",
+    "closingDescription": "メッセンジャーやメモに散らばったテキストや画像をEasyClipに保存し、必要なときに検索して再びコピーできます。"
   },
   "pricing": {
     "hero": {

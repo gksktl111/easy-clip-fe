@@ -75,6 +75,12 @@
   --landing-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
   --landing-brand-muted: rgba(255, 255, 255, 0.72);
   --landing-brand-soft: rgba(255, 255, 255, 0.78);
+  --landing-hero-glow: radial-gradient(
+    circle at 50% 0%,
+    rgba(79, 70, 229, 0.18),
+    transparent 54%
+  );
+  --landing-workspace-accent: #4f46e5;
 
   /* Pricing */
   --pricing-hero-glow: radial-gradient(
@@ -98,8 +104,8 @@
   --pricing-check-bg: #0f172a;
   --pricing-check-fg: #ffffff;
   --pricing-accent: #4f46e5;
-  --pricing-button-bg: #111827;
-  --pricing-button-bg-hover: #1f2937;
+  --pricing-button-bg: #4f46e5;
+  --pricing-button-bg-hover: #4338ca;
   --pricing-button-fg: #ffffff;
   --pricing-button-featured-bg: #b7bec9;
   --pricing-button-featured-bg-hover: #d5dae2;
@@ -169,6 +175,12 @@
   --landing-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
   --landing-brand-muted: rgba(248, 250, 252, 0.72);
   --landing-brand-soft: rgba(248, 250, 252, 0.78);
+  --landing-hero-glow: radial-gradient(
+    circle at 50% 0%,
+    rgba(99, 102, 241, 0.28),
+    transparent 54%
+  );
+  --landing-workspace-accent: #a5b4fc;
 
   /* Pricing */
   --pricing-hero-glow: radial-gradient(

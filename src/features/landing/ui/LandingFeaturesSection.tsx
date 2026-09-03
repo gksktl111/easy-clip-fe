@@ -9,6 +9,8 @@ interface LandingFeature {
 }
 
 interface LandingFeaturesSectionProps {
+  title: string;
+  description: string;
   features: readonly LandingFeature[];
 }
 
@@ -29,6 +31,8 @@ function LandingFeatureCard({ feature }: { feature: LandingFeature }) {
 }
 
 export function LandingFeaturesSection({
+  title,
+  description,
   features,
 }: LandingFeaturesSectionProps) {
   return (
@@ -36,10 +40,10 @@ export function LandingFeaturesSection({
       <div className="mx-auto max-w-6xl px-6">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            일의 흐름을 끊지 않는 클립보드
+            {title}
           </h2>
           <p className="mt-4 text-lg text-(--muted)">
-            복사, 정리, 재사용까지 한 번에 관리하세요.
+            {description}
           </p>
         </div>
 
