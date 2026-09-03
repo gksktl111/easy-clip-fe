@@ -49,6 +49,7 @@ export const useInfiniteClipsQuery = ({
 
   return {
     clips,
+    error: query.error,
     fetchNextPage: query.fetchNextPage,
     hasNextPage: Boolean(query.hasNextPage),
     isAuthenticated,

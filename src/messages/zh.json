@@ -317,6 +317,10 @@
       "description": "请检查网络连接，或稍后再试。",
       "retry": "重试"
     },
+    "folderNotFoundState": {
+      "title": "该文件夹不存在。",
+      "description": "该文件夹可能已被删除，或地址不正确。"
+    },
     "item": {
       "saving": "保存中",
       "copy": "复制 {name}",

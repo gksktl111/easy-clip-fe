@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useFolderClipsPage } from "@/features/clip/hooks/useFolderClipsPage";
+import { isFolderNotFoundError } from "@/features/clip/service/folderClipQueryState";
 import { ClipDeleteActionBar } from "@/features/clip/ui/ClipDeleteActionBar";
 import { ClipContextMenu } from "@/features/clip/ui/ClipContextMenu";
 import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
@@ -9,6 +10,7 @@ import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { ClipDeleteModeButton } from "@/features/clip/ui/ClipDeleteModeButton";
 import { FilterBar } from "@/features/clip/ui/FilterBar";
 import { FolderClipCaptureHint } from "@/features/clip/ui/FolderClipCaptureHint";
+import { FolderNotFoundState } from "@/features/clip/ui/FolderNotFoundState";
 import { ConfirmActionModal } from "@/shared/ui/overlay/ConfirmActionModal";
 
 // 폴더 클립의 조회, 복사, 즐겨찾기, 컨텍스트 메뉴와 삭제 UI를 조합합니다.
@@ -25,7 +27,12 @@ export function FolderClipsPage({
   const { capture, collection, contextMenu, deletion, feedback } =
     useFolderClipsPage({ folderId, onClipsDeleted });
   const { commands, filter, results } = collection;
+  const isFolderNotFound = isFolderNotFoundError(results.error);
   const hasClipLoadError = results.isError && results.clips.length === 0;
+
+  if (isFolderNotFound) {
+    return <FolderNotFoundState />;
+  }
 
   return (
     <div
