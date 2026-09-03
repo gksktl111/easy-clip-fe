@@ -68,7 +68,7 @@ function LaptopProductPreview({ image }: ProductPreviewProps) {
           <span className="absolute top-0 right-[6%] left-[6%] h-px bg-white/40" />
           <span className="absolute top-[32%] left-1/2 h-[42%] w-[18%] -translate-x-1/2 rounded-[0.25rem_0.25rem_0.45rem_0.45rem] border border-black/20 bg-neutral-950/20" />
         </div>
-        <div className="relative -mt-[1.8%] aspect-[70/1] rounded-b-[0.85rem] border border-t-0 border-black/35 bg-gradient-to-b from-neutral-600 to-neutral-800">
+        <div className="relative aspect-[70/1] rounded-b-[0.85rem] border border-t-0 border-black/35 bg-gradient-to-b from-neutral-600 to-neutral-800">
           <span className="absolute right-[2%] bottom-0 left-[2%] h-px bg-black/35" />
         </div>
       </div>
@@ -81,11 +81,11 @@ function PhoneProductPreview({ image }: ProductPreviewProps) {
     <div className="relative isolate">
       <span
         aria-hidden
-        className="absolute -right-[2.2%] top-[25%] h-[7%] w-[3%] rounded-r-sm bg-gradient-to-b from-neutral-300 to-neutral-800"
+        className="absolute top-[25%] -right-[2.2%] h-[7%] w-[3%] rounded-r-sm bg-gradient-to-b from-neutral-300 to-neutral-800"
       />
       <span
         aria-hidden
-        className="absolute -right-[2.2%] top-[35%] h-[10%] w-[3%] rounded-r-sm bg-gradient-to-b from-neutral-300 to-neutral-800"
+        className="absolute top-[35%] -right-[2.2%] h-[10%] w-[3%] rounded-r-sm bg-gradient-to-b from-neutral-300 to-neutral-800"
       />
 
       <div className="relative rounded-[14%] border border-black/75 bg-gradient-to-br from-slate-300 via-neutral-600 to-neutral-900 p-[5.5%] shadow-[0_1rem_1.8rem_rgba(15,23,42,0.28)]">
