@@ -317,6 +317,10 @@
       "description": "ネットワーク接続を確認するか、しばらくしてから再試行してください。",
       "retry": "再試行"
     },
+    "folderNotFoundState": {
+      "title": "このフォルダは存在しません。",
+      "description": "フォルダが削除されたか、アドレスが正しくない可能性があります。"
+    },
     "item": {
       "saving": "保存中",
       "copy": "{name}をコピー",
