@@ -1,9 +1,6 @@
-export type ClipApiType = "TEXT" | "COLOR" | "IMAGE";
+import type { ClipTagResponseDto } from "@/features/clip/model/tag.dto";
 
-export interface ClipTagResponseDto {
-  id: string;
-  name: string;
-}
+export type ClipApiType = "TEXT" | "COLOR" | "IMAGE";
 
 export interface ClipListItemResponseDto {
   id: string;

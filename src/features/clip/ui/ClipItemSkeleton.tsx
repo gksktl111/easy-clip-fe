@@ -4,7 +4,7 @@
 export function ClipItemSkeleton() {
   return (
     <article
-      className="flex h-52 w-full flex-col justify-between rounded-2xl border border-(--border) bg-(--surface) p-4"
+      className="flex h-60 w-full flex-col justify-between rounded-2xl border border-(--border) bg-(--surface) p-4"
       aria-hidden
     >
       <div className="space-y-3">
@@ -21,6 +21,10 @@ export function ClipItemSkeleton() {
       <div className="flex items-center gap-2 border-t border-(--border) pt-3">
         <div className="skeleton-shimmer h-6 w-6 rounded-md" />
         <div className="skeleton-shimmer h-3 w-24 rounded-md" />
+      </div>
+      <div className="flex items-center gap-2 border-t border-(--border) pt-3">
+        <div className="skeleton-shimmer h-5 w-14 rounded-md" />
+        <div className="skeleton-shimmer h-5 w-20 rounded-md" />
       </div>
     </article>
   );

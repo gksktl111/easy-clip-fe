@@ -9,15 +9,18 @@ import {
   HiOutlinePhotograph,
   HiOutlineRefresh,
   HiOutlineStar,
+  HiOutlineTag,
   HiStar,
 } from "react-icons/hi";
 import type { Clip } from "@/features/clip/model/clip";
+import { TagChip } from "@/features/clip/ui/TagChip";
 
 // 클립 하나의 미리보기, 유형 정보, 복사, 즐겨찾기와 삭제 선택 상태를 표시합니다.
 interface ClipItemProps {
   clip: Clip;
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
+  onEditTags?: (clip: Clip) => void;
   onContextMenu?: (
     event: React.MouseEvent<HTMLButtonElement>,
     clip: Clip,
@@ -79,6 +82,7 @@ export function ClipItem({
   clip,
   onCopy,
   onToggleFavorite,
+  onEditTags,
   onContextMenu,
   isDeleteMode = false,
   isFavoriteMutationPending = false,
@@ -95,10 +99,12 @@ export function ClipItem({
   const primaryActionLabel = isDeleteMode
     ? t("selectForDelete", { name: clip.name })
     : t("copy", { name: clip.name });
+  const visibleTags = clip.tags.slice(0, 2);
+  const hiddenTagCount = Math.max(clip.tags.length - visibleTags.length, 0);
 
   return (
     <article
-      className="group relative h-52 w-full overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[disabled=true]:opacity-75 data-[selected=true]:border-(--danger) data-[selected=true]:ring-2 data-[selected=true]:ring-(--danger-border)"
+      className="group relative flex h-60 w-full flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[disabled=true]:opacity-75 data-[selected=true]:border-(--danger) data-[selected=true]:ring-2 data-[selected=true]:ring-(--danger-border)"
       data-disabled={isDisabled}
       data-delete-mode={isDeleteMode}
       data-selected={isSelected}
@@ -124,7 +130,7 @@ export function ClipItem({
 
           onContextMenu?.(event, clip);
         }}
-        className="flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) disabled:cursor-wait"
+        className="flex min-h-0 w-full flex-1 cursor-pointer flex-col overflow-hidden text-left transition focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--focus-ring) disabled:cursor-wait"
       >
         <span className="flex-1 overflow-hidden px-4 py-3">
           <ClipContentPreview clip={clip} />
@@ -138,6 +144,41 @@ export function ClipItem({
           </span>
         </span>
       </button>
+      <div className="flex min-h-10 items-center gap-1.5 border-t border-(--border) px-3 py-2">
+        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+          {visibleTags.map((tag) => (
+            <TagChip
+              key={tag.id}
+              name={tag.name}
+              backgroundColor={tag.backgroundColor}
+            />
+          ))}
+          {hiddenTagCount > 0 ? (
+            <span className="shrink-0 text-xs text-(--muted)">
+              +{hiddenTagCount}
+            </span>
+          ) : null}
+          {!clip.tags.length ? (
+            <span className="truncate text-xs text-(--muted)">
+              {t("noTags")}
+            </span>
+          ) : null}
+        </div>
+        {onEditTags && !isDeleteMode ? (
+          <button
+            type="button"
+            disabled={isDisabled}
+            onClick={(event) => {
+              event.stopPropagation();
+              onEditTags(clip);
+            }}
+            className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-(--muted) transition hover:bg-(--surface-muted) hover:text-(--foreground) focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) disabled:cursor-default disabled:opacity-50"
+            aria-label={t("editTags", { name: clip.name })}
+          >
+            <HiOutlineTag className="h-4 w-4" aria-hidden />
+          </button>
+        ) : null}
+      </div>
       {isDeleteMode ? (
         <div className="absolute top-3 left-3 z-20">
           <button

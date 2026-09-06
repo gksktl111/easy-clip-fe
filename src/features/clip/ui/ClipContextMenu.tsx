@@ -3,6 +3,7 @@
 import {
   HiOutlineClipboardCopy,
   HiOutlinePencil,
+  HiOutlineTag,
   HiOutlineTrash,
 } from "react-icons/hi";
 import type { ClipContextMenuState } from "@/features/clip/hooks/useClipContextMenu";
@@ -16,9 +17,11 @@ interface ClipContextMenuProps {
   copyLabel: string;
   renameLabel?: string;
   deleteLabel: string;
+  editTagsLabel?: string;
   onCopy: (clip: Clip) => void;
   onRename?: (clip: Clip) => void;
   onDelete: (clipId: string) => void;
+  onEditTags?: (clip: Clip) => void;
 }
 
 export function ClipContextMenu({
@@ -27,9 +30,11 @@ export function ClipContextMenu({
   copyLabel,
   renameLabel,
   deleteLabel,
+  editTagsLabel,
   onCopy,
   onRename,
   onDelete,
+  onEditTags,
 }: ClipContextMenuProps) {
   if (!contextMenu) {
     return null;
@@ -58,6 +63,15 @@ export function ClipContextMenu({
                 label: renameLabel,
                 icon: <HiOutlinePencil className="h-4 w-4" aria-hidden />,
                 onClick: () => onRename(targetClip),
+              },
+            ]
+          : []),
+        ...(editTagsLabel && onEditTags
+          ? [
+              {
+                label: editTagsLabel,
+                icon: <HiOutlineTag className="h-4 w-4" aria-hidden />,
+                onClick: () => onEditTags(targetClip),
               },
             ]
           : []),

@@ -6,6 +6,7 @@ import { useClipContextMenu } from "@/features/clip/hooks/useClipContextMenu";
 import { useClipCopyAction } from "@/features/clip/hooks/useClipCopyAction";
 import { useClipDeletion } from "@/features/clip/hooks/useClipDeletion";
 import { useFolderClipCapture } from "@/features/clip/hooks/useFolderClipCapture";
+import { useClipTagWorkspace } from "@/features/clip/hooks/useClipTagWorkspace";
 import { useClipFavoriteMutation } from "@/features/clip/mutations/useClipFavoriteMutation";
 import { useInfiniteClipsQuery } from "@/features/clip/queries/useInfiniteClipsQuery";
 import type { Clip } from "@/features/clip/model/clip";
@@ -33,7 +34,12 @@ export const useFolderClipsPage = ({
     isAuthenticated: query.isAuthenticated,
     onDeleted: onClipsDeleted,
   });
-  const isInteractionDisabled = deletion.isDeleteMode || deletion.isDeleting;
+  const tagWorkspace = useClipTagWorkspace({
+    folderId,
+    isAuthenticated: query.isAuthenticated,
+  });
+  const isInteractionDisabled =
+    deletion.isDeleteMode || deletion.isDeleting || tagWorkspace.isOpen;
   const capture = useFolderClipCapture({
     folderId,
     isAuthenticated: query.isAuthenticated,
@@ -113,6 +119,21 @@ export const useFolderClipsPage = ({
     [closeContextMenu, deleteClip],
   );
 
+  const openClipTagEditor = useCallback(
+    (clip: Clip) => {
+      closeContextMenu();
+      deactivate();
+      tagWorkspace.openClipEditor(clip);
+    },
+    [closeContextMenu, deactivate, tagWorkspace],
+  );
+
+  const openTagManager = useCallback(() => {
+    closeContextMenu();
+    deactivate();
+    tagWorkspace.openManager();
+  }, [closeContextMenu, deactivate, tagWorkspace]);
+
   return {
     capture: {
       activatePage,
@@ -166,6 +187,20 @@ export const useFolderClipsPage = ({
     },
     feedback: {
       copyToast,
+    },
+    tags: {
+      close: tagWorkspace.close,
+      create: tagWorkspace.createTag,
+      isOpen: tagWorkspace.isOpen,
+      isSavingClipTags: tagWorkspace.isSavingClipTags,
+      isTagActionPending: tagWorkspace.isTagActionPending,
+      openClipEditor: openClipTagEditor,
+      openManager: openTagManager,
+      query: tagWorkspace.query,
+      remove: tagWorkspace.removeTag,
+      saveClipTags: tagWorkspace.saveClipTags,
+      state: tagWorkspace.state,
+      update: tagWorkspace.updateTag,
     },
   };
 };

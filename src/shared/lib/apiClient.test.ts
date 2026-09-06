@@ -22,9 +22,8 @@ describe("apiClient 인증 만료 알림", () => {
     vi.stubGlobal("window", eventTarget);
     vi.stubGlobal("fetch", fetchMock);
 
-    const { apiRequest, subscribeToAuthExpired } = await import(
-      "@/shared/lib/apiClient"
-    );
+    const { apiRequest, subscribeToAuthExpired } =
+      await import("@/shared/lib/apiClient");
     const onAuthExpired = vi.fn();
     const unsubscribe = subscribeToAuthExpired(onAuthExpired);
 
@@ -45,9 +44,8 @@ describe("apiClient 인증 만료 알림", () => {
     vi.stubGlobal("window", eventTarget);
     vi.stubGlobal("fetch", fetchMock);
 
-    const { apiRequest, subscribeToAuthExpired } = await import(
-      "@/shared/lib/apiClient"
-    );
+    const { apiRequest, subscribeToAuthExpired } =
+      await import("@/shared/lib/apiClient");
     const onAuthExpired = vi.fn();
     const unsubscribe = subscribeToAuthExpired(onAuthExpired);
 
@@ -64,9 +62,8 @@ describe("apiClient 인증 만료 알림", () => {
     vi.stubGlobal("window", eventTarget);
     vi.stubGlobal("fetch", fetchMock);
 
-    const { apiRequest, subscribeToAuthExpired } = await import(
-      "@/shared/lib/apiClient"
-    );
+    const { apiRequest, subscribeToAuthExpired } =
+      await import("@/shared/lib/apiClient");
     const onAuthExpired = vi.fn();
     const unsubscribe = subscribeToAuthExpired(onAuthExpired);
 
@@ -76,5 +73,18 @@ describe("apiClient 인증 만료 알림", () => {
 
     expect(onAuthExpired).not.toHaveBeenCalled();
     unsubscribe();
+  });
+});
+
+describe("apiClient 성공 응답 파싱", () => {
+  it("200 응답 본문이 비어 있으면 null을 반환한다", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValueOnce(new Response(null, { status: 200 })),
+    );
+
+    const { apiRequest } = await import("@/shared/lib/apiClient");
+
+    await expect(apiRequest<null>("/empty-response")).resolves.toBeNull();
   });
 });
