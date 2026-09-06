@@ -193,8 +193,8 @@ test("클립 태그를 선택하고 회색 자동 생성·색상 지정 생성 �
     .getByRole("button", { name: "저장", exact: true })
     .click();
 
-  expect(replacedTagRequests[1]).toEqual([]);
   await expect(page.getByText("태그 없음", { exact: true })).toBeVisible();
+  expect(replacedTagRequests[1]).toEqual([]);
 });
 
 test("폴더 태그의 색상 생성·수정·삭제와 입력 오류를 관리한다", async ({
@@ -264,6 +264,11 @@ test("폴더 태그의 색상 생성·수정·삭제와 입력 오류를 관리�
 
   const manager = page.getByRole("dialog", { name: "폴더 태그 관리" });
   await manager.getByRole("button", { name: "새 태그" }).click();
+  await page.keyboard.press("Escape");
+  await expect(manager).toBeVisible();
+  await expect(manager.getByLabel("태그 이름")).toHaveCount(0);
+
+  await manager.getByRole("button", { name: "새 태그" }).click();
   const nameInput = manager.getByLabel("태그 이름");
 
   await nameInput.fill("   ");
@@ -300,6 +305,12 @@ test("폴더 태그의 색상 생성·수정·삭제와 입력 오류를 관리�
     "“업무” 태그가 적용된 모든 클립에서도 태그가 제거됩니다.",
   );
   await expect(confirm).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(confirm).toBeHidden();
+  await expect(manager).toBeVisible();
+  await expect(manager.getByText("업무", { exact: true })).toBeVisible();
+
+  await manager.getByRole("button", { name: "업무 태그 삭제" }).click();
   await page.getByRole("button", { name: "삭제", exact: true }).click();
   await expect(manager.getByText("업무", { exact: true })).toHaveCount(0);
 
@@ -315,4 +326,73 @@ test("폴더 태그의 색상 생성·수정·삭제와 입력 오류를 관리�
     },
     { method: "DELETE" },
   ]);
+});
+
+test("클립 태그 저장 404에서 최신 클립 목록을 다시 불러온다", async ({
+  page,
+}) => {
+  const folderTags: MockFolderTag[] = [
+    {
+      id: "tag-red",
+      name: "중요",
+      backgroundColor: "RED",
+      folderId: "folder-1",
+    },
+  ];
+  let clipListRequestCount = 0;
+
+  await addAuthCookie(page);
+  await mockWorkspaceRequests(page, folderTags);
+  await page.route("**/clips?**", (route) => {
+    clipListRequestCount += 1;
+    return route.fulfill({
+      json: {
+        items:
+          clipListRequestCount === 1
+            ? [
+                {
+                  id: "clip-1",
+                  type: "TEXT",
+                  title: "테스트 클립",
+                  textContent: "태그 API 테스트",
+                  colorHex: null,
+                  imageUrl: null,
+                  workspaceId: "workspace-1",
+                  folderId: "folder-1",
+                  createdAt: "2026-09-06T00:00:00.000Z",
+                  updatedAt: "2026-09-06T00:00:00.000Z",
+                  deletedAt: null,
+                  likeByMe: false,
+                  tags: folderTags,
+                },
+              ]
+            : [],
+        hasMore: false,
+        nextCursor: null,
+      },
+    });
+  });
+  await page.route("**/folders/folder-1/tags", (route) =>
+    route.fulfill({ json: folderTags }),
+  );
+  await page.route("**/clips/clip-1/tags", (route) =>
+    route.fulfill({
+      status: 404,
+      json: { message: "클립을 찾을 수 없습니다." },
+    }),
+  );
+
+  await page.goto("/folder/folder-1");
+  await page.getByRole("button", { name: "테스트 클립 태그 편집" }).click();
+
+  const editor = page.getByRole("dialog", { name: "클립 태그 편집" });
+  await editor.getByRole("button", { name: "저장", exact: true }).click();
+
+  await expect(
+    editor.getByText("목록을 새로고침했습니다.", { exact: false }),
+  ).toBeVisible();
+  await expect.poll(() => clipListRequestCount).toBeGreaterThan(1);
+
+  await editor.getByRole("button", { name: "태그 창 닫기" }).click();
+  await expect(page.getByText("테스트 클립", { exact: true })).toHaveCount(0);
 });

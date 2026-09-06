@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   HiArrowLeft,
@@ -72,17 +72,6 @@ export function ClipTagEditorModal({
   const [inputError, setInputError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const isBusy = isSavingClipTags || isTagActionPending;
-
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !isBusy) {
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, [isBusy, onClose]);
 
   const filteredTags = useMemo(() => {
     const normalizedQuery = searchQuery.toLocaleLowerCase();
@@ -200,7 +189,12 @@ export function ClipTagEditorModal({
   const title = view === "manage" ? t("manageTitle") : t("editorTitle");
 
   return (
-    <Modal onClose={close} contentClassName="w-full max-w-lg" className="py-4">
+    <Modal
+      onClose={close}
+      onEscape={close}
+      contentClassName="w-full max-w-lg"
+      className="py-4"
+    >
       <section
         className="flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-2xl"
         role="dialog"

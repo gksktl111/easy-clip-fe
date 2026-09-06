@@ -3,10 +3,12 @@
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { replaceClipTags } from "@/features/clip/api/tagApi";
+import { clipQueryKeys } from "@/features/clip/queries/clipQueryKey";
 import {
   folderTagQueryKeys,
   updateClipTagsInCache,
 } from "@/features/clip/service/tagQueryCache";
+import { ApiError } from "@/shared/lib/apiClient";
 
 interface UseClipTagsMutationOptions {
   folderId: string;
@@ -31,6 +33,11 @@ export const useClipTagsMutation = ({
       void queryClient.invalidateQueries({
         queryKey: folderTagQueryKeys.list(folderId),
       });
+    },
+    onError: (error) => {
+      if (error instanceof ApiError && error.status === 404) {
+        void queryClient.invalidateQueries({ queryKey: clipQueryKeys.all });
+      }
     },
   });
   const { mutateAsync } = mutation;

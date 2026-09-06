@@ -11,6 +11,7 @@ interface ModalProps {
   isOpen?: boolean;
   overlay?: "default" | "strong";
   onClose?: () => void;
+  onEscape?: () => void;
 }
 
 export function Modal({
@@ -20,6 +21,7 @@ export function Modal({
   isOpen = true,
   overlay = "default",
   onClose,
+  onEscape,
 }: ModalProps) {
   const portalElement = typeof document === "undefined" ? null : document.body;
 
@@ -35,6 +37,12 @@ export function Modal({
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           onClose?.();
+        }
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && onEscape) {
+          event.stopPropagation();
+          onEscape();
         }
       }}
     >

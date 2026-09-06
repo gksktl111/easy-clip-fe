@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 import { useTranslations } from "next-intl";
 import { HiOutlinePencil, HiOutlinePlus, HiOutlineTrash } from "react-icons/hi";
 import type { FolderTag, TagBackgroundColor } from "@/features/clip/model/tag";
@@ -88,6 +88,23 @@ export function FolderTagManagerPanel({
     setActionError(null);
   };
 
+  const handleNestedEscape = (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || (!form && !deleteTarget)) {
+      return;
+    }
+
+    event.stopPropagation();
+    if (isPending) {
+      return;
+    }
+
+    if (deleteTarget) {
+      setDeleteTarget(null);
+    } else {
+      closeForm();
+    }
+  };
+
   const submitForm = async () => {
     if (!form || isPending) {
       return;
@@ -163,7 +180,14 @@ export function FolderTagManagerPanel({
 
   if (form) {
     return (
-      <div className="space-y-5">
+      <form
+        className="space-y-5"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void submitForm();
+        }}
+        onKeyDown={handleNestedEscape}
+      >
         <div>
           <label
             htmlFor="folder-tag-name"
@@ -176,13 +200,6 @@ export function FolderTagManagerPanel({
             autoFocus
             value={form.name}
             onChange={(event) => updateFormName(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                void submitForm();
-              } else if (event.key === "Escape") {
-                closeForm();
-              }
-            }}
             inputClassName="mt-2 rounded-lg px-3 py-2 focus:ring-0"
             placeholder={t("namePlaceholder")}
             aria-invalid={Boolean(fieldError)}
@@ -227,8 +244,8 @@ export function FolderTagManagerPanel({
             {t("cancel")}
           </Button>
           <Button
+            type="submit"
             disabled={isPending}
-            onClick={() => void submitForm()}
             variant="primary"
             size="sm"
           >
@@ -239,12 +256,12 @@ export function FolderTagManagerPanel({
                 : t("save")}
           </Button>
         </div>
-      </div>
+      </form>
     );
   }
 
   return (
-    <div>
+    <div onKeyDown={handleNestedEscape}>
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm text-(--muted)">{t("manageDescription")}</p>
         <Button
