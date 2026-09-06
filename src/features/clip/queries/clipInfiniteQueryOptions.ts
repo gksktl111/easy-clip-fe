@@ -3,6 +3,7 @@ import { fetchClips } from "@/features/clip/api/clipApi";
 import type { ClipFilter } from "@/features/clip/model/clip";
 import type { FetchClipsQueryDto } from "@/features/clip/model/clip.dto";
 import { clipQueryKeys } from "@/features/clip/queries/clipQueryKey";
+import { shouldRetryFolderClipsQuery } from "@/features/clip/service/folderClipQueryState";
 import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 const mapFilterToApiType = (filter: ClipFilter): FetchClipsQueryDto["type"] => {
@@ -63,5 +64,6 @@ export const clipInfiniteQueryOptions = ({
     getNextPageParam: (lastPage) =>
       lastPage.hasMore ? lastPage.nextCursor : undefined,
     placeholderData: (previousData) => previousData,
+    ...(folderId ? { retry: shouldRetryFolderClipsQuery } : {}),
   });
 };

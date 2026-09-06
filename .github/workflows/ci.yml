@@ -11,6 +11,9 @@ jobs:
   verify:
     name: 검증
     runs-on: ubuntu-latest
+    env:
+      # E2E의 Playwright route mock이 처리할 테스트용 공개 API origin입니다.
+      NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:3108
 
     steps:
       - name: 소스 체크아웃

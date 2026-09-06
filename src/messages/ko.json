@@ -317,6 +317,10 @@
       "description": "네트워크 상태를 확인하거나 잠시 후 다시 시도해주세요.",
       "retry": "다시 시도"
     },
+    "folderNotFoundState": {
+      "title": "존재하지 않는 폴더입니다.",
+      "description": "폴더가 삭제되었거나 주소가 올바르지 않습니다."
+    },
     "item": {
       "saving": "저장 중",
       "copy": "{name} 복사",

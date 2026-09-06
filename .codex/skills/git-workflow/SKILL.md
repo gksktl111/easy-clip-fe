@@ -121,14 +121,15 @@ git push -u origin refactor/97
 ```bash
 npm run lint
 npm run typecheck
-npm run build
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3108 npm run build
 npm run test
-npm run test:e2e
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3108 CI=true npm run test:e2e
 ```
 
 - 하나라도 실패하면 원인을 해결하고 전체 검증을 다시 통과시킨 뒤 push한다.
 - 로컬 환경 제약으로 실행할 수 없는 명령이 있으면 사유와 미검증 항목을 사용자에게 알리고, 사용자의 명시적 지시 없이는 push하지 않는다.
 - CI 워크플로 또는 npm 스크립트가 바뀌면 이 검증 목록도 함께 갱신한다.
+- E2E는 API 요청을 Playwright route로 mock하므로, 앱 서버와 충돌하지 않는 테스트용 공개 API origin `http://127.0.0.1:3108`을 빌드 시점과 E2E 실행 시점 모두 고정한다. `.env.local` 값에 의존하지 않는다.
 
 ## PR 생성
 

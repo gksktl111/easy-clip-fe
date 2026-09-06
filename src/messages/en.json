@@ -317,6 +317,10 @@
       "description": "Check your network connection or try again shortly.",
       "retry": "Try again"
     },
+    "folderNotFoundState": {
+      "title": "This folder does not exist.",
+      "description": "It may have been deleted, or the address may be incorrect."
+    },
     "item": {
       "saving": "Saving",
       "copy": "Copy {name}",

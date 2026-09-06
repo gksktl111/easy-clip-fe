@@ -134,6 +134,7 @@ export const useFolderClipsPage = ({
       pendingFavoriteClipId: favorite.pendingClipId,
       results: {
         clips: query.clips,
+        error: query.error,
         fetchNextPage: query.fetchNextPage,
         hasNextPage: query.hasNextPage,
         isError: query.isError,
