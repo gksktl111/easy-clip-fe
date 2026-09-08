@@ -90,6 +90,14 @@ export const useFolderClipCapture = ({
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.closest("input, textarea") || target.isContentEditable)
+      ) {
+        return;
+      }
+
       if (isDisabled || !isActive || !folderId || !ensureAuthenticated()) {
         return;
       }
