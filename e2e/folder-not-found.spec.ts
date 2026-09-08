@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test("존재하지 않는 폴더는 재시도 없이 전용 오류 상태를 표시한다", async ({
   context,
@@ -56,5 +56,5 @@ test("존재하지 않는 폴더는 재시도 없이 전용 오류 상태를 표
   await expect(page.getByRole("button", { name: "다시 시도" })).toHaveCount(
     0,
   );
-  expect(clipRequestCount).toBe(1);
+  expect(clipRequestCount).toBe(0);
 });

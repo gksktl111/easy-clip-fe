@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test("최근 항목 3페이지에서 즐겨찾기 등록·해제·실패 재시도와 목록 동기화를 유지한다", async ({
   page,
@@ -52,7 +52,7 @@ test("최근 항목 3페이지에서 즐겨찾기 등록·해제·실패 재시�
     }),
   );
   await page.route("**/folders", (route) =>
-    route.fulfill({ json: [{ id: "folder-1", name: "프로젝트", order: 0 }] }),
+    route.fulfill({ json: [{ id: "folder-1", name: "프로젝트", order: 0, isLocked: false }] }),
   );
   await page.route("**/clips?**", (route) => {
     const params = new URL(route.request().url()).searchParams;

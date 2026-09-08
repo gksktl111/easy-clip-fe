@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
 interface MockFolderTag {
   id: string;
@@ -52,7 +52,7 @@ const mockWorkspaceRequests = async (
   );
   await page.route("**/folders", (route) =>
     route.fulfill({
-      json: [{ id: "folder-1", name: "프로젝트", order: 0 }],
+      json: [{ id: "folder-1", name: "프로젝트", order: 0, isLocked: false }],
     }),
   );
   await page.route("**/clips?**", (route) =>

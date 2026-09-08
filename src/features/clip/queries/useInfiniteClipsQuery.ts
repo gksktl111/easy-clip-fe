@@ -1,7 +1,9 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { ApiError } from "@/shared/lib/apiClient";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef } from "react";
 import type { Clip, ClipFilter } from "@/features/clip/model/clip";
 import { clipInfiniteQueryOptions } from "@/features/clip/queries/clipInfiniteQueryOptions";
 import { mapClipResponse } from "@/features/clip/service/mapClipResponse";
@@ -27,17 +29,39 @@ export const useInfiniteClipsQuery = ({
 }: UseInfiniteClipsQueryOptions) => {
   const { user } = useAuth();
   const isAuthenticated = Boolean(user);
-  const isQueryEnabled = isAuthenticated && enabled;
-  const query = useInfiniteQuery(
-    clipInfiniteQueryOptions({
-      folderId,
-      favorite,
-      recent,
-      filter,
-      searchQuery,
-      enabled: isQueryEnabled,
-    }),
-  );
+  const access = useResourceAccess();
+  const canRead =
+    access.status === "ready" &&
+    (!folderId || access.folderLocks[folderId] === false);
+  const isQueryEnabled = isAuthenticated && enabled && canRead;
+  const queryClient = useQueryClient();
+  const options = clipInfiniteQueryOptions({
+    accessScope: access.scope,
+    folderId,
+    favorite,
+    recent,
+    filter,
+    searchQuery,
+    enabled: isQueryEnabled,
+  });
+  const query = useInfiniteQuery(options);
+  const restarted = useRef(new Set<string>());
+  const identity = JSON.stringify(options.queryKey);
+  useEffect(() => {
+    if (
+      !canRead ||
+      !query.isFetchNextPageError ||
+      !(query.error instanceof ApiError) ||
+      query.error.status !== 404 ||
+      restarted.current.has(identity)
+    )
+      return;
+    restarted.current.add(identity);
+    void queryClient.resetQueries({
+      queryKey: JSON.parse(identity),
+      exact: true,
+    });
+  }, [canRead, identity, query.isFetchNextPageError, query.error, queryClient]);
 
   const clips = useMemo<Clip[]>(
     () =>
@@ -48,7 +72,12 @@ export const useInfiniteClipsQuery = ({
   );
 
   return {
-    clips,
+    clips: canRead
+      ? clips.filter(
+          (clip) =>
+            clip.folderId && access.folderLocks[clip.folderId] === false,
+        )
+      : [],
     error: query.error,
     fetchNextPage: query.fetchNextPage,
     hasNextPage: Boolean(query.hasNextPage),
@@ -56,6 +85,12 @@ export const useInfiniteClipsQuery = ({
     isError: query.isError,
     isFetchingNextPage: query.isFetchingNextPage,
     isLoading: isQueryEnabled && query.isPending,
-    refetch: query.refetch,
+    refetch: () => {
+      restarted.current.delete(identity);
+      return queryClient.resetQueries({
+        queryKey: options.queryKey,
+        exact: true,
+      });
+    },
   };
 };

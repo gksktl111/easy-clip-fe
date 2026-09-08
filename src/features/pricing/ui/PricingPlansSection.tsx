@@ -1,5 +1,7 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { Button } from "@/shared/ui/button/Button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -31,6 +33,8 @@ import { DEFAULT_LOCALE, isAppLocale } from "@/shared/config/locale";
 // 구독 상태에 맞는 요금제 카드 액션과 취소 흐름을 조합합니다.
 export function PricingPlansSection() {
   const router = useRouter();
+  const access = useResourceAccess();
+  const a = useTranslations("access");
   const t = useTranslations("pricing");
   const currentLocale = useLocale();
   const locale = isAppLocale(currentLocale) ? currentLocale : DEFAULT_LOCALE;
@@ -52,12 +56,19 @@ export function PricingPlansSection() {
     setIsCancelingSubscription(true);
 
     try {
-      await cancelSubscription();
-      notifySuccess(t("toasts.cancelSuccess"));
+      const result = await cancelSubscription();
+      notifySuccess(
+        result.cancellation?.message || t("toasts.cancelSuccess"),
+        result.cancellation?.pendingRenewalPayment
+          ? t("subscription.pendingRenewalPayment")
+          : undefined,
+      );
       setIsCancelModalOpen(false);
       router.push("/favorites");
-    } catch {
-      notifyError(t("toasts.updateError"));
+    } catch (error) {
+      notifyError(
+        error instanceof ApiError ? error.message : t("toasts.updateError"),
+      );
     } finally {
       setIsCancelingSubscription(false);
     }
@@ -85,16 +96,28 @@ export function PricingPlansSection() {
         }
       }
 
-      notifyError(t("toasts.updateError"));
+      notifyError(
+        error instanceof ApiError ? error.message : t("toasts.updateError"),
+      );
     } finally {
       setIsResumingSubscription(false);
     }
   };
 
   const renderPlanAction = (plan: PricingPlan) => {
+    if (isAuthenticated && access.status !== "ready")
+      return (
+        <PricingPlanAction disabled featured={plan.highlight} kind="button">
+          {a("checkingTitle")}
+        </PricingPlanAction>
+      );
     const isFreePlan = !plan.highlight;
     const isCurrentFreePlan =
-      isAuthenticated && isFreePlan && subscription?.plan === "FREE";
+      isAuthenticated &&
+      isFreePlan &&
+      Boolean(subscription) &&
+      !isCurrentProPlan &&
+      !isResumableProPlan;
     const isCurrentProPlanCard =
       isAuthenticated && plan.highlight && isCurrentProPlan;
     const isResumeTargetPlan =
@@ -200,6 +223,15 @@ export function PricingPlansSection() {
 
   return (
     <>
+      {isAuthenticated &&
+      (access.status === "error" || access.status === "incompatible") ? (
+        <div className="mt-6" role="status">
+          <p>{a("errorDescription")}</p>
+          <Button variant="secondary" onClick={() => void access.refresh()}>
+            {a("retry")}
+          </Button>
+        </div>
+      ) : null}
       <div className="mt-10 grid gap-4 sm:mt-12 sm:gap-6 lg:mt-16 lg:grid-cols-[0.95fr_1.05fr]">
         {PRICING_PLANS.map((plan) => (
           <PricingPlanCard
@@ -213,6 +245,7 @@ export function PricingPlansSection() {
         ))}
       </div>
 
+      <p className="mt-4 text-sm text-(--muted)">{a("clipLimitExplanation")}</p>
       {isCancelModalOpen ? (
         <PricingCancelModal
           isCanceling={isCancelingSubscription}

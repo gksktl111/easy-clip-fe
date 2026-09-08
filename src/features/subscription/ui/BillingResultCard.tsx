@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { HiCheckCircle, HiExclamationCircle } from "react-icons/hi";
 
@@ -17,10 +18,11 @@ export function BillingResultCard({
   message,
   status,
 }: BillingResultCardProps) {
+  const t = useTranslations("access");
   return (
     <section className="w-full max-w-md rounded-2xl border border-(--border) bg-(--surface-elevated) p-6 text-center shadow-xl">
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-(--surface-muted)">
-        {status === "success" ? (
+        {isSuccess ? (
           <HiCheckCircle className="h-7 w-7 text-(--success)" aria-hidden />
         ) : (
           <HiExclamationCircle
@@ -30,25 +32,27 @@ export function BillingResultCard({
         )}
       </div>
       <h1 className="mt-5 text-2xl font-semibold">
-        {status === "success" ? "결제 확인" : "결제 실패"}
+        {status === "success" ? t("billingChecking") : t("billingFailed")}
       </h1>
       <p className="mt-3 text-sm leading-6 text-(--muted)">
         {isConfirming
-          ? "결제 승인 정보를 확인하고 있습니다."
+          ? t("billingLoading")
           : (message ??
             (isMissingSuccessParams
-              ? "결제 승인 정보가 부족합니다."
-              : "결제 페이지에서 다시 시도해 주세요."))}
+              ? t("billingMissing")
+              : t("billingUncertain")))}
       </p>
 
       <Link
-        href={isSuccess ? "/recent" : "/billing"}
+        href={isSuccess ? "/recent" : "/pricing"}
         className="mt-6 flex cursor-pointer items-center justify-center rounded-xl bg-(--primary) px-4 py-3 text-sm font-semibold transition hover:bg-(--primary-hover)"
       >
         {isSuccess ? (
-          <span className="text-primary-foreground">앱으로 이동</span>
+          <span className="text-primary-foreground">{t("openApp")}</span>
         ) : (
-          <span className="text-primary-foreground">결제 다시 시도</span>
+          <span className="text-primary-foreground">
+            {t("checkSubscription")}
+          </span>
         )}
       </Link>
     </section>

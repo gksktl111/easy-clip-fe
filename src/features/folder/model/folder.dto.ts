@@ -2,6 +2,7 @@ export interface FolderResponseDto {
   id: string;
   name: string;
   order: number;
+  isLocked?: boolean;
   workspaceId: string;
   createdAt: string;
   updatedAt: string;

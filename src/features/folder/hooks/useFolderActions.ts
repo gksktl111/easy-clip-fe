@@ -1,5 +1,9 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { requestAccessRefresh } from "@/shared/access/accessEvents";
+import { ApiError } from "@/shared/lib/apiClient";
+
 import { useCallback, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -25,6 +29,7 @@ const createAuthRequiredError = () => new Error("AUTH_REQUIRED");
 // 폴더 생성, 이름 변경, 삭제와 optimistic 순서 변경 액션을 관리합니다.
 export const useFolderActions = () => {
   const { user } = useAuth();
+  const access = useResourceAccess();
   const isAuthenticated = Boolean(user);
   const queryClient = useQueryClient();
   const folderQueryKey = useMemo(
@@ -47,9 +52,16 @@ export const useFolderActions = () => {
           throw createAuthRequiredError();
         }
 
+        if (!access.canCreateFolder)
+          throw new ApiError(
+            "폴더 생성 권한을 확인해주세요.",
+            409,
+            "PLAN_LIMIT_EXCEEDED",
+          );
         return createFolderRequest({ name });
       },
       onSuccess: (createdFolder) => {
+        requestAccessRefresh();
         setFolders((folders) =>
           sortFolders([...folders, mapFolder(createdFolder)]),
         );
@@ -69,14 +81,17 @@ export const useFolderActions = () => {
           throw createAuthRequiredError();
         }
 
+        if (access.status !== "ready" || access.folderLocks[folderId] !== false)
+          throw new ApiError("잠긴 폴더입니다.", 403, "PROJECT_LOCKED");
         return updateFolderRequest(folderId, { name });
       },
       onSuccess: (updatedFolder) => {
+        requestAccessRefresh();
         setFolders((folders) =>
           sortFolders(
             folders.map((folder) =>
               folder.id === updatedFolder.id
-                ? mapFolder(updatedFolder)
+                ? { ...folder, ...mapFolder(updatedFolder) }
                 : folder,
             ),
           ),
@@ -95,6 +110,7 @@ export const useFolderActions = () => {
         return folderId;
       },
       onSuccess: (folderId) => {
+        requestAccessRefresh();
         setFolders((folders) =>
           folders.filter((folder) => folder.id !== folderId),
         );
@@ -110,6 +126,12 @@ export const useFolderActions = () => {
           throw createAuthRequiredError();
         }
 
+        if (!access.isPro || access.status !== "ready")
+          throw new ApiError(
+            "Pro에서 폴더 순서를 변경할 수 있습니다.",
+            403,
+            "FEATURE_NOT_AVAILABLE",
+          );
         return reorderFolderRequest(payload);
       },
       onSuccess: () => {

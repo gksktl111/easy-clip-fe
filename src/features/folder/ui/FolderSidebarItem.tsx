@@ -1,5 +1,9 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { useTranslations } from "next-intl";
+import { HiOutlineLockClosed } from "react-icons/hi";
+
 import Link from "next/link";
 import {
   HiOutlineDotsVertical,
@@ -69,10 +73,16 @@ export function FolderSidebarItem({
   const isDragging = Boolean(draggingFolderId);
   const isDraggedItem = draggingFolderId === folder.id;
   const isActiveFolder = pathname === getFolderPath(folder.id);
+  const access = useResourceAccess();
+  const t = useTranslations("access");
+  const canReorder = access.status === "ready" && access.isPro;
+  const canRename =
+    access.status === "ready" && access.folderLocks[folder.id] === false;
   const isDropTarget = dropIndicatorEdge !== null;
   const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
     // 링크나 옵션 버튼에 포커스가 있어도 폴더 항목 단위 단축키로 순서를 바꿀 수 있게 버블링을 받습니다.
     if (
+      !canReorder ||
       !event.ctrlKey ||
       (event.key !== "ArrowUp" && event.key !== "ArrowDown")
     ) {
@@ -116,7 +126,8 @@ export function FolderSidebarItem({
       >
         <button
           type="button"
-          draggable
+          disabled={!canReorder}
+          draggable={canReorder}
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
           className={`text-muted flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) ${
@@ -135,6 +146,12 @@ export function FolderSidebarItem({
         >
           <HiOutlineFolder className="h-5 w-5 shrink-0" aria-hidden />
           <span className="truncate">{folder.name}</span>
+          {folder.isLocked ? (
+            <HiOutlineLockClosed
+              className="h-4 w-4 shrink-0 text-(--muted)"
+              aria-label={t("lockedBadge")}
+            />
+          ) : null}
         </Link>
 
         <button
@@ -153,12 +170,13 @@ export function FolderSidebarItem({
 
       {isOptionsOpen ? (
         <FolderOptionsMenu
-          canMoveUp={canMoveUp}
-          canMoveDown={canMoveDown}
+          canMoveUp={canReorder && canMoveUp}
+          canMoveDown={canReorder && canMoveDown}
           moveFolderUpLabel={moveFolderUpLabel}
           moveFolderDownLabel={moveFolderDownLabel}
           // 우클릭 메뉴는 커서 좌표에 fixed로 띄우고, 옵션 버튼 메뉴는 기존 위치에 absolute로 띄웁니다.
           position={optionsMenuPosition}
+          canRename={canRename}
           renameLabel={renameLabel}
           deleteLabel={deleteLabel}
           onMoveUp={onMoveUp}

@@ -1,6 +1,7 @@
 export { getAuthStartPath, logout } from "@/features/auth/api/authApi";
 export { AuthProvider } from "@/features/auth/client/AuthProvider";
 export { useAuth } from "@/features/auth/hooks/useAuth";
+export { currentUserQueryOptions } from "@/features/auth/queries/currentUserQueryOptions";
 export { useLogout } from "@/features/auth/hooks/useLogout";
 export type {
   AuthSession,

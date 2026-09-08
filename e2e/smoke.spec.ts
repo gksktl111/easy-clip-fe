@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test("랜딩 페이지의 핵심 메시지와 단일 CTA를 렌더링한다", async ({ page }) => {
   await page.goto("/");

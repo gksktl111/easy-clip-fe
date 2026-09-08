@@ -1,5 +1,7 @@
 "use client";
 
+import { requestAccessRefresh } from "@/shared/access/accessEvents";
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { useCallback, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -27,6 +29,9 @@ export const useTrashActions = ({
   onItemsChanged,
 }: UseTrashActionsOptions = {}) => {
   const { user } = useAuth();
+  const access = useResourceAccess();
+  const [failure, setFailure] = useState<unknown>(null);
+  const [deletedCount, setDeletedCount] = useState<number | null>(null);
   const isAuthenticated = Boolean(user);
   const queryClient = useQueryClient();
   const [error, setError] = useState<TrashActionError | null>(null);
@@ -40,19 +45,34 @@ export const useTrashActions = ({
 
   const runAction = useCallback(
     async (actionKey: string, action: () => Promise<unknown>) => {
-      if (!isAuthenticated || pendingActionKeyRef.current) {
+      if (
+        !isAuthenticated ||
+        access.status !== "ready" ||
+        pendingActionKeyRef.current
+      ) {
         return false;
       }
 
       pendingActionKeyRef.current = actionKey;
       setPendingActionKey(actionKey);
       setError(null);
+      setFailure(null);
+      setDeletedCount(null);
 
       try {
-        await action();
-        await refreshRelatedData();
+        const result = await action();
+        if (
+          result &&
+          typeof result === "object" &&
+          "totalDeleted" in result &&
+          typeof result.totalDeleted === "number"
+        )
+          setDeletedCount(result.totalDeleted);
+        await refreshRelatedData().catch(() => undefined);
+        requestAccessRefresh();
         return true;
       } catch (actionError) {
+        setFailure(actionError);
         const isRestoreConflict =
           actionKey.includes("restore") &&
           actionError instanceof ApiError &&
@@ -66,7 +86,7 @@ export const useTrashActions = ({
         setPendingActionKey(null);
       }
     },
-    [isAuthenticated, refreshRelatedData],
+    [isAuthenticated, access.status, refreshRelatedData],
   );
 
   const restoreClip = useCallback(
@@ -109,7 +129,10 @@ export const useTrashActions = ({
     () => runAction("trash-clear-all", deleteAllTrashItems),
     [runAction],
   );
-  const clearError = useCallback(() => setError(null), []);
+  const clearError = useCallback(() => {
+    setError(null);
+    setFailure(null);
+  }, []);
 
   return {
     clearAll,
@@ -118,6 +141,8 @@ export const useTrashActions = ({
     deleteFolder,
     deleteItems,
     error,
+    failure,
+    deletedCount,
     pendingActionKey,
     restoreClip,
     restoreFolder,

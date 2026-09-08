@@ -88,3 +88,98 @@ describe("apiClient 성공 응답 파싱", () => {
     await expect(apiRequest<null>("/empty-response")).resolves.toBeNull();
   });
 });
+
+describe("정책 오류와 오래된 권한 응답", () => {
+  it.each([
+    {
+      status: 400,
+      body: { message: ["입력 오류", 12], details: [] },
+      message: "입력 오류",
+      code: undefined,
+    },
+    {
+      status: 403,
+      body: { message: "일반 접근 오류", code: "UNKNOWN_POLICY" },
+      message: "일반 접근 오류",
+      code: "UNKNOWN_POLICY",
+    },
+    {
+      status: 409,
+      body: { message: "부모 폴더 복구 필요" },
+      message: "부모 폴더 복구 필요",
+      code: undefined,
+    },
+    {
+      status: 409,
+      body: {},
+      message: "Request failed with status 409",
+      code: undefined,
+    },
+  ])(
+    "$status 오류의 미지 코드와 누락 필드를 일반 오류로 유지한다",
+    async ({ status, body, message, code }) => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue(new Response(JSON.stringify(body), { status }));
+      vi.stubGlobal("fetch", fetchMock);
+      const { apiRequest } = await import("./apiClient");
+      await expect(
+        apiRequest("/clips", { method: "POST" }),
+      ).rejects.toMatchObject({ status, message, code, details: undefined });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it("오류 코드·상세 및 문자열 배열 메시지를 보존한다", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            message: ["첫 오류", "다음 오류"],
+            code: "CLIP_LIMIT_EXCEEDED",
+            details: {
+              limit: 300,
+              currentCount: 300,
+              upgradeCanResolve: false,
+            },
+          }),
+          { status: 409 },
+        ),
+      ),
+    );
+    const { apiRequest } = await import("./apiClient");
+    await expect(
+      apiRequest("/clips", { method: "POST" }),
+    ).rejects.toMatchObject({
+      status: 409,
+      code: "CLIP_LIMIT_EXCEEDED",
+      message: "첫 오류\n다음 오류",
+      details: { limit: 300, currentCount: 300, upgradeCanResolve: false },
+    });
+  });
+
+  it("권한 변경 전에 시작한 콘텐츠 응답을 버린다", async () => {
+    let resolve!: (response: Response) => void;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        () =>
+          new Promise<Response>((done) => {
+            resolve = done;
+          }),
+      ),
+    );
+    const { apiRequest } = await import("./apiClient");
+    const { advanceAccessGeneration, AccessChangedError } =
+      await import("@/shared/access/accessEvents");
+    const request = apiRequest("/clips?type=ALL");
+    advanceAccessGeneration();
+    resolve(
+      new Response(
+        JSON.stringify({ items: [{ title: "이전 Pro 비공개 콘텐츠" }] }),
+      ),
+    );
+    await expect(request).rejects.toBeInstanceOf(AccessChangedError);
+  });
+});

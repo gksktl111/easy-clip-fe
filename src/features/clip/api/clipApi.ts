@@ -11,7 +11,10 @@ import {
 } from "@/features/clip/model/clip.dto";
 import { apiRequest } from "@/shared/lib/apiClient";
 
-export const fetchClips = async (options: FetchClipsQueryDto = {}) => {
+export const fetchClips = async (
+  options: FetchClipsQueryDto = {},
+  signal?: AbortSignal,
+) => {
   const searchParams = new URLSearchParams();
   searchParams.set("type", options.type ?? "ALL");
 
@@ -37,6 +40,7 @@ export const fetchClips = async (options: FetchClipsQueryDto = {}) => {
 
   return apiRequest<ClipCursorPageResponseDto>(`/clips?${searchParams}`, {
     cache: "no-store",
+    signal,
   });
 };
 

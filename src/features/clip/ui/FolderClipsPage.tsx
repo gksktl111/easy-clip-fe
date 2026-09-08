@@ -1,5 +1,9 @@
 "use client";
 
+import { ClipCaptureDraftPanel } from "@/features/clip/ui/ClipCaptureDraftPanel";
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
+import { ApiError } from "@/shared/lib/apiClient";
 import { useTranslations } from "next-intl";
 import { HiOutlineTag } from "react-icons/hi";
 import { useFolderClipsPage } from "@/features/clip/hooks/useFolderClipsPage";
@@ -23,18 +27,35 @@ interface FolderClipsPageProps {
   onClipsDeleted?: () => void | Promise<void>;
 }
 
-export function FolderClipsPage({
+export function FolderClipsPage(props: FolderClipsPageProps) {
+  const access = useResourceAccess();
+  return (
+    <FolderClipsContent key={`${access.scope}:${props.folderId}`} {...props} />
+  );
+}
+
+function FolderClipsContent({
   folderId,
   onClipsDeleted,
 }: FolderClipsPageProps) {
   const t = useTranslations("clips");
+  const access = useResourceAccess();
+  const a = useTranslations("access");
   const { capture, collection, contextMenu, deletion, feedback, tags, rename } =
     useFolderClipsPage({ folderId, onClipsDeleted });
   const { commands, filter, results } = collection;
   const isFolderNotFound = isFolderNotFoundError(results.error);
   const hasClipLoadError = results.isError && results.clips.length === 0;
 
-  if (isFolderNotFound) {
+  if (access.status !== "ready") return <ResourceAccessNotice />;
+  if (
+    access.folderLocks[folderId] === true ||
+    (results.error instanceof ApiError &&
+      results.error.code === "PROJECT_LOCKED")
+  )
+    return <ResourceAccessNotice locked />;
+
+  if (isFolderNotFound || !(folderId in access.folderLocks)) {
     return <FolderNotFoundState />;
   }
 
@@ -69,8 +90,16 @@ export function FolderClipsPage({
         />
       ) : null}
       {!hasClipLoadError && !capture.isActive ? (
-        <FolderClipCaptureHint message={t("captureHint")} />
+        <FolderClipCaptureHint
+          message={`${t("captureHint")} ${a("clipLimit", { limit: access.isPro ? 300 : 50 })}`}
+        />
       ) : null}
+      <ClipCaptureDraftPanel
+        draft={capture.draft}
+        pending={capture.isCreating}
+        onRetry={capture.retryDraft}
+        onDiscard={capture.discardDraft}
+      />
       <ClipResultsSection
         clips={results.clips}
         hasNextPage={results.hasNextPage}

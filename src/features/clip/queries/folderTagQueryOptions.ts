@@ -19,5 +19,5 @@ export const folderTagQueryOptions = ({
     queryFn: async () =>
       (await fetchFolderTags(folderId)).map(mapFolderTagResponse),
     retry: (failureCount, error) =>
-      !(error instanceof ApiError && error.status === 404) && failureCount < 3,
+      !(error instanceof ApiError && error.status >= 400 && error.status < 500) && failureCount < 3,
   });

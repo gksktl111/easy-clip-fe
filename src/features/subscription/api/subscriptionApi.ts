@@ -6,9 +6,10 @@ import {
 } from "@/features/subscription/model/subscription.dto";
 import { apiRequest } from "@/shared/lib/apiClient";
 
-export const fetchMySubscription = async () =>
+export const fetchMySubscription = async (signal?: AbortSignal) =>
   apiRequest<MySubscriptionResponseDto>("/subscriptions/me", {
     cache: "no-store",
+    signal,
   });
 
 export const updateMySubscription = async (

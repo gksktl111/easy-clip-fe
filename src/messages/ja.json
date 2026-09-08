@@ -74,9 +74,9 @@
         "cta": "無料で始める",
         "features": {
           "projects": "1つのプロジェクトを利用可能",
-          "clips": "最大50件のクリップを作成可能",
+          "clips": "フォルダーごとに50件まで追加保存",
           "devices": "デスクトップ1台、モバイル1台を連携可能",
-          "organization": "検索機能を利用可能",
+          "organization": "アクセス可能なフォルダーで検索 + タグ",
           "ai": ""
         }
       },
@@ -89,9 +89,9 @@
         "cta": "Proにアップグレード",
         "features": {
           "projects": "プロジェクトを無制限に作成可能",
-          "clips": "プロジェクトごとに最大500件のクリップを作成可能",
+          "clips": "フォルダーごとに300件まで追加保存",
           "devices": "デバイスを無制限に連携可能",
-          "organization": "タグ機能を利用可能",
+          "organization": "アクセス可能なフォルダーで検索 + タグ",
           "ai": "AI機能は近日追加予定"
         }
       }
@@ -114,7 +114,8 @@
         "dismiss": "いいえ",
         "confirm": "はい",
         "confirming": "変更中"
-      }
+      },
+      "pendingRenewalPayment": "開始済みの更新請求が完了し、利用期間が延長される場合があります。"
     },
     "comparison": {
       "eyebrow": "クイック比較",
@@ -133,8 +134,8 @@
         },
         "clips": {
           "label": "クリップ数",
-          "freeValue": "最大50件",
-          "proValue": "プロジェクトごとに最大500件"
+          "freeValue": "フォルダーごとに50件まで追加保存",
+          "proValue": "フォルダーごとに300件まで追加保存"
         },
         "devices": {
           "label": "デバイス連携",
@@ -143,8 +144,8 @@
         },
         "organization": {
           "label": "整理方法",
-          "freeValue": "検索",
-          "proValue": "検索 + タグ"
+          "freeValue": "アクセス可能なフォルダーで検索 + タグ",
+          "proValue": "アクセス可能なフォルダーで検索 + タグ"
         },
         "ai": {
           "label": "AI機能",
@@ -266,8 +267,8 @@
     "actionError": "ゴミ箱の操作を完了できませんでした。しばらくしてから再試行してください。",
     "restoreConflictError": "削除されたフォルダ内のクリップは単独では復元できません。先に親フォルダを復元してください。",
     "clearAllPartialError": "一部の項目を削除できませんでした。失敗 {failedCount} 件 / 全体 {totalCount} 件",
-    "emptyTitle": "ゴミ箱は空です",
-    "emptyDescription": "削除されたクリップやフォルダがここに表示されます。",
+    "emptyTitle": "表示できるゴミ箱項目はありません",
+    "emptyDescription": "ロックされたフォルダの削除項目は非表示の場合があります。全削除には非表示の項目も含まれます。",
     "listTitle": "削除済みアイテム",
     "totalCount": "{count, plural, =0 {0件} other {#件}}",
     "folderType": "フォルダ",
@@ -287,7 +288,7 @@
     },
     "clearAllModal": {
       "title": "ゴミ箱をすべて削除",
-      "description": "本当にゴミ箱内のすべての項目を完全削除しますか？"
+      "description": "ロックされたフォルダ内の非表示の削除項目も完全に削除します。元に戻せません。"
     },
     "deleteSelectedModal": {
       "title": "選択項目を削除",
@@ -301,7 +302,8 @@
     "foldersEmpty": "削除済みフォルダはありません。",
     "deletedAt": "削除日時",
     "restore": "復元",
-    "deleteForever": "削除"
+    "deleteForever": "削除",
+    "deletedResult": "{count}件を完全に削除しました。"
   },
   "clips": {
     "count": "{count, plural, =0 {0 件のクリップ} other {# 件のクリップ}}",
@@ -432,5 +434,46 @@
       "tooLong": "前後の空白を除いて{max}文字以内で入力してください。",
       "count": "{count}/{max}文字"
     }
+  },
+  "access": {
+    "checkingTitle": "アクセス権を確認中",
+    "checkingDescription": "最新の契約とフォルダの状態を確認してから内容を表示します。",
+    "errorTitle": "アクセス権を確認できません",
+    "errorDescription": "接続を確認して、もう一度お試しください。",
+    "incompatibleTitle": "フォルダの状態を確認できません",
+    "incompatibleDescription": "サーバーからロック情報を取得できませんでした。更新するか、後ほどお試しください。",
+    "lockedTitle": "ロックされたフォルダです",
+    "lockedDescription": "Freeではサーバーが指定した1つのフォルダを利用できます。データは保持されます。削除しても別のフォルダは開きません。",
+    "retry": "再確認",
+    "plans": "Proプランを見る",
+    "trash": "ゴミ箱から復元",
+    "lockedBadge": "ロック中",
+    "folderLimit": "Freeは1フォルダまでです。利用可能なフォルダがゴミ箱にある場合は復元してください。追加の利用にはProが必要です。",
+    "deleteFolderTitle": "フォルダを削除しますか？",
+    "deleteFolderDescription": "削除しても他のロックは解除されません。削除したフォルダはゴミ箱から復元できます。",
+    "operationError": "操作を完了できませんでした。もう一度お試しください。",
+    "limitCount": "現在{count}件 / 上限{limit}件",
+    "billingSuccess": "Pro契約が有効になりました。",
+    "billingUncertain": "決済結果が不明な可能性があります。再決済の前に契約状態を確認してください。",
+    "billingChecking": "決済確認",
+    "billingFailed": "決済失敗",
+    "billingLoading": "決済情報を確認しています。",
+    "billingMissing": "必要な決済情報が不足しています。",
+    "openApp": "アプリへ",
+    "checkSubscription": "契約状態を確認",
+    "errors": {
+      "PROJECT_LOCKED": "ロックされたフォルダにはアクセスできません。",
+      "CLIP_LIMIT_EXCEEDED": "フォルダのクリップ追加上限に達しました。既存のクリップは保持されます。",
+      "PLAN_LIMIT_EXCEEDED": "現在のプランではフォルダの作成・復元が制限されています。利用可能なフォルダがゴミ箱にあれば復元してください。",
+      "FEATURE_NOT_AVAILABLE": "フォルダの並べ替えにはProが必要です。"
+    },
+    "draftTitle": "未保存のクリップ",
+    "draftDescription": "入力を保持しています。通信エラーの場合は保存済みか確認してから再試行してください。",
+    "retrySave": "再保存",
+    "discardDraft": "入力を破棄",
+    "clipLimit": "フォルダごとの追加保存上限：{limit}件。",
+    "closeFolderLimit": "フォルダ追加の案内を閉じる",
+    "clipLimitExplanation": "上限を超えた既存のクリップも保持されます。上限は新しいクリップの追加に適用されます。",
+    "proFeaturesTitle": "Proで利用できる機能"
   }
 }

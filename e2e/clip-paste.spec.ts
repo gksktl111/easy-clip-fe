@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
 import ko from "../src/messages/ko.json";
 import en from "../src/messages/en.json";
@@ -50,7 +50,9 @@ const setupWorkspace = async (
     }),
   );
   await page.route("**/folders", (route) =>
-    route.fulfill({ json: [{ id: "folder-1", name: "프로젝트", order: 0 }] }),
+    route.fulfill({
+      json: [{ id: "folder-1", name: "프로젝트", order: 0, isLocked: false }],
+    }),
   );
   await page.route("**/folders/folder-1/tags", (route) =>
     route.fulfill({ json: [] }),
@@ -262,10 +264,22 @@ for (const locale of ["ko", "en", "ja", "zh"] as const) {
     await expectError(errors.textSaveFailed);
     expect(requestCount).toBe(1);
 
+    await page
+      .getByRole("button", {
+        name: messages[locale].access.discardDraft,
+        exact: true,
+      })
+      .click();
     await pasteImage("image/png");
     await expectError(errors.imageSaveFailed);
     expect(requestCount).toBe(2);
 
+    await page
+      .getByRole("button", {
+        name: messages[locale].access.discardDraft,
+        exact: true,
+      })
+      .click();
     unsupportedResponse = true;
     await pasteImage("image/png");
     await expect.poll(() => requestCount).toBe(3);

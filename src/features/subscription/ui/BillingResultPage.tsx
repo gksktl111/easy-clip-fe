@@ -1,9 +1,15 @@
 "use client";
 
+import { useAuth } from "@/features/auth";
+import { useTranslations } from "next-intl";
+import { requestAccessRefresh } from "@/shared/access/accessEvents";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
-import { confirmBillingAuth } from "@/features/subscription/api/subscriptionApi";
+import {
+  confirmBillingAuthOnce,
+  BillingConfirmationAlreadySubmittedError,
+} from "@/features/subscription/service/confirmBillingAuthOnce";
 import type { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 import { syncMySubscriptionQueryData } from "@/features/subscription/service/subscriptionQueryCache";
 import { BillingResultCard } from "@/features/subscription/ui/BillingResultCard";
@@ -16,13 +22,20 @@ interface BillingResultPageProps {
   status: "success" | "fail";
 }
 
-export function BillingResultPage({
+export function BillingResultPage(props: BillingResultPageProps) {
+  const { user } = useAuth();
+  return <BillingResultContent key={user?.id ?? "anonymous"} {...props} />;
+}
+
+function BillingResultContent({
   authKey,
   customerKey,
   errorMessage,
   status,
 }: BillingResultPageProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const t = useTranslations("access");
   const isMissingSuccessParams =
     status === "success" && (!authKey || !customerKey);
   const [subscription, setSubscription] =
@@ -48,22 +61,33 @@ export function BillingResultPage({
   }, []);
 
   useEffect(() => {
-    if (status !== "success" || !authKey || !customerKey) {
+    if (status !== "success" || !authKey || !customerKey || !user) {
       return;
     }
 
+    let active = true;
     // Toss 성공 리다이렉트의 authKey/customerKey를 서버에 전달해 최종 구독 승인을 완료한다.
-    confirmBillingAuth({ authKey, customerKey })
+    confirmBillingAuthOnce(user.id, { authKey, customerKey })
       .then((nextSubscription) => {
-        syncMySubscriptionQueryData(queryClient, nextSubscription, null);
+        if (!active) return;
+        syncMySubscriptionQueryData(queryClient, nextSubscription, user.id);
         setSubscription(nextSubscription);
-        setMessage("Pro 구독이 활성화되었습니다.");
+        setMessage(t("billingSuccess"));
       })
-      .catch(() => {
-        setMessage("결제 승인을 완료하지 못했습니다.");
+      .catch((error) => {
+        if (!active) return;
+        requestAccessRefresh();
+        setMessage(
+          `${error instanceof Error && !(error instanceof BillingConfirmationAlreadySubmittedError) ? error.message : ""} ${t("billingUncertain")}`,
+        );
       })
-      .finally(() => setIsConfirming(false));
-  }, [authKey, customerKey, queryClient, status]);
+      .finally(() => {
+        if (active) setIsConfirming(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [authKey, customerKey, queryClient, status, user, t]);
 
   const isSuccess = status === "success" && subscription?.plan === "PRO";
 

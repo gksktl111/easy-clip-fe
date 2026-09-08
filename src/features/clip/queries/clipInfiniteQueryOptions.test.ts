@@ -15,17 +15,21 @@ describe("clipInfiniteQueryOptions", () => {
       throw new Error("폴더 조회의 재시도 정책이 설정되지 않았습니다.");
     }
 
-    expect(retry(0, new ApiError("폴더를 찾을 수 없습니다.", 404))).toBe(
-      false,
-    );
+    expect(retry(0, new ApiError("폴더를 찾을 수 없습니다.", 404))).toBe(false);
   });
 
-  it("폴더가 아닌 클립 조회에는 기존 재시도 정책을 유지한다", () => {
+  it("최근·즐겨찾기 조회도 정책 오류는 재시도하지 않는다", () => {
     const options = clipInfiniteQueryOptions({
       enabled: true,
       filter: "all",
     });
 
-    expect(options.retry).toBeUndefined();
+    expect(typeof options.retry).toBe("function");
+    if (typeof options.retry === "function") {
+      expect(
+        options.retry(0, new ApiError("잠금", 403, "PROJECT_LOCKED")),
+      ).toBe(false);
+      expect(options.retry(0, new ApiError("오류", 500))).toBe(true);
+    }
   });
 });

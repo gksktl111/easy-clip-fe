@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/features/auth";
+import {
+  useCaptureDraftStore,
+  type CaptureInput,
+} from "@/features/clip/store/captureDraftStore";
+import { isPolicyError } from "@/shared/access/policyError";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCreateClipMutation } from "@/features/clip/mutations/useCreateClipMutation";
@@ -23,6 +29,11 @@ export const useFolderClipCapture = ({
   isDisabled = false,
 }: UseFolderClipCaptureOptions) => {
   const router = useRouter();
+  const { user } = useAuth();
+  const drafts = useCaptureDraftStore();
+  const draft =
+    drafts.ownerId === user?.id ? drafts.drafts[folderId] : undefined;
+  const submitting = useRef(false);
   const t = useTranslations("clips.captureErrors");
   const {
     createImage,
@@ -52,50 +63,66 @@ export const useFolderClipCapture = ({
     return false;
   }, [isAuthenticated, router]);
 
-  const createTextClipFromPaste = useCallback(
-    async (content: string) => {
-      const trimmed = content.trim();
+  const submitInput = useCallback(
+    async (input: CaptureInput) => {
       if (
         isDisabled ||
-        isCreating ||
-        !trimmed ||
+        submitting.current ||
         !folderId ||
+        !user ||
         !isAuthenticated
-      ) {
+      )
         return;
-      }
-
+      const id = crypto.randomUUID();
+      drafts.save(user.id, folderId, { id, input });
+      submitting.current = true;
       try {
-        await createText(folderId, trimmed);
-      } catch {
-        notifyError(t("textSaveFailed"));
+        if (input.type === "text") await createText(folderId, input.text);
+        else await createImage(folderId, input.file);
+        drafts.remove(user.id, folderId, id);
+      } catch (error) {
+        drafts.fail(user.id, folderId, id, error);
+        if (!isPolicyError(error))
+          notifyError(
+            input.type === "text"
+              ? t("textSaveFailed")
+              : isUnsupportedImageClipError(error)
+                ? t("unsupportedImage")
+                : t("imageSaveFailed"),
+          );
+      } finally {
+        submitting.current = false;
       }
     },
-    [createText, folderId, isAuthenticated, isCreating, isDisabled, t],
+    [
+      createText,
+      createImage,
+      drafts,
+      folderId,
+      isAuthenticated,
+      isDisabled,
+      t,
+      user,
+    ],
+  );
+
+  const createTextClipFromPaste = useCallback(
+    async (content: string) => {
+      const text = content.trim();
+      if (text) await submitInput({ type: "text", text });
+    },
+    [submitInput],
   );
 
   const createImageClipFromPaste = useCallback(
     async (file: File) => {
-      if (isDisabled || isCreating || !folderId || !isAuthenticated) {
-        return;
-      }
-
       if (!isAllowedImageClipFile(file)) {
         notifyError(t("unsupportedImage"));
         return;
       }
-
-      try {
-        await createImage(folderId, file);
-      } catch (error) {
-        notifyError(
-          isUnsupportedImageClipError(error)
-            ? t("unsupportedImage")
-            : t("imageSaveFailed"),
-        );
-      }
+      await submitInput({ type: "image", file });
     },
-    [createImage, folderId, isAuthenticated, isCreating, isDisabled, t],
+    [submitInput, t],
   );
 
   useEffect(() => {
@@ -108,7 +135,13 @@ export const useFolderClipCapture = ({
         return;
       }
 
-      if (isDisabled || !isActive || !folderId || !ensureAuthenticated()) {
+      if (
+        draft ||
+        isDisabled ||
+        !isActive ||
+        !folderId ||
+        !ensureAuthenticated()
+      ) {
         return;
       }
 
@@ -138,6 +171,7 @@ export const useFolderClipCapture = ({
   }, [
     createImageClipFromPaste,
     createTextClipFromPaste,
+    draft,
     ensureAuthenticated,
     folderId,
     isActive,
@@ -149,5 +183,12 @@ export const useFolderClipCapture = ({
     deactivate,
     isActive,
     isCreating,
+    draft,
+    retryDraft: () => {
+      if (draft) void submitInput(draft.input);
+    },
+    discardDraft: () => {
+      if (user && draft) drafts.remove(user.id, folderId, draft.id);
+    },
   };
 };

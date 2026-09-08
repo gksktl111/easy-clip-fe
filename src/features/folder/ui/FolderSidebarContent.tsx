@@ -1,5 +1,12 @@
 "use client";
 
+import Link from "next/link";
+import { HiX } from "react-icons/hi";
+import { Button } from "@/shared/ui/button/Button";
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { ApiError } from "@/shared/lib/apiClient";
+import { ConfirmActionModal } from "@/shared/ui/overlay/ConfirmActionModal";
+
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useFolderActions } from "@/features/folder/hooks/useFolderActions";
@@ -49,6 +56,10 @@ export function FolderSidebarContent({
   onFolderDeleted,
 }: FolderSidebarContentProps) {
   const t = useTranslations("sidebar");
+  const a = useTranslations("access");
+  const access = useResourceAccess();
+  const [showCreateLimit, setShowCreateLimit] = useState(false);
+  const [deleteFolderId, setDeleteFolderId] = useState<string | null>(null);
   const {
     createFolder,
     isCreatingFolder,
@@ -95,7 +106,12 @@ export function FolderSidebarContent({
   ) => {
     clearFolderDragState();
 
-    if (isReorderingFolder || !sourceId || sourceId === targetId) {
+    if (
+      !access.isPro ||
+      isReorderingFolder ||
+      !sourceId ||
+      sourceId === targetId
+    ) {
       return;
     }
 
@@ -123,8 +139,10 @@ export function FolderSidebarContent({
         ? createFolder(trimmedName)
         : renameFolder(folderNameModal.folderId, trimmedName);
 
-    void request.then(closeFolderNameModal).catch(() => {
-      notifyError(t("folderActionError"));
+    void request.then(closeFolderNameModal).catch((error) => {
+      notifyError(
+        error instanceof ApiError ? error.message : t("folderActionError"),
+      );
     });
   };
 
@@ -146,7 +164,7 @@ export function FolderSidebarContent({
     folderId: string,
     event: React.DragEvent<HTMLButtonElement>,
   ) => {
-    if (isReorderingFolder) {
+    if (!access.isPro || isReorderingFolder) {
       event.preventDefault();
       return;
     }
@@ -205,7 +223,7 @@ export function FolderSidebarContent({
   };
 
   const handleMoveFolder = (folderId: string, direction: "up" | "down") => {
-    if (isReorderingFolder) {
+    if (!access.isPro || isReorderingFolder) {
       return;
     }
 
@@ -249,7 +267,7 @@ export function FolderSidebarContent({
 
   const handleOpenRenameFolder = (folderId: string) => {
     const targetFolder = folders.find((folder) => folder.id === folderId);
-    if (!targetFolder) {
+    if (!targetFolder || access.folderLocks[folderId] !== false) {
       return;
     }
 
@@ -308,6 +326,11 @@ export function FolderSidebarContent({
             : null
         }
         onAddFolder={() => {
+          if (!access.canCreateFolder) {
+            setShowCreateLimit(true);
+            return;
+          }
+          setShowCreateLimit(false);
           setFolderNameModal({ mode: "create", value: "" });
         }}
         onNavigate={onNavigate}
@@ -321,9 +344,62 @@ export function FolderSidebarContent({
         onToggleOptions={handleToggleFolderOptions}
         onOpenOptionsMenu={folderOptionsMenu.openContextMenu}
         onRenameFolder={handleOpenRenameFolder}
-        onDeleteFolder={handleDeleteFolder}
+        onDeleteFolder={(id) => setDeleteFolderId(id)}
       />
 
+      {showCreateLimit ? (
+        <div
+          className="m-3 space-y-2 rounded-lg border border-(--border) p-3 text-xs"
+          role="status"
+        >
+          <div className="flex items-start gap-2">
+            <p className="min-w-0 flex-1">
+              {access.status === "ready"
+                ? a("folderLimit")
+                : a("checkingDescription")}
+            </p>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              aria-label={a("closeFolderLimit")}
+              onClick={() => setShowCreateLimit(false)}
+            >
+              <HiX className="h-4 w-4" aria-hidden />
+            </Button>
+          </div>
+          <div className="flex items-center gap-4 text-(--foreground)">
+            <Link
+              href="/pricing"
+              className="font-medium underline! decoration-1 underline-offset-4"
+            >
+              {a("plans")}
+            </Link>
+            <button
+              type="button"
+              onClick={() => void access.refresh()}
+              className="cursor-pointer font-medium underline! decoration-1 underline-offset-4"
+            >
+              {a("retry")}
+            </button>
+          </div>
+        </div>
+      ) : null}
+      <ConfirmActionModal
+        isOpen={deleteFolderId !== null}
+        title={a("deleteFolderTitle")}
+        description={a("deleteFolderDescription")}
+        cancelLabel={t("cancel")}
+        confirmLabel={t("delete")}
+        isConfirming={isRemovingFolder}
+        onCancel={() => setDeleteFolderId(null)}
+        onConfirm={() => {
+          if (deleteFolderId) {
+            handleDeleteFolder(deleteFolderId);
+            setDeleteFolderId(null);
+          }
+        }}
+      />
       {folderNameModal ? (
         <FolderNameModal
           title={t(

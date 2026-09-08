@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
 type MoveRequest = { targetId: string; beforeId?: string; afterId?: string };
 
@@ -7,6 +7,7 @@ async function mockFolders(page: Page, count = 3) {
     id: `folder-${index + 1}`,
     name: `폴더 ${index + 1}`,
     order: index,
+    isLocked: false,
   }));
   const requests: MoveRequest[] = [];
   let failNext = false;
