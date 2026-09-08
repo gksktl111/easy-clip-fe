@@ -23,6 +23,7 @@ interface ClipResultsSectionProps {
   onRetry?: () => void;
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
+  onEditTags?: (clip: Clip) => void;
   pendingFavoriteClipId?: string | null;
   onContextMenu?: (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -46,6 +47,7 @@ export function ClipResultsSection({
   onRetry,
   onCopy,
   onToggleFavorite,
+  onEditTags,
   pendingFavoriteClipId,
   onContextMenu,
   isDeleteMode = false,
@@ -97,6 +99,7 @@ export function ClipResultsSection({
       isFavoriteMutationPending={isFavoriteMutationPending}
       onCopy={onCopy}
       onToggleFavorite={onToggleFavorite}
+      onEditTags={onEditTags}
       onContextMenu={onContextMenu}
       isDeleteMode={isDeleteMode}
       isInteractionDisabled={isInteractionDisabled}

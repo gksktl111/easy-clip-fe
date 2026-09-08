@@ -48,6 +48,24 @@
   --chip-text: #ffffff;
   --icon-chip: #e5e7eb;
   --icon-chip-text: #111827;
+  --tag-gray-bg: #e3e2e0;
+  --tag-gray-fg: #37352f;
+  --tag-brown-bg: #eee0da;
+  --tag-brown-fg: #64473a;
+  --tag-orange-bg: #fadec9;
+  --tag-orange-fg: #9a3412;
+  --tag-yellow-bg: #fdecc8;
+  --tag-yellow-fg: #854d0e;
+  --tag-green-bg: #dbeddb;
+  --tag-green-fg: #166534;
+  --tag-blue-bg: #d3e5ef;
+  --tag-blue-fg: #1d4ed8;
+  --tag-purple-bg: #e8deee;
+  --tag-purple-fg: #6b21a8;
+  --tag-pink-bg: #f5e0e9;
+  --tag-pink-fg: #9d174d;
+  --tag-red-bg: #ffe2dd;
+  --tag-red-fg: #b91c1c;
 
   /* Clip cards */
   --favorite-btn-bg: rgba(255, 255, 255, 0.88);
@@ -148,6 +166,24 @@
   --chip-text: #f8fafc;
   --icon-chip: #4f46e5;
   --icon-chip-text: #f8fafc;
+  --tag-gray-bg: #454545;
+  --tag-gray-fg: #f3f4f6;
+  --tag-brown-bg: #594a42;
+  --tag-brown-fg: #f5ddd0;
+  --tag-orange-bg: #734b32;
+  --tag-orange-fg: #fed7aa;
+  --tag-yellow-bg: #675a2f;
+  --tag-yellow-fg: #fef3c7;
+  --tag-green-bg: #365846;
+  --tag-green-fg: #dcfce7;
+  --tag-blue-bg: #354f69;
+  --tag-blue-fg: #dbeafe;
+  --tag-purple-bg: #53466a;
+  --tag-purple-fg: #f3e8ff;
+  --tag-pink-bg: #6b4055;
+  --tag-pink-fg: #fce7f3;
+  --tag-red-bg: #70413f;
+  --tag-red-fg: #fee2e2;
 
   /* Clip cards */
   --favorite-btn-bg: rgba(30, 30, 31, 0.88);
@@ -336,4 +372,49 @@ a {
   background: var(--clip-scrollbar-thumb-hover);
   border: 2px solid transparent;
   background-clip: padding-box;
+}
+
+.tag-color[data-tag-color="GRAY"] {
+  background-color: var(--tag-gray-bg);
+  color: var(--tag-gray-fg);
+}
+
+.tag-color[data-tag-color="BROWN"] {
+  background-color: var(--tag-brown-bg);
+  color: var(--tag-brown-fg);
+}
+
+.tag-color[data-tag-color="ORANGE"] {
+  background-color: var(--tag-orange-bg);
+  color: var(--tag-orange-fg);
+}
+
+.tag-color[data-tag-color="YELLOW"] {
+  background-color: var(--tag-yellow-bg);
+  color: var(--tag-yellow-fg);
+}
+
+.tag-color[data-tag-color="GREEN"] {
+  background-color: var(--tag-green-bg);
+  color: var(--tag-green-fg);
+}
+
+.tag-color[data-tag-color="BLUE"] {
+  background-color: var(--tag-blue-bg);
+  color: var(--tag-blue-fg);
+}
+
+.tag-color[data-tag-color="PURPLE"] {
+  background-color: var(--tag-purple-bg);
+  color: var(--tag-purple-fg);
+}
+
+.tag-color[data-tag-color="PINK"] {
+  background-color: var(--tag-pink-bg);
+  color: var(--tag-pink-fg);
+}
+
+.tag-color[data-tag-color="RED"] {
+  background-color: var(--tag-red-bg);
+  color: var(--tag-red-fg);
 }

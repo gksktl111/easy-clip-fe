@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import {
   HiOutlineColorSwatch,
@@ -25,6 +26,7 @@ interface FilterBarProps {
   isSaving?: boolean;
   showStatus?: boolean;
   countLabel?: string;
+  actions?: ReactNode;
 }
 
 export function FilterBar({
@@ -36,6 +38,7 @@ export function FilterBar({
   isSaving = false,
   showStatus = true,
   countLabel,
+  actions,
 }: FilterBarProps) {
   const t = useTranslations("clips.filter");
   const tItem = useTranslations("clips.item");
@@ -92,6 +95,7 @@ export function FilterBar({
           </span>
         </div>
       ) : null}
+      {actions}
       {countLabel ? <Badge variant="chip">{countLabel}</Badge> : null}
     </div>
   );

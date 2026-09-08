@@ -154,5 +154,11 @@ export const apiRequest = async <T>(
     return null as T;
   }
 
-  return (await response.json()) as T;
+  const responseBody = await response.text();
+
+  if (!responseBody) {
+    return null as T;
+  }
+
+  return JSON.parse(responseBody) as T;
 };

@@ -26,7 +26,15 @@ export function ConfirmActionModal({
   onConfirm,
 }: ConfirmActionModalProps) {
   return (
-    <Modal isOpen={isOpen} contentClassName="w-full max-w-sm">
+    <Modal
+      isOpen={isOpen}
+      contentClassName="w-full max-w-sm"
+      onEscape={() => {
+        if (!isConfirming) {
+          onCancel();
+        }
+      }}
+    >
       <div className="rounded-xl bg-(--surface-elevated) shadow-xl">
         <div className="border-b border-(--border) px-5 py-4">
           <p className="text-foreground text-sm font-semibold">{title}</p>

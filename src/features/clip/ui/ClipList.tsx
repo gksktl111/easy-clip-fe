@@ -15,6 +15,7 @@ interface ClipListProps {
   isFavoriteMutationPending?: boolean;
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
+  onEditTags?: (clip: Clip) => void;
   pendingFavoriteClipId?: string | null;
   onContextMenu?: (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -34,6 +35,7 @@ export function ClipList({
   isFavoriteMutationPending = false,
   onCopy,
   onToggleFavorite,
+  onEditTags,
   pendingFavoriteClipId,
   onContextMenu,
   isDeleteMode = false,
@@ -55,6 +57,7 @@ export function ClipList({
             clip={clip}
             onCopy={onCopy}
             onToggleFavorite={onToggleFavorite}
+            onEditTags={onEditTags}
             onContextMenu={onContextMenu}
             isDeleteMode={isDeleteMode}
             isFavoriteMutationPending={isFavoriteMutationPending}
