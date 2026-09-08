@@ -104,6 +104,11 @@ test("마지막 폴더의 메뉴·키보드 위 이동과 실패 복구", async 
   await page.keyboard.press("Control+ArrowUp");
   await expect(folderLinks(page)).toHaveText(["폴더 1", "폴더 2", "폴더 3"]);
   await expect.poll(() => mock.requests.length).toBe(2);
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "폴더 2 폴더를 위로 이동했습니다." }),
+  ).toBeVisible();
   mock.failNext();
   await page.getByRole("link", { name: "폴더 3", exact: true }).focus();
   await page.keyboard.press("Control+ArrowUp");
