@@ -306,6 +306,11 @@
     "count": "{count, plural, =0 {0개 클립} other {#개 클립}}",
     "copyToast": "복사됨!",
     "captureHint": "아무 곳이나 클릭한 뒤 Ctrl+V를 눌러 새 클립을 저장하세요.",
+    "captureErrors": {
+      "textSaveFailed": "클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      "imageSaveFailed": "이미지 클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      "unsupportedImage": "지원하지 않는 이미지 형식입니다. JPEG, PNG, WebP, GIF 또는 AVIF 파일을 사용해주세요."
+    },
     "filter": {
       "all": "전체",
       "text": "텍스트",

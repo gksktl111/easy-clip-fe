@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCreateClipMutation } from "@/features/clip/mutations/useCreateClipMutation";
 import {
   isAllowedImageClipFile,
   isUnsupportedImageClipError,
-  UNSUPPORTED_IMAGE_CLIP_MESSAGE,
 } from "@/features/clip/service/imageClipValidation";
 import { notifyError } from "@/shared/feedback/toast";
 
@@ -23,8 +23,12 @@ export const useFolderClipCapture = ({
   isDisabled = false,
 }: UseFolderClipCaptureOptions) => {
   const router = useRouter();
-  const { createImage, createText, isPending: isCreating } =
-    useCreateClipMutation();
+  const t = useTranslations("clips.captureErrors");
+  const {
+    createImage,
+    createText,
+    isPending: isCreating,
+  } = useCreateClipMutation();
   const [isActive, setIsActive] = useState(false);
 
   const activate = useCallback(() => {
@@ -51,17 +55,23 @@ export const useFolderClipCapture = ({
   const createTextClipFromPaste = useCallback(
     async (content: string) => {
       const trimmed = content.trim();
-      if (isDisabled || isCreating || !trimmed || !folderId || !isAuthenticated) {
+      if (
+        isDisabled ||
+        isCreating ||
+        !trimmed ||
+        !folderId ||
+        !isAuthenticated
+      ) {
         return;
       }
 
       try {
         await createText(folderId, trimmed);
       } catch {
-        notifyError("클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        notifyError(t("textSaveFailed"));
       }
     },
-    [createText, folderId, isAuthenticated, isCreating, isDisabled],
+    [createText, folderId, isAuthenticated, isCreating, isDisabled, t],
   );
 
   const createImageClipFromPaste = useCallback(
@@ -71,7 +81,7 @@ export const useFolderClipCapture = ({
       }
 
       if (!isAllowedImageClipFile(file)) {
-        notifyError(UNSUPPORTED_IMAGE_CLIP_MESSAGE);
+        notifyError(t("unsupportedImage"));
         return;
       }
 
@@ -80,12 +90,12 @@ export const useFolderClipCapture = ({
       } catch (error) {
         notifyError(
           isUnsupportedImageClipError(error)
-            ? UNSUPPORTED_IMAGE_CLIP_MESSAGE
-            : "이미지 클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+            ? t("unsupportedImage")
+            : t("imageSaveFailed"),
         );
       }
     },
-    [createImage, folderId, isAuthenticated, isCreating, isDisabled],
+    [createImage, folderId, isAuthenticated, isCreating, isDisabled, t],
   );
 
   useEffect(() => {
