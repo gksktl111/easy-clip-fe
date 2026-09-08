@@ -37,14 +37,14 @@ export function NotFoundPage() {
             style={{ color: "var(--primary-foreground)" }}
             className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-(--primary) px-4 py-3 text-sm font-medium text-(--primary-foreground) hover:bg-(--primary-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring)"
           >
-            <HiOutlineHome className="h-5 w-5" aria-hidden />
+            <HiOutlineHome className="h-5 w-5 shrink-0" aria-hidden />
             {t("home")}
           </Link>
           <Link
             href="/favorites"
             className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-(--border) px-4 py-3 text-sm font-medium text-(--foreground) hover:bg-(--surface-muted) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring)"
           >
-            <HiOutlineCollection className="h-5 w-5" aria-hidden />
+            <HiOutlineCollection className="h-5 w-5 shrink-0" aria-hidden />
             {t("clips")}
           </Link>
         </nav>

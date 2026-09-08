@@ -7,12 +7,11 @@ import {
   DeleteClipsResponseDto,
   FetchClipsQueryDto,
   LikeClipResponseDto,
+  RenameClipRequestDto,
 } from "@/features/clip/model/clip.dto";
 import { apiRequest } from "@/shared/lib/apiClient";
 
-export const fetchClips = async (
-  options: FetchClipsQueryDto = {},
-) => {
+export const fetchClips = async (options: FetchClipsQueryDto = {}) => {
   const searchParams = new URLSearchParams();
   searchParams.set("type", options.type ?? "ALL");
 
@@ -96,3 +95,13 @@ export const recordClipView = (clipId: string) =>
   apiRequest<null>(`/clips/${clipId}/views`, {
     method: "POST",
   });
+
+export const renameClip = (clipId: string, payload: RenameClipRequestDto) => {
+  const formData = new FormData();
+  formData.set("title", payload.title);
+
+  return apiRequest<ClipResponseDto>(`/clips/${clipId}`, {
+    method: "PATCH",
+    body: formData,
+  });
+};

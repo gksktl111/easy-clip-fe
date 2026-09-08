@@ -146,7 +146,11 @@ test("클립 태그를 선택하고 회색 자동 생성·색상 지정 생성 �
   });
 
   await page.goto("/folder/folder-1");
-  await page.getByRole("button", { name: "테스트 클립 태그 편집" }).click();
+  await page.getByRole("button", { name: "테스트 클립 옵션 열기" }).click();
+  await page
+    .locator("[data-clip-menu]")
+    .getByRole("button", { name: "태그 편집", exact: true })
+    .click();
 
   const editor = page.getByRole("dialog", { name: "클립 태그 편집" });
   await expect(
@@ -395,4 +399,112 @@ test("클립 태그 저장 404에서 최신 클립 목록을 다시 불러온다
 
   await editor.getByRole("button", { name: "태그 창 닫기" }).click();
   await expect(page.getByText("테스트 클립", { exact: true })).toHaveCount(0);
+});
+
+test("옵션에서 클립 이름만 변경하고 실패 시 입력을 유지하며 다시 저장한다", async ({
+  page,
+}) => {
+  await addAuthCookie(page);
+  await mockWorkspaceRequests(page, []);
+  let title = "테스트 클립";
+  let attempts = 0;
+  let listReads = 0;
+  const clip = () => ({
+    id: "clip-1",
+    type: "TEXT",
+    title,
+    textContent: "변하지 않는 본문",
+    colorHex: null,
+    imageUrl: null,
+    workspaceId: "workspace-1",
+    folderId: "folder-1",
+    createdAt: "2026-09-06T00:00:00.000Z",
+    updatedAt: "2026-09-06T00:00:00.000Z",
+    deletedAt: null,
+    likeByMe: true,
+    tags: [
+      {
+        id: "tag-1",
+        name: "중요",
+        backgroundColor: "RED",
+        folderId: "folder-1",
+      },
+    ],
+  });
+  await page.route("**/clips?**", (route) => {
+    listReads += 1;
+    return route.fulfill({
+      json: {
+        items: [clip(), { ...clip(), id: "clip-2", title: "다른 클립" }],
+        hasMore: false,
+        nextCursor: null,
+      },
+    });
+  });
+  await page.route("**/clips/clip-1", async (route) => {
+    expect(route.request().method()).toBe("PATCH");
+    const body = route.request().postData() ?? "";
+    expect(body.match(/name="[^"]+"/g)).toEqual(['name="title"']);
+    expect(body).toContain("새 클립 이름");
+    attempts += 1;
+    if (attempts === 1) {
+      return route.fulfill({ status: 500, json: { message: "오류" } });
+    }
+    title = "새 클립 이름";
+    return route.fulfill({ json: clip() });
+  });
+  await page.goto("/folder/folder-1");
+  await page.getByRole("button", { name: "테스트 클립 옵션 열기" }).click();
+  await page
+    .locator("[data-clip-menu]")
+    .getByRole("button", { name: "이름 변경", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", { name: "클립 이름 변경" });
+  const input = dialog.getByLabel("클립 이름", { exact: true });
+  await expect(input).toBeFocused();
+  await expect(input).toHaveValue("테스트 클립");
+  await input.fill("   ");
+  await expect(
+    dialog.getByRole("button", { name: "변경", exact: true }),
+  ).toBeDisabled();
+  await input.press("Enter");
+  expect(attempts).toBe(0);
+  await input.fill("1234567890123456");
+  await expect(input).toHaveAttribute("aria-invalid", "true");
+  await expect(dialog.getByText("16/15자", { exact: true })).toBeVisible();
+  await expect(
+    dialog.getByText("이름은 앞뒤 공백을 제외하고 15자 이내로 입력해주세요."),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "변경", exact: true }),
+  ).toBeDisabled();
+  await input.press("Enter");
+  expect(attempts).toBe(0);
+  await input.fill("  123456789012345  ");
+  await expect(input).toHaveAttribute("aria-invalid", "false");
+  await expect(dialog.getByText("15/15자", { exact: true })).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "변경", exact: true }),
+  ).toBeEnabled();
+  await input.fill("  새 클립 이름  ");
+  await dialog.getByRole("button", { name: "변경", exact: true }).click();
+  await expect(
+    page.getByText("클립 이름을 변경하지 못했습니다. 다시 시도해주세요.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(input).toHaveValue("  새 클립 이름  ");
+  await input.press("Enter");
+  await expect(dialog).toBeHidden();
+  await expect(
+    page.getByRole("button", { name: "새 클립 이름 옵션 열기" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "다른 클립 옵션 열기" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("변하지 않는 본문", { exact: true }).first(),
+  ).toBeVisible();
+  expect(attempts).toBe(2);
+  expect(listReads).toBeGreaterThan(1);
 });

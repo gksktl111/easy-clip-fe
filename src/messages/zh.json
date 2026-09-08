@@ -243,6 +243,7 @@
     "closeButton": "关闭"
   },
   "trash": {
+    "selectionHint": "选择要恢复的项目。",
     "title": "回收站",
     "retentionNotice": "最多保留 30 天",
     "description": "查看已删除的剪贴内容和文件夹，并可执行恢复或永久删除。",
@@ -340,7 +341,8 @@
       "toggleFavorite": "切换收藏",
       "selectForDelete": "选择删除 {name}",
       "noTags": "无标签",
-      "editTags": "编辑 {name} 的标签"
+      "editTags": "编辑 {name} 的标签",
+      "openOptions": "打开{name}的选项"
     },
     "tags": {
       "manage": "管理标签",
@@ -421,9 +423,14 @@
       "description": "确定要删除当前文件夹中的全部剪贴内容吗？"
     },
     "renameModal": {
-      "title": "重命名",
-      "label": "剪贴名称",
-      "placeholder": "例如：剪贴"
+      "title": "重命名剪贴内容",
+      "close": "关闭重命名",
+      "field": "剪贴名称",
+      "placeholder": "输入新名称",
+      "error": "无法更改名称，请重试。",
+      "hint": "去除首尾空格后，最多可输入{max}个字符。",
+      "tooLong": "去除首尾空格后，名称不能超过{max}个字符。",
+      "count": "{count}/{max}字"
     }
   }
 }

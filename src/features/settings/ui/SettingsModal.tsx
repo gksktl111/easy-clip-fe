@@ -87,7 +87,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
       <div className="text-foreground relative flex max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-xl">
         <div className="flex items-center justify-between border-b border-(--border) px-6 py-4">
           <div className="flex items-center gap-3 text-base font-semibold">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--modal-icon-bg) text-(--modal-icon-fg)">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
               <HiOutlineCog className="h-5 w-5" aria-hidden />
             </span>
             {t("title")}

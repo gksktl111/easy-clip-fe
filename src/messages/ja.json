@@ -243,6 +243,7 @@
     "closeButton": "閉じる"
   },
   "trash": {
+    "selectionHint": "復元する項目を選択してください。",
     "title": "ゴミ箱",
     "retentionNotice": "最大30日間保管されます",
     "description": "削除したクリップとフォルダを確認し、復元または完全削除できます。",
@@ -340,7 +341,8 @@
       "toggleFavorite": "お気に入りを切り替え",
       "selectForDelete": "{name}を削除対象として選択",
       "noTags": "タグなし",
-      "editTags": "{name}のタグを編集"
+      "editTags": "{name}のタグを編集",
+      "openOptions": "{name}のオプションを開く"
     },
     "tags": {
       "manage": "タグを管理",
@@ -421,9 +423,14 @@
       "description": "本当に現在のフォルダ内のすべてのクリップを削除しますか？"
     },
     "renameModal": {
-      "title": "名前を変更",
-      "label": "クリップ名",
-      "placeholder": "例: クリップ"
+      "title": "クリップ名を変更",
+      "close": "名前変更を閉じる",
+      "field": "クリップ名",
+      "placeholder": "新しい名前を入力してください",
+      "error": "クリップ名を変更できませんでした。もう一度お試しください。",
+      "hint": "前後の空白を除き、最大{max}文字まで入力できます。",
+      "tooLong": "前後の空白を除いて{max}文字以内で入力してください。",
+      "count": "{count}/{max}文字"
     }
   }
 }

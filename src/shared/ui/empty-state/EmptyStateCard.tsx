@@ -25,10 +25,13 @@ export function EmptyStateCard({
         className,
       )}
     >
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--icon-chip) text-(--icon-chip-text)">
+      <div
+        aria-hidden
+        className="flex h-10 w-10 shrink-0 items-center justify-center text-(--muted) [&>svg]:h-8 [&>svg]:w-8"
+      >
         {icon}
       </div>
-      <p className="mt-5 text-base font-semibold text-(--foreground)">
+      <p className="mt-4 text-base font-semibold text-(--foreground)">
         {title}
       </p>
       <p className="mt-2 text-sm leading-relaxed text-(--muted)">

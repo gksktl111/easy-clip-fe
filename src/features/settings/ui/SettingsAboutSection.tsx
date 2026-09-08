@@ -52,7 +52,7 @@ export function SettingsAboutSection({
       </div>
       <div className="mt-3 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--modal-icon-bg) text-(--modal-icon-fg)">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
             <HiOutlineCreditCard className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0 flex-1">

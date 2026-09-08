@@ -103,7 +103,9 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
         </div>
       ) : null}
 
-      {!results.isLoading && !hasRows ? <TrashPageEmptyState /> : null}
+      {!results.isLoading && !hasRows && !results.error ? (
+        <TrashPageEmptyState />
+      ) : null}
 
       {results.isLoading || hasRows ? (
         <TrashListSection
