@@ -7,7 +7,6 @@ import {
   HiOutlineColorSwatch,
   HiOutlineDocumentText,
   HiOutlinePhotograph,
-  HiOutlineRefresh,
   HiOutlineStar,
   HiOutlineTag,
   HiStar,
@@ -212,18 +211,13 @@ export function ClipItem({
           }
         }}
         disabled={isFavoriteDisabled}
-        className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-(--favorite-btn-bg-hover) disabled:cursor-wait disabled:opacity-50"
+        className="absolute top-3 right-3 z-10 cursor-pointer rounded-full border border-transparent bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-colors duration-150 hover:bg-(--favorite-btn-bg-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) disabled:cursor-default aria-pressed:border-(--favorite-btn-selected-border) aria-pressed:bg-(--favorite-btn-selected-bg) motion-reduce:transition-none"
         style={{ boxShadow: "var(--favorite-btn-shadow)" }}
         aria-label={t("toggleFavorite")}
         aria-pressed={Boolean(clip.isFavorite)}
         aria-busy={isFavoritePending}
       >
-        {isFavoritePending ? (
-          <HiOutlineRefresh
-            className="h-4 w-4 animate-spin text-(--favorite-icon-muted)"
-            aria-hidden
-          />
-        ) : clip.isFavorite ? (
+        {clip.isFavorite ? (
           <HiStar className="h-4 w-4 text-(--warning)" aria-hidden />
         ) : (
           <HiOutlineStar

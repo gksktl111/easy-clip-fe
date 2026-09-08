@@ -4,6 +4,10 @@ import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { likeClip, unlikeClip } from "@/features/clip/api/clipApi";
 import type { Clip } from "@/features/clip/model/clip";
+import {
+  optimisticallyUpdateClipFavorite,
+  restoreClipFavorite,
+} from "@/features/clip/service/clipFavoriteQueryCache";
 import { clipQueryKeys } from "@/features/clip/queries/clipQueryKey";
 
 interface UseClipFavoriteMutationOptions {
@@ -25,6 +29,13 @@ export const useClipFavoriteMutation = ({
   const mutation = useMutation({
     mutationFn: ({ clipId, isFavorite }: ToggleFavoriteVariables) =>
       isFavorite ? likeClip(clipId) : unlikeClip(clipId),
+    onMutate: async ({ clipId, isFavorite }) => {
+      await queryClient.cancelQueries({ queryKey: clipQueryKeys.all });
+      return optimisticallyUpdateClipFavorite(queryClient, clipId, isFavorite);
+    },
+    onError: (_error, { clipId }, snapshot) => {
+      if (snapshot) restoreClipFavorite(queryClient, clipId, snapshot);
+    },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
   });

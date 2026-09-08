@@ -104,6 +104,8 @@ test("최근 항목 3페이지에서 즐겨찾기 등록·해제·실패 재시�
   await button.click();
   await expect(button).toBeDisabled();
   await expect(button).toHaveAttribute("aria-busy", "true");
+  await expect(button).toHaveAttribute("aria-pressed", "true");
+  await expect(button.locator(".animate-spin")).toHaveCount(0);
   await button.dispatchEvent("click");
   await expect.poll(() => methods.length).toBe(1);
   releaseRequest?.();
@@ -119,7 +121,14 @@ test("최근 항목 3페이지에서 즐겨찾기 등록·해제·실패 재시�
   expect(methods).toEqual(["POST", "DELETE"]);
 
   failNext = true;
+  requestGate = new Promise<void>((resolve) => {
+    releaseRequest = resolve;
+  });
   await button.click();
+  await expect(button).toHaveAttribute("aria-pressed", "true");
+  await expect(button).toBeDisabled();
+  releaseRequest?.();
+  requestGate = undefined;
   await expect(
     page.getByText("즐겨찾기 변경에 실패했습니다. 다시 시도해주세요."),
   ).toBeVisible();
