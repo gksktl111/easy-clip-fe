@@ -343,7 +343,8 @@
       "selectForDelete": "{name} 삭제 선택",
       "noTags": "태그 없음",
       "editTags": "{name} 태그 편집",
-      "openOptions": "{name} 옵션 열기"
+      "openOptions": "{name} 옵션 열기",
+      "copying": "복사 중…"
     },
     "tags": {
       "manage": "태그 관리",

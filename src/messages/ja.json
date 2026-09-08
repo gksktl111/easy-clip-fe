@@ -343,7 +343,8 @@
       "selectForDelete": "{name}を削除対象として選択",
       "noTags": "タグなし",
       "editTags": "{name}のタグを編集",
-      "openOptions": "{name}のオプションを開く"
+      "openOptions": "{name}のオプションを開く",
+      "copying": "コピー中…"
     },
     "tags": {
       "manage": "タグを管理",

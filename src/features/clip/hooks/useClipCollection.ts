@@ -44,6 +44,7 @@ export const useClipCollection = ({
       changeSearchQuery: filter.changeSearchQuery,
       searchQuery: filter.searchQuery,
     },
+    pendingCopyClipId: copy.pendingCopyClipId,
     isFavoritePending: supportsFavoriteToggle && favoriteMutation.isPending,
     pendingFavoriteClipId: supportsFavoriteToggle
       ? favoriteMutation.pendingClipId

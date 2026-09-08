@@ -10,6 +10,7 @@ export function FavoriteClipsPage() {
     filter,
     isFavoritePending,
     pendingFavoriteClipId,
+    pendingCopyClipId,
     results,
   } = useClipCollection({ favorite: true, supportsFavoriteToggle: true });
 
@@ -35,6 +36,7 @@ export function FavoriteClipsPage() {
       onToggleFavorite={commands.toggleFavorite}
       isFavoriteMutationPending={isFavoritePending}
       pendingFavoriteClipId={pendingFavoriteClipId}
+      pendingCopyClipId={pendingCopyClipId}
       searchQuery={filter.searchQuery}
     />
   );

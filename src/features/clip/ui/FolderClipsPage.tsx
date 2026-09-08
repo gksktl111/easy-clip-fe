@@ -120,6 +120,7 @@ function FolderClipsContent({
         isInteractionDisabled={deletion.isDeleting}
         isFavoriteMutationPending={collection.isFavoritePending}
         pendingFavoriteClipId={collection.pendingFavoriteClipId}
+        pendingCopyClipId={collection.pendingCopyClipId}
         selectedClipIds={deletion.selectedClipIds}
         onToggleSelected={deletion.toggleClipSelected}
       />

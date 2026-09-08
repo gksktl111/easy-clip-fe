@@ -30,6 +30,7 @@ interface ClipItemProps {
   isSelected?: boolean;
   onToggleSelected?: (clipId: string) => void;
   pendingFavoriteClipId?: string | null;
+  pendingCopyClipId?: string | null;
 }
 
 function ClipTypeIcon({ type }: { type: Clip["type"] }) {
@@ -89,9 +90,12 @@ export function ClipItem({
   isSelected = false,
   onToggleSelected,
   pendingFavoriteClipId,
+  pendingCopyClipId,
 }: ClipItemProps) {
   const t = useTranslations("clips.item");
   const isDisabled = isInteractionDisabled;
+  const isCopying = !isDeleteMode && pendingCopyClipId === clip.id;
+  const isCopyBlocked = !isDeleteMode && Boolean(pendingCopyClipId);
   const isFavoritePending = pendingFavoriteClipId === clip.id;
   const isFavoriteDisabled =
     isDisabled ||
@@ -113,7 +117,8 @@ export function ClipItem({
     >
       <button
         type="button"
-        disabled={isDisabled}
+        disabled={isDisabled || isCopyBlocked}
+        aria-busy={isCopying}
         aria-label={primaryActionLabel}
         aria-pressed={isDeleteMode ? isSelected : undefined}
         onClick={(event) => {
@@ -132,7 +137,7 @@ export function ClipItem({
 
           onContextMenu?.(event, clip);
         }}
-        className="flex min-h-0 w-full flex-1 cursor-pointer flex-col overflow-hidden text-left transition focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--focus-ring) disabled:cursor-wait"
+        className="flex min-h-0 w-full flex-1 cursor-pointer flex-col overflow-hidden text-left transition focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--focus-ring) disabled:cursor-wait disabled:opacity-60"
       >
         <span
           className={`flex-1 overflow-hidden px-4 py-3 ${clip.type === "text" ? "pr-12" : ""}`}
@@ -144,7 +149,11 @@ export function ClipItem({
             <ClipTypeIcon type={clip.type} />
           </span>
           <span className="text-foreground truncate font-medium">
-            {clip.type === "color" ? clip.content : clip.name}
+            {isCopying
+              ? t("copying")
+              : clip.type === "color"
+                ? clip.content
+                : clip.name}
           </span>
         </span>
       </button>

@@ -3,7 +3,8 @@
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 
 import { useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { messagesByLocale } from "@/shared/config/messages";
+import { createTranslator, useTranslations } from "next-intl";
 import { HiOutlineCog, HiOutlineX } from "react-icons/hi";
 import { persistUserSettings } from "@/features/settings/service/settingsService";
 import { SettingsAboutSection } from "@/features/settings/ui/SettingsAboutSection";
@@ -66,12 +67,17 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
   const handleLanguageChange = async (nextLanguage: AppLocale) => {
     if (nextLanguage === language) return;
     const previousLanguage = language;
+    const nextFeedback = createTranslator({
+      locale: nextLanguage,
+      messages: messagesByLocale[nextLanguage],
+      namespace: "feedback",
+    });
 
     if (pending.current) return;
     setLanguage(nextLanguage);
 
     if (!user) {
-      notifySuccess(feedback("settingsSaved"));
+      notifySuccess(nextFeedback("settingsSaved"));
       return;
     }
 
@@ -80,7 +86,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
     try {
       await persistUserSettings({ language: nextLanguage });
-      notifySuccess(feedback("settingsSaved"));
+      notifySuccess(nextFeedback("settingsSaved"));
     } catch {
       setLanguage(previousLanguage);
       notifyError(t("saveError"));

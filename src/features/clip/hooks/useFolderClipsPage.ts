@@ -162,6 +162,7 @@ export const useFolderClipsPage = ({
         changeSearchQuery: filter.changeSearchQuery,
         searchQuery: filter.searchQuery,
       },
+      pendingCopyClipId: copy.pendingCopyClipId,
       isFavoritePending: favorite.isPending,
       pendingFavoriteClipId: favorite.pendingClipId,
       results: {

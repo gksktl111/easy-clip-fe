@@ -10,6 +10,7 @@ export function RecentClipsPage() {
     filter,
     isFavoritePending,
     pendingFavoriteClipId,
+    pendingCopyClipId,
     results,
   } = useClipCollection({ recent: true, supportsFavoriteToggle: true });
 
@@ -35,6 +36,7 @@ export function RecentClipsPage() {
       onToggleFavorite={commands.toggleFavorite}
       isFavoriteMutationPending={isFavoritePending}
       pendingFavoriteClipId={pendingFavoriteClipId}
+      pendingCopyClipId={pendingCopyClipId}
       searchQuery={filter.searchQuery}
     />
   );

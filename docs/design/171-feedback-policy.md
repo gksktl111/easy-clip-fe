@@ -46,7 +46,7 @@
 - `npm run lint`, `npm run typecheck`: 통과.
 - `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3108 npm run build`: 프로덕션 빌드 통과.
 - `npm run test`: 24개 파일, 103개 테스트 통과.
-- `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3108 CI=true npm run test:e2e -- --retries=0`: 73개 테스트 통과, 재시도 없음.
+- `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3108 CI=true npm run test:e2e`: 83개 테스트 통과, 재시도 없음.
 - `npm run build-storybook`: 통과. 기존 의존 번들의 크기 경고는 남아 있다.
 - `git diff --check`: 통과.
 
@@ -64,3 +64,11 @@
 ## 구현 참고
 
 Sonner 공식 문서의 [사용자 정의 토스트](https://sonner.emilkowal.ski/toast)와 [Toaster 설정](https://sonner.emilkowal.ski/toaster)을 확인하고, 설치된 2.0.7의 타입과 닫힘 생명주기에 맞춰 적용했다.
+
+## PR #174 리뷰 반영
+
+- [진행 중 복사 요청 처리](https://github.com/gksktl111/easy-clip-fe/pull/174#discussion_r3957592000): 타당. 수정 전 지연된 이미지 복사 중에도 복사 버튼이 활성화되고 진행 상태가 없음을 재현했다. 폴더·최근·즐겨찾기 화면에 `pendingCopyClipId`를 연결해 복사 버튼들을 비활성화하고 실행 중인 클립에 `복사 중…`과 `aria-busy`를 표시한다. 성공·실패 모두 버튼을 다시 활성화하며, 삭제 선택과 즐겨찾기 등 다른 기능은 별도 상태를 유지한다.
+- [언어 변경 성공 알림](https://github.com/gksktl111/easy-clip-fe/pull/174#discussion_r3957592008): 타당. 수정 전 한국어에서 영어로 변경한 뒤에도 `설정을 저장했습니다.`가 출력됨을 재현했다. provider와 공유하는 메시지 목록을 사용해 선택한 로케일의 번역 함수를 생성하고, 게스트 로컬 저장과 로그인 사용자 서버 저장 모두 그 함수로 성공 알림을 표시한다. 실패 시 기존 언어 복원과 오류 안내를 유지한다.
+- 회귀 E2E 10개 추가: 세 화면 × 지연 이미지 복사 성공/실패 6개, 언어 변경 후 새 언어 알림 4개. 수정 전 대표 2개가 실패하고 수정 후 10개 모두 통과했다.
+
+리뷰 반영 검증 화면: [복사 진행 상태](171-screenshots/copy-pending.png), [변경한 언어의 저장 알림](171-screenshots/language-saved-en.png).

@@ -343,7 +343,8 @@
       "selectForDelete": "选择删除 {name}",
       "noTags": "无标签",
       "editTags": "编辑 {name} 的标签",
-      "openOptions": "打开{name}的选项"
+      "openOptions": "打开{name}的选项",
+      "copying": "正在复制…"
     },
     "tags": {
       "manage": "管理标签",

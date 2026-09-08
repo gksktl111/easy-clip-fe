@@ -1,7 +1,7 @@
 "use client";
 
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRecordClipViewMutation } from "@/features/clip/mutations/useRecordClipViewMutation";
 import type { Clip } from "@/features/clip/model/clip";
@@ -19,6 +19,9 @@ export const useClipCopyAction = ({
   isDisabled = false,
 }: UseClipCopyActionOptions) => {
   const pending = useRef(false);
+  const [pendingCopyClipId, setPendingCopyClipId] = useState<string | null>(
+    null,
+  );
   const access = useResourceAccess();
   const t = useTranslations("feedback");
   const { recordClipView } = useRecordClipViewMutation();
@@ -36,6 +39,7 @@ export const useClipCopyAction = ({
       }
 
       pending.current = true;
+      setPendingCopyClipId(clip.id);
       try {
         await copyClipToClipboard(clip);
       } catch {
@@ -43,6 +47,7 @@ export const useClipCopyAction = ({
         return;
       } finally {
         pending.current = false;
+        setPendingCopyClipId(null);
       }
 
       notifySuccess(t("copySuccess"), undefined, "clip-copy");
@@ -58,5 +63,6 @@ export const useClipCopyAction = ({
 
   return {
     copyClip,
+    pendingCopyClipId,
   };
 };

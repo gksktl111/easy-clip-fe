@@ -343,7 +343,8 @@
       "selectForDelete": "Select {name} for deletion",
       "noTags": "No tags",
       "editTags": "Edit tags for {name}",
-      "openOptions": "Open options for {name}"
+      "openOptions": "Open options for {name}",
+      "copying": "Copying…"
     },
     "tags": {
       "manage": "Manage tags",

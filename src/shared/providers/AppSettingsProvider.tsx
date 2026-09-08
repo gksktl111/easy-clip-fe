@@ -2,11 +2,8 @@
 
 // 초기 사용자 설정을 반영해 다국어 메시지와 테마 상태를 제공합니다.
 import { useEffect, useLayoutEffect, useRef } from "react";
+import { messagesByLocale } from "@/shared/config/messages";
 import { NextIntlClientProvider } from "next-intl";
-import enMessages from "@/messages/en.json";
-import jaMessages from "@/messages/ja.json";
-import koMessages from "@/messages/ko.json";
-import zhMessages from "@/messages/zh.json";
 import { DEFAULT_TIME_ZONE, type AppLocale } from "@/shared/config/locale";
 import {
   applySettings,
@@ -19,13 +16,6 @@ interface AppSettingsProviderProps {
   initialLocale: AppLocale;
   initialTheme: ThemeMode;
 }
-
-const messagesByLocale = {
-  ko: koMessages,
-  en: enMessages,
-  ja: jaMessages,
-  zh: zhMessages,
-} as const;
 
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -46,7 +36,9 @@ export function AppSettingsProvider({
       language: initialLocale,
       theme: initialTheme,
     };
-    useSettingsStore.getState().applyInitialSettings(initialSettingsRef.current);
+    useSettingsStore
+      .getState()
+      .applyInitialSettings(initialSettingsRef.current);
   }
 
   const storeTheme = useSettingsStore((state) => state.theme);

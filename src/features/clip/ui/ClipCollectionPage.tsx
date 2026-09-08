@@ -23,6 +23,7 @@ interface ClipCollectionPageProps {
   onSearchChange: (value: string) => void;
   onToggleFavorite?: (clip: Clip) => void;
   pendingFavoriteClipId?: string | null;
+  pendingCopyClipId?: string | null;
   searchQuery: string;
 }
 
@@ -41,6 +42,7 @@ export function ClipCollectionPage({
   onSearchChange,
   onToggleFavorite,
   pendingFavoriteClipId,
+  pendingCopyClipId,
   searchQuery,
 }: ClipCollectionPageProps) {
   const t = useTranslations("clips");
@@ -72,6 +74,7 @@ export function ClipCollectionPage({
         onToggleFavorite={onToggleFavorite}
         isFavoriteMutationPending={isFavoriteMutationPending}
         pendingFavoriteClipId={pendingFavoriteClipId}
+        pendingCopyClipId={pendingCopyClipId}
       />
     </div>
   );
