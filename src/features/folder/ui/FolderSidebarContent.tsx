@@ -7,6 +7,10 @@ import type {
   FolderDropPosition,
   FolderItem,
 } from "@/features/folder/model/folder";
+import {
+  getFolderDropTarget,
+  type FolderDropTarget,
+} from "@/features/folder/service/folderDropTarget";
 import { getFolderKeyboardMoveTarget } from "@/features/folder/service/folderCollection";
 import { getFolderPath } from "@/features/folder/service/folderRoute";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
@@ -25,13 +29,6 @@ interface FolderSidebarContentProps {
   onRetry?: () => void;
   onFolderDeleted: (redirectPath: string | null) => void;
 }
-
-type FolderDropTarget = {
-  targetId: string;
-  position: FolderDropPosition;
-  indicatorFolderId: string;
-  indicatorEdge: "top" | "bottom";
-};
 
 type FolderNameModalState =
   | { mode: "create"; value: string }
@@ -89,65 +86,6 @@ export function FolderSidebarContent({
   const clearFolderDragState = () => {
     setDraggingFolderId(null);
     setFolderDropTarget(null);
-  };
-
-  const getFolderDropTarget = (
-    sourceId: string | null,
-    folderId: string,
-    event: React.DragEvent<HTMLLIElement>,
-  ): FolderDropTarget | null => {
-    if (!sourceId || sourceId === folderId) {
-      return null;
-    }
-
-    const sourceIndex = folders.findIndex((folder) => folder.id === sourceId);
-    const hoveredIndex = folders.findIndex((folder) => folder.id === folderId);
-
-    if (sourceIndex === -1 || hoveredIndex === -1) {
-      return null;
-    }
-
-    const { top, height } = event.currentTarget.getBoundingClientRect();
-    const isBeforeHovered = event.clientY < top + height / 2;
-
-    if (!isBeforeHovered) {
-      if (sourceIndex === hoveredIndex + 1) {
-        return null;
-      }
-
-      return {
-        targetId: folderId,
-        position: "after",
-        indicatorFolderId: folderId,
-        indicatorEdge: "bottom",
-      };
-    }
-
-    const previousFolder = folders[hoveredIndex - 1] ?? null;
-
-    if (!previousFolder) {
-      if (sourceIndex === 0) {
-        return null;
-      }
-
-      return {
-        targetId: folderId,
-        position: "before",
-        indicatorFolderId: folderId,
-        indicatorEdge: "top",
-      };
-    }
-
-    if (previousFolder.id === sourceId || sourceIndex === hoveredIndex - 1) {
-      return null;
-    }
-
-    return {
-      targetId: previousFolder.id,
-      position: "after",
-      indicatorFolderId: previousFolder.id,
-      indicatorEdge: "bottom",
-    };
   };
 
   const handleDropFolder = (
@@ -232,9 +170,9 @@ export function FolderSidebarContent({
     }
 
     const nextDropTarget = getFolderDropTarget(
+      folders,
       draggingFolderId,
       folderId,
-      event,
     );
 
     setFolderDropTarget((currentTarget) =>
@@ -252,7 +190,7 @@ export function FolderSidebarContent({
     event: React.DragEvent<HTMLLIElement>,
   ) => {
     event.preventDefault();
-    const dropTarget = getFolderDropTarget(draggingFolderId, folderId, event);
+    const dropTarget = getFolderDropTarget(folders, draggingFolderId, folderId);
 
     if (!dropTarget) {
       clearFolderDragState();

@@ -88,11 +88,16 @@ test("최근 항목 3페이지에서 즐겨찾기 등록·해제·실패 재시�
     .getByRole("button", { name: "즐겨찾기 전환" });
 
   await page.goto("/recent");
-  await expect(page.locator("article")).toHaveCount(6);
+  // 뷰포트의 선조회로 다음 페이지까지 도착할 수 있으므로 중간 개수를 고정하지 않습니다.
+  await expect(
+    page.getByRole("button", { name: "검증 클립 6 복사", exact: true }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "검증 클립 6 복사", exact: true })
     .scrollIntoViewIfNeeded();
-  await expect(page.locator("article")).toHaveCount(12);
+  await expect(
+    page.getByRole("button", { name: "검증 클립 12 복사", exact: true }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "검증 클립 12 복사", exact: true })
     .scrollIntoViewIfNeeded();
