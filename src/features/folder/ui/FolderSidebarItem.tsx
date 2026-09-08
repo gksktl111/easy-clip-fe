@@ -97,17 +97,6 @@ export function FolderSidebarItem({
       onKeyDown={handleKeyDown}
       className={`relative rounded-lg ${isDraggedItem ? "opacity-50" : ""}`}
     >
-      {dropIndicatorEdge ? (
-        <span
-          className={`pointer-events-none absolute right-2 left-2 z-10 h-0.5 rounded-full bg-(--focus-ring) opacity-100 shadow-[0_0_0_1px_var(--surface-muted)] transition-[opacity,transform] duration-150 ${
-            dropIndicatorEdge === "top"
-              ? "top-0 -translate-y-1/2"
-              : "bottom-0 translate-y-1/2"
-          }`}
-          aria-hidden
-        />
-      ) : null}
-
       <div
         onContextMenu={onOpenOptionsMenu}
         className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium ${
