@@ -449,10 +449,10 @@ for (const error of ["limit", "conflict"] as const) {
     await page
       .getByRole("button", { name: ko.trash.restoreSelected, exact: true })
       .click();
-    await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    await expect(page.locator("[data-sonner-toast]")).toContainText(
       error === "limit"
         ? ko.access.errors.CLIP_LIMIT_EXCEEDED
-        : "부모 폴더를 먼저 복구해주세요",
+        : ko.trash.restoreConflictError,
     );
     await expect(
       page

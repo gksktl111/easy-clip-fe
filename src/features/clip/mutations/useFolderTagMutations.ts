@@ -72,7 +72,9 @@ export const useFolderTagMutations = ({
     onSuccess: (tag) => updateFolderTagInCache(queryClient, tag),
     onError: refreshMissingResources,
     onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
+      queryClient
+        .invalidateQueries({ queryKey: clipQueryKeys.all })
+        .catch(() => undefined),
   });
 
   const deleteMutation = useMutation({
@@ -84,7 +86,9 @@ export const useFolderTagMutations = ({
       removeFolderTagFromCache(queryClient, folderId, tagId),
     onError: refreshMissingResources,
     onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
+      queryClient
+        .invalidateQueries({ queryKey: clipQueryKeys.all })
+        .catch(() => undefined),
   });
   const { mutateAsync: createTagAsync } = createMutation;
   const { mutateAsync: updateTagAsync } = updateMutation;

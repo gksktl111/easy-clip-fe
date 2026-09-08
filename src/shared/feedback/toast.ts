@@ -2,74 +2,50 @@
 
 import { createElement } from "react";
 import { toast } from "sonner";
+import { ToastMessage, type ToastMessageProps } from "./ToastMessage";
 
-const TOAST_DURATION_MS = 3000;
-
-type ToastVariant = "error" | "success";
-
-const TOAST_ACCENT_CLASS: Record<ToastVariant, string> = {
-  error: "bg-(--danger)",
-  success: "bg-(--success)",
-};
-
-const renderToast = (
-  id: string | number,
-  variant: ToastVariant,
-  message: string,
-  description?: string,
-) =>
-  createElement(
-    "button",
-    {
-      type: "button",
-      onClick: () => toast.dismiss(id),
-      className:
-        "flex w-[360px] max-w-[calc(100vw-32px)] cursor-pointer items-start gap-3 rounded-xl border border-(--border) bg-(--surface-elevated) px-4 py-3 text-left text-(--foreground) shadow-lg shadow-black/10 transition hover:bg-(--surface-muted) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring)",
-      "aria-label": `${message} 알림 닫기`,
-    },
-    createElement("span", {
-      className: `mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${TOAST_ACCENT_CLASS[variant]}`,
-      "aria-hidden": true,
-    }),
-    createElement(
-      "span",
-      {
-        className: "min-w-0 flex-1",
-      },
-      createElement(
-        "span",
-        {
-          className: "block text-sm font-semibold leading-5",
-        },
-        message,
-      ),
-      description
-        ? createElement(
-            "span",
-            {
-              className: "mt-1 block text-sm leading-5 text-(--muted)",
-            },
-            description,
-          )
-        : null,
-    ),
-  );
+export const TOAST_DURATION_MS = 4000;
+let sequence = 0;
 
 const notify = (
-  variant: ToastVariant,
+  variant: ToastMessageProps["variant"],
   message: string,
   description?: string,
+  eventId?: string,
 ) => {
-  toast.custom((id) => renderToast(id, variant, message, description), {
-    duration: TOAST_DURATION_MS,
-  });
+  const prefix =
+    JSON.stringify(
+      eventId ? ["event", eventId] : ["result", variant, message, description],
+    ) + ":";
+  const existing = toast
+    .getToasts()
+    .find((item) => typeof item.id === "string" && item.id.startsWith(prefix));
+  // 닫힘 애니메이션 중인 ID를 재사용하면 Sonner가 새 결과까지 제거할 수 있습니다.
+  const id = existing?.id ?? `${prefix}${++sequence}`;
+  return toast.custom(
+    (id) => createElement(ToastMessage, { id, variant, message, description }),
+    {
+      // 같은 결과의 연속 호출은 쌓지 않고 기존 알림과 표시 시간을 갱신합니다.
+      id,
+      onAutoClose: (item) => {
+        toast.dismiss(item.id);
+      },
+      onDismiss: (item) => {
+        toast.dismiss(item.id);
+      },
+      duration: TOAST_DURATION_MS,
+    },
+  );
 };
 
-export const notifyError = (message: string, description?: string) => {
-  // 앱 전역 알림 정책은 이 헬퍼를 통해 한 곳에서 조정한다.
-  notify("error", message, description);
-};
+export const notifyError = (
+  message: string,
+  description?: string,
+  eventId?: string,
+) => notify("error", message, description, eventId);
 
-export const notifySuccess = (message: string, description?: string) => {
-  notify("success", message, description);
-};
+export const notifySuccess = (
+  message: string,
+  description?: string,
+  eventId?: string,
+) => notify("success", message, description, eventId);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   removeAllClipsInFolder,
@@ -20,7 +20,7 @@ interface DeleteClipsVariables {
   kind: "single" | "multiple";
 }
 
-export type DeleteAllClipsResult = "deleted" | "empty" | "ignored";
+export type DeleteAllClipsResult = number | null;
 
 const getUniqueClipIds = (clipIds: string[]) => [...new Set(clipIds)];
 
@@ -31,29 +31,38 @@ export const useClipDeletionMutation = ({
   onDeleted,
 }: UseClipDeletionMutationOptions) => {
   const queryClient = useQueryClient();
+  const pending = useRef(false);
   const deleteMutation = useMutation({
     mutationFn: async ({ clipIds, kind }: DeleteClipsVariables) => {
       if (kind === "single") {
         await removeClip(clipIds[0] ?? "");
-        return;
+        return 1;
       }
 
-      await removeClips({ clipIds });
+      return (await removeClips({ clipIds })).deletedCount;
     },
     onSuccess: () => {
-      void onDeleted?.();
+      void Promise.resolve()
+        .then(() => onDeleted?.())
+        .catch(() => undefined);
     },
     onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
+      queryClient
+        .invalidateQueries({ queryKey: clipQueryKeys.all })
+        .catch(() => undefined),
   });
   const deleteAllMutation = useMutation({
     mutationFn: (targetFolderId: string) =>
       removeAllClipsInFolder(targetFolderId),
     onSuccess: () => {
-      void onDeleted?.();
+      void Promise.resolve()
+        .then(() => onDeleted?.())
+        .catch(() => undefined);
     },
     onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
+      queryClient
+        .invalidateQueries({ queryKey: clipQueryKeys.all })
+        .catch(() => undefined),
   });
   const isDeleting = deleteMutation.isPending || deleteAllMutation.isPending;
   const { mutateAsync: deleteMutateAsync } = deleteMutation;
@@ -61,49 +70,56 @@ export const useClipDeletionMutation = ({
 
   const deleteClip = useCallback(
     async (clipId: string) => {
-      if (!isAuthenticated || isDeleting) {
-        return false;
+      if (!isAuthenticated || isDeleting || pending.current) {
+        return null;
       }
 
-      await deleteMutateAsync({ clipIds: [clipId], kind: "single" });
-      return true;
+      pending.current = true;
+      try {
+        return await deleteMutateAsync({ clipIds: [clipId], kind: "single" });
+      } finally {
+        pending.current = false;
+      }
     },
     [deleteMutateAsync, isAuthenticated, isDeleting],
   );
 
   const deleteClips = useCallback(
     async (clipIds: string[]) => {
-      if (!isAuthenticated || isDeleting) {
-        return false;
+      if (!isAuthenticated || isDeleting || pending.current) {
+        return null;
       }
 
       const uniqueClipIds = getUniqueClipIds(clipIds);
       if (uniqueClipIds.length === 0) {
-        return false;
+        return null;
       }
 
-      await deleteMutateAsync({
-        clipIds: uniqueClipIds,
-        kind: "multiple",
-      });
-      return true;
+      pending.current = true;
+      try {
+        return await deleteMutateAsync({
+          clipIds: uniqueClipIds,
+          kind: "multiple",
+        });
+      } finally {
+        pending.current = false;
+      }
     },
     [deleteMutateAsync, isAuthenticated, isDeleting],
   );
 
   const deleteAll = useCallback(async (): Promise<DeleteAllClipsResult> => {
-    if (!isAuthenticated || !folderId || isDeleting) {
-      return "ignored";
+    if (!isAuthenticated || !folderId || isDeleting || pending.current) {
+      return null;
     }
 
-    const { deletedCount } = await deleteAllMutateAsync(folderId);
-    return deletedCount > 0 ? "deleted" : "empty";
-  }, [
-    deleteAllMutateAsync,
-    folderId,
-    isAuthenticated,
-    isDeleting,
-  ]);
+    pending.current = true;
+    try {
+      return (await deleteAllMutateAsync(folderId)).deletedCount;
+    } finally {
+      pending.current = false;
+    }
+  }, [deleteAllMutateAsync, folderId, isAuthenticated, isDeleting]);
 
   return {
     deleteAll,

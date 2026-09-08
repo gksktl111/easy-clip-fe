@@ -1,9 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useCallback, useMemo, useState } from "react";
 import { useClipDeletionMutation } from "@/features/clip/mutations/useClipDeletionMutation";
 import type { Clip } from "@/features/clip/model/clip";
-import { notifyError } from "@/shared/feedback/toast";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 
 interface UseClipDeletionOptions {
   clips: Clip[];
@@ -19,6 +21,7 @@ export const useClipDeletion = ({
   isAuthenticated,
   onDeleted,
 }: UseClipDeletionOptions) => {
+  const t = useTranslations("feedback");
   const {
     deleteAll: deleteAllMutation,
     deleteClip: deleteClipMutation,
@@ -99,12 +102,13 @@ export const useClipDeletion = ({
       }
 
       try {
-        await deleteClipMutation(clipId);
+        const count = await deleteClipMutation(clipId);
+        if (count !== null) notifySuccess(t("deleteSuccess", { count }));
       } catch {
-        notifyError("클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        notifyError(t("deleteError"));
       }
     },
-    [deleteClipMutation, isAuthenticated, isDeleting],
+    [deleteClipMutation, isAuthenticated, isDeleting, t],
   );
 
   const deleteSelected = useCallback(async () => {
@@ -113,19 +117,20 @@ export const useClipDeletion = ({
       return;
     }
 
-    let isDeleted = false;
+    let count: number | null = null;
 
     try {
-      isDeleted = await deleteClipsMutation(clipIds);
+      count = await deleteClipsMutation(clipIds);
     } catch {
-      notifyError("선택한 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      notifyError(t("deleteError"));
     }
 
-    if (isDeleted) {
+    if (count !== null) {
+      notifySuccess(t("deleteSuccess", { count }));
       setSelectedClipIds(new Set());
       setIsDeleteMode(false);
     }
-  }, [deleteClipsMutation, selectedAvailableClipIds]);
+  }, [deleteClipsMutation, selectedAvailableClipIds, t]);
 
   const deleteAll = useCallback(async () => {
     if (!isAuthenticated || isDeleting || !folderId) {
@@ -137,16 +142,15 @@ export const useClipDeletion = ({
     try {
       const result = await deleteAllMutation();
 
-      if (result === "deleted" || result === "empty") {
+      if (result !== null) {
+        notifySuccess(t("deleteSuccess", { count: result }));
         setSelectedClipIds(new Set());
         setIsDeleteMode(false);
       }
     } catch {
-      notifyError(
-        "현재 폴더의 모든 클립 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
-      );
+      notifyError(t("deleteError"));
     }
-  }, [deleteAllMutation, folderId, isAuthenticated, isDeleting]);
+  }, [deleteAllMutation, folderId, isAuthenticated, isDeleting, t]);
 
   return {
     cancelDeleteMode,

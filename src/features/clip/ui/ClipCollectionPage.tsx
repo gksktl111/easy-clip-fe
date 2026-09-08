@@ -4,7 +4,6 @@ import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
 import { useTranslations } from "next-intl";
 import type { Clip } from "@/features/clip/model/clip";
-import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
 import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { FilterBar, type FilterType } from "@/features/clip/ui/FilterBar";
 
@@ -12,7 +11,6 @@ import { FilterBar, type FilterType } from "@/features/clip/ui/FilterBar";
 interface ClipCollectionPageProps {
   activeFilter: FilterType;
   clips: Clip[];
-  copyToastPosition: { x: number; y: number } | null;
   hasNextPage?: boolean;
   isError?: boolean;
   isFetchingNextPage?: boolean;
@@ -31,7 +29,6 @@ interface ClipCollectionPageProps {
 export function ClipCollectionPage({
   activeFilter,
   clips,
-  copyToastPosition,
   hasNextPage,
   isError,
   isFetchingNextPage,
@@ -76,7 +73,6 @@ export function ClipCollectionPage({
         isFavoriteMutationPending={isFavoriteMutationPending}
         pendingFavoriteClipId={pendingFavoriteClipId}
       />
-      <ClipCopyToast label={t("copyToast")} position={copyToastPosition} />
     </div>
   );
 }

@@ -1,35 +1,32 @@
 "use client";
 
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
-import { useCallback } from "react";
-import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
+import { useCallback, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { useRecordClipViewMutation } from "@/features/clip/mutations/useRecordClipViewMutation";
 import type { Clip } from "@/features/clip/model/clip";
 import { copyClipToClipboard } from "@/features/clip/service/clipClipboard";
-import { notifyError } from "@/shared/feedback/toast";
-
-interface CopyFeedbackPosition {
-  x: number;
-  y: number;
-}
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 
 interface UseClipCopyActionOptions {
   isAuthenticated: boolean;
   isDisabled?: boolean;
 }
 
-// 클립 복사, 최근 사용 기록 mutation 호출과 선택적 위치 피드백을 처리합니다.
+// 클립 복사, 최근 사용 기록 mutation 호출과 공통 토스트를 처리합니다.
 export const useClipCopyAction = ({
   isAuthenticated,
   isDisabled = false,
 }: UseClipCopyActionOptions) => {
+  const pending = useRef(false);
   const access = useResourceAccess();
-  const { copyToast, showCopyToast } = useCopyToast();
+  const t = useTranslations("feedback");
   const { recordClipView } = useRecordClipViewMutation();
 
   const copyClip = useCallback(
-    async (clip: Clip, feedbackPosition?: CopyFeedbackPosition) => {
+    async (clip: Clip) => {
       if (
+        pending.current ||
         isDisabled ||
         access.status !== "ready" ||
         !clip.folderId ||
@@ -38,16 +35,17 @@ export const useClipCopyAction = ({
         return;
       }
 
+      pending.current = true;
       try {
         await copyClipToClipboard(clip);
       } catch {
-        notifyError("클립을 복사하지 못했습니다. 잠시 후 다시 시도해주세요.");
+        notifyError(t("copyError"), undefined, "clip-copy");
         return;
+      } finally {
+        pending.current = false;
       }
 
-      if (feedbackPosition) {
-        showCopyToast(feedbackPosition.x, feedbackPosition.y);
-      }
+      notifySuccess(t("copySuccess"), undefined, "clip-copy");
 
       if (isAuthenticated) {
         void recordClipView(clip.id).catch(() => {
@@ -55,11 +53,10 @@ export const useClipCopyAction = ({
         });
       }
     },
-    [isAuthenticated, isDisabled, recordClipView, showCopyToast, access],
+    [isAuthenticated, isDisabled, recordClipView, t, access],
   );
 
   return {
     copyClip,
-    copyToast,
   };
 };

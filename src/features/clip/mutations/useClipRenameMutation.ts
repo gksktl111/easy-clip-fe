@@ -10,6 +10,8 @@ export const useClipRenameMutation = () => {
     mutationFn: ({ clipId, title }: { clipId: string; title: string }) =>
       renameClip(clipId, { title }),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
+      queryClient
+        .invalidateQueries({ queryKey: clipQueryKeys.all })
+        .catch(() => undefined),
   });
 };

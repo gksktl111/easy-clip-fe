@@ -20,7 +20,6 @@ interface FolderSidebarSectionProps {
   openFolderOptionsLabel: string;
   renameLabel: string;
   deleteLabel: string;
-  folderOrderStatus: string;
   optionsMenu: ContextMenuState<string> | null;
   draggingFolderId: string | null;
   dropIndicator: {
@@ -61,7 +60,6 @@ export function FolderSidebarSection({
   openFolderOptionsLabel,
   renameLabel,
   deleteLabel,
-  folderOrderStatus,
   optionsMenu,
   draggingFolderId,
   dropIndicator,
@@ -140,9 +138,6 @@ export function FolderSidebarSection({
           ))
         )}
       </ul>
-      <p className="sr-only" role="status">
-        {folderOrderStatus}
-      </p>
     </div>
   );
 }

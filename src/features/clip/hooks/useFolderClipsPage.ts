@@ -70,7 +70,7 @@ export const useFolderClipsPage = ({
     contextMenu: contextMenuState,
     openContextMenu,
   } = contextMenu;
-  const { copyClip: copyClipAction, copyToast } = copy;
+  const { copyClip: copyClipAction } = copy;
   const toggleFavorite = useCallback(
     (clip: Clip) => {
       if (!isInteractionDisabled) {
@@ -107,8 +107,7 @@ export const useFolderClipsPage = ({
   }, [closeContextMenu, deactivate, startDeleteMode]);
 
   const copyClip = useCallback(
-    (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) =>
-      copyClipAction(clip, { x: event.clientX, y: event.clientY }),
+    (clip: Clip) => copyClipAction(clip),
     [copyClipAction],
   );
 
@@ -195,9 +194,6 @@ export const useFolderClipsPage = ({
       selectedClipCount,
       selectedClipIds,
       toggleClipSelected,
-    },
-    feedback: {
-      copyToast,
     },
     tags: {
       close: tagWorkspace.close,

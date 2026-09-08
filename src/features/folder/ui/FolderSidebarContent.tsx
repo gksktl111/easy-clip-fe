@@ -22,7 +22,7 @@ import { getFolderKeyboardMoveTarget } from "@/features/folder/service/folderCol
 import { getFolderPath } from "@/features/folder/service/folderRoute";
 import { FolderNameModal } from "@/features/folder/ui/FolderNameModal";
 import { FolderSidebarSection } from "@/features/folder/ui/FolderSidebarSection";
-import { notifyError } from "@/shared/feedback/toast";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { useContextMenu } from "@/shared/hooks/useContextMenu";
 
 interface FolderSidebarContentProps {
@@ -55,6 +55,7 @@ export function FolderSidebarContent({
   onRetry,
   onFolderDeleted,
 }: FolderSidebarContentProps) {
+  const feedback = useTranslations("feedback");
   const t = useTranslations("sidebar");
   const a = useTranslations("access");
   const access = useResourceAccess();
@@ -78,7 +79,6 @@ export function FolderSidebarContent({
   const [draggingFolderId, setDraggingFolderId] = useState<string | null>(null);
   const [folderDropTarget, setFolderDropTarget] =
     useState<FolderDropTarget | null>(null);
-  const [folderOrderStatus, setFolderOrderStatus] = useState("");
   const folderNameInputRef = useRef<HTMLInputElement>(null);
   const folderNameModalMode = folderNameModal?.mode ?? null;
   const isFolderNameSubmitting =
@@ -116,7 +116,9 @@ export function FolderSidebarContent({
     }
 
     void saveFolderOrder(sourceId, targetId, position)
-      .then(() => setFolderOrderStatus(t("folderOrderChanged")))
+      .then((changed) => {
+        if (changed) notifySuccess(t("folderOrderChanged"));
+      })
       .catch(() => {
         notifyError(t("folderActionError"));
       });
@@ -139,11 +141,22 @@ export function FolderSidebarContent({
         ? createFolder(trimmedName)
         : renameFolder(folderNameModal.folderId, trimmedName);
 
-    void request.then(closeFolderNameModal).catch((error) => {
-      notifyError(
-        error instanceof ApiError ? error.message : t("folderActionError"),
-      );
-    });
+    void request
+      .then(() => {
+        notifySuccess(
+          feedback(
+            folderNameModal.mode === "create"
+              ? "folderCreated"
+              : "folderRenamed",
+          ),
+        );
+        closeFolderNameModal();
+      })
+      .catch((error) => {
+        notifyError(
+          error instanceof ApiError ? error.message : t("folderActionError"),
+        );
+      });
   };
 
   const getRedirectPathAfterFolderDelete = (deletedFolderId: string) => {
@@ -241,8 +254,9 @@ export function FolderSidebarContent({
     // 버튼 메뉴와 우클릭 메뉴 모두 같은 순서 저장 경로를 타도록 여기서만 메뉴를 닫고 저장합니다.
     folderOptionsMenu.closeMenu();
     void saveFolderOrder(folderId, moveTarget.targetId, moveTarget.position)
-      .then(() => {
-        setFolderOrderStatus(
+      .then((changed) => {
+        if (!changed) return;
+        notifySuccess(
           t(direction === "up" ? "folderMovedUp" : "folderMovedDown", {
             name: sourceFolder.name,
           }),
@@ -292,6 +306,7 @@ export function FolderSidebarContent({
     void removeFolder(folderId)
       .then(() => {
         folderOptionsMenu.closeMenu();
+        notifySuccess(feedback("folderDeleted"));
         onFolderDeleted(redirectPath);
       })
       .catch(() => {
@@ -314,7 +329,6 @@ export function FolderSidebarContent({
         openFolderOptionsLabel={t("openFolderOptions")}
         renameLabel={t("rename")}
         deleteLabel={t("delete")}
-        folderOrderStatus={folderOrderStatus}
         optionsMenu={folderOptionsMenu.menu}
         draggingFolderId={draggingFolderId}
         dropIndicator={

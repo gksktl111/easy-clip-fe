@@ -84,7 +84,10 @@ export const useTrashItemsQuery = () => {
     items,
     refetch: () => {
       restarted.current.delete(identity);
-      return queryClient.resetQueries({ queryKey, exact: true });
+      return queryClient.resetQueries(
+        { queryKey, exact: true },
+        { throwOnError: true },
+      );
     },
   };
 };

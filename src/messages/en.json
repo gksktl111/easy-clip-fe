@@ -307,7 +307,6 @@
   },
   "clips": {
     "count": "{count, plural, =0 {0 clips} one {# clip} other {# clips}}",
-    "copyToast": "Copied!",
     "captureHint": "Click anywhere and press Ctrl+V to capture a new clip.",
     "captureErrors": {
       "textSaveFailed": "Could not save the clip. Please try again shortly.",
@@ -386,7 +385,7 @@
       },
       "errors": {
         "invalid": "Check the tag name and color.",
-        "notFound": "The folder or tag was not found, so the list was refreshed.",
+        "notFound": "The clip or tag could not be found. Check the list and try again.",
         "conflict": "A tag with this exact name already exists.",
         "actionFailed": "Could not complete the tag action. Please try again shortly.",
         "loadFailed": "Could not load the tag list."
@@ -475,5 +474,35 @@
     "closeFolderLimit": "Close folder limit notice",
     "clipLimitExplanation": "Existing clips are preserved even above the limit. Limits apply to adding new clips.",
     "proFeaturesTitle": "Features available with Pro"
+  },
+  "feedback": {
+    "close": "Dismiss notification",
+    "region": "Notifications",
+    "copySuccess": "Clip copied.",
+    "copyError": "Could not copy the clip. Try again.",
+    "deleteSuccess": "Moved {count} clips to trash.",
+    "deleteError": "Could not delete clips. Try again.",
+    "saveSuccess": "Clip saved.",
+    "renameSuccess": "Clip renamed.",
+    "favoriteAdded": "Added to favorites.",
+    "favoriteRemoved": "Removed from favorites.",
+    "favoriteError": "Could not update favorites. Try again.",
+    "folderCreated": "Folder created.",
+    "folderRenamed": "Folder renamed.",
+    "folderDeleted": "Folder moved to trash.",
+    "restoreSuccess": "Restored {count} items.",
+    "permanentDeleteSuccess": "Permanently deleted {count} items.",
+    "refreshSuccess": "Trash refreshed.",
+    "refreshError": "Could not refresh trash. Try again.",
+    "settingsSaved": "Settings saved.",
+    "tagCreated": "Tag created.",
+    "tagUpdated": "Tag updated.",
+    "tagDeleted": "Tag deleted.",
+    "clipTagsSaved": "Clip tags saved.",
+    "billingStartError": "Could not start payment authorization. Try again.",
+    "billingConfirmed": "Subscription payment approved.",
+    "billingFailed": "Payment could not be completed. Check your payment status.",
+    "loggedOut": "Signed out.",
+    "policyResolution": "Check accessible folders and plan limits, then try again."
   }
 }

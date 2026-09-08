@@ -1,7 +1,11 @@
 "use client";
 
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
+
+import { useTranslations } from "next-intl";
+
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { likeClip, unlikeClip } from "@/features/clip/api/clipApi";
 import type { Clip } from "@/features/clip/model/clip";
@@ -13,7 +17,6 @@ import { clipQueryKeys } from "@/features/clip/queries/clipQueryKey";
 
 interface UseClipFavoriteMutationOptions {
   isAuthenticated: boolean;
-  onError?: () => void;
 }
 
 interface ToggleFavoriteVariables {
@@ -24,8 +27,9 @@ interface ToggleFavoriteVariables {
 // 즐겨찾기 요청과 완료 후 목록 갱신을 관리합니다.
 export const useClipFavoriteMutation = ({
   isAuthenticated,
-  onError,
 }: UseClipFavoriteMutationOptions) => {
+  const t = useTranslations("feedback");
+  const pending = useRef(false);
   const access = useResourceAccess();
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -39,7 +43,9 @@ export const useClipFavoriteMutation = ({
       if (snapshot) restoreClipFavorite(queryClient, clipId, snapshot);
     },
     onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
+      queryClient
+        .invalidateQueries({ queryKey: clipQueryKeys.all })
+        .catch(() => undefined),
   });
   const { isPending, mutateAsync } = mutation;
 
@@ -48,6 +54,7 @@ export const useClipFavoriteMutation = ({
       if (
         !isAuthenticated ||
         isPending ||
+        pending.current ||
         access.status !== "ready" ||
         !clip.folderId ||
         access.folderLocks[clip.folderId] !== false
@@ -55,16 +62,24 @@ export const useClipFavoriteMutation = ({
         return;
       }
 
+      pending.current = true;
       try {
         await mutateAsync({
           clipId: clip.id,
           isFavorite: !clip.isFavorite,
         });
+        notifySuccess(
+          t(clip.isFavorite ? "favoriteRemoved" : "favoriteAdded"),
+          undefined,
+          "clip-favorite",
+        );
       } catch {
-        onError?.();
+        notifyError(t("favoriteError"), undefined, "clip-favorite");
+      } finally {
+        pending.current = false;
       }
     },
-    [isAuthenticated, isPending, mutateAsync, onError, access],
+    [isAuthenticated, isPending, mutateAsync, t, access],
   );
 
   return {

@@ -1,6 +1,5 @@
 "use client";
 
-import { PolicyErrorNotice } from "@/shared/access/PolicyErrorNotice";
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
 import { useState } from "react";
@@ -45,12 +44,7 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
     actions.pendingActionKey === "trash-delete-selected";
   const isActionPending = actions.pendingActionKey !== null;
   const hasRows = rows.length > 0;
-  const errorMessage =
-    results.error === "restoreConflict"
-      ? t("restoreConflictError")
-      : results.error === "action"
-        ? t("actionError")
-        : t("error");
+  const errorMessage = t("error");
 
   const handleDeleteSelected = async () => {
     if (selectedItems.length === 0) {
@@ -98,17 +92,7 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
         onRequestDeleteSelected={() => setDeleteModal("selected")}
       />
 
-      {results.failure ? (
-        <div className="p-4">
-          <PolicyErrorNotice error={results.failure} />
-        </div>
-      ) : null}
-      {results.deletedCount !== null ? (
-        <p role="status" className="px-4 py-2 text-sm">
-          {t("deletedResult", { count: results.deletedCount })}
-        </p>
-      ) : null}
-      {results.error && !results.failure ? (
+      {results.error ? (
         <div className="p-6 pt-6">
           <p
             className="rounded-xl border border-(--danger-border) bg-(--danger-surface) px-4 py-3 text-sm text-(--danger-text)"

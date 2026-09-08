@@ -393,7 +393,9 @@ test("클립 태그 저장 404에서 최신 클립 목록을 다시 불러온다
   await editor.getByRole("button", { name: "저장", exact: true }).click();
 
   await expect(
-    editor.getByText("목록을 새로고침했습니다.", { exact: false }),
+    page
+      .locator("[data-sonner-toast]")
+      .getByText("목록을 확인하고 다시 시도해주세요.", { exact: false }),
   ).toBeVisible();
   await expect.poll(() => clipListRequestCount).toBeGreaterThan(1);
 

@@ -14,7 +14,7 @@ import {
   isAllowedImageClipFile,
   isUnsupportedImageClipError,
 } from "@/features/clip/service/imageClipValidation";
-import { notifyError } from "@/shared/feedback/toast";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 
 interface UseFolderClipCaptureOptions {
   folderId: string;
@@ -28,6 +28,7 @@ export const useFolderClipCapture = ({
   isAuthenticated,
   isDisabled = false,
 }: UseFolderClipCaptureOptions) => {
+  const feedback = useTranslations("feedback");
   const router = useRouter();
   const { user } = useAuth();
   const drafts = useCaptureDraftStore();
@@ -80,6 +81,7 @@ export const useFolderClipCapture = ({
         if (input.type === "text") await createText(folderId, input.text);
         else await createImage(folderId, input.file);
         drafts.remove(user.id, folderId, id);
+        notifySuccess(feedback("saveSuccess"));
       } catch (error) {
         drafts.fail(user.id, folderId, id, error);
         if (!isPolicyError(error))
@@ -95,6 +97,7 @@ export const useFolderClipCapture = ({
       }
     },
     [
+      feedback,
       createText,
       createImage,
       drafts,

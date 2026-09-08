@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { useTranslations } from "next-intl";
 import { useTrashActions } from "@/features/trash/hooks/useTrashActions";
 import { useTrashItemsQuery } from "@/features/trash/hooks/useTrashItemsQuery";
@@ -20,17 +21,13 @@ export const useTrashPage = ({
   activeFolders,
   onItemsChanged,
 }: UseTrashPageOptions) => {
+  const feedback = useTranslations("feedback");
+  const reloading = useRef(false);
   const t = useTranslations("trash");
   const query = useTrashItemsQuery();
   const trashActions = useTrashActions({ onItemsChanged });
   const { refetch } = query;
-  const {
-    clearError,
-    error: actionError,
-    failure,
-    deletedCount,
-    ...actions
-  } = trashActions;
+  const actions = trashActions;
   const labels = useMemo(
     () => ({
       folderType: t("folderType"),
@@ -58,9 +55,17 @@ export const useTrashPage = ({
   );
 
   const reload = useCallback(async () => {
-    clearError();
-    await refetch();
-  }, [clearError, refetch]);
+    if (reloading.current) return;
+    reloading.current = true;
+    try {
+      await refetch();
+      notifySuccess(feedback("refreshSuccess"));
+    } catch {
+      notifyError(feedback("refreshError"));
+    } finally {
+      reloading.current = false;
+    }
+  }, [refetch, feedback]);
 
   return {
     actions: {
@@ -68,9 +73,7 @@ export const useTrashPage = ({
       reload,
     },
     results: {
-      failure,
-      deletedCount,
-      error: actionError ?? (query.isError ? "load" : null),
+      error: query.isError ? "load" : null,
       fetchNextPage: query.fetchNextPage,
       hasNextPage: query.hasNextPage,
       isFetchingNextPage: query.isFetchingNextPage,

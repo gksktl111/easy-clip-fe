@@ -1,7 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { notifyError } from "@/shared/feedback/toast";
 import { useClipCollectionFilter } from "@/features/clip/hooks/useClipCollectionFilter";
 import { useClipCopyAction } from "@/features/clip/hooks/useClipCopyAction";
 import { useClipFavoriteMutation } from "@/features/clip/mutations/useClipFavoriteMutation";
@@ -19,7 +17,6 @@ export const useClipCollection = ({
   recent = false,
   supportsFavoriteToggle = false,
 }: UseClipCollectionOptions) => {
-  const t = useTranslations("clips.item");
   const filter = useClipCollectionFilter();
   const query = useInfiniteClipsQuery({
     favorite,
@@ -32,7 +29,6 @@ export const useClipCollection = ({
   });
   const favoriteMutation = useClipFavoriteMutation({
     isAuthenticated: query.isAuthenticated,
-    onError: () => notifyError(t("favoriteError")),
   });
 
   return {
@@ -41,9 +37,6 @@ export const useClipCollection = ({
       toggleFavorite: supportsFavoriteToggle
         ? favoriteMutation.toggleFavorite
         : undefined,
-    },
-    feedback: {
-      copyToast: copy.copyToast,
     },
     filter: {
       activeFilter: filter.activeFilter,

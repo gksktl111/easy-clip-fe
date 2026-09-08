@@ -32,7 +32,9 @@ export const useCreateClipMutation = () => {
             file: variables.file,
           }),
     onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: clipQueryKeys.all }),
+      queryClient
+        .invalidateQueries({ queryKey: clipQueryKeys.all })
+        .catch(() => undefined),
   });
   const { mutateAsync } = mutation;
 
