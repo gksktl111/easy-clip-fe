@@ -306,6 +306,11 @@
     "count": "{count, plural, =0 {0 件のクリップ} other {# 件のクリップ}}",
     "copyToast": "コピーしました！",
     "captureHint": "どこかをクリックしてから Ctrl+V を押すと新しいクリップを保存できます。",
+    "captureErrors": {
+      "textSaveFailed": "クリップを保存できませんでした。しばらくしてからもう一度お試しください。",
+      "imageSaveFailed": "画像クリップを保存できませんでした。しばらくしてからもう一度お試しください。",
+      "unsupportedImage": "対応していない画像形式です。JPEG、PNG、WebP、GIF、AVIFのいずれかのファイルを使用してください。"
+    },
     "filter": {
       "all": "すべて",
       "text": "テキスト",

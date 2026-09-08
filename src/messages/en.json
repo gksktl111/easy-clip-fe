@@ -306,6 +306,11 @@
     "count": "{count, plural, =0 {0 clips} one {# clip} other {# clips}}",
     "copyToast": "Copied!",
     "captureHint": "Click anywhere and press Ctrl+V to capture a new clip.",
+    "captureErrors": {
+      "textSaveFailed": "Could not save the clip. Please try again shortly.",
+      "imageSaveFailed": "Could not save the image clip. Please try again shortly.",
+      "unsupportedImage": "Unsupported image format. Use a JPEG, PNG, WebP, GIF, or AVIF file."
+    },
     "filter": {
       "all": "All",
       "text": "Text",

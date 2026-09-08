@@ -1,11 +1,27 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const setupWorkspace = async (page: Page) => {
+import ko from "../src/messages/ko.json";
+import en from "../src/messages/en.json";
+import ja from "../src/messages/ja.json";
+import zh from "../src/messages/zh.json";
+
+const messages = { ko, en, ja, zh };
+
+const setupWorkspace = async (
+  page: Page,
+  locale: keyof typeof messages = "ko",
+) => {
   const created: string[] = [];
   let reads = 0;
   const items: Record<string, unknown>[] = [];
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.context().addCookies([
+    {
+      name: "easy_clip_language",
+      value: locale,
+      domain: "127.0.0.1",
+      path: "/",
+    },
     {
       name: "easy_clip_refresh_token",
       value: "test-token",
@@ -29,7 +45,7 @@ const setupWorkspace = async (page: Page) => {
         id: "settings-1",
         userId: "user-1",
         theme: "LIGHT",
-        language: "ko",
+        language: locale,
       },
     }),
   );
@@ -71,10 +87,14 @@ const setupWorkspace = async (page: Page) => {
     await route.fulfill({ status: 201, json: clip });
   });
   await page.goto("/folder/folder-1");
-  const search = page.locator('input[placeholder="클립 검색..."]:visible');
+  const search = page
+    .getByPlaceholder(messages[locale].clips.filter.searchPlaceholder)
+    .filter({ visible: true });
   await search.click();
   await expect(
-    page.getByText("붙여넣기 준비됨", { exact: true }).first(),
+    page
+      .getByText(messages[locale].clips.filter.readyToPaste, { exact: true })
+      .first(),
   ).toBeAttached();
   await page.waitForLoadState("networkidle");
   return { created, reads: () => reads, search };
@@ -184,3 +204,72 @@ test("이미지 수집을 유지하고 태그 모달 및 삭제 모드에서는 
   await settlePaste(page);
   expect(state.created).toEqual(["이미지 클립"]);
 });
+
+for (const locale of ["ko", "en", "ja", "zh"] as const) {
+  test(`${locale}에서 클립 저장 실패와 미지원 이미지 오류를 번역한다`, async ({
+    page,
+  }) => {
+    const state = await setupWorkspace(page, locale);
+    const errors = messages[locale].clips.captureErrors;
+    let requestCount = 0;
+    let unsupportedResponse = false;
+    await page.route("**/clips", (route) => {
+      requestCount += 1;
+      return route.fulfill({
+        status: unsupportedResponse ? 400 : 500,
+        json: {
+          message: unsupportedResponse
+            ? "현재 jpeg, png, webp, gif, avif 이미지만 업로드할 수 있습니다."
+            : "테스트 서버 오류",
+        },
+      });
+    });
+    const pasteImage = async (type: string) => {
+      await page.evaluate((mime) => {
+        const clipboardData = new DataTransfer();
+        clipboardData.items.add(
+          new File(["test"], "test-image", { type: mime }),
+        );
+        document.body.dispatchEvent(
+          new ClipboardEvent("paste", { bubbles: true, clipboardData }),
+        );
+      }, type);
+    };
+    const expectError = async (message: string) => {
+      await expect(
+        page.locator("[data-sonner-toast]").filter({ hasText: message }).last(),
+      ).toBeVisible();
+      await settlePaste(page);
+      await expect(
+        page
+          .getByText(messages[locale].clips.filter.readyToPaste, {
+            exact: true,
+          })
+          .first(),
+      ).toBeAttached();
+    };
+
+    // 미지원 파일은 서버 요청 없이 현재 언어로 안내합니다.
+    await pasteImage("image/svg+xml");
+    await expectError(errors.unsupportedImage);
+    expect(requestCount).toBe(0);
+
+    await page
+      .getByText(messages[locale].clips.filter.readyToPaste, { exact: true })
+      .last()
+      .click();
+    await pasteText(page, "저장 실패 검증");
+    await expectError(errors.textSaveFailed);
+    expect(requestCount).toBe(1);
+
+    await pasteImage("image/png");
+    await expectError(errors.imageSaveFailed);
+    expect(requestCount).toBe(2);
+
+    unsupportedResponse = true;
+    await pasteImage("image/png");
+    await expect.poll(() => requestCount).toBe(3);
+    await expectError(errors.unsupportedImage);
+    expect(state.created).toEqual([]);
+  });
+}
