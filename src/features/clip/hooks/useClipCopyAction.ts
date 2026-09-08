@@ -1,5 +1,6 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { useCallback } from "react";
 import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
 import { useRecordClipViewMutation } from "@/features/clip/mutations/useRecordClipViewMutation";
@@ -22,12 +23,18 @@ export const useClipCopyAction = ({
   isAuthenticated,
   isDisabled = false,
 }: UseClipCopyActionOptions) => {
+  const access = useResourceAccess();
   const { copyToast, showCopyToast } = useCopyToast();
   const { recordClipView } = useRecordClipViewMutation();
 
   const copyClip = useCallback(
     async (clip: Clip, feedbackPosition?: CopyFeedbackPosition) => {
-      if (isDisabled) {
+      if (
+        isDisabled ||
+        access.status !== "ready" ||
+        !clip.folderId ||
+        access.folderLocks[clip.folderId] !== false
+      ) {
         return;
       }
 
@@ -48,7 +55,7 @@ export const useClipCopyAction = ({
         });
       }
     },
-    [isAuthenticated, isDisabled, recordClipView, showCopyToast],
+    [isAuthenticated, isDisabled, recordClipView, showCopyToast, access],
   );
 
   return {

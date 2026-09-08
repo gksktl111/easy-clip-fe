@@ -7,3 +7,6 @@ export {
 export type { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 export { BillingPage } from "@/features/subscription/ui/BillingPage";
 export { BillingResultPage } from "@/features/subscription/ui/BillingResultPage";
+
+export { mySubscriptionQueryOptions } from "@/features/subscription/queries/mySubscriptionQueryOptions";
+export { hasEstimatedProAccess } from "@/features/subscription/service/subscriptionPolicy";

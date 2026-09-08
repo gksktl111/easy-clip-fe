@@ -1,3 +1,8 @@
+import {
+  AccessChangedError,
+  getAccessGeneration,
+  requestAccessRefresh,
+} from "@/shared/access/accessEvents";
 import { buildApiUrl } from "@/shared/config/env";
 
 type ApiRequestOptions = Omit<RequestInit, "headers"> & {
@@ -9,10 +14,20 @@ type ApiRequestOptions = Omit<RequestInit, "headers"> & {
 export class ApiError extends Error {
   status: number;
 
-  constructor(message: string, status: number) {
+  code?: string;
+  details?: Record<string, unknown>;
+
+  constructor(
+    message: string,
+    status: number,
+    code?: string,
+    details?: Record<string, unknown>,
+  ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.code = code;
+    this.details = details;
   }
 }
 
@@ -38,19 +53,35 @@ export const subscribeToAuthExpired = (callback: () => void) => {
 const isAuthRefreshExcludedPath = (path: string) =>
   path === "/auth/refresh" || path === "/auth/logout";
 
-const readErrorMessage = async (response: Response) => {
+const readApiError = async (response: Response) => {
   let message = `Request failed with status ${response.status}`;
-
+  let code: string | undefined;
+  let details: Record<string, unknown> | undefined;
   try {
-    const errorBody = (await response.json()) as { message?: string };
-    if (typeof errorBody.message === "string" && errorBody.message) {
-      message = errorBody.message;
+    const body: unknown = await response.json();
+    if (body && typeof body === "object") {
+      const data = body as Record<string, unknown>;
+      if (typeof data.message === "string" && data.message)
+        message = data.message;
+      if (Array.isArray(data.message)) {
+        const messages = data.message.filter(
+          (value): value is string => typeof value === "string",
+        );
+        if (messages.length) message = messages.join("\n");
+      }
+      if (typeof data.code === "string") code = data.code;
+      if (
+        data.details &&
+        typeof data.details === "object" &&
+        !Array.isArray(data.details)
+      ) {
+        details = data.details as Record<string, unknown>;
+      }
     }
   } catch {
-    // 응답 본문이 JSON이 아니어도 status 기준 에러 처리는 유지한다.
+    // HTML/빈 오류 응답도 HTTP 상태 기반으로 처리합니다.
   }
-
-  return message;
+  return new ApiError(message, response.status, code, details);
 };
 
 const wait = (delayMs: number) =>
@@ -116,12 +147,19 @@ export const apiRequest = async <T>(
     ...init
   }: ApiRequestOptions = {},
 ): Promise<T> => {
+  const requestGeneration = getAccessGeneration();
+  const isContentRequest =
+    /^\/(clips|trash)(?:[/?]|$)/.test(path) ||
+    /^\/folders\/[^/]+\/tags(?:[/?]|$)/.test(path);
   const response = await fetch(buildApiUrl(path), {
     ...init,
     // httpOnly 쿠키 기반 인증이므로 모든 API 요청에 쿠키를 포함한다.
     credentials: credentials ?? "include",
     headers: new Headers(headers),
   });
+
+  if (isContentRequest && requestGeneration !== getAccessGeneration())
+    throw new AccessChangedError();
 
   if (!response.ok) {
     if (
@@ -146,8 +184,17 @@ export const apiRequest = async <T>(
       notifyAuthExpired();
     }
 
-    const message = await readErrorMessage(response);
-    throw new ApiError(message, response.status);
+    const error = await readApiError(response);
+    if (
+      [
+        "PROJECT_LOCKED",
+        "PLAN_LIMIT_EXCEEDED",
+        "FEATURE_NOT_AVAILABLE",
+      ].includes(error.code ?? "")
+    ) {
+      requestAccessRefresh("policy");
+    }
+    throw error;
   }
 
   if (response.status === 204) {
@@ -160,5 +207,7 @@ export const apiRequest = async <T>(
     return null as T;
   }
 
+  if (isContentRequest && requestGeneration !== getAccessGeneration())
+    throw new AccessChangedError();
   return JSON.parse(responseBody) as T;
 };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { likeClip, unlikeClip } from "@/features/clip/api/clipApi";
@@ -25,6 +26,7 @@ export const useClipFavoriteMutation = ({
   isAuthenticated,
   onError,
 }: UseClipFavoriteMutationOptions) => {
+  const access = useResourceAccess();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: ({ clipId, isFavorite }: ToggleFavoriteVariables) =>
@@ -43,7 +45,13 @@ export const useClipFavoriteMutation = ({
 
   const toggleFavorite = useCallback(
     async (clip: Clip) => {
-      if (!isAuthenticated || isPending) {
+      if (
+        !isAuthenticated ||
+        isPending ||
+        access.status !== "ready" ||
+        !clip.folderId ||
+        access.folderLocks[clip.folderId] !== false
+      ) {
         return;
       }
 
@@ -56,7 +64,7 @@ export const useClipFavoriteMutation = ({
         onError?.();
       }
     },
-    [isAuthenticated, isPending, mutateAsync, onError],
+    [isAuthenticated, isPending, mutateAsync, onError, access],
   );
 
   return {

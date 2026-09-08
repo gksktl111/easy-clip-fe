@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 import type { TrashItemResponseDto } from "../src/features/trash/model/trash.dto";
 import ko from "../src/messages/ko.json";
 import en from "../src/messages/en.json";
@@ -63,7 +63,7 @@ async function setup(page: Page, locale: keyof typeof messages = "ko") {
     }),
   );
   await page.route("**/folders", (r) =>
-    r.fulfill({ json: [{ id: "folder-1", name: "프로젝트", order: 0 }] }),
+    r.fulfill({ json: [{ id: "folder-1", name: "프로젝트", order: 0, isLocked: false }] }),
   );
   await page.route("**/trash?**", (r) =>
     state.failLoad
@@ -147,6 +147,8 @@ test("휴지통 복구와 선택 삭제 취소·확정, 전체 비우기를 유�
     path: "/trash/restore",
     body: { items: [{ itemType: "CLIP", id: "clip-1" }] },
   });
+  await expect(page.locator("article")).toHaveCount(1);
+  await expect(page.locator("article").getByRole("checkbox")).toBeEnabled();
   await page.locator("article").getByRole("checkbox").check();
   await page
     .getByRole("button", { name: ko.trash.deleteSelected, exact: true })

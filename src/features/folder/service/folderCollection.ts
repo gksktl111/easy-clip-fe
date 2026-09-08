@@ -8,6 +8,7 @@ export const mapFolder = (folder: FolderResponseDto): FolderItem => ({
   id: folder.id,
   name: folder.name,
   order: folder.order,
+  ...(typeof folder.isLocked === "boolean" ? { isLocked: folder.isLocked } : {}),
 });
 
 export const sortFolders = (folders: FolderItem[]) =>

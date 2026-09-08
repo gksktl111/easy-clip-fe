@@ -1,5 +1,8 @@
 "use client";
 
+import { PolicyErrorNotice } from "@/shared/access/PolicyErrorNotice";
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useTrashPage } from "@/features/trash/hooks/useTrashPage";
@@ -18,6 +21,7 @@ interface TrashPageProps {
 
 export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
   const t = useTranslations("trash");
+  const access = useResourceAccess();
   const [deleteModal, setDeleteModal] = useState<
     "clearAll" | "selected" | null
   >(null);
@@ -72,6 +76,8 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
     }
   };
 
+  if (access.status !== "ready") return <ResourceAccessNotice />;
+
   return (
     <div className="bg-background flex h-full min-h-0 flex-col overflow-hidden">
       <TrashPageHeader
@@ -92,7 +98,17 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
         onRequestDeleteSelected={() => setDeleteModal("selected")}
       />
 
-      {results.error ? (
+      {results.failure ? (
+        <div className="p-4">
+          <PolicyErrorNotice error={results.failure} />
+        </div>
+      ) : null}
+      {results.deletedCount !== null ? (
+        <p role="status" className="px-4 py-2 text-sm">
+          {t("deletedResult", { count: results.deletedCount })}
+        </p>
+      ) : null}
+      {results.error && !results.failure ? (
         <div className="p-6 pt-6">
           <p
             className="rounded-xl border border-(--danger-border) bg-(--danger-surface) px-4 py-3 text-sm text-(--danger-text)"

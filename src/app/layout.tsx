@@ -1,3 +1,4 @@
+import { ResourceAccessProvider } from "@/app/_components/ResourceAccessProvider";
 import type { Metadata } from "next";
 import { UserSettingsSync } from "@/app/_components/UserSettingsSync";
 import { AuthProvider } from "@/features/auth";
@@ -41,7 +42,7 @@ export default async function RootLayout({
               <UserSettingsSync
                 enabled={initialSettings.source === "fallback"}
               />
-              {children}
+              <ResourceAccessProvider>{children}</ResourceAccessProvider>
               <AppToaster />
             </AuthProvider>
           </AppSettingsProvider>

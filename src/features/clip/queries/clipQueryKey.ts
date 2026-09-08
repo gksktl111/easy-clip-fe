@@ -2,6 +2,7 @@ import type { FetchClipsQueryDto } from "@/features/clip/model/clip.dto";
 
 export interface ClipQueryOptions {
   folderId?: string | null;
+  accessScope?: string;
   favorite?: boolean;
   q?: string;
   recent?: boolean;
@@ -19,6 +20,7 @@ export const clipQueryKeys = {
         recent: Boolean(options.recent),
         type: options.type ?? "ALL",
         q: options.q?.trim() ?? "",
+        ...(options.accessScope ? { accessScope: options.accessScope } : {}),
       },
     ] as const,
 };

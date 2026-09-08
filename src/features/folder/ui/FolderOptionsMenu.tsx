@@ -10,6 +10,7 @@ import { ActionMenu } from "@/shared/ui/menu/ActionMenu";
 
 // 폴더 이름 변경과 삭제 액션을 컨텍스트 메뉴로 제공합니다.
 interface FolderOptionsMenuProps {
+  canRename?: boolean;
   canMoveDown: boolean;
   canMoveUp: boolean;
   position?: { x: number; y: number } | null;
@@ -24,6 +25,7 @@ interface FolderOptionsMenuProps {
 }
 
 export function FolderOptionsMenu({
+  canRename = true,
   canMoveDown,
   canMoveUp,
   position,
@@ -47,6 +49,7 @@ export function FolderOptionsMenu({
         items={[
           {
             label: renameLabel,
+            disabled: !canRename,
             icon: <HiOutlinePencil className="h-4 w-4" aria-hidden />,
             onClick: onRename,
           },

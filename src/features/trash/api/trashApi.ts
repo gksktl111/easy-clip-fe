@@ -14,7 +14,7 @@ interface FetchTrashItemsOptions {
 export const fetchTrashItems = async ({
   cursor,
   limit = 20,
-}: FetchTrashItemsOptions = {}) => {
+}: FetchTrashItemsOptions = {}, signal?: AbortSignal) => {
   const searchParams = new URLSearchParams();
   searchParams.set("limit", String(limit));
 
@@ -24,8 +24,11 @@ export const fetchTrashItems = async ({
 
   return apiRequest<TrashListResponseDto>(`/trash?${searchParams}`, {
     cache: "no-store",
+    signal,
   });
 };
+
+const uniqueItems = (items: TrashItemMutationDto[]) => [...new Map(items.map((item) => [`${item.itemType}:${item.id}`, item])).values()];
 
 const trashJsonHeaders = {
   "Content-Type": "application/json",
@@ -35,14 +38,14 @@ export const restoreTrashItems = async (items: TrashItemMutationDto[]) =>
   apiRequest<TrashRestoreResponseDto>("/trash/restore", {
     method: "PATCH",
     headers: trashJsonHeaders,
-    body: JSON.stringify({ items }),
+    body: JSON.stringify({ items: uniqueItems(items) }),
   });
 
 export const deleteTrashItems = async (items: TrashItemMutationDto[]) =>
   apiRequest<TrashDeleteAllResponseDto>("/trash/items", {
     method: "DELETE",
     headers: trashJsonHeaders,
-    body: JSON.stringify({ items }),
+    body: JSON.stringify({ items: uniqueItems(items) }),
   });
 
 export const restoreTrashClip = async (clipId: string) =>

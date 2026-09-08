@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test.use({ viewport: { width: 390, height: 844 } });
 
@@ -111,6 +111,10 @@ test("인증된 사용자의 미등록 하위 경로도 404이며 클립 화면�
   await expect(
     page.getByRole("heading", { name: "페이지를 찾을 수 없습니다" }),
   ).toHaveCount(0);
+  await page.route("**/folders", (route) => route.fulfill({ json: [
+    { id: "empty", name: "빈 폴더", order: 0, isLocked: false },
+    { id: "error", name: "오류 폴더", order: 1, isLocked: false },
+  ] }));
   await page.goto("/folder/empty");
   await expect(
     page.getByText("아직 저장된 클립이 없습니다", { exact: true }),

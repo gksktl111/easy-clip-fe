@@ -16,6 +16,7 @@ const mapFilterToApiType = (filter: ClipFilter): FetchClipsQueryDto["type"] => {
 
 interface ClipInfiniteQueryOptions {
   enabled: boolean;
+  accessScope?: string;
   favorite?: boolean;
   filter: ClipFilter;
   folderId?: string;
@@ -26,6 +27,7 @@ interface ClipInfiniteQueryOptions {
 // query key, 요청 함수, 페이지네이션 규칙을 함께 재사용합니다.
 export const clipInfiniteQueryOptions = ({
   enabled,
+  accessScope,
   favorite,
   filter,
   folderId,
@@ -37,6 +39,7 @@ export const clipInfiniteQueryOptions = ({
 
   return infiniteQueryOptions({
     queryKey: clipQueryKeys.list({
+      accessScope,
       folderId,
       favorite,
       recent,
@@ -45,25 +48,27 @@ export const clipInfiniteQueryOptions = ({
     }),
     enabled,
     initialPageParam: null as string | null,
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam, signal }) => {
       const loadingStartedAt = Date.now();
 
       try {
-        return await fetchClips({
-          folderId,
-          favorite,
-          recent,
-          type,
-          q,
-          cursor: pageParam,
-        });
+        return await fetchClips(
+          {
+            folderId,
+            favorite,
+            recent,
+            type,
+            q,
+            cursor: pageParam,
+          },
+          signal,
+        );
       } finally {
         await waitForMinimumLoading(loadingStartedAt);
       }
     },
     getNextPageParam: (lastPage) =>
       lastPage.hasMore ? lastPage.nextCursor : undefined,
-    placeholderData: (previousData) => previousData,
-    ...(folderId ? { retry: shouldRetryFolderClipsQuery } : {}),
+    retry: shouldRetryFolderClipsQuery,
   });
 };

@@ -15,6 +15,7 @@ export interface MySubscriptionResponseDto {
   currentPeriodEnd: string | null;
   nextBillingAt: string | null;
   provider: SubscriptionProviderDto | null;
+  cancellation?: { pendingRenewalPayment: boolean; message: string };
 }
 
 export interface UpdateMySubscriptionDto {

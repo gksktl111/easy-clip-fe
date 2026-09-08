@@ -74,9 +74,9 @@
         "cta": "무료로 시작하기",
         "features": {
           "projects": "프로젝트 1개 사용 가능",
-          "clips": "최대 50개의 클립 생성 가능",
+          "clips": "폴더당 50개까지 추가 저장",
           "devices": "데스크톱 1개, 모바일 1개 연동 가능",
-          "organization": "검색 기능 사용 가능",
+          "organization": "접근 가능한 폴더에서 검색 + 태그",
           "ai": ""
         }
       },
@@ -89,9 +89,9 @@
         "cta": "Pro로 업그레이드",
         "features": {
           "projects": "무제한 프로젝트 생성 가능",
-          "clips": "프로젝트당 최대 500개의 클립 생성 가능",
+          "clips": "폴더당 300개까지 추가 저장",
           "devices": "무제한 기기 연동",
-          "organization": "태그 기능 사용 가능",
+          "organization": "접근 가능한 폴더에서 검색 + 태그",
           "ai": "AI 기능 추가 예정"
         }
       }
@@ -114,7 +114,8 @@
         "dismiss": "아니오",
         "confirm": "예",
         "confirming": "변경 중"
-      }
+      },
+      "pendingRenewalPayment": "이미 시작된 이번 청구가 완료되어 이용 기간이 연장될 수 있습니다."
     },
     "comparison": {
       "eyebrow": "빠른 비교",
@@ -133,8 +134,8 @@
         },
         "clips": {
           "label": "클립 수",
-          "freeValue": "최대 50개",
-          "proValue": "프로젝트당 최대 500개"
+          "freeValue": "폴더당 50개까지 추가 저장",
+          "proValue": "폴더당 300개까지 추가 저장"
         },
         "devices": {
           "label": "기기 연동",
@@ -143,8 +144,8 @@
         },
         "organization": {
           "label": "정리 방식",
-          "freeValue": "검색",
-          "proValue": "검색 + 태그"
+          "freeValue": "접근 가능한 폴더에서 검색 + 태그",
+          "proValue": "접근 가능한 폴더에서 검색 + 태그"
         },
         "ai": {
           "label": "AI 기능",
@@ -266,8 +267,8 @@
     "actionError": "휴지통 작업을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.",
     "restoreConflictError": "삭제된 폴더에 속한 클립은 단독으로 복구할 수 없습니다. 먼저 부모 폴더를 복구해주세요.",
     "clearAllPartialError": "일부 항목을 삭제하지 못했습니다. 실패 {failedCount}개 / 전체 {totalCount}개",
-    "emptyTitle": "휴지통이 비어 있습니다",
-    "emptyDescription": "삭제된 클립이나 폴더가 생기면 이곳에 표시됩니다.",
+    "emptyTitle": "표시할 휴지통 항목이 없습니다",
+    "emptyDescription": "잠긴 폴더의 삭제 항목은 표시되지 않을 수 있습니다. 전체 비우기는 숨겨진 항목도 삭제합니다.",
     "listTitle": "삭제 항목",
     "totalCount": "{count, plural, =0 {항목 0개} other {항목 #개}}",
     "folderType": "폴더",
@@ -287,7 +288,7 @@
     },
     "clearAllModal": {
       "title": "휴지통 전체 삭제",
-      "description": "정말 휴지통의 모든 항목을 영구 삭제하시겠습니까?"
+      "description": "현재 보이지 않는 잠긴 폴더의 삭제 항목도 영구 삭제됩니다. 영구 삭제한 자료는 복구할 수 없습니다."
     },
     "deleteSelectedModal": {
       "title": "선택 항목 삭제",
@@ -301,7 +302,8 @@
     "foldersEmpty": "삭제된 폴더가 없습니다.",
     "deletedAt": "삭제 시각",
     "restore": "복구",
-    "deleteForever": "삭제"
+    "deleteForever": "삭제",
+    "deletedResult": "{count}개 항목을 영구 삭제했습니다."
   },
   "clips": {
     "count": "{count, plural, =0 {0개 클립} other {#개 클립}}",
@@ -432,5 +434,46 @@
       "tooLong": "이름은 앞뒤 공백을 제외하고 {max}자 이내로 입력해주세요.",
       "count": "{count}/{max}자"
     }
+  },
+  "access": {
+    "checkingTitle": "권한을 확인하고 있습니다",
+    "checkingDescription": "최신 구독과 폴더 상태를 확인한 뒤 콘텐츠를 표시합니다.",
+    "errorTitle": "권한을 확인하지 못했습니다",
+    "errorDescription": "연결 상태를 확인하고 다시 시도해주세요.",
+    "incompatibleTitle": "폴더 상태를 확인할 수 없습니다",
+    "incompatibleDescription": "서버의 폴더 잠금 정보가 없습니다. 새로고침 후에도 계속되면 잠시 후 다시 시도해주세요.",
+    "lockedTitle": "잠긴 폴더입니다",
+    "lockedDescription": "Free에서는 서버가 지정한 폴더 1개만 이용할 수 있습니다. 기존 데이터는 보존됩니다. 접근 폴더를 삭제해도 다른 폴더가 열리지 않습니다.",
+    "retry": "다시 확인",
+    "plans": "Pro 요금제 보기",
+    "trash": "휴지통에서 복구",
+    "lockedBadge": "잠김",
+    "folderLimit": "Free에서는 폴더 1개를 사용할 수 있습니다. 기존 접근 폴더가 휴지통에 있으면 복구해주세요. 폴더를 더 사용하려면 Pro가 필요합니다.",
+    "deleteFolderTitle": "폴더를 삭제할까요?",
+    "deleteFolderDescription": "이 폴더를 삭제해도 다른 잠긴 폴더가 열리지 않습니다. 삭제한 폴더는 휴지통에서 복구할 수 있습니다.",
+    "operationError": "작업을 완료하지 못했습니다. 다시 시도해주세요.",
+    "limitCount": "현재 {count}개 / 한도 {limit}개",
+    "billingSuccess": "Pro 구독이 활성화되었습니다.",
+    "billingUncertain": "결제 결과가 불명확할 수 있습니다. 다시 결제하기 전에 구독 상태를 확인해주세요.",
+    "billingChecking": "결제 확인",
+    "billingFailed": "결제 실패",
+    "billingLoading": "결제 승인 정보를 확인하고 있습니다.",
+    "billingMissing": "결제 승인 정보가 부족합니다.",
+    "openApp": "앱으로 이동",
+    "checkSubscription": "구독 상태 확인",
+    "errors": {
+      "PROJECT_LOCKED": "잠긴 폴더에는 접근할 수 없습니다.",
+      "CLIP_LIMIT_EXCEEDED": "폴더의 클립 추가 저장 한도에 도달했습니다. 기존 클립은 보존됩니다.",
+      "PLAN_LIMIT_EXCEEDED": "현재 플랜에서는 폴더 생성 또는 복구가 제한됩니다. 기존 접근 폴더가 휴지통에 있다면 복구해주세요.",
+      "FEATURE_NOT_AVAILABLE": "폴더 순서 변경은 Pro에서 사용할 수 있습니다."
+    },
+    "draftTitle": "저장하지 못한 클립",
+    "draftDescription": "입력을 보관했습니다. 네트워크 오류라면 목록에서 저장 여부를 확인한 뒤 재시도해주세요.",
+    "retrySave": "다시 저장",
+    "discardDraft": "입력 버리기",
+    "clipLimit": "폴더당 추가 저장 한도: {limit}개.",
+    "closeFolderLimit": "폴더 추가 안내 닫기",
+    "clipLimitExplanation": "기존 클립은 한도를 초과해도 보존됩니다. 한도는 새 클립 추가에 적용됩니다.",
+    "proFeaturesTitle": "Pro에서 사용할 수 있는 기능"
   }
 }

@@ -118,7 +118,7 @@ export function TrashPageHeader({
           ) : null}
         </div>
         <Button
-          disabled={areControlsDisabled || count === 0}
+          disabled={areControlsDisabled}
           onClick={onRequestClearAll}
           variant="dangerOutline"
           size="sm"

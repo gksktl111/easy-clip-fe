@@ -5,6 +5,6 @@ import { getMySubscriptionQueryKey } from "@/features/subscription/service/subsc
 export const mySubscriptionQueryOptions = (userId: string | null) =>
   queryOptions({
     queryKey: getMySubscriptionQueryKey(userId),
-    queryFn: fetchMySubscription,
+    queryFn: ({ signal }) => fetchMySubscription(signal),
     staleTime: 5 * 60 * 1000,
   });

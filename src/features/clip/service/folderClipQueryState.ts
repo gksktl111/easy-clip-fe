@@ -1,3 +1,4 @@
+import { AccessChangedError } from "@/shared/access/accessEvents";
 import { ApiError } from "@/shared/lib/apiClient";
 
 // 존재하지 않는 폴더를 가리키는 404는 재시도나 일반 오류 화면으로 처리하지 않습니다.
@@ -8,4 +9,7 @@ export const isFolderNotFoundError = (error: unknown) =>
 export const shouldRetryFolderClipsQuery = (
   failureCount: number,
   error: unknown,
-) => !isFolderNotFoundError(error) && failureCount < 3;
+) =>
+  !(error instanceof AccessChangedError) &&
+  !(error instanceof ApiError && error.status >= 400 && error.status < 500) &&
+  failureCount < 3;

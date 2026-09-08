@@ -1,5 +1,6 @@
 "use client";
 
+import { requestAccessRefresh } from "@/shared/access/accessEvents";
 import { QueryClient } from "@tanstack/react-query";
 import type { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 
@@ -13,14 +14,12 @@ export const syncMySubscriptionQueryData = (
   subscription: MySubscriptionResponseDto,
   userId: string | null,
 ) => {
-  queryClient.setQueriesData<MySubscriptionResponseDto>(
-    { queryKey: [MY_SUBSCRIPTION_QUERY_KEY] },
-    subscription,
-  );
-
   if (userId) {
     queryClient.setQueryData(getMySubscriptionQueryKey(userId), subscription);
+  } else {
+    void invalidateMySubscriptionQueries(queryClient);
   }
+  requestAccessRefresh();
 };
 
 export const invalidateMySubscriptionQueries = (queryClient: QueryClient) =>

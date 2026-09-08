@@ -24,7 +24,13 @@ export const useTrashPage = ({
   const query = useTrashItemsQuery();
   const trashActions = useTrashActions({ onItemsChanged });
   const { refetch } = query;
-  const { clearError, error: actionError, ...actions } = trashActions;
+  const {
+    clearError,
+    error: actionError,
+    failure,
+    deletedCount,
+    ...actions
+  } = trashActions;
   const labels = useMemo(
     () => ({
       folderType: t("folderType"),
@@ -62,6 +68,8 @@ export const useTrashPage = ({
       reload,
     },
     results: {
+      failure,
+      deletedCount,
       error: actionError ?? (query.isError ? "load" : null),
       fetchNextPage: query.fetchNextPage,
       hasNextPage: query.hasNextPage,

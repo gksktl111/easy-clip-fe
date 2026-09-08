@@ -1,5 +1,6 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { useClipRename } from "@/features/clip/hooks/useClipRename";
 import { useCallback } from "react";
 import { useClipCollectionFilter } from "@/features/clip/hooks/useClipCollectionFilter";
@@ -22,6 +23,7 @@ export const useFolderClipsPage = ({
   folderId,
   onClipsDeleted,
 }: UseFolderClipsPageOptions) => {
+  const access = useResourceAccess();
   const filter = useClipCollectionFilter();
   const query = useInfiniteClipsQuery({
     folderId,
@@ -41,6 +43,8 @@ export const useFolderClipsPage = ({
   });
   const rename = useClipRename(query.isAuthenticated);
   const isInteractionDisabled =
+    access.status !== "ready" ||
+    access.folderLocks[folderId] !== false ||
     deletion.isDeleteMode ||
     deletion.isDeleting ||
     tagWorkspace.isOpen ||
@@ -142,6 +146,9 @@ export const useFolderClipsPage = ({
     },
     capture: {
       activatePage,
+      draft: capture.draft,
+      retryDraft: capture.retryDraft,
+      discardDraft: capture.discardDraft,
       isActive,
       isCreating,
     },

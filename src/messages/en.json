@@ -74,9 +74,9 @@
         "cta": "Start for free",
         "features": {
           "projects": "Use 1 project",
-          "clips": "Create up to 50 clips",
+          "clips": "Add clips up to 50 per folder",
           "devices": "Connect 1 desktop and 1 mobile device",
-          "organization": "Use search",
+          "organization": "Search + tags in accessible folders",
           "ai": ""
         }
       },
@@ -89,9 +89,9 @@
         "cta": "Upgrade to Pro",
         "features": {
           "projects": "Create unlimited projects",
-          "clips": "Create up to 500 clips per project",
+          "clips": "Add clips up to 300 per folder",
           "devices": "Connect unlimited devices",
-          "organization": "Use tags",
+          "organization": "Search + tags in accessible folders",
           "ai": "AI features coming soon"
         }
       }
@@ -114,7 +114,8 @@
         "dismiss": "No",
         "confirm": "Yes",
         "confirming": "Updating"
-      }
+      },
+      "pendingRenewalPayment": "An already-started renewal charge may complete and extend your access."
     },
     "comparison": {
       "eyebrow": "Quick comparison",
@@ -133,8 +134,8 @@
         },
         "clips": {
           "label": "Clips",
-          "freeValue": "Up to 50",
-          "proValue": "Up to 500 per project"
+          "freeValue": "Add clips up to 50 per folder",
+          "proValue": "Add clips up to 300 per folder"
         },
         "devices": {
           "label": "Devices",
@@ -143,8 +144,8 @@
         },
         "organization": {
           "label": "Organization",
-          "freeValue": "Search",
-          "proValue": "Search + tags"
+          "freeValue": "Search + tags in accessible folders",
+          "proValue": "Search + tags in accessible folders"
         },
         "ai": {
           "label": "AI features",
@@ -266,8 +267,8 @@
     "actionError": "Could not complete the trash action. Please try again shortly.",
     "restoreConflictError": "Clips inside a deleted folder cannot be restored on their own. Restore the parent folder first.",
     "clearAllPartialError": "Some items could not be deleted. Failed {failedCount} of {totalCount}.",
-    "emptyTitle": "Trash is empty",
-    "emptyDescription": "Deleted clips or folders will appear here.",
+    "emptyTitle": "No trash items to display",
+    "emptyDescription": "Deleted items in locked folders may be hidden. Empty trash also deletes hidden items.",
     "listTitle": "Deleted items",
     "totalCount": "{count, plural, =0 {0 items} one {# item} other {# items}}",
     "folderType": "Folder",
@@ -287,7 +288,7 @@
     },
     "clearAllModal": {
       "title": "Delete all trash items",
-      "description": "Are you sure you want to permanently delete every item in trash?"
+      "description": "Deleted items hidden in locked folders will also be permanently deleted. This cannot be undone."
     },
     "deleteSelectedModal": {
       "title": "Delete selected items",
@@ -301,7 +302,8 @@
     "foldersEmpty": "No deleted folders.",
     "deletedAt": "Deleted at",
     "restore": "Restore",
-    "deleteForever": "Delete"
+    "deleteForever": "Delete",
+    "deletedResult": "Permanently deleted {count} items."
   },
   "clips": {
     "count": "{count, plural, =0 {0 clips} one {# clip} other {# clips}}",
@@ -432,5 +434,46 @@
       "tooLong": "Enter a name of {max} characters or fewer after trimming spaces.",
       "count": "{count}/{max} characters"
     }
+  },
+  "access": {
+    "checkingTitle": "Checking access",
+    "checkingDescription": "Content will appear after checking your subscription and folders.",
+    "errorTitle": "Unable to verify access",
+    "errorDescription": "Check your connection and try again.",
+    "incompatibleTitle": "Folder access is unavailable",
+    "incompatibleDescription": "The server did not provide folder lock information. Refresh or try again later.",
+    "lockedTitle": "This folder is locked",
+    "lockedDescription": "Free provides access to one server-selected folder. Your data is preserved. Deleting that folder does not unlock another.",
+    "retry": "Check again",
+    "plans": "View Pro plan",
+    "trash": "Restore from trash",
+    "lockedBadge": "Locked",
+    "folderLimit": "Free allows one folder. Restore your accessible folder if it is in trash. Pro is required to use more folders.",
+    "deleteFolderTitle": "Delete this folder?",
+    "deleteFolderDescription": "Deleting this folder does not unlock other folders. You can restore it from trash.",
+    "operationError": "Unable to complete the action. Please try again.",
+    "limitCount": "Current: {count} / Limit: {limit}",
+    "billingSuccess": "Your Pro subscription is active.",
+    "billingUncertain": "The payment result may be uncertain. Check your subscription before paying again.",
+    "billingChecking": "Payment confirmation",
+    "billingFailed": "Payment failed",
+    "billingLoading": "Confirming your payment.",
+    "billingMissing": "Required payment information is missing.",
+    "openApp": "Open app",
+    "checkSubscription": "Check subscription",
+    "errors": {
+      "PROJECT_LOCKED": "This folder is locked.",
+      "CLIP_LIMIT_EXCEEDED": "This folder has reached its clip creation limit. Existing clips are preserved.",
+      "PLAN_LIMIT_EXCEEDED": "Your plan restricts folder creation or restoration. Restore your accessible folder if it is in trash.",
+      "FEATURE_NOT_AVAILABLE": "Folder reordering requires Pro."
+    },
+    "draftTitle": "Unsaved clip",
+    "draftDescription": "Your input is retained. After a network error, check whether it was saved before retrying.",
+    "retrySave": "Save again",
+    "discardDraft": "Discard input",
+    "clipLimit": "New clips can be added up to {limit} per folder.",
+    "closeFolderLimit": "Close folder limit notice",
+    "clipLimitExplanation": "Existing clips are preserved even above the limit. Limits apply to adding new clips.",
+    "proFeaturesTitle": "Features available with Pro"
   }
 }
