@@ -324,6 +324,7 @@
     "item": {
       "saving": "保存中",
       "copy": "复制 {name}",
+      "favoriteError": "无法更新收藏，请重试。",
       "toggleFavorite": "切换收藏",
       "selectForDelete": "选择删除 {name}",
       "noTags": "无标签",

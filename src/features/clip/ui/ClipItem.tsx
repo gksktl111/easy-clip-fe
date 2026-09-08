@@ -95,7 +95,10 @@ export function ClipItem({
   const isDisabled = isInteractionDisabled;
   const isFavoritePending = pendingFavoriteClipId === clip.id;
   const isFavoriteDisabled =
-    isDisabled || isDeleteMode || isFavoriteMutationPending;
+    isDisabled ||
+    isDeleteMode ||
+    isFavoriteMutationPending ||
+    !onToggleFavorite;
   const primaryActionLabel = isDeleteMode
     ? t("selectForDelete", { name: clip.name })
     : t("copy", { name: clip.name });
@@ -212,6 +215,7 @@ export function ClipItem({
         className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-(--favorite-btn-bg-hover) disabled:cursor-wait disabled:opacity-50"
         style={{ boxShadow: "var(--favorite-btn-shadow)" }}
         aria-label={t("toggleFavorite")}
+        aria-pressed={Boolean(clip.isFavorite)}
         aria-busy={isFavoritePending}
       >
         {isFavoritePending ? (

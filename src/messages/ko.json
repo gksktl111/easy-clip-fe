@@ -324,6 +324,7 @@
     "item": {
       "saving": "저장 중",
       "copy": "{name} 복사",
+      "favoriteError": "즐겨찾기 변경에 실패했습니다. 다시 시도해주세요.",
       "toggleFavorite": "즐겨찾기 전환",
       "selectForDelete": "{name} 삭제 선택",
       "noTags": "태그 없음",

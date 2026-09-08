@@ -8,6 +8,7 @@ import { clipQueryKeys } from "@/features/clip/queries/clipQueryKey";
 
 interface UseClipFavoriteMutationOptions {
   isAuthenticated: boolean;
+  onError?: () => void;
 }
 
 interface ToggleFavoriteVariables {
@@ -18,6 +19,7 @@ interface ToggleFavoriteVariables {
 // 즐겨찾기 요청과 완료 후 목록 갱신을 관리합니다.
 export const useClipFavoriteMutation = ({
   isAuthenticated,
+  onError,
 }: UseClipFavoriteMutationOptions) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -40,15 +42,15 @@ export const useClipFavoriteMutation = ({
           isFavorite: !clip.isFavorite,
         });
       } catch {
-      // 요청 실패 시 목록은 기존 query 결과를 유지합니다.
+        onError?.();
       }
     },
-    [isAuthenticated, isPending, mutateAsync],
+    [isAuthenticated, isPending, mutateAsync, onError],
   );
 
   return {
     isPending,
-    pendingClipId: isPending ? mutation.variables?.clipId ?? null : null,
+    pendingClipId: isPending ? (mutation.variables?.clipId ?? null) : null,
     toggleFavorite,
   };
 };

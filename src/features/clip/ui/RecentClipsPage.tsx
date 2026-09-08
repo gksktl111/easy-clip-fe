@@ -5,9 +5,14 @@ import { ClipCollectionPage } from "@/features/clip/ui/ClipCollectionPage";
 
 // 최근 사용한 클립 데이터를 공통 컬렉션 화면에 연결합니다.
 export function RecentClipsPage() {
-  const { commands, feedback, filter, results } = useClipCollection({
-    recent: true,
-  });
+  const {
+    commands,
+    feedback,
+    filter,
+    isFavoritePending,
+    pendingFavoriteClipId,
+    results,
+  } = useClipCollection({ recent: true, supportsFavoriteToggle: true });
 
   return (
     <ClipCollectionPage
@@ -32,6 +37,9 @@ export function RecentClipsPage() {
         void results.refetch();
       }}
       onSearchChange={filter.changeSearchQuery}
+      onToggleFavorite={commands.toggleFavorite}
+      isFavoriteMutationPending={isFavoritePending}
+      pendingFavoriteClipId={pendingFavoriteClipId}
       searchQuery={filter.searchQuery}
     />
   );

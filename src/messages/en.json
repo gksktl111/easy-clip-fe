@@ -324,6 +324,7 @@
     "item": {
       "saving": "Saving",
       "copy": "Copy {name}",
+      "favoriteError": "Could not update favorites. Please try again.",
       "toggleFavorite": "Toggle favorite",
       "selectForDelete": "Select {name} for deletion",
       "noTags": "No tags",

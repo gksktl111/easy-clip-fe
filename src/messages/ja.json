@@ -324,6 +324,7 @@
     "item": {
       "saving": "保存中",
       "copy": "{name}をコピー",
+      "favoriteError": "お気に入りを変更できませんでした。もう一度お試しください。",
       "toggleFavorite": "お気に入りを切り替え",
       "selectForDelete": "{name}を削除対象として選択",
       "noTags": "タグなし",
