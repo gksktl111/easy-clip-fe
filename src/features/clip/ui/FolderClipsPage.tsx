@@ -11,7 +11,6 @@ import { isFolderNotFoundError } from "@/features/clip/service/folderClipQuerySt
 import { ClipDeleteActionBar } from "@/features/clip/ui/ClipDeleteActionBar";
 import { ClipContextMenu } from "@/features/clip/ui/ClipContextMenu";
 import { ClipRenameModal } from "@/features/clip/ui/ClipRenameModal";
-import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
 import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { ClipTagEditorModal } from "@/features/clip/ui/ClipTagEditorModal";
 import { ClipDeleteModeButton } from "@/features/clip/ui/ClipDeleteModeButton";
@@ -41,7 +40,7 @@ function FolderClipsContent({
   const t = useTranslations("clips");
   const access = useResourceAccess();
   const a = useTranslations("access");
-  const { capture, collection, contextMenu, deletion, feedback, tags, rename } =
+  const { capture, collection, contextMenu, deletion, tags, rename } =
     useFolderClipsPage({ folderId, onClipsDeleted });
   const { commands, filter, results } = collection;
   const isFolderNotFound = isFolderNotFoundError(results.error);
@@ -121,6 +120,7 @@ function FolderClipsContent({
         isInteractionDisabled={deletion.isDeleting}
         isFavoriteMutationPending={collection.isFavoritePending}
         pendingFavoriteClipId={collection.pendingFavoriteClipId}
+        pendingCopyClipId={collection.pendingCopyClipId}
         selectedClipIds={deletion.selectedClipIds}
         onToggleSelected={deletion.toggleClipSelected}
       />
@@ -155,7 +155,6 @@ function FolderClipsContent({
         />
       ) : null}
       {rename.isOpen ? <ClipRenameModal {...rename} /> : null}
-      <ClipCopyToast label={t("copyToast")} position={feedback.copyToast} />
       {tags.state ? (
         <ClipTagEditorModal
           key={

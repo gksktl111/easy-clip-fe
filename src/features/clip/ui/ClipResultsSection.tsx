@@ -25,6 +25,7 @@ interface ClipResultsSectionProps {
   onToggleFavorite?: (clip: Clip) => void;
   onEditTags?: (clip: Clip) => void;
   pendingFavoriteClipId?: string | null;
+  pendingCopyClipId?: string | null;
   onContextMenu?: (
     event: React.MouseEvent<HTMLButtonElement>,
     clip: Clip,
@@ -49,6 +50,7 @@ export function ClipResultsSection({
   onToggleFavorite,
   onEditTags,
   pendingFavoriteClipId,
+  pendingCopyClipId,
   onContextMenu,
   isDeleteMode = false,
   isInteractionDisabled = false,
@@ -106,6 +108,7 @@ export function ClipResultsSection({
       selectedClipIds={selectedClipIds}
       onToggleSelected={onToggleSelected}
       pendingFavoriteClipId={pendingFavoriteClipId}
+      pendingCopyClipId={pendingCopyClipId}
     />
   );
 }

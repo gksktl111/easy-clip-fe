@@ -165,7 +165,7 @@ export const useFolderActions = () => {
       );
 
       if (nextFolders === currentFolders) {
-        return;
+        return false;
       }
 
       const payload =
@@ -177,6 +177,7 @@ export const useFolderActions = () => {
         await queryClient.cancelQueries({ queryKey: folderQueryKey });
         queryClient.setQueryData(folderQueryKey, nextFolders);
         await reorderFolder(payload);
+        return true;
       } catch (error) {
         queryClient.setQueryData(folderQueryKey, currentFolders);
         void queryClient.invalidateQueries({ queryKey: folderQueryKey });

@@ -1,5 +1,6 @@
 "use client";
 
+import { notifyError } from "@/shared/feedback/toast";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -17,7 +18,6 @@ export function LoginPageController() {
   const router = useRouter();
   const { status } = useAuth();
   const [isLoginPending, setIsLoginPending] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -27,18 +27,16 @@ export function LoginPageController() {
 
   const handleLogin = (provider: OAuthProvider) => {
     try {
-      setErrorMessage(null);
       setIsLoginPending(true);
       window.location.assign(buildApiUrl(getAuthStartPath(provider)));
     } catch {
       setIsLoginPending(false);
-      setErrorMessage(t("configError"));
+      notifyError(t("configError"));
     }
   };
 
   return (
     <LoginPage
-      errorMessage={errorMessage}
       isLoading={
         isLoginPending || status === "idle" || status === "initializing"
       }

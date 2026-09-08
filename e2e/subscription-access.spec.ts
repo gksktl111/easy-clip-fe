@@ -279,7 +279,7 @@ test("숨겨진 항목만 있는 휴지통도 전체 비우기와 서버 처리 
     .getByRole("button", { name: "전체 삭제", exact: true })
     .last()
     .click();
-  await expect(page.getByText("3개 항목을 영구 삭제했습니다.")).toBeVisible();
+  await expect(page.getByText("항목 3개를 영구 삭제했습니다.")).toBeVisible();
   expect(deletes).toBe(1);
 });
 

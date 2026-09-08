@@ -84,6 +84,9 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
   await expect(
     page.getByText(ko.access.billingSuccess, { exact: true }),
   ).toBeVisible();
+  await expect(page.locator("[data-sonner-toast]")).toContainText(
+    ko.feedback.billingConfirmed,
+  );
   await page.getByRole("link", { name: ko.access.openApp }).click();
   await expect(
     page.getByRole("heading", { name: ko.access.checkingTitle }),
@@ -125,6 +128,9 @@ for (const failure of ["network", "conflict"] as const) {
     await expect(
       page.getByText(ko.access.billingUncertain, { exact: false }),
     ).toBeVisible();
+    await expect(page.locator("[data-sonner-toast]")).toContainText(
+      ko.feedback.billingFailed,
+    );
     if (failure === "conflict")
       await expect(
         page.getByText("이전 결제 결과 확인 중", { exact: false }),
@@ -134,6 +140,7 @@ for (const failure of ["network", "conflict"] as const) {
     await expect(
       page.getByText(ko.access.billingUncertain, { exact: false }),
     ).toBeVisible();
+    await expect(page.locator("[data-sonner-toast]")).toHaveCount(0);
     expect(confirms).toBe(1);
   });
 }

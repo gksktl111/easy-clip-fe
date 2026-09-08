@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, type KeyboardEvent } from "react";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
+
+import { useRef, useState, type KeyboardEvent } from "react";
 import { useTranslations } from "next-intl";
 import { HiOutlinePencil, HiOutlinePlus, HiOutlineTrash } from "react-icons/hi";
 import type { FolderTag, TagBackgroundColor } from "@/features/clip/model/tag";
@@ -49,10 +51,11 @@ export function FolderTagManagerPanel({
   onUpdate,
   tags,
 }: FolderTagManagerPanelProps) {
+  const submitting = useRef(false);
+  const feedback = useTranslations("feedback");
   const t = useTranslations("clips.tags");
   const [form, setForm] = useState<TagFormState | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FolderTag | null>(null);
 
   const getRequestErrorMessage = (error: unknown) => {
@@ -73,19 +76,16 @@ export function FolderTagManagerPanel({
 
   const updateFormName = (name: string) => {
     setFieldError(null);
-    setActionError(null);
     setForm((current) => (current ? { ...current, name } : current));
   };
 
   const updateFormColor = (backgroundColor: TagBackgroundColor) => {
-    setActionError(null);
     setForm((current) => (current ? { ...current, backgroundColor } : current));
   };
 
   const closeForm = () => {
     setForm(null);
     setFieldError(null);
-    setActionError(null);
   };
 
   const handleNestedEscape = (event: KeyboardEvent) => {
@@ -106,7 +106,7 @@ export function FolderTagManagerPanel({
   };
 
   const submitForm = async () => {
-    if (!form || isPending) {
+    if (!form || isPending || submitting.current) {
       return;
     }
 
@@ -117,11 +117,12 @@ export function FolderTagManagerPanel({
     }
 
     setFieldError(null);
-    setActionError(null);
 
+    submitting.current = true;
     try {
       if (form.mode === "create") {
         await onCreate(form.name, form.backgroundColor);
+        notifySuccess(feedback("tagCreated"));
       } else {
         const payload: {
           name?: string;
@@ -142,6 +143,7 @@ export function FolderTagManagerPanel({
 
         const updatedTag = await onUpdate(form.tag.id, payload);
         onRename?.(form.tag.name, updatedTag);
+        notifySuccess(feedback("tagUpdated"));
       }
 
       closeForm();
@@ -152,29 +154,31 @@ export function FolderTagManagerPanel({
           ? message
           : null,
       );
-      setActionError(
-        error instanceof ApiError && [400, 409].includes(error.status)
-          ? null
-          : message,
-      );
+      if (!(error instanceof ApiError && [400, 409].includes(error.status)))
+        notifyError(message);
+    } finally {
+      submitting.current = false;
     }
   };
 
   const confirmDelete = async () => {
-    if (!deleteTarget || isPending) {
+    if (!deleteTarget || isPending || submitting.current) {
       return;
     }
 
     const target = deleteTarget;
-    setActionError(null);
 
+    submitting.current = true;
     try {
       await onDelete(target);
+      notifySuccess(feedback("tagDeleted"));
       setDeleteTarget(null);
       onDeleted?.(target);
     } catch (error) {
       setDeleteTarget(null);
-      setActionError(getRequestErrorMessage(error));
+      notifyError(getRequestErrorMessage(error));
+    } finally {
+      submitting.current = false;
     }
   };
 
@@ -228,12 +232,6 @@ export function FolderTagManagerPanel({
           />
         </div>
 
-        {actionError ? (
-          <p className="text-sm text-(--danger-text)" role="alert">
-            {actionError}
-          </p>
-        ) : null}
-
         <div className="flex justify-end gap-2 border-t border-(--border) pt-4">
           <Button
             disabled={isPending}
@@ -267,7 +265,6 @@ export function FolderTagManagerPanel({
         <Button
           disabled={isPending}
           onClick={() => {
-            setActionError(null);
             setForm({ mode: "create", name: "", backgroundColor: "GRAY" });
           }}
           variant="secondarySurface"
@@ -278,15 +275,6 @@ export function FolderTagManagerPanel({
           {t("newTag")}
         </Button>
       </div>
-
-      {actionError ? (
-        <p
-          className="mb-3 rounded-lg bg-(--danger-surface) px-3 py-2 text-sm text-(--danger-text)"
-          role="alert"
-        >
-          {actionError}
-        </p>
-      ) : null}
 
       {tags.length ? (
         <ul className="max-h-72 space-y-1 overflow-y-auto pr-1">
@@ -302,7 +290,6 @@ export function FolderTagManagerPanel({
               <Button
                 disabled={isPending}
                 onClick={() => {
-                  setActionError(null);
                   setForm({
                     mode: "edit",
                     tag,

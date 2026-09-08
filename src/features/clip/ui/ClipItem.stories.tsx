@@ -64,3 +64,10 @@ export const Color: Story = {
     },
   },
 };
+
+export const Copying: Story = {
+  args: { pendingCopyClipId: "clip-1" },
+};
+export const WaitingForOtherCopy: Story = {
+  args: { pendingCopyClipId: "clip-2" },
+};

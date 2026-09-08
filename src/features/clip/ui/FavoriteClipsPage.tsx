@@ -7,10 +7,10 @@ import { ClipCollectionPage } from "@/features/clip/ui/ClipCollectionPage";
 export function FavoriteClipsPage() {
   const {
     commands,
-    feedback,
     filter,
     isFavoritePending,
     pendingFavoriteClipId,
+    pendingCopyClipId,
     results,
   } = useClipCollection({ favorite: true, supportsFavoriteToggle: true });
 
@@ -18,16 +18,12 @@ export function FavoriteClipsPage() {
     <ClipCollectionPage
       activeFilter={filter.activeFilter}
       clips={results.clips}
-      copyToastPosition={feedback.copyToast}
       hasNextPage={results.hasNextPage}
       isError={results.isError}
       isFetchingNextPage={results.isFetchingNextPage}
       isLoading={results.isLoading}
-      onCopy={(clip, event) => {
-        void commands.copyClip(clip, {
-          x: event.clientX,
-          y: event.clientY,
-        });
+      onCopy={(clip) => {
+        void commands.copyClip(clip);
       }}
       onFetchNextPage={() => {
         void results.fetchNextPage();
@@ -40,6 +36,7 @@ export function FavoriteClipsPage() {
       onToggleFavorite={commands.toggleFavorite}
       isFavoriteMutationPending={isFavoritePending}
       pendingFavoriteClipId={pendingFavoriteClipId}
+      pendingCopyClipId={pendingCopyClipId}
       searchQuery={filter.searchQuery}
     />
   );

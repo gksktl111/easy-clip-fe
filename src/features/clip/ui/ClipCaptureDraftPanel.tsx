@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import type { CaptureDraft } from "@/features/clip/store/captureDraftStore";
+import { isPolicyError } from "@/shared/access/policyError";
 import { PolicyErrorNotice } from "@/shared/access/PolicyErrorNotice";
 import { Button } from "@/shared/ui/button/Button";
 
@@ -28,7 +29,9 @@ export function ClipCaptureDraftPanel({
       <p className="max-h-24 overflow-auto text-sm break-words whitespace-pre-wrap">
         {draft.input.type === "text" ? draft.input.text : draft.input.file.name}
       </p>
-      <PolicyErrorNotice error={draft.error} />
+      {isPolicyError(draft.error) ? (
+        <PolicyErrorNotice error={draft.error} />
+      ) : null}
       <div className="flex gap-2">
         <Button size="sm" disabled={pending} onClick={onRetry}>
           {t("retrySave")}

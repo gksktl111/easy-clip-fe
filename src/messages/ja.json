@@ -307,7 +307,6 @@
   },
   "clips": {
     "count": "{count, plural, =0 {0 件のクリップ} other {# 件のクリップ}}",
-    "copyToast": "コピーしました！",
     "captureHint": "どこかをクリックしてから Ctrl+V を押すと新しいクリップを保存できます。",
     "captureErrors": {
       "textSaveFailed": "クリップを保存できませんでした。しばらくしてからもう一度お試しください。",
@@ -344,7 +343,8 @@
       "selectForDelete": "{name}を削除対象として選択",
       "noTags": "タグなし",
       "editTags": "{name}のタグを編集",
-      "openOptions": "{name}のオプションを開く"
+      "openOptions": "{name}のオプションを開く",
+      "copying": "コピー中…"
     },
     "tags": {
       "manage": "タグを管理",
@@ -386,7 +386,7 @@
       },
       "errors": {
         "invalid": "タグ名と色を確認してください。",
-        "notFound": "フォルダまたはタグが見つからないため、一覧を更新しました。",
+        "notFound": "クリップまたはタグが見つかりません。一覧を確認して再試行してください。",
         "conflict": "同じ名前のタグがすでにあります。",
         "actionFailed": "タグ操作を完了できませんでした。しばらくしてから再試行してください。",
         "loadFailed": "タグ一覧を読み込めませんでした。"
@@ -475,5 +475,35 @@
     "closeFolderLimit": "フォルダ追加の案内を閉じる",
     "clipLimitExplanation": "上限を超えた既存のクリップも保持されます。上限は新しいクリップの追加に適用されます。",
     "proFeaturesTitle": "Proで利用できる機能"
+  },
+  "feedback": {
+    "close": "通知を閉じる",
+    "region": "通知",
+    "copySuccess": "クリップをコピーしました。",
+    "copyError": "コピーできませんでした。再試行してください。",
+    "deleteSuccess": "クリップ{count}件をゴミ箱に移動しました。",
+    "deleteError": "クリップを削除できませんでした。再試行してください。",
+    "saveSuccess": "クリップを保存しました。",
+    "renameSuccess": "クリップ名を変更しました。",
+    "favoriteAdded": "お気に入りに追加しました。",
+    "favoriteRemoved": "お気に入りを解除しました。",
+    "favoriteError": "お気に入りを変更できませんでした。再試行してください。",
+    "folderCreated": "フォルダーを作成しました。",
+    "folderRenamed": "フォルダー名を変更しました。",
+    "folderDeleted": "フォルダーをゴミ箱に移動しました。",
+    "restoreSuccess": "{count}件を復元しました。",
+    "permanentDeleteSuccess": "{count}件を完全に削除しました。",
+    "refreshSuccess": "ゴミ箱を更新しました。",
+    "refreshError": "ゴミ箱を更新できませんでした。再試行してください。",
+    "settingsSaved": "設定を保存しました。",
+    "tagCreated": "タグを作成しました。",
+    "tagUpdated": "タグを変更しました。",
+    "tagDeleted": "タグを削除しました。",
+    "clipTagsSaved": "クリップのタグを保存しました。",
+    "billingStartError": "決済認証を開始できませんでした。再試行してください。",
+    "billingConfirmed": "サブスクリプションの決済が承認されました。",
+    "billingFailed": "決済を完了できませんでした。決済状況をご確認ください。",
+    "loggedOut": "ログアウトしました。",
+    "policyResolution": "利用可能なフォルダーとプランの上限を確認して再試行してください。"
   }
 }

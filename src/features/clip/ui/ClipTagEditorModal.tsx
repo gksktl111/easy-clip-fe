@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
+
+import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   HiArrowLeft,
@@ -62,6 +64,8 @@ export function ClipTagEditorModal({
   onUpdateTag,
   tags,
 }: ClipTagEditorModalProps) {
+  const submitting = useRef(false);
+  const feedback = useTranslations("feedback");
   const t = useTranslations("clips.tags");
   const [view, setView] = useState(initialView);
   const [selectedNames, setSelectedNames] = useState<string[]>(
@@ -70,7 +74,6 @@ export function ClipTagEditorModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [newTagColor, setNewTagColor] = useState<TagBackgroundColor>("GRAY");
   const [inputError, setInputError] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
   const isBusy = isSavingClipTags || isTagActionPending;
 
   const filteredTags = useMemo(() => {
@@ -112,7 +115,6 @@ export function ClipTagEditorModal({
   };
 
   const toggleTag = (name: string) => {
-    setActionError(null);
     setSelectedNames((currentNames) =>
       currentNames.includes(name)
         ? currentNames.filter((currentName) => currentName !== name)
@@ -135,10 +137,10 @@ export function ClipTagEditorModal({
     );
     setSearchQuery("");
     setInputError(null);
-    setActionError(null);
   };
 
   const createColoredTag = async () => {
+    if (submitting.current) return;
     if (!canCreateFromSearch || validationError || isBusy) {
       if (validationError) {
         setInputError(t(`validation.${validationError}`));
@@ -147,10 +149,11 @@ export function ClipTagEditorModal({
     }
 
     setInputError(null);
-    setActionError(null);
 
+    submitting.current = true;
     try {
       const createdTag = await onCreateTag(searchQuery, newTagColor);
+      notifySuccess(feedback("tagCreated"));
       setSelectedNames((currentNames) =>
         getUniqueTagNames([...currentNames, createdTag.name]),
       );
@@ -161,22 +164,27 @@ export function ClipTagEditorModal({
       if (error instanceof ApiError && [400, 409].includes(error.status)) {
         setInputError(message);
       } else {
-        setActionError(message);
+        notifyError(message);
       }
+    } finally {
+      submitting.current = false;
     }
   };
 
   const saveClipTags = async () => {
-    if (!clip || isBusy) {
+    if (!clip || isBusy || submitting.current) {
       return;
     }
 
-    setActionError(null);
+    submitting.current = true;
     try {
       await onSaveClipTags(clip.id, selectedNames);
+      notifySuccess(feedback("clipTagsSaved"));
       onClose();
     } catch (error) {
-      setActionError(getRequestErrorMessage(error));
+      notifyError(getRequestErrorMessage(error));
+    } finally {
+      submitting.current = false;
     }
   };
 
@@ -312,7 +320,6 @@ export function ClipTagEditorModal({
                 onChange={(event) => {
                   setSearchQuery(event.target.value);
                   setInputError(null);
-                  setActionError(null);
                 }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" && canCreateFromSearch) {
@@ -413,12 +420,6 @@ export function ClipTagEditorModal({
                     </div>
                   </div>
                 </div>
-              ) : null}
-
-              {actionError ? (
-                <p className="mt-3 text-sm text-(--danger-text)" role="alert">
-                  {actionError}
-                </p>
               ) : null}
             </div>
           )}

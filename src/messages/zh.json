@@ -307,7 +307,6 @@
   },
   "clips": {
     "count": "{count, plural, =0 {0 个剪贴项} other {# 个剪贴项}}",
-    "copyToast": "已复制！",
     "captureHint": "点击任意位置后按 Ctrl+V，即可保存新的剪贴内容。",
     "captureErrors": {
       "textSaveFailed": "无法保存剪贴内容，请稍后重试。",
@@ -344,7 +343,8 @@
       "selectForDelete": "选择删除 {name}",
       "noTags": "无标签",
       "editTags": "编辑 {name} 的标签",
-      "openOptions": "打开{name}的选项"
+      "openOptions": "打开{name}的选项",
+      "copying": "正在复制…"
     },
     "tags": {
       "manage": "管理标签",
@@ -386,7 +386,7 @@
       },
       "errors": {
         "invalid": "请检查标签名称和颜色。",
-        "notFound": "找不到文件夹或标签，列表已刷新。",
+        "notFound": "找不到剪辑或标签。请检查列表后重试。",
         "conflict": "已存在同名标签。",
         "actionFailed": "无法完成标签操作，请稍后重试。",
         "loadFailed": "无法加载标签列表。"
@@ -475,5 +475,35 @@
     "closeFolderLimit": "关闭文件夹添加提示",
     "clipLimitExplanation": "超过上限的已有剪贴内容仍会保留。上限仅适用于新增内容。",
     "proFeaturesTitle": "Pro可用功能"
+  },
+  "feedback": {
+    "close": "关闭通知",
+    "region": "通知",
+    "copySuccess": "已复制剪辑。",
+    "copyError": "无法复制剪辑，请重试。",
+    "deleteSuccess": "已将 {count} 个剪辑移至回收站。",
+    "deleteError": "无法删除剪辑，请重试。",
+    "saveSuccess": "已保存剪辑。",
+    "renameSuccess": "已重命名剪辑。",
+    "favoriteAdded": "已添加到收藏。",
+    "favoriteRemoved": "已取消收藏。",
+    "favoriteError": "无法更新收藏，请重试。",
+    "folderCreated": "已创建文件夹。",
+    "folderRenamed": "已重命名文件夹。",
+    "folderDeleted": "已将文件夹移至回收站。",
+    "restoreSuccess": "已恢复 {count} 个项目。",
+    "permanentDeleteSuccess": "已永久删除 {count} 个项目。",
+    "refreshSuccess": "已刷新回收站。",
+    "refreshError": "无法刷新回收站，请重试。",
+    "settingsSaved": "已保存设置。",
+    "tagCreated": "已创建标签。",
+    "tagUpdated": "已更新标签。",
+    "tagDeleted": "已删除标签。",
+    "clipTagsSaved": "已保存剪辑标签。",
+    "billingStartError": "无法开始支付验证，请重试。",
+    "billingConfirmed": "订阅付款已获批准。",
+    "billingFailed": "未能完成付款，请检查付款状态。",
+    "loggedOut": "已退出登录。",
+    "policyResolution": "请检查可访问的文件夹和套餐限额后重试。"
   }
 }

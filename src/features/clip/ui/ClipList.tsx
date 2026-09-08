@@ -17,6 +17,7 @@ interface ClipListProps {
   onToggleFavorite?: (clip: Clip) => void;
   onEditTags?: (clip: Clip) => void;
   pendingFavoriteClipId?: string | null;
+  pendingCopyClipId?: string | null;
   onContextMenu?: (
     event: React.MouseEvent<HTMLButtonElement>,
     clip: Clip,
@@ -37,6 +38,7 @@ export function ClipList({
   onToggleFavorite,
   onEditTags,
   pendingFavoriteClipId,
+  pendingCopyClipId,
   onContextMenu,
   isDeleteMode = false,
   isInteractionDisabled = false,
@@ -65,6 +67,7 @@ export function ClipList({
             isSelected={selectedClipIds.has(clip.id)}
             onToggleSelected={onToggleSelected}
             pendingFavoriteClipId={pendingFavoriteClipId}
+            pendingCopyClipId={pendingCopyClipId}
           />
         ))}
       </div>

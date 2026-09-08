@@ -3,7 +3,7 @@
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { Button } from "@/shared/ui/button/Button";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   PRICING_PLANS,
@@ -32,6 +32,7 @@ import { DEFAULT_LOCALE, isAppLocale } from "@/shared/config/locale";
 
 // 구독 상태에 맞는 요금제 카드 액션과 취소 흐름을 조합합니다.
 export function PricingPlansSection() {
+  const pending = useRef(false);
   const router = useRouter();
   const access = useResourceAccess();
   const a = useTranslations("access");
@@ -49,10 +50,11 @@ export function PricingPlansSection() {
   const isResumableProPlan = hasRemainingCanceledProPeriod(subscription);
 
   const handleCancelSubscription = async () => {
-    if (isCancelingSubscription) {
+    if (pending.current || isCancelingSubscription) {
       return;
     }
 
+    pending.current = true;
     setIsCancelingSubscription(true);
 
     try {
@@ -70,15 +72,17 @@ export function PricingPlansSection() {
         error instanceof ApiError ? error.message : t("toasts.updateError"),
       );
     } finally {
+      pending.current = false;
       setIsCancelingSubscription(false);
     }
   };
 
   const handleResumeSubscription = async () => {
-    if (isResumingSubscription) {
+    if (pending.current || isResumingSubscription) {
       return;
     }
 
+    pending.current = true;
     setIsResumingSubscription(true);
 
     try {
@@ -100,6 +104,7 @@ export function PricingPlansSection() {
         error instanceof ApiError ? error.message : t("toasts.updateError"),
       );
     } finally {
+      pending.current = false;
       setIsResumingSubscription(false);
     }
   };

@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
+
+import { useRef, useState } from "react";
+import { messagesByLocale } from "@/shared/config/messages";
+import { createTranslator, useTranslations } from "next-intl";
 import { HiOutlineCog, HiOutlineX } from "react-icons/hi";
 import { persistUserSettings } from "@/features/settings/service/settingsService";
 import { SettingsAboutSection } from "@/features/settings/ui/SettingsAboutSection";
@@ -19,6 +22,7 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
+  const pending = useRef(false);
   const t = useTranslations("settings");
   const { user } = useAuth();
   const subscriptionQuery = useMySubscription();
@@ -26,7 +30,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
   const [savingField, setSavingField] = useState<"theme" | "language" | null>(
     null,
   );
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const feedback = useTranslations("feedback");
   const isDark = theme === "dark";
   const isSubscriptionLoading = Boolean(user && subscriptionQuery.isPending);
   const subscriptionError = subscriptionQuery.isError
@@ -37,43 +41,57 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     const previousTheme = theme;
     const nextTheme = isDark ? "light" : "dark";
 
-    setErrorMessage(null);
+    if (pending.current) return;
     setTheme(nextTheme);
 
     if (!user) {
+      notifySuccess(feedback("settingsSaved"));
       return;
     }
 
+    pending.current = true;
     setSavingField("theme");
 
     try {
       await persistUserSettings({ theme: nextTheme });
+      notifySuccess(feedback("settingsSaved"));
     } catch {
       setTheme(previousTheme);
-      setErrorMessage(t("saveError"));
+      notifyError(t("saveError"));
     } finally {
+      pending.current = false;
       setSavingField(null);
     }
   };
 
   const handleLanguageChange = async (nextLanguage: AppLocale) => {
+    if (nextLanguage === language) return;
     const previousLanguage = language;
+    const nextFeedback = createTranslator({
+      locale: nextLanguage,
+      messages: messagesByLocale[nextLanguage],
+      namespace: "feedback",
+    });
 
-    setErrorMessage(null);
+    if (pending.current) return;
     setLanguage(nextLanguage);
 
     if (!user) {
+      notifySuccess(nextFeedback("settingsSaved"));
       return;
     }
 
+    pending.current = true;
     setSavingField("language");
 
     try {
       await persistUserSettings({ language: nextLanguage });
+      notifySuccess(nextFeedback("settingsSaved"));
     } catch {
       setLanguage(previousLanguage);
-      setErrorMessage(t("saveError"));
+      notifyError(t("saveError"));
     } finally {
+      pending.current = false;
       setSavingField(null);
     }
   };
@@ -115,15 +133,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
               void handleLanguageChange(nextLanguage);
             }}
           />
-
-          {errorMessage ? (
-            <p
-              className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"
-              role="alert"
-            >
-              {errorMessage}
-            </p>
-          ) : null}
 
           <SettingsAboutSection
             subscription={subscriptionQuery.subscription}

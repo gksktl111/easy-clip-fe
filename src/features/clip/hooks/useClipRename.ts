@@ -5,9 +5,10 @@ import { useTranslations } from "next-intl";
 import type { Clip } from "@/features/clip/model/clip";
 import { useClipRenameMutation } from "@/features/clip/mutations/useClipRenameMutation";
 import { isValidClipName } from "@/features/clip/service/clipNameValidation";
-import { notifyError } from "@/shared/feedback/toast";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 
 export const useClipRename = (isAuthenticated: boolean) => {
+  const feedback = useTranslations("feedback");
   const t = useTranslations("clips.renameModal");
   const [clip, setClip] = useState<Clip | null>(null);
   const [value, setValue] = useState("");
@@ -39,6 +40,7 @@ export const useClipRename = (isAuthenticated: boolean) => {
     try {
       await mutation.mutateAsync({ clipId: clip.id, title });
       setClip(null);
+      notifySuccess(feedback("renameSuccess"));
     } catch {
       notifyError(t("error"));
     } finally {

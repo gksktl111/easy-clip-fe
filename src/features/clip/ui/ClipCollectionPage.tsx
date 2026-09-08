@@ -4,7 +4,6 @@ import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
 import { useTranslations } from "next-intl";
 import type { Clip } from "@/features/clip/model/clip";
-import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
 import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { FilterBar, type FilterType } from "@/features/clip/ui/FilterBar";
 
@@ -12,7 +11,6 @@ import { FilterBar, type FilterType } from "@/features/clip/ui/FilterBar";
 interface ClipCollectionPageProps {
   activeFilter: FilterType;
   clips: Clip[];
-  copyToastPosition: { x: number; y: number } | null;
   hasNextPage?: boolean;
   isError?: boolean;
   isFetchingNextPage?: boolean;
@@ -25,13 +23,13 @@ interface ClipCollectionPageProps {
   onSearchChange: (value: string) => void;
   onToggleFavorite?: (clip: Clip) => void;
   pendingFavoriteClipId?: string | null;
+  pendingCopyClipId?: string | null;
   searchQuery: string;
 }
 
 export function ClipCollectionPage({
   activeFilter,
   clips,
-  copyToastPosition,
   hasNextPage,
   isError,
   isFetchingNextPage,
@@ -44,6 +42,7 @@ export function ClipCollectionPage({
   onSearchChange,
   onToggleFavorite,
   pendingFavoriteClipId,
+  pendingCopyClipId,
   searchQuery,
 }: ClipCollectionPageProps) {
   const t = useTranslations("clips");
@@ -75,8 +74,8 @@ export function ClipCollectionPage({
         onToggleFavorite={onToggleFavorite}
         isFavoriteMutationPending={isFavoriteMutationPending}
         pendingFavoriteClipId={pendingFavoriteClipId}
+        pendingCopyClipId={pendingCopyClipId}
       />
-      <ClipCopyToast label={t("copyToast")} position={copyToastPosition} />
     </div>
   );
 }
