@@ -1,22 +1,31 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { useClipRename } from "@/features/clip/hooks/useClipRename";
 import { useCallback } from "react";
-import { useParams } from "next/navigation";
 import { useClipCollectionFilter } from "@/features/clip/hooks/useClipCollectionFilter";
 import { useClipContextMenu } from "@/features/clip/hooks/useClipContextMenu";
 import { useClipCopyAction } from "@/features/clip/hooks/useClipCopyAction";
 import { useClipDeletion } from "@/features/clip/hooks/useClipDeletion";
-import { useClipFavoriteAction } from "@/features/clip/hooks/useClipFavoriteAction";
 import { useFolderClipCapture } from "@/features/clip/hooks/useFolderClipCapture";
-import { useInfiniteClips } from "@/features/clip/hooks/useInfiniteClips";
+import { useClipTagWorkspace } from "@/features/clip/hooks/useClipTagWorkspace";
+import { useClipFavoriteMutation } from "@/features/clip/mutations/useClipFavoriteMutation";
+import { useInfiniteClipsQuery } from "@/features/clip/queries/useInfiniteClipsQuery";
 import type { Clip } from "@/features/clip/model/clip";
 
+interface UseFolderClipsPageOptions {
+  folderId: string;
+  onClipsDeleted?: () => void | Promise<void>;
+}
+
 // 폴더 클립의 조회, 수집, 메뉴와 삭제 하위 훅을 페이지 영역별 계약으로 조합합니다.
-export const useFolderClipsPage = () => {
-  const params = useParams<{ id?: string }>();
-  const folderId = params?.id ?? "";
+export const useFolderClipsPage = ({
+  folderId,
+  onClipsDeleted,
+}: UseFolderClipsPageOptions) => {
+  const access = useResourceAccess();
   const filter = useClipCollectionFilter();
-  const query = useInfiniteClips({
+  const query = useInfiniteClipsQuery({
     folderId,
     filter: filter.activeFilter,
     searchQuery: filter.debouncedSearchQuery,
@@ -26,8 +35,20 @@ export const useFolderClipsPage = () => {
     clips: query.clips,
     folderId,
     isAuthenticated: query.isAuthenticated,
+    onDeleted: onClipsDeleted,
   });
-  const isInteractionDisabled = deletion.isDeleteMode || deletion.isDeleting;
+  const tagWorkspace = useClipTagWorkspace({
+    folderId,
+    isAuthenticated: query.isAuthenticated,
+  });
+  const rename = useClipRename(query.isAuthenticated);
+  const isInteractionDisabled =
+    access.status !== "ready" ||
+    access.folderLocks[folderId] !== false ||
+    deletion.isDeleteMode ||
+    deletion.isDeleting ||
+    tagWorkspace.isOpen ||
+    rename.isOpen;
   const capture = useFolderClipCapture({
     folderId,
     isAuthenticated: query.isAuthenticated,
@@ -40,18 +61,24 @@ export const useFolderClipsPage = () => {
     isAuthenticated: query.isAuthenticated,
     isDisabled: isInteractionDisabled,
   });
-  const favorite = useClipFavoriteAction({
+  const favorite = useClipFavoriteMutation({
     isAuthenticated: query.isAuthenticated,
-    isDisabled: isInteractionDisabled,
   });
-  const { activate, deactivate, isActive } = capture;
+  const { activate, deactivate, isActive, isCreating } = capture;
   const {
     closeContextMenu,
     contextMenu: contextMenuState,
     openContextMenu,
   } = contextMenu;
-  const { copyClip: copyClipAction, copyToast } = copy;
-  const { toggleFavorite } = favorite;
+  const { copyClip: copyClipAction } = copy;
+  const toggleFavorite = useCallback(
+    (clip: Clip) => {
+      if (!isInteractionDisabled) {
+        void favorite.toggleFavorite(clip);
+      }
+    },
+    [favorite, isInteractionDisabled],
+  );
   const {
     cancelDeleteMode,
     closeDeleteAllModal,
@@ -80,17 +107,8 @@ export const useFolderClipsPage = () => {
   }, [closeContextMenu, deactivate, startDeleteMode]);
 
   const copyClip = useCallback(
-    (clip: Clip, event: React.MouseEvent<HTMLDivElement>) =>
-      copyClipAction(clip, { x: event.clientX, y: event.clientY }),
+    (clip: Clip) => copyClipAction(clip),
     [copyClipAction],
-  );
-
-  const copyClipFromMenu = useCallback(
-    async (clip: Clip) => {
-      await copyClipAction(clip);
-      closeContextMenu();
-    },
-    [closeContextMenu, copyClipAction],
   );
 
   const deleteClipFromMenu = useCallback(
@@ -101,13 +119,40 @@ export const useFolderClipsPage = () => {
     [closeContextMenu, deleteClip],
   );
 
+  const openClipTagEditor = useCallback(
+    (clip: Clip) => {
+      closeContextMenu();
+      deactivate();
+      tagWorkspace.openClipEditor(clip);
+    },
+    [closeContextMenu, deactivate, tagWorkspace],
+  );
+
+  const openTagManager = useCallback(() => {
+    closeContextMenu();
+    deactivate();
+    tagWorkspace.openManager();
+  }, [closeContextMenu, deactivate, tagWorkspace]);
+
   return {
+    rename: {
+      ...rename,
+      open: (clip: Clip) => {
+        closeContextMenu();
+        deactivate();
+        rename.open(clip);
+      },
+    },
     capture: {
       activatePage,
+      draft: capture.draft,
+      retryDraft: capture.retryDraft,
+      discardDraft: capture.discardDraft,
       isActive,
+      isCreating,
     },
     collection: {
-      actions: {
+      commands: {
         copyClip,
         toggleFavorite,
       },
@@ -117,8 +162,12 @@ export const useFolderClipsPage = () => {
         changeSearchQuery: filter.changeSearchQuery,
         searchQuery: filter.searchQuery,
       },
+      pendingCopyClipId: copy.pendingCopyClipId,
+      isFavoritePending: favorite.isPending,
+      pendingFavoriteClipId: favorite.pendingClipId,
       results: {
         clips: query.clips,
+        error: query.error,
         fetchNextPage: query.fetchNextPage,
         hasNextPage: query.hasNextPage,
         isError: query.isError,
@@ -129,7 +178,6 @@ export const useFolderClipsPage = () => {
     },
     contextMenu: {
       close: closeContextMenu,
-      copyClip: copyClipFromMenu,
       deleteClip: deleteClipFromMenu,
       open: openContextMenu,
       state: contextMenuState,
@@ -148,8 +196,19 @@ export const useFolderClipsPage = () => {
       selectedClipIds,
       toggleClipSelected,
     },
-    feedback: {
-      copyToast,
+    tags: {
+      close: tagWorkspace.close,
+      create: tagWorkspace.createTag,
+      isOpen: tagWorkspace.isOpen,
+      isSavingClipTags: tagWorkspace.isSavingClipTags,
+      isTagActionPending: tagWorkspace.isTagActionPending,
+      openClipEditor: openClipTagEditor,
+      openManager: openTagManager,
+      query: tagWorkspace.query,
+      remove: tagWorkspace.removeTag,
+      saveClipTags: tagWorkspace.saveClipTags,
+      state: tagWorkspace.state,
+      update: tagWorkspace.updateTag,
     },
   };
 };

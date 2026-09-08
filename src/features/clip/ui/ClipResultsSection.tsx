@@ -17,11 +17,19 @@ interface ClipResultsSectionProps {
   isLoading?: boolean;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  isCreatingClip?: boolean;
+  isFavoriteMutationPending?: boolean;
   onFetchNextPage?: () => void;
   onRetry?: () => void;
-  onCopy?: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
+  onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
-  onContextMenu?: (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => void;
+  onEditTags?: (clip: Clip) => void;
+  pendingFavoriteClipId?: string | null;
+  pendingCopyClipId?: string | null;
+  onContextMenu?: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    clip: Clip,
+  ) => void;
   isDeleteMode?: boolean;
   isInteractionDisabled?: boolean;
   selectedClipIds?: Set<string>;
@@ -34,10 +42,15 @@ export function ClipResultsSection({
   isLoading = false,
   hasNextPage = false,
   isFetchingNextPage = false,
+  isCreatingClip = false,
+  isFavoriteMutationPending = false,
   onFetchNextPage,
   onRetry,
   onCopy,
   onToggleFavorite,
+  onEditTags,
+  pendingFavoriteClipId,
+  pendingCopyClipId,
   onContextMenu,
   isDeleteMode = false,
   isInteractionDisabled = false,
@@ -75,7 +88,7 @@ export function ClipResultsSection({
     return <ClipErrorState onRetry={onRetry} />;
   }
 
-  if (!clips.length) {
+  if (!clips.length && !isCreatingClip) {
     return <EmptyState />;
   }
 
@@ -84,13 +97,18 @@ export function ClipResultsSection({
       clips={clips}
       loadMoreRef={ref}
       isFetchingNextPage={isFetchingNextPage}
+      isCreatingClip={isCreatingClip}
+      isFavoriteMutationPending={isFavoriteMutationPending}
       onCopy={onCopy}
       onToggleFavorite={onToggleFavorite}
+      onEditTags={onEditTags}
       onContextMenu={onContextMenu}
       isDeleteMode={isDeleteMode}
       isInteractionDisabled={isInteractionDisabled}
       selectedClipIds={selectedClipIds}
       onToggleSelected={onToggleSelected}
+      pendingFavoriteClipId={pendingFavoriteClipId}
+      pendingCopyClipId={pendingCopyClipId}
     />
   );
 }

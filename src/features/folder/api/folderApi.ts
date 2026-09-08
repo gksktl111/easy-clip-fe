@@ -6,9 +6,10 @@ import {
 } from "@/features/folder/model/folder.dto";
 import { apiRequest } from "@/shared/lib/apiClient";
 
-export const fetchFolders = () =>
+export const fetchFolders = (signal?: AbortSignal) =>
   apiRequest<FolderResponseDto[]>("/folders", {
     cache: "no-store",
+    signal,
   });
 
 export const createFolder = (payload: CreateFolderRequestDto) =>

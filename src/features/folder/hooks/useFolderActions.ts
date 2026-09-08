@@ -1,8 +1,11 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { requestAccessRefresh } from "@/shared/access/accessEvents";
+import { ApiError } from "@/shared/lib/apiClient";
+
 import { useCallback, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import {
   createFolder as createFolderRequest,
   deleteFolder as deleteFolderRequest,
@@ -19,18 +22,19 @@ import {
   sortFolders,
 } from "@/features/folder/service/folderCollection";
 import { getFolderQueryKey } from "@/features/folder/service/folderQueryCache";
-import { invalidateTrashQueries } from "@/features/trash/service/trashQueryCache";
+import { useAuth } from "@/features/auth";
 
 const createAuthRequiredError = () => new Error("AUTH_REQUIRED");
 
 // 폴더 생성, 이름 변경, 삭제와 optimistic 순서 변경 액션을 관리합니다.
 export const useFolderActions = () => {
-  const session = useAuthSession();
-  const isAuthenticated = Boolean(session?.user);
+  const { user } = useAuth();
+  const access = useResourceAccess();
+  const isAuthenticated = Boolean(user);
   const queryClient = useQueryClient();
   const folderQueryKey = useMemo(
-    () => getFolderQueryKey(session?.user?.id ?? null),
-    [session?.user?.id],
+    () => getFolderQueryKey(user?.id ?? null),
+    [user?.id],
   );
   const setFolders = useCallback(
     (updater: (currentFolders: FolderItem[]) => FolderItem[]) => {
@@ -41,75 +45,99 @@ export const useFolderActions = () => {
     [folderQueryKey, queryClient],
   );
 
-  const { mutateAsync: createFolder } = useMutation({
-    mutationFn: async (name: string) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: createFolder, isPending: isCreatingFolder } =
+    useMutation({
+      mutationFn: async (name: string) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      return createFolderRequest({ name });
-    },
-    onSuccess: (createdFolder) => {
-      setFolders((folders) =>
-        sortFolders([...folders, mapFolder(createdFolder)]),
-      );
-    },
-  });
+        if (!access.canCreateFolder)
+          throw new ApiError(
+            "폴더 생성 권한을 확인해주세요.",
+            409,
+            "PLAN_LIMIT_EXCEEDED",
+          );
+        return createFolderRequest({ name });
+      },
+      onSuccess: (createdFolder) => {
+        requestAccessRefresh();
+        setFolders((folders) =>
+          sortFolders([...folders, mapFolder(createdFolder)]),
+        );
+      },
+    });
 
-  const { mutateAsync: renameFolderMutation } = useMutation({
-    mutationFn: async ({
-      folderId,
-      name,
-    }: {
-      folderId: string;
-      name: string;
-    }) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: renameFolderMutation, isPending: isRenamingFolder } =
+    useMutation({
+      mutationFn: async ({
+        folderId,
+        name,
+      }: {
+        folderId: string;
+        name: string;
+      }) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      return updateFolderRequest(folderId, { name });
-    },
-    onSuccess: (updatedFolder) => {
-      setFolders((folders) =>
-        sortFolders(
-          folders.map((folder) =>
-            folder.id === updatedFolder.id ? mapFolder(updatedFolder) : folder,
+        if (access.status !== "ready" || access.folderLocks[folderId] !== false)
+          throw new ApiError("잠긴 폴더입니다.", 403, "PROJECT_LOCKED");
+        return updateFolderRequest(folderId, { name });
+      },
+      onSuccess: (updatedFolder) => {
+        requestAccessRefresh();
+        setFolders((folders) =>
+          sortFolders(
+            folders.map((folder) =>
+              folder.id === updatedFolder.id
+                ? { ...folder, ...mapFolder(updatedFolder) }
+                : folder,
+            ),
           ),
-        ),
-      );
-    },
-  });
+        );
+      },
+    });
 
-  const { mutateAsync: removeFolder } = useMutation({
-    mutationFn: async (folderId: string) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: removeFolder, isPending: isRemovingFolder } =
+    useMutation({
+      mutationFn: async (folderId: string) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      await deleteFolderRequest(folderId);
-      return folderId;
-    },
-    onSuccess: (folderId) => {
-      setFolders((folders) =>
-        folders.filter((folder) => folder.id !== folderId),
-      );
-      void invalidateTrashQueries(queryClient);
-    },
-  });
+        await deleteFolderRequest(folderId);
+        return folderId;
+      },
+      onSuccess: (folderId) => {
+        requestAccessRefresh();
+        setFolders((folders) =>
+          folders.filter((folder) => folder.id !== folderId),
+        );
+      },
+    });
 
-  const { mutateAsync: reorderFolder } = useMutation({
-    mutationFn: async (payload: Parameters<typeof reorderFolderRequest>[0]) => {
-      if (!isAuthenticated) {
-        throw createAuthRequiredError();
-      }
+  const { mutateAsync: reorderFolder, isPending: isReorderingFolder } =
+    useMutation({
+      mutationFn: async (
+        payload: Parameters<typeof reorderFolderRequest>[0],
+      ) => {
+        if (!isAuthenticated) {
+          throw createAuthRequiredError();
+        }
 
-      return reorderFolderRequest(payload);
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: folderQueryKey });
-    },
-  });
+        if (!access.isPro || access.status !== "ready")
+          throw new ApiError(
+            "Pro에서 폴더 순서를 변경할 수 있습니다.",
+            403,
+            "FEATURE_NOT_AVAILABLE",
+          );
+        return reorderFolderRequest(payload);
+      },
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: folderQueryKey });
+      },
+    });
 
   const renameFolder = useCallback(
     (folderId: string, name: string) =>
@@ -137,7 +165,7 @@ export const useFolderActions = () => {
       );
 
       if (nextFolders === currentFolders) {
-        return;
+        return false;
       }
 
       const payload =
@@ -149,6 +177,7 @@ export const useFolderActions = () => {
         await queryClient.cancelQueries({ queryKey: folderQueryKey });
         queryClient.setQueryData(folderQueryKey, nextFolders);
         await reorderFolder(payload);
+        return true;
       } catch (error) {
         queryClient.setQueryData(folderQueryKey, currentFolders);
         void queryClient.invalidateQueries({ queryKey: folderQueryKey });
@@ -160,6 +189,10 @@ export const useFolderActions = () => {
 
   return {
     createFolder,
+    isCreatingFolder,
+    isRemovingFolder,
+    isRenamingFolder,
+    isReorderingFolder,
     removeFolder,
     renameFolder,
     saveFolderOrder,

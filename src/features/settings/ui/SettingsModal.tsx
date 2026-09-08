@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
+
+import { useRef, useState } from "react";
+import { messagesByLocale } from "@/shared/config/messages";
+import { createTranslator, useTranslations } from "next-intl";
 import { HiOutlineCog, HiOutlineX } from "react-icons/hi";
-import { useAuthSession } from "@/features/auth/hooks/useAuthSession";
 import { persistUserSettings } from "@/features/settings/service/settingsService";
 import { SettingsAboutSection } from "@/features/settings/ui/SettingsAboutSection";
 import { SettingsPreferencesSection } from "@/features/settings/ui/SettingsPreferencesSection";
-import { useMySubscription } from "@/features/subscription/hooks/useMySubscription";
+import { useMySubscription } from "@/features/subscription";
 import type { AppLocale } from "@/shared/config/locale";
+import { useAuth } from "@/features/auth";
 import { useSettingsStore } from "@/shared/store/settingsStore";
 import { Button } from "@/shared/ui/button/Button";
 import { Modal } from "@/shared/ui/overlay/Modal";
@@ -19,18 +22,17 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
+  const pending = useRef(false);
   const t = useTranslations("settings");
-  const session = useAuthSession();
+  const { user } = useAuth();
   const subscriptionQuery = useMySubscription();
   const { theme, language, setLanguage, setTheme } = useSettingsStore();
   const [savingField, setSavingField] = useState<"theme" | "language" | null>(
     null,
   );
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const feedback = useTranslations("feedback");
   const isDark = theme === "dark";
-  const isSubscriptionLoading = Boolean(
-    session?.user && subscriptionQuery.isPending,
-  );
+  const isSubscriptionLoading = Boolean(user && subscriptionQuery.isPending);
   const subscriptionError = subscriptionQuery.isError
     ? t("subscriptionLoadError")
     : null;
@@ -39,43 +41,57 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     const previousTheme = theme;
     const nextTheme = isDark ? "light" : "dark";
 
-    setErrorMessage(null);
+    if (pending.current) return;
     setTheme(nextTheme);
 
-    if (!session?.user) {
+    if (!user) {
+      notifySuccess(feedback("settingsSaved"));
       return;
     }
 
+    pending.current = true;
     setSavingField("theme");
 
     try {
       await persistUserSettings({ theme: nextTheme });
+      notifySuccess(feedback("settingsSaved"));
     } catch {
       setTheme(previousTheme);
-      setErrorMessage(t("saveError"));
+      notifyError(t("saveError"));
     } finally {
+      pending.current = false;
       setSavingField(null);
     }
   };
 
   const handleLanguageChange = async (nextLanguage: AppLocale) => {
+    if (nextLanguage === language) return;
     const previousLanguage = language;
+    const nextFeedback = createTranslator({
+      locale: nextLanguage,
+      messages: messagesByLocale[nextLanguage],
+      namespace: "feedback",
+    });
 
-    setErrorMessage(null);
+    if (pending.current) return;
     setLanguage(nextLanguage);
 
-    if (!session?.user) {
+    if (!user) {
+      notifySuccess(nextFeedback("settingsSaved"));
       return;
     }
 
+    pending.current = true;
     setSavingField("language");
 
     try {
       await persistUserSettings({ language: nextLanguage });
+      notifySuccess(nextFeedback("settingsSaved"));
     } catch {
       setLanguage(previousLanguage);
-      setErrorMessage(t("saveError"));
+      notifyError(t("saveError"));
     } finally {
+      pending.current = false;
       setSavingField(null);
     }
   };
@@ -89,7 +105,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
       <div className="text-foreground relative flex max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-xl">
         <div className="flex items-center justify-between border-b border-(--border) px-6 py-4">
           <div className="flex items-center gap-3 text-base font-semibold">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--modal-icon-bg) text-(--modal-icon-fg)">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
               <HiOutlineCog className="h-5 w-5" aria-hidden />
             </span>
             {t("title")}
@@ -117,15 +133,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
               void handleLanguageChange(nextLanguage);
             }}
           />
-
-          {errorMessage ? (
-            <p
-              className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"
-              role="alert"
-            >
-              {errorMessage}
-            </p>
-          ) : null}
 
           <SettingsAboutSection
             subscription={subscriptionQuery.subscription}

@@ -1,12 +1,10 @@
-import { ClipApiType } from "@/features/clip/model/clip.dto";
-
 export type TrashItemResponseDto =
   | {
       itemType: "CLIP";
       id: string;
       deletedAt: string | null;
       title: string;
-      type: ClipApiType;
+      type: "TEXT" | "COLOR" | "IMAGE";
       folderId: string;
     }
   | {

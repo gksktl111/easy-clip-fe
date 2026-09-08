@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: Easy Clip 저장소의 Git/GitHub 운영 절차를 적용한다. 이슈 분류·생성, 브랜치 생성·전환·정리, 커밋, push, PR 생성·수정·검토·병합, dev-main 승격과 버전 산정·반영, 커밋 이력 확인·재작성 또는 위험한 Git 작업을 수행할 때 사용한다.
+description: Easy Clip 저장소의 Git/GitHub 운영 절차를 적용하고 GitHub 관련 전용 에이전트 작업을 GPT-5.4로 고정한다. 이슈 분류·생성, 브랜치 생성·전환·정리, 커밋, push, PR 생성·수정·검토·병합, dev-main 승격과 버전 산정·반영, 커밋 이력 확인·재작성 또는 위험한 Git 작업을 수행할 때 사용한다.
 ---
 
 # Git/GitHub 워크플로
@@ -12,6 +12,14 @@ description: Easy Clip 저장소의 Git/GitHub 운영 절차를 적용한다. �
 - 사용자의 기존 변경을 되돌리거나 관련 없는 파일을 stage하지 않는다.
 - 이슈 없이 작업을 시작하지 않는다. 예외가 필요하면 사용자와 먼저 범위를 합의한다.
 - GitHub CLI `gh`를 사용할 수 있으며 쓰기 후 원격 상태를 다시 조회한다.
+
+## 에이전트 모델 선택
+
+- 사용자가 선택한 최상위 에이전트의 모델은 변경하지 않는다.
+- GitHub 관련 동작을 새로 시작하거나 별도 에이전트에 위임할 때는 모델을 항상 `gpt-5.4`로 지정한다.
+- 작업 난이도, 외부 쓰기, 위험도와 무관하게 `gpt-5.6` 계열 또는 다른 모델로 자동 승격·대체하지 않는다.
+- `gpt-5.4`를 사용할 수 없는 실행 환경에서는 다른 모델로 조용히 대체하지 말고 사용자에게 알린다.
+- 이 규칙은 기존의 검증, 위험 작업 사전 확인, 사용자 승인 요건을 대체하지 않는다.
 
 ## 제목 형식
 
@@ -96,7 +104,7 @@ git switch -c refactor/97
 
 1. `git diff`, `git diff --cached`, `git status`로 범위를 확인한다.
 2. 관련 파일만 명시적으로 stage한다.
-3. 검증 결과를 확인한다.
+3. 아래의 로컬 CI 검증을 모두 통과시킨다.
 4. 제목 형식에 맞춰 커밋한다.
 5. 커밋과 원격 대상 브랜치를 확인한 뒤 push한다.
 
@@ -105,6 +113,23 @@ git add AGENTS.md .codex/skills
 git commit -m "#97 / refactor(config) : 저장소 지침을 로컬 스킬로 분리"
 git push -u origin refactor/97
 ```
+
+### Push 전 로컬 CI 검증
+
+모든 브랜치 push 전 `.github/workflows/ci.yml`의 `verify` job과 같은 검증 명령을 로컬에서 순서대로 실행한다.
+
+```bash
+npm run lint
+npm run typecheck
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3108 npm run build
+npm run test
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3108 CI=true npm run test:e2e
+```
+
+- 하나라도 실패하면 원인을 해결하고 전체 검증을 다시 통과시킨 뒤 push한다.
+- 로컬 환경 제약으로 실행할 수 없는 명령이 있으면 사유와 미검증 항목을 사용자에게 알리고, 사용자의 명시적 지시 없이는 push하지 않는다.
+- CI 워크플로 또는 npm 스크립트가 바뀌면 이 검증 목록도 함께 갱신한다.
+- E2E는 API 요청을 Playwright route로 mock하므로, 앱 서버와 충돌하지 않는 테스트용 공개 API origin `http://127.0.0.1:3108`을 빌드 시점과 E2E 실행 시점 모두 고정한다. `.env.local` 값에 의존하지 않는다.
 
 ## PR 생성
 
@@ -118,15 +143,6 @@ git push -u origin refactor/97
 ```bash
 gh pr create --base dev --title "#97 / refactor(config) : 저장소 지침을 로컬 스킬로 분리" --body "..."
 ```
-
-현재 검증 명령:
-
-- `npm run lint`
-- `npm run build`
-- build 후 필요 시 `npm run start`
-- 공통 UI/story 변경 시 `npm run build-storybook`
-
-존재하지 않는 `npm run package`, `npm run test:e2e`, `npm run typecheck`를 실행 결과에 포함하지 않는다.
 
 ## 리뷰와 병합
 

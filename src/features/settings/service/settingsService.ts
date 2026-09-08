@@ -6,6 +6,7 @@ import {
   SERVER_SUPPORTED_LANGUAGES,
   ServerSupportedLanguage,
   UpdateUserSettingsDto,
+  UpdateUserSettingsThemeDto,
   UserSettingsThemeDto,
 } from "@/features/settings/model/settings.dto";
 import {
@@ -14,30 +15,17 @@ import {
   useSettingsStore,
 } from "@/shared/store/settingsStore";
 
-const getSystemTheme = (): ThemeMode => {
-  if (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  ) {
-    return "dark";
-  }
-
-  return "light";
-};
-
+// 서버 DTO의 대문자 테마 값을 클라이언트 전역 설정 값으로 변환합니다.
 const mapThemeFromServer = (theme: UserSettingsThemeDto): ThemeMode => {
   if (theme === "LIGHT") {
     return "light";
   }
 
-  if (theme === "DARK") {
-    return "dark";
-  }
-
-  return getSystemTheme();
+  return "dark";
 };
 
-const mapThemeToServer = (theme: ThemeMode): UserSettingsThemeDto =>
+// 프론트 정책은 light/dark만 허용하므로 수정 요청에도 SYSTEM을 보내지 않습니다.
+const mapThemeToServer = (theme: ThemeMode): UpdateUserSettingsThemeDto =>
   theme === "light" ? "LIGHT" : "DARK";
 
 export const isServerSupportedLanguage = (

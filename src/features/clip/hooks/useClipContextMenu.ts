@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { Clip } from "@/features/clip/model/clip";
+import {
+  type ContextMenuState,
+  useContextMenu,
+} from "@/shared/hooks/useContextMenu";
 
-export interface ClipContextMenuState {
-  id: string;
-  x: number;
-  y: number;
-}
+export type ClipContextMenuState = ContextMenuState<string>;
 
 interface UseClipContextMenuOptions {
   isDisabled?: boolean;
@@ -17,50 +17,39 @@ interface UseClipContextMenuOptions {
 export const useClipContextMenu = ({
   isDisabled = false,
 }: UseClipContextMenuOptions = {}) => {
-  const [contextMenu, setContextMenu] = useState<ClipContextMenuState | null>(
-    null,
-  );
+  const contextMenu = useContextMenu<string>({
+    dataAttribute: "data-clip-menu",
+    isDisabled,
+  });
 
-  const closeContextMenu = useCallback(() => setContextMenu(null), []);
-
-  const openContextMenu = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => {
-      event.preventDefault();
-
-      if (isDisabled) {
-        return;
-      }
-
-      setContextMenu({
-        id: clip.id,
-        x: event.clientX,
-        y: event.clientY,
-      });
-    },
-    [isDisabled],
-  );
-
+  const { menu, closeMenu } = contextMenu;
   useEffect(() => {
-    if (!contextMenu) {
-      return;
-    }
-
-    const handlePointerDown = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target || target.closest("[data-clip-menu]")) {
-        return;
-      }
-
-      closeContextMenu();
+    if (!menu) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeMenu();
     };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [menu, closeMenu]);
 
-    window.addEventListener("pointerdown", handlePointerDown);
-    return () => window.removeEventListener("pointerdown", handlePointerDown);
-  }, [closeContextMenu, contextMenu]);
+  const openClipContextMenu = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    clip: Clip,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.type === "contextmenu" ? event.clientX : rect.right;
+    const y = event.type === "contextmenu" ? event.clientY : rect.bottom;
+    contextMenu.toggleMenu(clip.id, {
+      x: Math.max(8, Math.min(x, window.innerWidth - 144)),
+      y: Math.max(8, Math.min(y, window.innerHeight - 128)),
+    });
+  };
 
   return {
-    closeContextMenu,
-    contextMenu,
-    openContextMenu,
+    closeContextMenu: contextMenu.closeMenu,
+    contextMenu: contextMenu.menu,
+    openContextMenu: openClipContextMenu,
   };
 };

@@ -1,3 +1,8 @@
+import {
+  AccessChangedError,
+  getAccessGeneration,
+  requestAccessRefresh,
+} from "@/shared/access/accessEvents";
 import { buildApiUrl } from "@/shared/config/env";
 
 type ApiRequestOptions = Omit<RequestInit, "headers"> & {
@@ -9,10 +14,20 @@ type ApiRequestOptions = Omit<RequestInit, "headers"> & {
 export class ApiError extends Error {
   status: number;
 
-  constructor(message: string, status: number) {
+  code?: string;
+  details?: Record<string, unknown>;
+
+  constructor(
+    message: string,
+    status: number,
+    code?: string,
+    details?: Record<string, unknown>,
+  ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.code = code;
+    this.details = details;
   }
 }
 
@@ -21,7 +36,7 @@ let refreshPromise: Promise<void> | null = null;
 const AUTH_EXPIRED_EVENT = "auth-session:expired";
 const REFRESH_RETRY_DELAYS_MS = [300, 800] as const;
 
-const dispatchAuthExpired = () => {
+const notifyAuthExpired = () => {
   if (typeof window === "undefined") {
     return;
   }
@@ -38,19 +53,35 @@ export const subscribeToAuthExpired = (callback: () => void) => {
 const isAuthRefreshExcludedPath = (path: string) =>
   path === "/auth/refresh" || path === "/auth/logout";
 
-const readErrorMessage = async (response: Response) => {
+const readApiError = async (response: Response) => {
   let message = `Request failed with status ${response.status}`;
-
+  let code: string | undefined;
+  let details: Record<string, unknown> | undefined;
   try {
-    const errorBody = (await response.json()) as { message?: string };
-    if (typeof errorBody.message === "string" && errorBody.message) {
-      message = errorBody.message;
+    const body: unknown = await response.json();
+    if (body && typeof body === "object") {
+      const data = body as Record<string, unknown>;
+      if (typeof data.message === "string" && data.message)
+        message = data.message;
+      if (Array.isArray(data.message)) {
+        const messages = data.message.filter(
+          (value): value is string => typeof value === "string",
+        );
+        if (messages.length) message = messages.join("\n");
+      }
+      if (typeof data.code === "string") code = data.code;
+      if (
+        data.details &&
+        typeof data.details === "object" &&
+        !Array.isArray(data.details)
+      ) {
+        details = data.details as Record<string, unknown>;
+      }
     }
   } catch {
-    // 응답 본문이 JSON이 아니어도 status 기준 에러 처리는 유지한다.
+    // HTML/빈 오류 응답도 HTTP 상태 기반으로 처리합니다.
   }
-
-  return message;
+  return new ApiError(message, response.status, code, details);
 };
 
 const wait = (delayMs: number) =>
@@ -65,7 +96,11 @@ const isRetryableRefreshError = (error: unknown) => {
 };
 
 const refreshWithRetry = async () => {
-  for (let attempt = 0; attempt <= REFRESH_RETRY_DELAYS_MS.length; attempt += 1) {
+  for (
+    let attempt = 0;
+    attempt <= REFRESH_RETRY_DELAYS_MS.length;
+    attempt += 1
+  ) {
     try {
       await apiRequest<unknown>("/auth/refresh", {
         method: "POST",
@@ -90,7 +125,8 @@ const requestTokenRefresh = async () => {
     // 동시에 여러 요청이 401을 받아도 refresh 호출은 이 Promise 하나로 합친다.
     refreshPromise = refreshWithRetry()
       .catch((error) => {
-        dispatchAuthExpired();
+        // refresh가 최종 실패하면 이 요청 묶음의 인증 만료를 한 번 알립니다.
+        notifyAuthExpired();
         throw error;
       })
       .finally(() => {
@@ -111,12 +147,19 @@ export const apiRequest = async <T>(
     ...init
   }: ApiRequestOptions = {},
 ): Promise<T> => {
+  const requestGeneration = getAccessGeneration();
+  const isContentRequest =
+    /^\/(clips|trash)(?:[/?]|$)/.test(path) ||
+    /^\/folders\/[^/]+\/tags(?:[/?]|$)/.test(path);
   const response = await fetch(buildApiUrl(path), {
     ...init,
     // httpOnly 쿠키 기반 인증이므로 모든 API 요청에 쿠키를 포함한다.
     credentials: credentials ?? "include",
     headers: new Headers(headers),
   });
+
+  if (isContentRequest && requestGeneration !== getAccessGeneration())
+    throw new AccessChangedError();
 
   if (!response.ok) {
     if (
@@ -136,17 +179,35 @@ export const apiRequest = async <T>(
       });
     }
 
-    if (response.status === 401 && (hasRetriedAuth || skipAuthRefresh)) {
-      dispatchAuthExpired();
+    if (response.status === 401 && hasRetriedAuth) {
+      // refresh 성공 후에도 원래 요청이 401이면 세션이 더는 유효하지 않습니다.
+      notifyAuthExpired();
     }
 
-    const message = await readErrorMessage(response);
-    throw new ApiError(message, response.status);
+    const error = await readApiError(response);
+    if (
+      [
+        "PROJECT_LOCKED",
+        "PLAN_LIMIT_EXCEEDED",
+        "FEATURE_NOT_AVAILABLE",
+      ].includes(error.code ?? "")
+    ) {
+      requestAccessRefresh("policy");
+    }
+    throw error;
   }
 
   if (response.status === 204) {
     return null as T;
   }
 
-  return (await response.json()) as T;
+  const responseBody = await response.text();
+
+  if (!responseBody) {
+    return null as T;
+  }
+
+  if (isContentRequest && requestGeneration !== getAccessGeneration())
+    throw new AccessChangedError();
+  return JSON.parse(responseBody) as T;
 };

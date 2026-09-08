@@ -3,8 +3,11 @@
 import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useInView } from "react-intersection-observer";
+import {
+  getTrashRowKey,
+  type TrashItemRow,
+} from "@/features/trash/model/trashRow";
 import { TrashListRow } from "@/features/trash/ui/TrashListRow";
-import type { TrashItemRow } from "@/features/trash/ui/trashRow";
 import { Checkbox } from "@/shared/ui/input/Checkbox";
 
 const SKELETON_ROWS = Array.from({ length: 6 }, (_, index) => index);
@@ -48,7 +51,7 @@ export function TrashListSection({
   });
   const allRowsSelected =
     rows.length > 0 &&
-    rows.every((row) => selectedRowKeys.has(`${row.kind}-${row.id}`));
+    rows.every((row) => selectedRowKeys.has(getTrashRowKey(row)));
 
   useEffect(() => {
     if (!inView) {
@@ -74,22 +77,23 @@ export function TrashListSection({
         <label className="flex min-w-0 items-center gap-3 text-sm font-medium text-(--foreground)">
           <Checkbox
             checked={allRowsSelected}
-            disabled={isLoading || rows.length === 0}
+            disabled={
+              isLoading || rows.length === 0 || pendingActionKey !== null
+            }
             onChange={onToggleAllRows}
           />
           <span>{t("selectAll")}</span>
         </label>
       </div>
 
-      <div className="hidden grid-cols-[2rem_minmax(0,1.5fr)_180px_220px_220px] items-center gap-4 border-y border-(--border) bg-(--surface-muted) px-4 py-3 text-xs font-semibold tracking-wide text-(--muted) uppercase min-[1200px]:grid min-[1200px]:px-6">
+      <div className="hidden grid-cols-[1.5rem_minmax(0,1fr)_minmax(8rem,0.45fr)_minmax(10rem,0.6fr)] items-center gap-4 border-y border-(--border) bg-(--surface-muted) px-4 py-3 text-xs font-semibold tracking-wide text-(--muted) uppercase min-[1200px]:grid min-[1200px]:px-6">
         <Checkbox
           checked={allRowsSelected}
-          disabled={isLoading || rows.length === 0}
+          disabled={isLoading || rows.length === 0 || pendingActionKey !== null}
           onChange={onToggleAllRows}
           aria-label={t("selectAll")}
         />
         <span>{t("columns.name")}</span>
-        <span>{t("columns.type")}</span>
         <span>{t("columns.deletedAt")}</span>
         <span>{t("columns.actions")}</span>
       </div>
@@ -99,9 +103,9 @@ export function TrashListSection({
           ? SKELETON_ROWS.map((row) => <TrashListSkeletonRow key={row} />)
           : rows.map((row) => (
               <TrashListRow
-                key={`${row.kind}-${row.id}`}
+                key={getTrashRowKey(row)}
                 row={row}
-                isSelected={selectedRowKeys.has(`${row.kind}-${row.id}`)}
+                isSelected={selectedRowKeys.has(getTrashRowKey(row))}
                 pendingActionKey={pendingActionKey}
                 onToggleSelected={onToggleRow}
                 onRestoreFolder={onRestoreFolder}
@@ -124,19 +128,18 @@ export function TrashListSection({
 function TrashListSkeletonRow() {
   return (
     <article className="px-4 py-4 min-[1200px]:px-6" aria-hidden>
-      <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 min-[1200px]:grid-cols-[2rem_minmax(0,1.5fr)_180px_220px_220px] min-[1200px]:items-center min-[1200px]:gap-4">
+      <div className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-3 min-[1200px]:grid-cols-[1.5rem_minmax(0,1fr)_minmax(8rem,0.45fr)_minmax(10rem,0.6fr)] min-[1200px]:items-center min-[1200px]:gap-4">
         <div className="mt-3 h-4 w-4 rounded border border-(--border) min-[1200px]:mt-0" />
         <div className="flex min-w-0 items-center gap-3">
-          <div className="skeleton-shimmer h-10 w-10 shrink-0 rounded-xl" />
+          <div className="skeleton-shimmer h-6 w-6 shrink-0 rounded-md" />
           <div className="min-w-0 flex-1 space-y-2">
             <div className="skeleton-shimmer h-4 w-2/3 rounded-md" />
             <div className="skeleton-shimmer h-3 w-1/2 rounded-md" />
           </div>
         </div>
 
-        <div className="skeleton-shimmer col-start-2 h-7 w-24 rounded-full min-[1200px]:col-start-auto" />
         <div className="skeleton-shimmer col-start-2 h-4 w-32 rounded-md min-[1200px]:col-start-auto" />
-        <div className="col-start-2 flex flex-wrap justify-end gap-2 min-[1200px]:col-start-auto min-[1200px]:justify-start">
+        <div className="col-start-2 flex flex-wrap justify-start gap-2 min-[1200px]:col-start-auto min-[1200px]:justify-start">
           <div className="skeleton-shimmer h-8 w-16 rounded-lg" />
           <div className="skeleton-shimmer h-8 w-20 rounded-lg" />
         </div>

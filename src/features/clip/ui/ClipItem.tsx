@@ -8,46 +8,49 @@ import {
   HiOutlineDocumentText,
   HiOutlinePhotograph,
   HiOutlineStar,
+  HiOutlineDotsVertical,
   HiStar,
 } from "react-icons/hi";
 import type { Clip } from "@/features/clip/model/clip";
+import { TagChip } from "@/features/clip/ui/TagChip";
 
 // 클립 하나의 미리보기, 유형 정보, 복사, 즐겨찾기와 삭제 선택 상태를 표시합니다.
 interface ClipItemProps {
   clip: Clip;
-  onCopy?: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
+  onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
-  onContextMenu?: (event: React.MouseEvent<HTMLDivElement>, clip: Clip) => void;
+  onEditTags?: (clip: Clip) => void;
+  onContextMenu?: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    clip: Clip,
+  ) => void;
   isDeleteMode?: boolean;
+  isFavoriteMutationPending?: boolean;
   isInteractionDisabled?: boolean;
   isSelected?: boolean;
   onToggleSelected?: (clipId: string) => void;
+  pendingFavoriteClipId?: string | null;
+  pendingCopyClipId?: string | null;
 }
 
 function ClipTypeIcon({ type }: { type: Clip["type"] }) {
   switch (type) {
     case "text":
-      return <HiOutlineDocumentText className="h-5 w-5" aria-hidden />;
+      return <HiOutlineDocumentText className="h-4 w-4 shrink-0" aria-hidden />;
     case "color":
-      return <HiOutlineColorSwatch className="h-5 w-5" aria-hidden />;
+      return <HiOutlineColorSwatch className="h-4 w-4 shrink-0" aria-hidden />;
     case "image":
-      return <HiOutlinePhotograph className="h-5 w-5" aria-hidden />;
+      return <HiOutlinePhotograph className="h-4 w-4 shrink-0" aria-hidden />;
     default:
       return null;
   }
 }
 
-function ClipContentPreview({
-  clip,
-  isOptimistic,
-}: {
-  clip: Clip;
-  isOptimistic: boolean;
-}) {
+function ClipContentPreview({ clip }: { clip: Clip }) {
   if (clip.type === "color") {
     return (
-      <div
-        className="h-full w-full rounded-xl border border-(--border)"
+      <span
+        className="block h-full w-full rounded-xl border border-(--border)"
         style={{ backgroundColor: clip.content }}
         aria-hidden
       />
@@ -56,36 +59,22 @@ function ClipContentPreview({
 
   if (clip.type === "image") {
     return (
-      <div
-        className="relative h-full w-full rounded-xl bg-(--surface-muted)"
-        style={
-          isOptimistic && clip.content
-            ? {
-                backgroundImage: `url(${clip.content})`,
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "contain",
-              }
-            : undefined
-        }
-      >
-        {isOptimistic ? null : (
-          <Image
-            src={clip.content}
-            alt={clip.name}
-            fill
-            sizes="(min-width: 1200px) 18vw, (min-width: 1024px) 22vw, (min-width: 768px) 28vw, 90vw"
-            className="rounded-xl object-contain"
-          />
-        )}
-      </div>
+      <span className="relative block h-full w-full rounded-xl bg-(--surface-muted)">
+        <Image
+          src={clip.content}
+          alt={clip.name}
+          fill
+          sizes="(min-width: 1200px) 18vw, (min-width: 1024px) 22vw, (min-width: 768px) 28vw, 90vw"
+          className="rounded-xl object-contain"
+        />
+      </span>
     );
   }
 
   return (
-    <p className="text-foreground line-clamp-4 text-sm leading-relaxed">
+    <span className="text-foreground line-clamp-4 text-sm leading-relaxed">
       {clip.content}
-    </p>
+    </span>
   );
 }
 
@@ -93,48 +82,126 @@ export function ClipItem({
   clip,
   onCopy,
   onToggleFavorite,
+  onEditTags,
   onContextMenu,
   isDeleteMode = false,
+  isFavoriteMutationPending = false,
   isInteractionDisabled = false,
   isSelected = false,
   onToggleSelected,
+  pendingFavoriteClipId,
+  pendingCopyClipId,
 }: ClipItemProps) {
   const t = useTranslations("clips.item");
-  const isOptimistic = Boolean(clip.isOptimistic);
-  const isDisabled = isOptimistic || isInteractionDisabled;
+  const isDisabled = isInteractionDisabled;
+  const isCopying = !isDeleteMode && pendingCopyClipId === clip.id;
+  const isCopyBlocked = !isDeleteMode && Boolean(pendingCopyClipId);
+  const isFavoritePending = pendingFavoriteClipId === clip.id;
+  const isFavoriteDisabled =
+    isDisabled ||
+    isDeleteMode ||
+    isFavoriteMutationPending ||
+    !onToggleFavorite;
+  const primaryActionLabel = isDeleteMode
+    ? t("selectForDelete", { name: clip.name })
+    : t("copy", { name: clip.name });
+  const visibleTags = clip.tags.slice(0, 2);
+  const hiddenTagCount = Math.max(clip.tags.length - visibleTags.length, 0);
 
   return (
-    <div
-      className="group relative flex h-52 w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[delete-mode=true]:cursor-pointer data-[disabled=true]:cursor-wait data-[disabled=true]:opacity-75 data-[selected=true]:border-(--danger) data-[selected=true]:ring-2 data-[selected=true]:ring-(--danger-border)"
-      data-optimistic={isOptimistic}
+    <article
+      className="group relative flex h-60 w-full flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface) shadow-sm transition-shadow hover:shadow-md data-[disabled=true]:opacity-75 data-[selected=true]:border-(--danger) data-[selected=true]:ring-2 data-[selected=true]:ring-(--danger-border)"
       data-disabled={isDisabled}
       data-delete-mode={isDeleteMode}
       data-selected={isSelected}
-      onClick={(event) => {
-        if (isDeleteMode) {
-          if (!isDisabled) {
-            onToggleSelected?.(clip.id);
-          }
-          return;
-        }
-
-        if (!isDisabled) {
-          onCopy?.(clip, event);
-        }
-      }}
-      onContextMenu={(event) => {
-        if (isDeleteMode) {
-          event.preventDefault();
-          return;
-        }
-
-        if (!isDisabled && !isDeleteMode) {
-          onContextMenu?.(event, clip);
-        }
-      }}
-      role="button"
-      tabIndex={0}
     >
+      <button
+        type="button"
+        disabled={isDisabled || isCopyBlocked}
+        aria-busy={isCopying}
+        aria-label={primaryActionLabel}
+        aria-pressed={isDeleteMode ? isSelected : undefined}
+        onClick={(event) => {
+          if (isDeleteMode) {
+            onToggleSelected?.(clip.id);
+            return;
+          }
+
+          onCopy?.(clip, event);
+        }}
+        onContextMenu={(event) => {
+          if (isDeleteMode) {
+            event.preventDefault();
+            return;
+          }
+
+          onContextMenu?.(event, clip);
+        }}
+        className="flex min-h-0 w-full flex-1 cursor-pointer flex-col overflow-hidden text-left transition focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--focus-ring) disabled:cursor-wait disabled:opacity-60"
+      >
+        <span
+          className={`flex-1 overflow-hidden px-4 py-3 ${clip.type === "text" ? "pr-12" : ""}`}
+        >
+          <ClipContentPreview clip={clip} />
+        </span>
+        <span className="flex items-center gap-2 border-t border-(--border) px-4 py-2.5 text-xs text-(--muted)">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center text-(--muted)">
+            <ClipTypeIcon type={clip.type} />
+          </span>
+          <span className="text-foreground truncate font-medium">
+            {isCopying
+              ? t("copying")
+              : clip.type === "color"
+                ? clip.content
+                : clip.name}
+          </span>
+        </span>
+      </button>
+      <div className="flex min-h-10 items-center gap-1.5 border-t border-(--border) px-3 py-2">
+        <button
+          type="button"
+          disabled={isDisabled || isDeleteMode || !onEditTags}
+          onClick={(event) => {
+            event.stopPropagation();
+            onEditTags?.(clip);
+          }}
+          aria-label={t("editTags", { name: clip.name })}
+          className="flex min-h-8 min-w-0 flex-1 cursor-pointer items-center gap-1 overflow-hidden rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) disabled:cursor-default"
+        >
+          {visibleTags.map((tag) => (
+            <TagChip
+              key={tag.id}
+              name={tag.name}
+              backgroundColor={tag.backgroundColor}
+            />
+          ))}
+          {hiddenTagCount > 0 ? (
+            <span className="shrink-0 text-xs text-(--muted)">
+              +{hiddenTagCount}
+            </span>
+          ) : null}
+          {!clip.tags.length ? (
+            <span className="truncate text-xs text-(--muted)">
+              {t("noTags")}
+            </span>
+          ) : null}
+        </button>
+        {onContextMenu && !isDeleteMode ? (
+          <button
+            type="button"
+            disabled={isDisabled}
+            onClick={(event) => {
+              event.stopPropagation();
+              onContextMenu(event, clip);
+            }}
+            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-(--muted) transition hover:bg-(--surface-muted) hover:text-(--foreground) focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) disabled:cursor-default disabled:opacity-50"
+            aria-label={t("openOptions", { name: clip.name })}
+            data-clip-menu
+          >
+            <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />
+          </button>
+        ) : null}
+      </div>
       {isDeleteMode ? (
         <div className="absolute top-3 left-3 z-20">
           <button
@@ -156,25 +223,20 @@ export function ClipItem({
           </button>
         </div>
       ) : null}
-      {isOptimistic ? (
-        <div className="absolute inset-x-3 top-3 z-20 flex justify-start">
-          <span className="rounded-full bg-(--primary) px-2.5 py-1 text-[11px] font-semibold text-(--primary-foreground) shadow-sm">
-            {t("saving")}
-          </span>
-        </div>
-      ) : null}
       <button
         type="button"
         onClick={(event) => {
           event.stopPropagation();
-          if (!isDisabled && !isDeleteMode) {
+          if (!isFavoriteDisabled) {
             onToggleFavorite?.(clip);
           }
         }}
-        disabled={isDisabled || isDeleteMode}
-        className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-(--favorite-btn-bg-hover) disabled:cursor-wait disabled:opacity-50"
+        disabled={isFavoriteDisabled}
+        className="absolute top-3 right-3 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-transparent bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-colors duration-150 hover:bg-(--favorite-btn-bg-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) disabled:cursor-default aria-pressed:border-(--favorite-btn-selected-border) aria-pressed:bg-(--favorite-btn-selected-bg) motion-reduce:transition-none"
         style={{ boxShadow: "var(--favorite-btn-shadow)" }}
         aria-label={t("toggleFavorite")}
+        aria-pressed={Boolean(clip.isFavorite)}
+        aria-busy={isFavoritePending}
       >
         {clip.isFavorite ? (
           <HiStar className="h-4 w-4 text-(--warning)" aria-hidden />
@@ -185,17 +247,6 @@ export function ClipItem({
           />
         )}
       </button>
-      <div className="flex-1 overflow-hidden px-4 py-3">
-        <ClipContentPreview clip={clip} isOptimistic={isOptimistic} />
-      </div>
-      <div className="flex items-center gap-2 border-t border-(--border) px-4 py-2.5 text-xs text-(--muted)">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-(--icon-chip) text-(--icon-chip-text)">
-          <ClipTypeIcon type={clip.type} />
-        </span>
-        <span className="text-foreground truncate font-medium">
-          {clip.type === "color" ? clip.content : clip.name}
-        </span>
-      </div>
-    </div>
+    </article>
   );
 }

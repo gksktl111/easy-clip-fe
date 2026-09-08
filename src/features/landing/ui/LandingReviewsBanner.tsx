@@ -7,6 +7,8 @@ interface LandingReview {
 }
 
 interface LandingReviewsBannerProps {
+  title: string;
+  description: string;
   reviews: readonly LandingReview[];
 }
 
@@ -32,15 +34,19 @@ function LandingReviewCard({ review }: { review: LandingReview }) {
   );
 }
 
-export function LandingReviewsBanner({ reviews }: LandingReviewsBannerProps) {
+export function LandingReviewsBanner({
+  title,
+  description,
+  reviews,
+}: LandingReviewsBannerProps) {
   return (
     <section className="mt-16 mb-[100px] overflow-x-clip">
       <div className="mx-auto max-w-6xl px-6 text-center">
         <h3 className="text-2xl font-bold tracking-tight md:text-3xl">
-          추천 작업 전문가들이 선택했습니다
+          {title}
         </h3>
         <p className="mt-3 text-sm text-(--muted) md:text-base">
-          클립보드 흐름이 바뀐 사용자들의 실제 후기를 확인해보세요.
+          {description}
         </p>
       </div>
 

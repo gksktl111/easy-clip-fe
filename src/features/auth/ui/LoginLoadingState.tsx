@@ -1,6 +1,6 @@
 "use client";
 
-// OAuth 제공자로 이동하는 동안 진행 상태와 안내 문구를 표시합니다.
+// 세션 확인 또는 OAuth 이동이 진행 중일 때 안내 문구를 표시합니다.
 interface LoginLoadingStateProps {
   label: string;
   isVisible: boolean;

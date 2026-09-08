@@ -1,26 +1,29 @@
 "use client";
 
-import { useRecentClipsPage } from "@/features/clip/hooks/useRecentClipsPage";
+import { useClipCollection } from "@/features/clip/hooks/useClipCollection";
 import { ClipCollectionPage } from "@/features/clip/ui/ClipCollectionPage";
 
 // 최근 사용한 클립 데이터를 공통 컬렉션 화면에 연결합니다.
 export function RecentClipsPage() {
-  const { actions, feedback, filter, results } = useRecentClipsPage();
+  const {
+    commands,
+    filter,
+    isFavoritePending,
+    pendingFavoriteClipId,
+    pendingCopyClipId,
+    results,
+  } = useClipCollection({ recent: true, supportsFavoriteToggle: true });
 
   return (
     <ClipCollectionPage
       activeFilter={filter.activeFilter}
       clips={results.clips}
-      copyToastPosition={feedback.copyToast}
       hasNextPage={results.hasNextPage}
       isError={results.isError}
       isFetchingNextPage={results.isFetchingNextPage}
       isLoading={results.isLoading}
-      onCopy={(clip, event) => {
-        void actions.copyClip(clip, {
-          x: event.clientX,
-          y: event.clientY,
-        });
+      onCopy={(clip) => {
+        void commands.copyClip(clip);
       }}
       onFetchNextPage={() => {
         void results.fetchNextPage();
@@ -30,6 +33,10 @@ export function RecentClipsPage() {
         void results.refetch();
       }}
       onSearchChange={filter.changeSearchQuery}
+      onToggleFavorite={commands.toggleFavorite}
+      isFavoriteMutationPending={isFavoritePending}
+      pendingFavoriteClipId={pendingFavoriteClipId}
+      pendingCopyClipId={pendingCopyClipId}
       searchQuery={filter.searchQuery}
     />
   );

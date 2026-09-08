@@ -1,9 +1,6 @@
-export type ClipApiType = "TEXT" | "COLOR" | "IMAGE";
+import type { ClipTagResponseDto } from "@/features/clip/model/tag.dto";
 
-export interface ClipTagResponseDto {
-  id: string;
-  name: string;
-}
+export type ClipApiType = "TEXT" | "COLOR" | "IMAGE";
 
 export interface ClipListItemResponseDto {
   id: string;
@@ -19,7 +16,6 @@ export interface ClipListItemResponseDto {
   deletedAt: string | null;
   likeByMe: boolean;
   tags: ClipTagResponseDto[];
-  isOptimistic?: boolean;
 }
 
 export interface ClipResponseDto {
@@ -71,4 +67,8 @@ export interface DeleteClipsResponseDto {
 
 export interface LikeClipResponseDto {
   likeByMe: boolean;
+}
+
+export interface RenameClipRequestDto {
+  title: string;
 }

@@ -54,108 +54,79 @@ export function TrashPageHeader({
             : null;
 
   return (
-    <div className="border-b border-(--border) px-4 py-6 min-[1200px]:px-6">
-      <div className="flex flex-col gap-4 min-[1200px]:flex-row min-[1200px]:items-start min-[1200px]:justify-between">
+    <header className="border-b border-(--border) px-4 py-5 min-[1200px]:px-6">
+      <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             <Text as="h1" variant="pageTitle">
               {t("title")}
             </Text>
-            <Badge variant="muted" className="font-medium">
-              {t("retentionNotice")}
-            </Badge>
-          </div>
-          <div className="mt-2 flex flex-col gap-1 min-[640px]:flex-row min-[640px]:items-center min-[640px]:gap-3">
-            <Text variant="bodyMuted">{t("description")}</Text>
-            {statusLabel ? (
-              <Text as="span" variant="bodyStrong">
-                {statusLabel}
-              </Text>
+            {!isLoading ? (
+              <Badge variant="muted">{t("totalCount", { count })}</Badge>
             ) : null}
           </div>
+          <Text variant="bodyMuted" className="mt-2">
+            {t("description")}
+          </Text>
+          <Text variant="caption" className="mt-1">
+            {t("retentionNotice")}
+          </Text>
         </div>
+        <Button
+          disabled={areControlsDisabled}
+          onClick={onReload}
+          variant="secondarySurface"
+          size="icon"
+          className="shrink-0"
+          aria-label={t("refresh")}
+          title={t("refresh")}
+        >
+          <HiOutlineRefresh className="h-4 w-4" aria-hidden />
+        </Button>
+      </div>
 
-        <div className="flex w-full flex-col items-end gap-4 min-[520px]:w-auto min-[520px]:shrink-0">
-          <div className="flex w-full flex-wrap justify-end gap-2 min-[520px]:w-auto min-[520px]:items-center">
-            {hasSelection ? (
-              <>
-                <Button
-                  disabled={
-                    areControlsDisabled ||
-                    isRestoringSelected ||
-                    isDeletingSelected ||
-                    isClearingAll
-                  }
-                  onClick={onRestoreSelected}
-                  variant="primary"
-                  size="md"
-                  className="min-w-0 flex-1 text-white hover:opacity-90 disabled:opacity-45 min-[520px]:flex-none"
-                >
-                  <HiOutlineReply className="h-4 w-4 shrink-0" aria-hidden />
-                  <span className="truncate">
-                    {isRestoringSelected
-                      ? t("restoringSelectedAction")
-                      : t("restoreSelected")}
-                  </span>
-                </Button>
-                <Button
-                  disabled={
-                    areControlsDisabled ||
-                    isRestoringSelected ||
-                    isDeletingSelected ||
-                    isClearingAll
-                  }
-                  onClick={onRequestDeleteSelected}
-                  variant="danger"
-                  size="md"
-                  className="min-w-0 flex-1 bg-red-500 text-white hover:bg-red-600 disabled:opacity-45 min-[520px]:flex-none"
-                >
-                  <HiOutlineTrash className="h-4 w-4 shrink-0" aria-hidden />
-                  <span className="truncate">
-                    {isDeletingSelected
-                      ? t("deletingSelectedAction")
-                      : t("deleteSelected")}
-                  </span>
-                </Button>
-              </>
-            ) : null}
-            <Button
-              disabled={
-                areControlsDisabled ||
-                count === 0 ||
-                isClearingAll ||
-                isRestoringSelected ||
-                isDeletingSelected
-              }
-              onClick={onRequestClearAll}
-              variant="dangerOutline"
-              size="md"
-              className="min-w-0 flex-1 disabled:opacity-45 min-[520px]:flex-none"
-            >
-              <HiOutlineTrash className="h-4 w-4 shrink-0" aria-hidden />
-              <span className="truncate">
-                {isClearingAll ? t("clearingAction") : t("clearAll")}
-              </span>
-            </Button>
-            <Button
-              disabled={areControlsDisabled}
-              onClick={onReload}
-              variant="secondary"
-              size="icon"
-              className="shrink-0 disabled:opacity-45"
-              aria-label={t("refresh")}
-              title={t("refresh")}
-            >
-              <HiOutlineRefresh className="h-4 w-4" aria-hidden />
-            </Button>
-          </div>
-          {!isLoading ? (
-            <Badge variant="mutedStrong" size="md">
-              {t("totalCount", { count })}
-            </Badge>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-(--border) pt-4">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
+          <span role="status" className="text-sm text-(--muted)">
+            {statusLabel ?? t("selectionHint")}
+          </span>
+          {hasSelection ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                disabled={areControlsDisabled}
+                onClick={onRestoreSelected}
+                variant="primary"
+                size="sm"
+              >
+                <HiOutlineReply className="h-4 w-4" aria-hidden />
+                {isRestoringSelected
+                  ? t("restoringSelectedAction")
+                  : t("restoreSelected")}
+              </Button>
+              <Button
+                disabled={areControlsDisabled}
+                onClick={onRequestDeleteSelected}
+                variant="dangerOutline"
+                size="sm"
+              >
+                <HiOutlineTrash className="h-4 w-4" aria-hidden />
+                {isDeletingSelected
+                  ? t("deletingSelectedAction")
+                  : t("deleteSelected")}
+              </Button>
+            </div>
           ) : null}
         </div>
+        <Button
+          disabled={areControlsDisabled}
+          onClick={onRequestClearAll}
+          variant="dangerOutline"
+          size="sm"
+        >
+          <HiOutlineTrash className="h-4 w-4" aria-hidden />
+          {isClearingAll ? t("clearingAction") : t("clearAll")}
+        </Button>
       </div>
-    </div>
+    </header>
   );
 }

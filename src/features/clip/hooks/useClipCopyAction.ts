@@ -1,63 +1,68 @@
 "use client";
 
-import { useCallback } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { recordClipView } from "@/features/clip/api/clipApi";
-import { useCopyToast } from "@/features/clip/hooks/useCopyToast";
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { useCallback, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRecordClipViewMutation } from "@/features/clip/mutations/useRecordClipViewMutation";
 import type { Clip } from "@/features/clip/model/clip";
 import { copyClipToClipboard } from "@/features/clip/service/clipClipboard";
-import {
-  invalidateClipQueries,
-  moveClipToRecentCache,
-} from "@/features/clip/service/clipQueryCache";
-import { notifyError } from "@/shared/feedback/toast";
-
-interface CopyFeedbackPosition {
-  x: number;
-  y: number;
-}
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 
 interface UseClipCopyActionOptions {
   isAuthenticated: boolean;
   isDisabled?: boolean;
 }
 
-// 클립 복사, 최근 사용 기록, 관련 캐시 갱신과 선택적 위치 피드백을 처리합니다.
+// 클립 복사, 최근 사용 기록 mutation 호출과 공통 토스트를 처리합니다.
 export const useClipCopyAction = ({
   isAuthenticated,
   isDisabled = false,
 }: UseClipCopyActionOptions) => {
-  const queryClient = useQueryClient();
-  const { copyToast, showCopyToast } = useCopyToast();
+  const pending = useRef(false);
+  const [pendingCopyClipId, setPendingCopyClipId] = useState<string | null>(
+    null,
+  );
+  const access = useResourceAccess();
+  const t = useTranslations("feedback");
+  const { recordClipView } = useRecordClipViewMutation();
 
   const copyClip = useCallback(
-    async (clip: Clip, feedbackPosition?: CopyFeedbackPosition) => {
-      if (isDisabled) {
+    async (clip: Clip) => {
+      if (
+        pending.current ||
+        isDisabled ||
+        access.status !== "ready" ||
+        !clip.folderId ||
+        access.folderLocks[clip.folderId] !== false
+      ) {
         return;
       }
 
+      pending.current = true;
+      setPendingCopyClipId(clip.id);
       try {
         await copyClipToClipboard(clip);
       } catch {
-        notifyError("클립을 복사하지 못했습니다. 잠시 후 다시 시도해주세요.");
+        notifyError(t("copyError"), undefined, "clip-copy");
         return;
+      } finally {
+        pending.current = false;
+        setPendingCopyClipId(null);
       }
 
-      if (feedbackPosition) {
-        showCopyToast(feedbackPosition.x, feedbackPosition.y);
-      }
+      notifySuccess(t("copySuccess"), undefined, "clip-copy");
 
       if (isAuthenticated) {
-        await recordClipView(clip.id);
-        moveClipToRecentCache(queryClient, clip.id);
-        void invalidateClipQueries(queryClient);
+        void recordClipView(clip.id).catch(() => {
+          // 복사는 이미 성공했으므로 조회 기록 실패는 사용자에게 노출하지 않습니다.
+        });
       }
     },
-    [isAuthenticated, isDisabled, queryClient, showCopyToast],
+    [isAuthenticated, isDisabled, recordClipView, t, access],
   );
 
   return {
     copyClip,
-    copyToast,
+    pendingCopyClipId,
   };
 };

@@ -1,8 +1,9 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
 import { useTranslations } from "next-intl";
 import type { Clip } from "@/features/clip/model/clip";
-import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
 import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { FilterBar, type FilterType } from "@/features/clip/ui/FilterBar";
 
@@ -10,27 +11,29 @@ import { FilterBar, type FilterType } from "@/features/clip/ui/FilterBar";
 interface ClipCollectionPageProps {
   activeFilter: FilterType;
   clips: Clip[];
-  copyToastPosition: { x: number; y: number } | null;
   hasNextPage?: boolean;
   isError?: boolean;
   isFetchingNextPage?: boolean;
+  isFavoriteMutationPending?: boolean;
   isLoading?: boolean;
-  onCopy: (clip: Clip, event: React.MouseEvent<HTMLDivElement>) => void;
+  onCopy: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onFetchNextPage: () => void;
   onFilterChange: (filter: FilterType) => void;
   onRetry: () => void;
   onSearchChange: (value: string) => void;
   onToggleFavorite?: (clip: Clip) => void;
+  pendingFavoriteClipId?: string | null;
+  pendingCopyClipId?: string | null;
   searchQuery: string;
 }
 
 export function ClipCollectionPage({
   activeFilter,
   clips,
-  copyToastPosition,
   hasNextPage,
   isError,
   isFetchingNextPage,
+  isFavoriteMutationPending,
   isLoading,
   onCopy,
   onFetchNextPage,
@@ -38,9 +41,13 @@ export function ClipCollectionPage({
   onRetry,
   onSearchChange,
   onToggleFavorite,
+  pendingFavoriteClipId,
+  pendingCopyClipId,
   searchQuery,
 }: ClipCollectionPageProps) {
   const t = useTranslations("clips");
+  const access = useResourceAccess();
+  if (access.status !== "ready") return <ResourceAccessNotice />;
   const hasClipLoadError = isError && clips.length === 0;
 
   return (
@@ -65,8 +72,10 @@ export function ClipCollectionPage({
         onRetry={onRetry}
         onCopy={onCopy}
         onToggleFavorite={onToggleFavorite}
+        isFavoriteMutationPending={isFavoriteMutationPending}
+        pendingFavoriteClipId={pendingFavoriteClipId}
+        pendingCopyClipId={pendingCopyClipId}
       />
-      <ClipCopyToast label={t("copyToast")} position={copyToastPosition} />
     </div>
   );
 }

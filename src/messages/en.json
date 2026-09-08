@@ -1,38 +1,163 @@
 {
+  "notFound": {
+    "title": "Page not found",
+    "description": "The address may be incorrect, or the page may have moved or been deleted.",
+    "navigation": "Go to another page",
+    "home": "Go home",
+    "clips": "Go to clips"
+  },
   "landing": {
     "themeToggle": "Toggle dark mode",
     "start": "Get Started",
-    "heroTitleLine1": "Copy anywhere.",
-    "heroTitleLine2": "Paste everywhere.",
-    "heroDescription": "Keep your clipboard perfectly synced across every device. Built for fast-moving developers, designers, and creative teams.",
-    "startFree": "Start for free",
-    "viewDemo": "View demo",
-    "demoWindowTitle": "Easy Clip - Clipboard Manager",
-    "demoDeviceTitle": "Easy Clip",
-    "demoItem1": "Design guidelines",
-    "demoItem2": "API endpoints",
-    "demoItem3": "Meeting notes",
-    "demoMobileItem1": "Design guide",
-    "demoMobileItem2": "API endpoints",
-    "sectionTitle": "A clipboard that keeps your flow moving",
-    "sectionDescription": "Manage copying, organizing, and reusing in one place.",
+    "navigationLabel": "Landing page navigation",
+    "pricing": "Pricing",
+    "heroTitleLine1": "Keep copied text and images",
+    "heroTitleLine2": "in one place.",
+    "heroDescription": "EasyClip is a web clip library where you paste content into folders, then find it again with search and favorites.",
+    "workflowTitle": "Save it, find it, and use it again.",
+    "workflowDescription": "Paste content into the folder you are working in, organize it, then search and copy it whenever you need it.",
+    "workflow": {
+      "capture": {
+        "title": "Paste to save",
+        "description": "Paste text or an image into the current folder to save it as a clip."
+      },
+      "organize": {
+        "title": "Organize with folders and favorites",
+        "description": "Group clips by project, and favorite the content you use often."
+      },
+      "reuse": {
+        "title": "Search and copy again",
+        "description": "Find the clip you need by keyword and click it once to copy it back to your clipboard."
+      }
+    },
+    "sectionTitle": "Find saved content in seconds",
+    "sectionDescription": "Save text and images, then manage them with folders, favorites, and search.",
     "features": {
-      "sync": {
-        "title": "Instant sync",
-        "description": "Everything you copy is reflected across your devices in real time."
+      "capture": {
+        "title": "Save as a clip",
+        "description": "Paste text and images into the current folder to keep them."
       },
       "folder": {
-        "title": "Folder organization",
-        "description": "Group clips by project and keep your workspace structured."
+        "title": "Organize by folder",
+        "description": "Group clips by project and keep needed information in one place."
       },
       "favorite": {
         "title": "Favorites",
-        "description": "Pin your most-used snippets for quick access."
+        "description": "Favorite content you reuse often so it is easy to find."
       },
       "search": {
         "title": "Fast search",
-        "description": "Find the clip you need the moment you type a keyword."
+        "description": "Search saved clips by keyword and copy the one you need right away."
       }
+    },
+    "reviewsTitle": "Why users changed their workflow",
+    "reviewsDescription": "See how saving and reusing content makes everyday work simpler.",
+    "closingTitleLine1": "Do not lose copied information.",
+    "closingTitleLine2": "Keep it in one place.",
+    "closingDescription": "Save text and images scattered across chats and notes in EasyClip. Search for them and copy them again whenever you need them."
+  },
+  "pricing": {
+    "hero": {
+      "eyebrow": "Simple plans for focused work",
+      "titleLine1": "Choose the EasyClip plan",
+      "titleLine2": "that fits how you work."
+    },
+    "plans": {
+      "recommended": "Recommended",
+      "currentPlan": "Current plan",
+      "free": {
+        "name": "Free",
+        "badge": "For getting started",
+        "description": "A simple plan for organizing clips with the essentials and fast search.",
+        "priceSuffix": "/ month",
+        "billingNote": "Start right away with no monthly fee",
+        "cta": "Start for free",
+        "features": {
+          "projects": "Use 1 project",
+          "clips": "Add clips up to 50 per folder",
+          "devices": "Connect 1 desktop and 1 mobile device",
+          "organization": "Search + tags in accessible folders",
+          "ai": ""
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "badge": "For focused work",
+        "description": "For managing multiple projects with tag-based organization.",
+        "priceSuffix": "/ month",
+        "billingNote": "Unlock Pro features for ₩3,900 per month",
+        "cta": "Upgrade to Pro",
+        "features": {
+          "projects": "Create unlimited projects",
+          "clips": "Add clips up to 300 per folder",
+          "devices": "Connect unlimited devices",
+          "organization": "Search + tags in accessible folders",
+          "ai": "AI features coming soon"
+        }
+      }
+    },
+    "subscription": {
+      "currentPro": "You are currently on Pro",
+      "renewalEnabled": "Auto-renewal is on.",
+      "renewalDisabled": "Auto-renewal is off.",
+      "renewalStopped": "Auto-renewal has stopped. You can keep using Pro until your access ends.",
+      "nextBillingAt": "Next billing date",
+      "currentPeriodEnd": "Access ends",
+      "date": "{label}: {value}",
+      "emptyValue": "-",
+      "downgrade": "Switch to Free",
+      "resume": "Resume subscription",
+      "resuming": "Resuming",
+      "cancelModal": {
+        "title": "Cancel your Pro subscription?",
+        "description": "This stops auto-renewal. Your plan will switch to Free after the current billing period ends.",
+        "dismiss": "No",
+        "confirm": "Yes",
+        "confirming": "Updating"
+      },
+      "pendingRenewalPayment": "An already-started renewal charge may complete and extend your access."
+    },
+    "comparison": {
+      "eyebrow": "Quick comparison",
+      "title": "Compare the essentials",
+      "description": "Compare the main differences side by side.",
+      "columns": {
+        "feature": "Feature",
+        "free": "Free",
+        "pro": "Pro"
+      },
+      "points": {
+        "projects": {
+          "label": "Projects",
+          "freeValue": "1",
+          "proValue": "Unlimited"
+        },
+        "clips": {
+          "label": "Clips",
+          "freeValue": "Add clips up to 50 per folder",
+          "proValue": "Add clips up to 300 per folder"
+        },
+        "devices": {
+          "label": "Devices",
+          "freeValue": "1 desktop + 1 mobile",
+          "proValue": "Unlimited devices"
+        },
+        "organization": {
+          "label": "Organization",
+          "freeValue": "Search + tags in accessible folders",
+          "proValue": "Search + tags in accessible folders"
+        },
+        "ai": {
+          "label": "AI features",
+          "freeValue": "Not available",
+          "proValue": "Coming soon"
+        }
+      }
+    },
+    "toasts": {
+      "cancelSuccess": "Your Pro subscription has been canceled.",
+      "resumeSuccess": "Pro auto-renewal has resumed.",
+      "updateError": "We could not update your subscription. Please try again shortly."
     }
   },
   "login": {
@@ -50,12 +175,23 @@
     "privacy": "Privacy Policy",
     "agreementSuffix": "."
   },
+  "authGuard": {
+    "loading": "Checking your session.",
+    "error": "We could not verify your session. Please try again shortly.",
+    "retry": "Try again",
+    "backHome": "Go to home"
+  },
   "sidebar": {
     "favorites": "Favorites",
     "recent": "Recent",
     "trash": "Trash",
     "addFolder": "Add Folder",
     "reorderFolder": "Reorder folder",
+    "moveFolderUp": "Move up",
+    "moveFolderDown": "Move down",
+    "folderMovedUp": "Moved {name} up.",
+    "folderMovedDown": "Moved {name} down.",
+    "folderOrderChanged": "Folder order updated.",
     "openFolderOptions": "Open folder options",
     "rename": "Rename",
     "delete": "Delete",
@@ -63,6 +199,11 @@
     "guest": "Guest",
     "settings": "Settings",
     "upgradePlan": "Upgrade plan",
+    "closeSidebar": "Close sidebar",
+    "folderLoadError": "Unable to load folders.",
+    "retry": "Try again",
+    "retrying": "Retrying...",
+    "folderActionError": "Unable to complete the folder action. Please try again shortly.",
     "closeCreateFolder": "Close create folder",
     "createFolder": "Create folder",
     "folderName": "Folder name",
@@ -83,6 +224,7 @@
     "general": "General",
     "language": "Language",
     "languageDescription": "Select your preferred language.",
+    "loadError": "Failed to load your settings. Please try again shortly.",
     "saveError": "Failed to save settings. Please try again shortly.",
     "subscriptionTitle": "Current subscription",
     "subscriptionPlan": "Plan",
@@ -102,6 +244,7 @@
     "closeButton": "Close"
   },
   "trash": {
+    "selectionHint": "Select items to restore.",
     "title": "Trash",
     "retentionNotice": "Kept for up to 30 days",
     "description": "Review deleted clips and folders, then restore or permanently remove them.",
@@ -124,8 +267,8 @@
     "actionError": "Could not complete the trash action. Please try again shortly.",
     "restoreConflictError": "Clips inside a deleted folder cannot be restored on their own. Restore the parent folder first.",
     "clearAllPartialError": "Some items could not be deleted. Failed {failedCount} of {totalCount}.",
-    "emptyTitle": "Trash is empty",
-    "emptyDescription": "Deleted clips or folders will appear here.",
+    "emptyTitle": "No trash items to display",
+    "emptyDescription": "Deleted items in locked folders may be hidden. Empty trash also deletes hidden items.",
     "listTitle": "Deleted items",
     "totalCount": "{count, plural, =0 {0 items} one {# item} other {# items}}",
     "folderType": "Folder",
@@ -145,7 +288,7 @@
     },
     "clearAllModal": {
       "title": "Delete all trash items",
-      "description": "Are you sure you want to permanently delete every item in trash?"
+      "description": "Deleted items hidden in locked folders will also be permanently deleted. This cannot be undone."
     },
     "deleteSelectedModal": {
       "title": "Delete selected items",
@@ -159,12 +302,17 @@
     "foldersEmpty": "No deleted folders.",
     "deletedAt": "Deleted at",
     "restore": "Restore",
-    "deleteForever": "Delete"
+    "deleteForever": "Delete",
+    "deletedResult": "Permanently deleted {count} items."
   },
   "clips": {
     "count": "{count, plural, =0 {0 clips} one {# clip} other {# clips}}",
-    "copyToast": "Copied!",
     "captureHint": "Click anywhere and press Ctrl+V to capture a new clip.",
+    "captureErrors": {
+      "textSaveFailed": "Could not save the clip. Please try again shortly.",
+      "imageSaveFailed": "Could not save the image clip. Please try again shortly.",
+      "unsupportedImage": "Unsupported image format. Use a JPEG, PNG, WebP, GIF, or AVIF file."
+    },
     "filter": {
       "all": "All",
       "text": "Text",
@@ -183,10 +331,77 @@
       "description": "Check your network connection or try again shortly.",
       "retry": "Try again"
     },
+    "folderNotFoundState": {
+      "title": "This folder does not exist.",
+      "description": "It may have been deleted, or the address may be incorrect."
+    },
     "item": {
       "saving": "Saving",
+      "copy": "Copy {name}",
+      "favoriteError": "Could not update favorites. Please try again.",
       "toggleFavorite": "Toggle favorite",
-      "selectForDelete": "Select {name} for deletion"
+      "selectForDelete": "Select {name} for deletion",
+      "noTags": "No tags",
+      "editTags": "Edit tags for {name}",
+      "openOptions": "Open options for {name}",
+      "copying": "Copying…"
+    },
+    "tags": {
+      "manage": "Manage tags",
+      "editAction": "Edit tags",
+      "editorTitle": "Edit clip tags",
+      "manageTitle": "Manage folder tags",
+      "backToSelection": "Back to tag selection",
+      "close": "Close tags",
+      "loading": "Loading tags.",
+      "retry": "Try again",
+      "selectedLabel": "Selected tags",
+      "removeFromClip": "Remove {name}",
+      "noneSelected": "No tags selected.",
+      "searchPlaceholder": "Search or create a tag",
+      "noSearchResults": "No matching tags.",
+      "quickAdd": "Add “{name}” now",
+      "createWithColorDescription": "Create it as a folder tag first to choose a color.",
+      "createWithColor": "Create with color",
+      "creating": "Creating",
+      "cancel": "Cancel",
+      "saving": "Saving",
+      "save": "Save",
+      "nameLabel": "Tag name",
+      "namePlaceholder": "e.g. Important",
+      "colorLabel": "Background color",
+      "create": "Create",
+      "manageDescription": "Manage every tag and color in this folder.",
+      "newTag": "New tag",
+      "editTag": "Edit {name}",
+      "deleteTag": "Delete {name}",
+      "empty": "No tags have been created yet.",
+      "deleteConfirmTitle": "Delete this tag?",
+      "deleteConfirmDescription": "“{name}” will also be removed from every clip using it.",
+      "deleting": "Deleting",
+      "delete": "Delete",
+      "validation": {
+        "required": "A tag name cannot contain only spaces.",
+        "tooLong": "Tag names can contain up to 10 characters."
+      },
+      "errors": {
+        "invalid": "Check the tag name and color.",
+        "notFound": "The clip or tag could not be found. Check the list and try again.",
+        "conflict": "A tag with this exact name already exists.",
+        "actionFailed": "Could not complete the tag action. Please try again shortly.",
+        "loadFailed": "Could not load the tag list."
+      },
+      "colors": {
+        "GRAY": "Gray",
+        "BROWN": "Brown",
+        "ORANGE": "Orange",
+        "YELLOW": "Yellow",
+        "GREEN": "Green",
+        "BLUE": "Blue",
+        "PURPLE": "Purple",
+        "PINK": "Pink",
+        "RED": "Red"
+      }
     },
     "actions": {
       "copy": "Copy",
@@ -210,9 +425,85 @@
       "description": "Are you sure you want to delete every clip in the current folder?"
     },
     "renameModal": {
-      "title": "Rename",
-      "label": "Clip name",
-      "placeholder": "e.g. Clip"
+      "title": "Rename clip",
+      "close": "Close rename clip",
+      "field": "Clip name",
+      "placeholder": "Enter a new name",
+      "error": "Could not rename the clip. Please try again.",
+      "hint": "Up to {max} characters, excluding leading and trailing spaces.",
+      "tooLong": "Enter a name of {max} characters or fewer after trimming spaces.",
+      "count": "{count}/{max} characters"
     }
+  },
+  "access": {
+    "checkingTitle": "Checking access",
+    "checkingDescription": "Content will appear after checking your subscription and folders.",
+    "errorTitle": "Unable to verify access",
+    "errorDescription": "Check your connection and try again.",
+    "incompatibleTitle": "Folder access is unavailable",
+    "incompatibleDescription": "The server did not provide folder lock information. Refresh or try again later.",
+    "lockedTitle": "This folder is locked",
+    "lockedDescription": "Free provides access to one server-selected folder. Your data is preserved. Deleting that folder does not unlock another.",
+    "retry": "Check again",
+    "plans": "View Pro plan",
+    "trash": "Restore from trash",
+    "lockedBadge": "Locked",
+    "folderLimit": "Free allows one folder. Restore your accessible folder if it is in trash. Pro is required to use more folders.",
+    "deleteFolderTitle": "Delete this folder?",
+    "deleteFolderDescription": "Deleting this folder does not unlock other folders. You can restore it from trash.",
+    "operationError": "Unable to complete the action. Please try again.",
+    "limitCount": "Current: {count} / Limit: {limit}",
+    "billingSuccess": "Your Pro subscription is active.",
+    "billingUncertain": "The payment result may be uncertain. Check your subscription before paying again.",
+    "billingChecking": "Payment confirmation",
+    "billingFailed": "Payment failed",
+    "billingLoading": "Confirming your payment.",
+    "billingMissing": "Required payment information is missing.",
+    "openApp": "Open app",
+    "checkSubscription": "Check subscription",
+    "errors": {
+      "PROJECT_LOCKED": "This folder is locked.",
+      "CLIP_LIMIT_EXCEEDED": "This folder has reached its clip creation limit. Existing clips are preserved.",
+      "PLAN_LIMIT_EXCEEDED": "Your plan restricts folder creation or restoration. Restore your accessible folder if it is in trash.",
+      "FEATURE_NOT_AVAILABLE": "Folder reordering requires Pro."
+    },
+    "draftTitle": "Unsaved clip",
+    "draftDescription": "Your input is retained. After a network error, check whether it was saved before retrying.",
+    "retrySave": "Save again",
+    "discardDraft": "Discard input",
+    "clipLimit": "New clips can be added up to {limit} per folder.",
+    "closeFolderLimit": "Close folder limit notice",
+    "clipLimitExplanation": "Existing clips are preserved even above the limit. Limits apply to adding new clips.",
+    "proFeaturesTitle": "Features available with Pro"
+  },
+  "feedback": {
+    "close": "Dismiss notification",
+    "region": "Notifications",
+    "copySuccess": "Clip copied.",
+    "copyError": "Could not copy the clip. Try again.",
+    "deleteSuccess": "Moved {count} clips to trash.",
+    "deleteError": "Could not delete clips. Try again.",
+    "saveSuccess": "Clip saved.",
+    "renameSuccess": "Clip renamed.",
+    "favoriteAdded": "Added to favorites.",
+    "favoriteRemoved": "Removed from favorites.",
+    "favoriteError": "Could not update favorites. Try again.",
+    "folderCreated": "Folder created.",
+    "folderRenamed": "Folder renamed.",
+    "folderDeleted": "Folder moved to trash.",
+    "restoreSuccess": "Restored {count} items.",
+    "permanentDeleteSuccess": "Permanently deleted {count} items.",
+    "refreshSuccess": "Trash refreshed.",
+    "refreshError": "Could not refresh trash. Try again.",
+    "settingsSaved": "Settings saved.",
+    "tagCreated": "Tag created.",
+    "tagUpdated": "Tag updated.",
+    "tagDeleted": "Tag deleted.",
+    "clipTagsSaved": "Clip tags saved.",
+    "billingStartError": "Could not start payment authorization. Try again.",
+    "billingConfirmed": "Subscription payment approved.",
+    "billingFailed": "Payment could not be completed. Check your payment status.",
+    "loggedOut": "Signed out.",
+    "policyResolution": "Check accessible folders and plan limits, then try again."
   }
 }

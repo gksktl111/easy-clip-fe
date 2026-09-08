@@ -27,3 +27,24 @@ export const LongDescription: Story = {
       "복사한 텍스트, 이미지, 색상 값을 저장하면 여기에서 다시 확인하고 사용할 수 있습니다.",
   },
 };
+
+export const Dark: Story = {
+  decorators: [
+    (Story) => (
+      <div data-theme="dark" className="bg-(--background) p-6">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export const Narrow: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-72">
+        <Story />
+      </div>
+    ),
+  ],
+  args: LongDescription.args,
+};

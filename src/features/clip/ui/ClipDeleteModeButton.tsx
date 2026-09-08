@@ -23,7 +23,7 @@ export function ClipDeleteModeButton({
       onClick={onClick}
       variant="danger"
       size="sm"
-      className="absolute right-4 bottom-4 rounded-full font-semibold shadow-lg disabled:cursor-not-allowed md:right-6 md:bottom-6"
+      className="absolute right-4 bottom-4 z-30 rounded-full font-semibold shadow-lg disabled:cursor-not-allowed md:right-6 md:bottom-6"
     >
       <HiOutlineTrash className="h-4 w-4" aria-hidden />
       {label ?? t("deleteClips")}

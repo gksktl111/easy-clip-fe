@@ -1,4 +1,4 @@
-import { AuthProvider } from "@/features/auth/model/auth";
+import type { OAuthProvider } from "@/features/auth/model/auth";
 import {
   LogoutResponseDto,
   RefreshAccessTokenResponseDto,
@@ -6,7 +6,8 @@ import {
 } from "@/features/auth/model/auth.dto";
 import { apiRequest } from "@/shared/lib/apiClient";
 
-export const getAuthStartPath = (provider: AuthProvider) => `/auth/${provider}`;
+export const getAuthStartPath = (provider: OAuthProvider) =>
+  `/auth/${provider}`;
 
 export const fetchMyProfile = async () =>
   apiRequest<UserProfileResponseDto>("/users/me", {

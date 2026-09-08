@@ -1,38 +1,163 @@
 {
+  "notFound": {
+    "title": "페이지를 찾을 수 없습니다",
+    "description": "주소가 잘못되었거나 페이지가 이동 또는 삭제되었습니다.",
+    "navigation": "다른 페이지로 이동",
+    "home": "홈으로",
+    "clips": "클립으로 이동"
+  },
   "landing": {
     "themeToggle": "다크 모드 전환",
     "start": "시작하기",
-    "heroTitleLine1": "어디서든 복사하고.",
-    "heroTitleLine2": "어디서나 붙여넣기.",
-    "heroDescription": "모든 기기에서 클립보드를 완벽하게 동기화하세요. 빠르게 움직이는 개발자, 디자이너, 크리에이티브 팀을 위해 설계되었습니다.",
-    "startFree": "무료로 시작하기",
-    "viewDemo": "데모 보기",
-    "demoWindowTitle": "Easy Clip - 클립보드 관리",
-    "demoDeviceTitle": "Easy Clip",
-    "demoItem1": "디자인 가이드라인",
-    "demoItem2": "API 엔드포인트",
-    "demoItem3": "회의 노트",
-    "demoMobileItem1": "디자인 가이드",
-    "demoMobileItem2": "API 엔드포인트",
-    "sectionTitle": "일의 흐름을 끊지 않는 클립보드",
-    "sectionDescription": "복사, 정리, 재사용까지 한 번에 관리하세요.",
+    "navigationLabel": "랜딩 페이지 탐색",
+    "pricing": "요금제",
+    "heroTitleLine1": "복사한 텍스트와 이미지를",
+    "heroTitleLine2": "한곳에 모아두세요.",
+    "heroDescription": "EasyClip은 필요한 내용을 폴더에 붙여넣어 저장하고, 검색과 즐겨찾기로 다시 찾는 웹 클립 보관함입니다.",
+    "workflowTitle": "저장하고, 찾고, 다시 쓰는 간단한 흐름",
+    "workflowDescription": "작업 중인 폴더에 붙여넣어 저장한 뒤, 정리하고 검색해 필요할 때 다시 복사하세요.",
+    "workflow": {
+      "capture": {
+        "title": "붙여넣어 저장",
+        "description": "작업 중인 폴더에서 텍스트나 이미지를 붙여넣으면 하나의 클립으로 보관됩니다."
+      },
+      "organize": {
+        "title": "폴더와 즐겨찾기로 정리",
+        "description": "프로젝트별 폴더에 모으고, 자주 쓰는 내용은 즐겨찾기에 표시하세요."
+      },
+      "reuse": {
+        "title": "검색해 다시 복사",
+        "description": "키워드로 원하는 클립을 찾아 한 번 클릭하면 클립보드에 다시 복사됩니다."
+      }
+    },
+    "sectionTitle": "필요한 내용을 바로 찾는 클립 보관함",
+    "sectionDescription": "텍스트와 이미지를 저장하고, 폴더·즐겨찾기·검색으로 관리하세요.",
     "features": {
-      "sync": {
-        "title": "즉시 동기화",
-        "description": "복사하는 순간 모든 기기에 실시간으로 반영됩니다."
+      "capture": {
+        "title": "클립으로 저장",
+        "description": "텍스트와 이미지를 현재 폴더에 붙여넣어 보관합니다."
       },
       "folder": {
-        "title": "폴더 정리",
-        "description": "프로젝트별로 클립을 묶어 체계적으로 관리하세요."
+        "title": "폴더로 정리",
+        "description": "프로젝트별로 클립을 모아 필요한 정보를 한곳에서 관리하세요."
       },
       "favorite": {
         "title": "즐겨찾기",
-        "description": "자주 쓰는 문구는 즐겨찾기로 빠르게 접근하세요."
+        "description": "반복해서 쓰는 내용은 즐겨찾기에 표시해 빠르게 찾을 수 있습니다."
       },
       "search": {
         "title": "빠른 검색",
-        "description": "키워드를 입력하면 즉시 원하는 클립을 찾아냅니다."
+        "description": "키워드로 저장한 클립을 검색해 바로 복사할 수 있습니다."
       }
+    },
+    "reviewsTitle": "작업 흐름을 바꾼 사용자들의 이야기",
+    "reviewsDescription": "저장과 재사용을 반복하는 일이 어떻게 달라졌는지 확인해 보세요.",
+    "closingTitleLine1": "복사한 정보,",
+    "closingTitleLine2": "이제는 한곳에 저장하세요.",
+    "closingDescription": "메신저나 메모에 흩어 둔 텍스트와 이미지를 EasyClip에 저장하세요. 필요할 때 검색해 다시 복사할 수 있습니다."
+  },
+  "pricing": {
+    "hero": {
+      "eyebrow": "집중해서 일하는 사용자를 위한 간단한 요금제",
+      "titleLine1": "작업 방식에 맞는",
+      "titleLine2": "EasyClip 플랜을 선택하세요."
+    },
+    "plans": {
+      "recommended": "추천",
+      "currentPlan": "현재 플랜",
+      "free": {
+        "name": "Free",
+        "badge": "개인 시작용",
+        "description": "가볍게 시작하고 검색 중심으로 클립을 정리하는 기본 플랜",
+        "priceSuffix": "/월",
+        "billingNote": "월간 요금 없이 바로 사용",
+        "cta": "무료로 시작하기",
+        "features": {
+          "projects": "프로젝트 1개 사용 가능",
+          "clips": "폴더당 50개까지 추가 저장",
+          "devices": "데스크톱 1개, 모바일 1개 연동 가능",
+          "organization": "접근 가능한 폴더에서 검색 + 태그",
+          "ai": ""
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "badge": "집중 작업용",
+        "description": "프로젝트를 여러 개 운영하고 태그 기반 정리가 필요한 플랜",
+        "priceSuffix": "/월",
+        "billingNote": "월 3,900원으로 Pro 기능 사용",
+        "cta": "Pro로 업그레이드",
+        "features": {
+          "projects": "무제한 프로젝트 생성 가능",
+          "clips": "폴더당 300개까지 추가 저장",
+          "devices": "무제한 기기 연동",
+          "organization": "접근 가능한 폴더에서 검색 + 태그",
+          "ai": "AI 기능 추가 예정"
+        }
+      }
+    },
+    "subscription": {
+      "currentPro": "현재 Pro 이용 중",
+      "renewalEnabled": "자동 갱신이 활성화되어 있습니다.",
+      "renewalDisabled": "자동 갱신이 비활성화되어 있습니다.",
+      "renewalStopped": "자동 갱신이 중지되었습니다. 이용 종료일까지 Pro 기능을 계속 이용할 수 있습니다.",
+      "nextBillingAt": "다음 결제일",
+      "currentPeriodEnd": "이용 종료일",
+      "date": "{label}: {value}",
+      "emptyValue": "-",
+      "downgrade": "Free로 전환하기",
+      "resume": "구독 재개",
+      "resuming": "재개 중",
+      "cancelModal": {
+        "title": "Pro 구독을 취소할까요?",
+        "description": "확인하면 자동 갱신이 중지되며, 현재 결제 기간이 끝난 뒤 Free 플랜으로 전환됩니다.",
+        "dismiss": "아니오",
+        "confirm": "예",
+        "confirming": "변경 중"
+      },
+      "pendingRenewalPayment": "이미 시작된 이번 청구가 완료되어 이용 기간이 연장될 수 있습니다."
+    },
+    "comparison": {
+      "eyebrow": "빠른 비교",
+      "title": "핵심 비교",
+      "description": "주요 차이를 항목별로 바로 비교할 수 있도록 정리했습니다.",
+      "columns": {
+        "feature": "항목",
+        "free": "Free",
+        "pro": "Pro"
+      },
+      "points": {
+        "projects": {
+          "label": "프로젝트 수",
+          "freeValue": "1개",
+          "proValue": "무제한"
+        },
+        "clips": {
+          "label": "클립 수",
+          "freeValue": "폴더당 50개까지 추가 저장",
+          "proValue": "폴더당 300개까지 추가 저장"
+        },
+        "devices": {
+          "label": "기기 연동",
+          "freeValue": "데스크톱 1개 + 모바일 1개",
+          "proValue": "무제한 기기 연동"
+        },
+        "organization": {
+          "label": "정리 방식",
+          "freeValue": "접근 가능한 폴더에서 검색 + 태그",
+          "proValue": "접근 가능한 폴더에서 검색 + 태그"
+        },
+        "ai": {
+          "label": "AI 기능",
+          "freeValue": "미지원",
+          "proValue": "추가 예정"
+        }
+      }
+    },
+    "toasts": {
+      "cancelSuccess": "Pro 구독이 취소되었습니다.",
+      "resumeSuccess": "Pro 구독 자동 갱신이 재개되었습니다.",
+      "updateError": "구독 변경에 실패했습니다. 잠시 후 다시 시도해주세요."
     }
   },
   "login": {
@@ -50,12 +175,23 @@
     "privacy": "개인정보처리방침",
     "agreementSuffix": "에 동의하게 됩니다."
   },
+  "authGuard": {
+    "loading": "인증 정보를 확인하는 중입니다.",
+    "error": "인증 정보를 확인하지 못했습니다. 잠시 후 다시 시도해주세요.",
+    "retry": "다시 시도",
+    "backHome": "홈으로 이동"
+  },
   "sidebar": {
     "favorites": "즐겨찾기",
     "recent": "최근 항목",
     "trash": "휴지통",
     "addFolder": "폴더 추가",
     "reorderFolder": "폴더 순서 변경",
+    "moveFolderUp": "위로 이동",
+    "moveFolderDown": "아래로 이동",
+    "folderMovedUp": "{name} 폴더를 위로 이동했습니다.",
+    "folderMovedDown": "{name} 폴더를 아래로 이동했습니다.",
+    "folderOrderChanged": "폴더 순서를 변경했습니다.",
     "openFolderOptions": "폴더 옵션 열기",
     "rename": "이름 변경",
     "delete": "삭제",
@@ -63,6 +199,11 @@
     "guest": "게스트",
     "settings": "설정",
     "upgradePlan": "요금제 업그레이드",
+    "closeSidebar": "사이드바 닫기",
+    "folderLoadError": "폴더 목록을 불러오지 못했습니다.",
+    "retry": "다시 시도",
+    "retrying": "다시 시도 중...",
+    "folderActionError": "폴더 작업을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.",
     "closeCreateFolder": "폴더 생성 닫기",
     "createFolder": "새 폴더 생성",
     "folderName": "폴더 이름",
@@ -83,6 +224,7 @@
     "general": "일반",
     "language": "언어",
     "languageDescription": "선호하는 언어를 선택하세요.",
+    "loadError": "사용자 설정을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
     "saveError": "설정을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.",
     "subscriptionTitle": "현재 구독 정보",
     "subscriptionPlan": "플랜",
@@ -102,6 +244,7 @@
     "closeButton": "닫기"
   },
   "trash": {
+    "selectionHint": "복구할 항목을 선택하세요.",
     "title": "휴지통",
     "retentionNotice": "최대 30일까지 보관됩니다",
     "description": "삭제된 클립과 폴더를 확인하고 복구하거나 영구 삭제할 수 있습니다.",
@@ -124,8 +267,8 @@
     "actionError": "휴지통 작업을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.",
     "restoreConflictError": "삭제된 폴더에 속한 클립은 단독으로 복구할 수 없습니다. 먼저 부모 폴더를 복구해주세요.",
     "clearAllPartialError": "일부 항목을 삭제하지 못했습니다. 실패 {failedCount}개 / 전체 {totalCount}개",
-    "emptyTitle": "휴지통이 비어 있습니다",
-    "emptyDescription": "삭제된 클립이나 폴더가 생기면 이곳에 표시됩니다.",
+    "emptyTitle": "표시할 휴지통 항목이 없습니다",
+    "emptyDescription": "잠긴 폴더의 삭제 항목은 표시되지 않을 수 있습니다. 전체 비우기는 숨겨진 항목도 삭제합니다.",
     "listTitle": "삭제 항목",
     "totalCount": "{count, plural, =0 {항목 0개} other {항목 #개}}",
     "folderType": "폴더",
@@ -145,7 +288,7 @@
     },
     "clearAllModal": {
       "title": "휴지통 전체 삭제",
-      "description": "정말 휴지통의 모든 항목을 영구 삭제하시겠습니까?"
+      "description": "현재 보이지 않는 잠긴 폴더의 삭제 항목도 영구 삭제됩니다. 영구 삭제한 자료는 복구할 수 없습니다."
     },
     "deleteSelectedModal": {
       "title": "선택 항목 삭제",
@@ -159,12 +302,17 @@
     "foldersEmpty": "삭제된 폴더가 없습니다.",
     "deletedAt": "삭제 시각",
     "restore": "복구",
-    "deleteForever": "삭제"
+    "deleteForever": "삭제",
+    "deletedResult": "{count}개 항목을 영구 삭제했습니다."
   },
   "clips": {
     "count": "{count, plural, =0 {0개 클립} other {#개 클립}}",
-    "copyToast": "복사됨!",
     "captureHint": "아무 곳이나 클릭한 뒤 Ctrl+V를 눌러 새 클립을 저장하세요.",
+    "captureErrors": {
+      "textSaveFailed": "클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      "imageSaveFailed": "이미지 클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      "unsupportedImage": "지원하지 않는 이미지 형식입니다. JPEG, PNG, WebP, GIF 또는 AVIF 파일을 사용해주세요."
+    },
     "filter": {
       "all": "전체",
       "text": "텍스트",
@@ -183,10 +331,77 @@
       "description": "네트워크 상태를 확인하거나 잠시 후 다시 시도해주세요.",
       "retry": "다시 시도"
     },
+    "folderNotFoundState": {
+      "title": "존재하지 않는 폴더입니다.",
+      "description": "폴더가 삭제되었거나 주소가 올바르지 않습니다."
+    },
     "item": {
       "saving": "저장 중",
+      "copy": "{name} 복사",
+      "favoriteError": "즐겨찾기 변경에 실패했습니다. 다시 시도해주세요.",
       "toggleFavorite": "즐겨찾기 전환",
-      "selectForDelete": "{name} 삭제 선택"
+      "selectForDelete": "{name} 삭제 선택",
+      "noTags": "태그 없음",
+      "editTags": "{name} 태그 편집",
+      "openOptions": "{name} 옵션 열기",
+      "copying": "복사 중…"
+    },
+    "tags": {
+      "manage": "태그 관리",
+      "editAction": "태그 편집",
+      "editorTitle": "클립 태그 편집",
+      "manageTitle": "폴더 태그 관리",
+      "backToSelection": "태그 선택으로 돌아가기",
+      "close": "태그 창 닫기",
+      "loading": "태그를 불러오는 중입니다.",
+      "retry": "다시 시도",
+      "selectedLabel": "선택한 태그",
+      "removeFromClip": "{name} 태그 해제",
+      "noneSelected": "선택한 태그가 없습니다.",
+      "searchPlaceholder": "태그 검색 또는 새 태그 입력",
+      "noSearchResults": "일치하는 태그가 없습니다.",
+      "quickAdd": "“{name}” 바로 추가",
+      "createWithColorDescription": "색상을 지정하려면 먼저 폴더 태그로 만드세요.",
+      "createWithColor": "색상으로 만들기",
+      "creating": "생성 중",
+      "cancel": "취소",
+      "saving": "저장 중",
+      "save": "저장",
+      "nameLabel": "태그 이름",
+      "namePlaceholder": "예: 중요",
+      "colorLabel": "배경색",
+      "create": "생성",
+      "manageDescription": "이 폴더의 모든 태그와 색상을 관리합니다.",
+      "newTag": "새 태그",
+      "editTag": "{name} 태그 수정",
+      "deleteTag": "{name} 태그 삭제",
+      "empty": "아직 만든 태그가 없습니다.",
+      "deleteConfirmTitle": "태그를 삭제할까요?",
+      "deleteConfirmDescription": "“{name}” 태그가 적용된 모든 클립에서도 태그가 제거됩니다.",
+      "deleting": "삭제 중",
+      "delete": "삭제",
+      "validation": {
+        "required": "공백만으로 된 이름은 사용할 수 없습니다.",
+        "tooLong": "태그 이름은 10자까지 입력할 수 있습니다."
+      },
+      "errors": {
+        "invalid": "태그 이름과 색상을 확인해주세요.",
+        "notFound": "클립 또는 태그를 찾을 수 없습니다. 목록을 확인하고 다시 시도해주세요.",
+        "conflict": "같은 이름의 태그가 이미 있습니다.",
+        "actionFailed": "태그 작업을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.",
+        "loadFailed": "태그 목록을 불러오지 못했습니다."
+      },
+      "colors": {
+        "GRAY": "회색",
+        "BROWN": "갈색",
+        "ORANGE": "주황색",
+        "YELLOW": "노란색",
+        "GREEN": "초록색",
+        "BLUE": "파란색",
+        "PURPLE": "보라색",
+        "PINK": "분홍색",
+        "RED": "빨간색"
+      }
     },
     "actions": {
       "copy": "복사",
@@ -210,9 +425,85 @@
       "description": "정말 현재 폴더의 모든 클립을 삭제하시겠습니까?"
     },
     "renameModal": {
-      "title": "이름 변경",
-      "label": "클립 이름",
-      "placeholder": "예: 클립"
+      "title": "클립 이름 변경",
+      "close": "클립 이름 변경 닫기",
+      "field": "클립 이름",
+      "placeholder": "새 이름을 입력하세요",
+      "error": "클립 이름을 변경하지 못했습니다. 다시 시도해주세요.",
+      "hint": "앞뒤 공백 제외, 최대 {max}자까지 입력할 수 있습니다.",
+      "tooLong": "이름은 앞뒤 공백을 제외하고 {max}자 이내로 입력해주세요.",
+      "count": "{count}/{max}자"
     }
+  },
+  "access": {
+    "checkingTitle": "권한을 확인하고 있습니다",
+    "checkingDescription": "최신 구독과 폴더 상태를 확인한 뒤 콘텐츠를 표시합니다.",
+    "errorTitle": "권한을 확인하지 못했습니다",
+    "errorDescription": "연결 상태를 확인하고 다시 시도해주세요.",
+    "incompatibleTitle": "폴더 상태를 확인할 수 없습니다",
+    "incompatibleDescription": "서버의 폴더 잠금 정보가 없습니다. 새로고침 후에도 계속되면 잠시 후 다시 시도해주세요.",
+    "lockedTitle": "잠긴 폴더입니다",
+    "lockedDescription": "Free에서는 서버가 지정한 폴더 1개만 이용할 수 있습니다. 기존 데이터는 보존됩니다. 접근 폴더를 삭제해도 다른 폴더가 열리지 않습니다.",
+    "retry": "다시 확인",
+    "plans": "Pro 요금제 보기",
+    "trash": "휴지통에서 복구",
+    "lockedBadge": "잠김",
+    "folderLimit": "Free에서는 폴더 1개를 사용할 수 있습니다. 기존 접근 폴더가 휴지통에 있으면 복구해주세요. 폴더를 더 사용하려면 Pro가 필요합니다.",
+    "deleteFolderTitle": "폴더를 삭제할까요?",
+    "deleteFolderDescription": "이 폴더를 삭제해도 다른 잠긴 폴더가 열리지 않습니다. 삭제한 폴더는 휴지통에서 복구할 수 있습니다.",
+    "operationError": "작업을 완료하지 못했습니다. 다시 시도해주세요.",
+    "limitCount": "현재 {count}개 / 한도 {limit}개",
+    "billingSuccess": "Pro 구독이 활성화되었습니다.",
+    "billingUncertain": "결제 결과가 불명확할 수 있습니다. 다시 결제하기 전에 구독 상태를 확인해주세요.",
+    "billingChecking": "결제 확인",
+    "billingFailed": "결제 실패",
+    "billingLoading": "결제 승인 정보를 확인하고 있습니다.",
+    "billingMissing": "결제 승인 정보가 부족합니다.",
+    "openApp": "앱으로 이동",
+    "checkSubscription": "구독 상태 확인",
+    "errors": {
+      "PROJECT_LOCKED": "잠긴 폴더에는 접근할 수 없습니다.",
+      "CLIP_LIMIT_EXCEEDED": "폴더의 클립 추가 저장 한도에 도달했습니다. 기존 클립은 보존됩니다.",
+      "PLAN_LIMIT_EXCEEDED": "현재 플랜에서는 폴더 생성 또는 복구가 제한됩니다. 기존 접근 폴더가 휴지통에 있다면 복구해주세요.",
+      "FEATURE_NOT_AVAILABLE": "폴더 순서 변경은 Pro에서 사용할 수 있습니다."
+    },
+    "draftTitle": "저장하지 못한 클립",
+    "draftDescription": "입력을 보관했습니다. 네트워크 오류라면 목록에서 저장 여부를 확인한 뒤 재시도해주세요.",
+    "retrySave": "다시 저장",
+    "discardDraft": "입력 버리기",
+    "clipLimit": "폴더당 추가 저장 한도: {limit}개.",
+    "closeFolderLimit": "폴더 추가 안내 닫기",
+    "clipLimitExplanation": "기존 클립은 한도를 초과해도 보존됩니다. 한도는 새 클립 추가에 적용됩니다.",
+    "proFeaturesTitle": "Pro에서 사용할 수 있는 기능"
+  },
+  "feedback": {
+    "close": "알림 닫기",
+    "region": "알림",
+    "copySuccess": "클립을 복사했습니다.",
+    "copyError": "클립을 복사하지 못했습니다. 다시 시도해주세요.",
+    "deleteSuccess": "클립 {count}개를 휴지통으로 이동했습니다.",
+    "deleteError": "클립을 삭제하지 못했습니다. 다시 시도해주세요.",
+    "saveSuccess": "클립을 저장했습니다.",
+    "renameSuccess": "클립 이름을 변경했습니다.",
+    "favoriteAdded": "즐겨찾기에 추가했습니다.",
+    "favoriteRemoved": "즐겨찾기에서 해제했습니다.",
+    "favoriteError": "즐겨찾기를 변경하지 못했습니다. 다시 시도해주세요.",
+    "folderCreated": "폴더를 만들었습니다.",
+    "folderRenamed": "폴더 이름을 변경했습니다.",
+    "folderDeleted": "폴더를 휴지통으로 이동했습니다.",
+    "restoreSuccess": "항목 {count}개를 복원했습니다.",
+    "permanentDeleteSuccess": "항목 {count}개를 영구 삭제했습니다.",
+    "refreshSuccess": "휴지통을 새로고침했습니다.",
+    "refreshError": "휴지통을 새로고침하지 못했습니다. 다시 시도해주세요.",
+    "settingsSaved": "설정을 저장했습니다.",
+    "tagCreated": "태그를 만들었습니다.",
+    "tagUpdated": "태그를 변경했습니다.",
+    "tagDeleted": "태그를 삭제했습니다.",
+    "clipTagsSaved": "클립 태그를 저장했습니다.",
+    "billingStartError": "결제 인증을 시작하지 못했습니다. 다시 시도해주세요.",
+    "billingConfirmed": "구독 결제가 승인되었습니다.",
+    "billingFailed": "결제를 완료하지 못했습니다. 결제 상태를 확인해주세요.",
+    "loggedOut": "로그아웃했습니다.",
+    "policyResolution": "사용 가능한 폴더와 요금제 한도를 확인한 후 다시 시도해주세요."
   }
 }

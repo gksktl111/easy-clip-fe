@@ -1,21 +1,21 @@
 "use client";
 
-// 앱 전역에서 사용하는 토스트 알림 렌더러입니다.
+import { useTranslations } from "next-intl";
 import { Toaster } from "sonner";
+import { TOAST_DURATION_MS } from "./toast";
 
 export function AppToaster() {
+  const t = useTranslations("feedback");
   return (
     <Toaster
       position="top-center"
+      containerAriaLabel={t("region")}
+      hotkey={["altKey", "KeyT"]}
+      visibleToasts={3}
+      mobileOffset={16}
       closeButton={false}
-      duration={3000}
-      toastOptions={{
-        duration: 3000,
-        classNames: {
-          toast:
-            "bg-transparent p-0 shadow-none",
-        },
-      }}
+      duration={TOAST_DURATION_MS}
+      toastOptions={{ classNames: { toast: "bg-transparent p-0 shadow-none" } }}
     />
   );
 }

@@ -1,38 +1,163 @@
 {
+  "notFound": {
+    "title": "ページが見つかりません",
+    "description": "アドレスが間違っているか、ページが移動または削除された可能性があります。",
+    "navigation": "別のページへ移動",
+    "home": "ホームへ",
+    "clips": "クリップへ"
+  },
   "landing": {
     "themeToggle": "ダークモードを切り替え",
     "start": "はじめる",
-    "heroTitleLine1": "どこでもコピー。",
-    "heroTitleLine2": "どこでも貼り付け。",
-    "heroDescription": "すべてのデバイスでクリップボードを完全に同期します。素早く動く開発者、デザイナー、クリエイティブチームのために設計されています。",
-    "startFree": "無料で始める",
-    "viewDemo": "デモを見る",
-    "demoWindowTitle": "Easy Clip - クリップボード管理",
-    "demoDeviceTitle": "Easy Clip",
-    "demoItem1": "デザインガイドライン",
-    "demoItem2": "API エンドポイント",
-    "demoItem3": "会議メモ",
-    "demoMobileItem1": "デザインガイド",
-    "demoMobileItem2": "API エンドポイント",
-    "sectionTitle": "作業の流れを止めないクリップボード",
-    "sectionDescription": "コピー、整理、再利用までを一か所で管理します。",
+    "navigationLabel": "ランディングページのナビゲーション",
+    "pricing": "料金プラン",
+    "heroTitleLine1": "コピーしたテキストと画像を",
+    "heroTitleLine2": "ひとつの場所にまとめましょう。",
+    "heroDescription": "EasyClipは、必要な内容をフォルダに貼り付けて保存し、検索やお気に入りから再び見つけられるWebクリップ保管庫です。",
+    "workflowTitle": "保存して、探して、もう一度使う。",
+    "workflowDescription": "作業中のフォルダに貼り付けて保存し、整理してから、必要なときに検索・コピーできます。",
+    "workflow": {
+      "capture": {
+        "title": "貼り付けて保存",
+        "description": "作業中のフォルダにテキストや画像を貼り付けると、ひとつのクリップとして保存されます。"
+      },
+      "organize": {
+        "title": "フォルダとお気に入りで整理",
+        "description": "プロジェクトごとにまとめ、よく使う内容はお気に入りに登録しましょう。"
+      },
+      "reuse": {
+        "title": "検索してもう一度コピー",
+        "description": "キーワードで必要なクリップを探し、1回クリックするとクリップボードに再コピーされます。"
+      }
+    },
+    "sectionTitle": "必要な情報をすぐに見つけられるクリップ保管庫",
+    "sectionDescription": "テキストと画像を保存し、フォルダ・お気に入り・検索で管理しましょう。",
     "features": {
-      "sync": {
-        "title": "即時同期",
-        "description": "コピーした内容がすぐにすべてのデバイスへリアルタイムで反映されます。"
+      "capture": {
+        "title": "クリップとして保存",
+        "description": "テキストと画像を現在のフォルダに貼り付けて保管できます。"
       },
       "folder": {
-        "title": "フォルダ整理",
-        "description": "プロジェクトごとにクリップをまとめて、すっきり管理できます。"
+        "title": "フォルダで整理",
+        "description": "プロジェクトごとにクリップをまとめ、必要な情報を一か所で管理できます。"
       },
       "favorite": {
         "title": "お気に入り",
-        "description": "よく使う文言はお気に入りにしてすぐにアクセスできます。"
+        "description": "繰り返し使う内容をお気に入りにして、すぐに見つけられます。"
       },
       "search": {
-        "title": "高速検索",
-        "description": "キーワードを入力すると必要なクリップをすぐに見つけられます。"
+        "title": "すばやく検索",
+        "description": "保存したクリップをキーワードで検索し、すぐにコピーできます。"
       }
+    },
+    "reviewsTitle": "作業の流れが変わったユーザーの声",
+    "reviewsDescription": "保存と再利用を繰り返す作業がどう変わるかをご覧ください。",
+    "closingTitleLine1": "コピーした情報を、",
+    "closingTitleLine2": "ひとつの場所に残しましょう。",
+    "closingDescription": "メッセンジャーやメモに散らばったテキストや画像をEasyClipに保存し、必要なときに検索して再びコピーできます。"
+  },
+  "pricing": {
+    "hero": {
+      "eyebrow": "集中して作業する人のためのシンプルなプラン",
+      "titleLine1": "あなたの働き方に合う",
+      "titleLine2": "EasyClipプランを選びましょう。"
+    },
+    "plans": {
+      "recommended": "おすすめ",
+      "currentPlan": "現在のプラン",
+      "free": {
+        "name": "Free",
+        "badge": "個人のスタート向け",
+        "description": "基本機能と検索でクリップを整理できるシンプルなプランです。",
+        "priceSuffix": "/月",
+        "billingNote": "月額料金なしですぐに利用できます",
+        "cta": "無料で始める",
+        "features": {
+          "projects": "1つのプロジェクトを利用可能",
+          "clips": "フォルダーごとに50件まで追加保存",
+          "devices": "デスクトップ1台、モバイル1台を連携可能",
+          "organization": "アクセス可能なフォルダーで検索 + タグ",
+          "ai": ""
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "badge": "集中作業向け",
+        "description": "複数のプロジェクトを運用し、タグで整理したい人のためのプランです。",
+        "priceSuffix": "/月",
+        "billingNote": "月額₩3,900でPro機能を利用できます",
+        "cta": "Proにアップグレード",
+        "features": {
+          "projects": "プロジェクトを無制限に作成可能",
+          "clips": "フォルダーごとに300件まで追加保存",
+          "devices": "デバイスを無制限に連携可能",
+          "organization": "アクセス可能なフォルダーで検索 + タグ",
+          "ai": "AI機能は近日追加予定"
+        }
+      }
+    },
+    "subscription": {
+      "currentPro": "現在Proを利用中",
+      "renewalEnabled": "自動更新が有効です。",
+      "renewalDisabled": "自動更新が無効です。",
+      "renewalStopped": "自動更新を停止しました。利用終了日までPro機能を引き続き利用できます。",
+      "nextBillingAt": "次回請求日",
+      "currentPeriodEnd": "利用終了日",
+      "date": "{label}: {value}",
+      "emptyValue": "-",
+      "downgrade": "Freeに切り替える",
+      "resume": "サブスクリプションを再開",
+      "resuming": "再開中",
+      "cancelModal": {
+        "title": "Proサブスクリプションを解約しますか？",
+        "description": "確認すると自動更新が停止され、現在の請求期間が終わった後にFreeプランへ切り替わります。",
+        "dismiss": "いいえ",
+        "confirm": "はい",
+        "confirming": "変更中"
+      },
+      "pendingRenewalPayment": "開始済みの更新請求が完了し、利用期間が延長される場合があります。"
+    },
+    "comparison": {
+      "eyebrow": "クイック比較",
+      "title": "主な違いを比較",
+      "description": "主な違いを項目ごとにすぐ比較できます。",
+      "columns": {
+        "feature": "項目",
+        "free": "Free",
+        "pro": "Pro"
+      },
+      "points": {
+        "projects": {
+          "label": "プロジェクト数",
+          "freeValue": "1件",
+          "proValue": "無制限"
+        },
+        "clips": {
+          "label": "クリップ数",
+          "freeValue": "フォルダーごとに50件まで追加保存",
+          "proValue": "フォルダーごとに300件まで追加保存"
+        },
+        "devices": {
+          "label": "デバイス連携",
+          "freeValue": "デスクトップ1台 + モバイル1台",
+          "proValue": "無制限のデバイス連携"
+        },
+        "organization": {
+          "label": "整理方法",
+          "freeValue": "アクセス可能なフォルダーで検索 + タグ",
+          "proValue": "アクセス可能なフォルダーで検索 + タグ"
+        },
+        "ai": {
+          "label": "AI機能",
+          "freeValue": "未対応",
+          "proValue": "近日追加予定"
+        }
+      }
+    },
+    "toasts": {
+      "cancelSuccess": "Proサブスクリプションを解約しました。",
+      "resumeSuccess": "Proの自動更新を再開しました。",
+      "updateError": "サブスクリプションを変更できませんでした。しばらくしてから再試行してください。"
     }
   },
   "login": {
@@ -50,12 +175,23 @@
     "privacy": "プライバシーポリシー",
     "agreementSuffix": "に同意したものとみなされます。"
   },
+  "authGuard": {
+    "loading": "認証情報を確認しています。",
+    "error": "認証情報を確認できませんでした。しばらくしてから再試行してください。",
+    "retry": "再試行",
+    "backHome": "ホームへ移動"
+  },
   "sidebar": {
     "favorites": "お気に入り",
     "recent": "最近",
     "trash": "ゴミ箱",
     "addFolder": "フォルダ追加",
     "reorderFolder": "フォルダの並び替え",
+    "moveFolderUp": "上へ移動",
+    "moveFolderDown": "下へ移動",
+    "folderMovedUp": "{name}フォルダを上へ移動しました。",
+    "folderMovedDown": "{name}フォルダを下へ移動しました。",
+    "folderOrderChanged": "フォルダの順序を変更しました。",
     "openFolderOptions": "フォルダオプションを開く",
     "rename": "名前を変更",
     "delete": "削除",
@@ -63,6 +199,11 @@
     "guest": "ゲスト",
     "settings": "設定",
     "upgradePlan": "プランをアップグレード",
+    "closeSidebar": "サイドバーを閉じる",
+    "folderLoadError": "フォルダ一覧を読み込めませんでした。",
+    "retry": "再試行",
+    "retrying": "再試行中...",
+    "folderActionError": "フォルダの操作を完了できませんでした。しばらくしてからもう一度お試しください。",
     "closeCreateFolder": "フォルダ作成を閉じる",
     "createFolder": "新しいフォルダを作成",
     "folderName": "フォルダ名",
@@ -83,6 +224,7 @@
     "general": "一般",
     "language": "言語",
     "languageDescription": "希望する言語を選択してください。",
+    "loadError": "ユーザー設定を読み込めませんでした。しばらくしてから再試行してください。",
     "saveError": "設定を保存できませんでした。しばらくしてからもう一度お試しください。",
     "subscriptionTitle": "現在のサブスクリプション",
     "subscriptionPlan": "プラン",
@@ -102,6 +244,7 @@
     "closeButton": "閉じる"
   },
   "trash": {
+    "selectionHint": "復元する項目を選択してください。",
     "title": "ゴミ箱",
     "retentionNotice": "最大30日間保管されます",
     "description": "削除したクリップとフォルダを確認し、復元または完全削除できます。",
@@ -124,8 +267,8 @@
     "actionError": "ゴミ箱の操作を完了できませんでした。しばらくしてから再試行してください。",
     "restoreConflictError": "削除されたフォルダ内のクリップは単独では復元できません。先に親フォルダを復元してください。",
     "clearAllPartialError": "一部の項目を削除できませんでした。失敗 {failedCount} 件 / 全体 {totalCount} 件",
-    "emptyTitle": "ゴミ箱は空です",
-    "emptyDescription": "削除されたクリップやフォルダがここに表示されます。",
+    "emptyTitle": "表示できるゴミ箱項目はありません",
+    "emptyDescription": "ロックされたフォルダの削除項目は非表示の場合があります。全削除には非表示の項目も含まれます。",
     "listTitle": "削除済みアイテム",
     "totalCount": "{count, plural, =0 {0件} other {#件}}",
     "folderType": "フォルダ",
@@ -145,7 +288,7 @@
     },
     "clearAllModal": {
       "title": "ゴミ箱をすべて削除",
-      "description": "本当にゴミ箱内のすべての項目を完全削除しますか？"
+      "description": "ロックされたフォルダ内の非表示の削除項目も完全に削除します。元に戻せません。"
     },
     "deleteSelectedModal": {
       "title": "選択項目を削除",
@@ -159,12 +302,17 @@
     "foldersEmpty": "削除済みフォルダはありません。",
     "deletedAt": "削除日時",
     "restore": "復元",
-    "deleteForever": "削除"
+    "deleteForever": "削除",
+    "deletedResult": "{count}件を完全に削除しました。"
   },
   "clips": {
     "count": "{count, plural, =0 {0 件のクリップ} other {# 件のクリップ}}",
-    "copyToast": "コピーしました！",
     "captureHint": "どこかをクリックしてから Ctrl+V を押すと新しいクリップを保存できます。",
+    "captureErrors": {
+      "textSaveFailed": "クリップを保存できませんでした。しばらくしてからもう一度お試しください。",
+      "imageSaveFailed": "画像クリップを保存できませんでした。しばらくしてからもう一度お試しください。",
+      "unsupportedImage": "対応していない画像形式です。JPEG、PNG、WebP、GIF、AVIFのいずれかのファイルを使用してください。"
+    },
     "filter": {
       "all": "すべて",
       "text": "テキスト",
@@ -183,10 +331,77 @@
       "description": "ネットワーク接続を確認するか、しばらくしてから再試行してください。",
       "retry": "再試行"
     },
+    "folderNotFoundState": {
+      "title": "このフォルダは存在しません。",
+      "description": "フォルダが削除されたか、アドレスが正しくない可能性があります。"
+    },
     "item": {
       "saving": "保存中",
+      "copy": "{name}をコピー",
+      "favoriteError": "お気に入りを変更できませんでした。もう一度お試しください。",
       "toggleFavorite": "お気に入りを切り替え",
-      "selectForDelete": "{name}を削除対象として選択"
+      "selectForDelete": "{name}を削除対象として選択",
+      "noTags": "タグなし",
+      "editTags": "{name}のタグを編集",
+      "openOptions": "{name}のオプションを開く",
+      "copying": "コピー中…"
+    },
+    "tags": {
+      "manage": "タグを管理",
+      "editAction": "タグを編集",
+      "editorTitle": "クリップのタグを編集",
+      "manageTitle": "フォルダのタグを管理",
+      "backToSelection": "タグ選択に戻る",
+      "close": "タグ画面を閉じる",
+      "loading": "タグを読み込んでいます。",
+      "retry": "再試行",
+      "selectedLabel": "選択したタグ",
+      "removeFromClip": "{name}タグを外す",
+      "noneSelected": "タグが選択されていません。",
+      "searchPlaceholder": "タグを検索または新規入力",
+      "noSearchResults": "一致するタグがありません。",
+      "quickAdd": "「{name}」をすぐ追加",
+      "createWithColorDescription": "色を指定する場合は、先にフォルダタグとして作成します。",
+      "createWithColor": "色を指定して作成",
+      "creating": "作成中",
+      "cancel": "キャンセル",
+      "saving": "保存中",
+      "save": "保存",
+      "nameLabel": "タグ名",
+      "namePlaceholder": "例：重要",
+      "colorLabel": "背景色",
+      "create": "作成",
+      "manageDescription": "このフォルダのすべてのタグと色を管理します。",
+      "newTag": "新しいタグ",
+      "editTag": "{name}タグを編集",
+      "deleteTag": "{name}タグを削除",
+      "empty": "作成済みのタグはありません。",
+      "deleteConfirmTitle": "タグを削除しますか？",
+      "deleteConfirmDescription": "「{name}」は使用中のすべてのクリップからも削除されます。",
+      "deleting": "削除中",
+      "delete": "削除",
+      "validation": {
+        "required": "空白だけの名前は使用できません。",
+        "tooLong": "タグ名は10文字まで入力できます。"
+      },
+      "errors": {
+        "invalid": "タグ名と色を確認してください。",
+        "notFound": "クリップまたはタグが見つかりません。一覧を確認して再試行してください。",
+        "conflict": "同じ名前のタグがすでにあります。",
+        "actionFailed": "タグ操作を完了できませんでした。しばらくしてから再試行してください。",
+        "loadFailed": "タグ一覧を読み込めませんでした。"
+      },
+      "colors": {
+        "GRAY": "グレー",
+        "BROWN": "ブラウン",
+        "ORANGE": "オレンジ",
+        "YELLOW": "イエロー",
+        "GREEN": "グリーン",
+        "BLUE": "ブルー",
+        "PURPLE": "パープル",
+        "PINK": "ピンク",
+        "RED": "レッド"
+      }
     },
     "actions": {
       "copy": "コピー",
@@ -210,9 +425,85 @@
       "description": "本当に現在のフォルダ内のすべてのクリップを削除しますか？"
     },
     "renameModal": {
-      "title": "名前を変更",
-      "label": "クリップ名",
-      "placeholder": "例: クリップ"
+      "title": "クリップ名を変更",
+      "close": "名前変更を閉じる",
+      "field": "クリップ名",
+      "placeholder": "新しい名前を入力してください",
+      "error": "クリップ名を変更できませんでした。もう一度お試しください。",
+      "hint": "前後の空白を除き、最大{max}文字まで入力できます。",
+      "tooLong": "前後の空白を除いて{max}文字以内で入力してください。",
+      "count": "{count}/{max}文字"
     }
+  },
+  "access": {
+    "checkingTitle": "アクセス権を確認中",
+    "checkingDescription": "最新の契約とフォルダの状態を確認してから内容を表示します。",
+    "errorTitle": "アクセス権を確認できません",
+    "errorDescription": "接続を確認して、もう一度お試しください。",
+    "incompatibleTitle": "フォルダの状態を確認できません",
+    "incompatibleDescription": "サーバーからロック情報を取得できませんでした。更新するか、後ほどお試しください。",
+    "lockedTitle": "ロックされたフォルダです",
+    "lockedDescription": "Freeではサーバーが指定した1つのフォルダを利用できます。データは保持されます。削除しても別のフォルダは開きません。",
+    "retry": "再確認",
+    "plans": "Proプランを見る",
+    "trash": "ゴミ箱から復元",
+    "lockedBadge": "ロック中",
+    "folderLimit": "Freeは1フォルダまでです。利用可能なフォルダがゴミ箱にある場合は復元してください。追加の利用にはProが必要です。",
+    "deleteFolderTitle": "フォルダを削除しますか？",
+    "deleteFolderDescription": "削除しても他のロックは解除されません。削除したフォルダはゴミ箱から復元できます。",
+    "operationError": "操作を完了できませんでした。もう一度お試しください。",
+    "limitCount": "現在{count}件 / 上限{limit}件",
+    "billingSuccess": "Pro契約が有効になりました。",
+    "billingUncertain": "決済結果が不明な可能性があります。再決済の前に契約状態を確認してください。",
+    "billingChecking": "決済確認",
+    "billingFailed": "決済失敗",
+    "billingLoading": "決済情報を確認しています。",
+    "billingMissing": "必要な決済情報が不足しています。",
+    "openApp": "アプリへ",
+    "checkSubscription": "契約状態を確認",
+    "errors": {
+      "PROJECT_LOCKED": "ロックされたフォルダにはアクセスできません。",
+      "CLIP_LIMIT_EXCEEDED": "フォルダのクリップ追加上限に達しました。既存のクリップは保持されます。",
+      "PLAN_LIMIT_EXCEEDED": "現在のプランではフォルダの作成・復元が制限されています。利用可能なフォルダがゴミ箱にあれば復元してください。",
+      "FEATURE_NOT_AVAILABLE": "フォルダの並べ替えにはProが必要です。"
+    },
+    "draftTitle": "未保存のクリップ",
+    "draftDescription": "入力を保持しています。通信エラーの場合は保存済みか確認してから再試行してください。",
+    "retrySave": "再保存",
+    "discardDraft": "入力を破棄",
+    "clipLimit": "フォルダごとの追加保存上限：{limit}件。",
+    "closeFolderLimit": "フォルダ追加の案内を閉じる",
+    "clipLimitExplanation": "上限を超えた既存のクリップも保持されます。上限は新しいクリップの追加に適用されます。",
+    "proFeaturesTitle": "Proで利用できる機能"
+  },
+  "feedback": {
+    "close": "通知を閉じる",
+    "region": "通知",
+    "copySuccess": "クリップをコピーしました。",
+    "copyError": "コピーできませんでした。再試行してください。",
+    "deleteSuccess": "クリップ{count}件をゴミ箱に移動しました。",
+    "deleteError": "クリップを削除できませんでした。再試行してください。",
+    "saveSuccess": "クリップを保存しました。",
+    "renameSuccess": "クリップ名を変更しました。",
+    "favoriteAdded": "お気に入りに追加しました。",
+    "favoriteRemoved": "お気に入りを解除しました。",
+    "favoriteError": "お気に入りを変更できませんでした。再試行してください。",
+    "folderCreated": "フォルダーを作成しました。",
+    "folderRenamed": "フォルダー名を変更しました。",
+    "folderDeleted": "フォルダーをゴミ箱に移動しました。",
+    "restoreSuccess": "{count}件を復元しました。",
+    "permanentDeleteSuccess": "{count}件を完全に削除しました。",
+    "refreshSuccess": "ゴミ箱を更新しました。",
+    "refreshError": "ゴミ箱を更新できませんでした。再試行してください。",
+    "settingsSaved": "設定を保存しました。",
+    "tagCreated": "タグを作成しました。",
+    "tagUpdated": "タグを変更しました。",
+    "tagDeleted": "タグを削除しました。",
+    "clipTagsSaved": "クリップのタグを保存しました。",
+    "billingStartError": "決済認証を開始できませんでした。再試行してください。",
+    "billingConfirmed": "サブスクリプションの決済が承認されました。",
+    "billingFailed": "決済を完了できませんでした。決済状況をご確認ください。",
+    "loggedOut": "ログアウトしました。",
+    "policyResolution": "利用可能なフォルダーとプランの上限を確認して再試行してください。"
   }
 }

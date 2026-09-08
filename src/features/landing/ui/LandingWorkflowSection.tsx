@@ -6,6 +6,8 @@ interface LandingWorkflowStep {
 }
 
 interface LandingWorkflowSectionProps {
+  title: string;
+  description: string;
   steps: readonly LandingWorkflowStep[];
 }
 
@@ -40,17 +42,20 @@ function LandingWorkflowStepCard({
   );
 }
 
-export function LandingWorkflowSection({ steps }: LandingWorkflowSectionProps) {
+export function LandingWorkflowSection({
+  title,
+  description,
+  steps,
+}: LandingWorkflowSectionProps) {
   return (
     <section className="border-t border-(--border) bg-(--surface) py-24">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
-            복사한 순간부터 다시 쓰는 순간까지
+            {title}
           </h2>
           <p className="mt-5 text-base leading-7 text-(--muted) md:text-lg">
-            저장, 분류, 재사용이 하나의 흐름으로 이어지도록 설계했습니다. 복붙을
-            임시 행동이 아니라 반복 가능한 작업 시스템으로 바꿉니다.
+            {description}
           </p>
         </div>
 

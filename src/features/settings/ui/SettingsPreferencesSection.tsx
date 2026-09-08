@@ -29,9 +29,9 @@ export function SettingsPreferencesSection({
     <>
       <section>
         <Text variant="sectionLabel">{t("appearance")}</Text>
-        <div className="mt-3 flex items-center justify-between rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--modal-icon-bg) text-(--modal-icon-fg)">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
               <HiOutlineMoon className="h-5 w-5" aria-hidden />
             </div>
             <div>
@@ -50,9 +50,9 @@ export function SettingsPreferencesSection({
 
       <section>
         <Text variant="sectionLabel">{t("general")}</Text>
-        <div className="mt-3 flex items-center justify-between rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--modal-icon-bg) text-(--modal-icon-fg)">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
               <HiOutlineTranslate className="h-5 w-5" aria-hidden />
             </div>
             <div>

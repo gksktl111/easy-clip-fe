@@ -1,5 +1,6 @@
 import { Clip, ClipType } from "@/features/clip/model/clip";
 import { ClipListItemResponseDto } from "@/features/clip/model/clip.dto";
+import { mapClipTagResponse } from "@/features/clip/service/mapTagResponse";
 
 const clipTypeMap: Record<ClipListItemResponseDto["type"], ClipType> = {
   TEXT: "text",
@@ -16,5 +17,5 @@ export const mapClipResponse = (clip: ClipListItemResponseDto): Clip => ({
   createdAt: new Date(clip.createdAt),
   updatedAt: new Date(clip.updatedAt),
   isFavorite: clip.likeByMe,
-  isOptimistic: clip.isOptimistic,
+  tags: clip.tags.map(mapClipTagResponse),
 });

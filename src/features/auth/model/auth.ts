@@ -1,14 +1,19 @@
-import { AuthAccountResponseDto } from "@/features/auth/model/auth.dto";
+export type OAuthProvider = "google" | "github";
 
-export type AuthProvider = "google" | "github";
-
-export interface AuthSessionUser {
+export interface CurrentUser {
   id: string;
   displayName: string;
   avatarUrl: string | null;
-  authAccounts?: AuthAccountResponseDto[];
+  email: string | null;
 }
 
 export interface AuthSession {
-  user: AuthSessionUser | null;
+  user: CurrentUser;
 }
+
+export type AuthStatus =
+  | "idle"
+  | "initializing"
+  | "authenticated"
+  | "unauthenticated"
+  | "error";

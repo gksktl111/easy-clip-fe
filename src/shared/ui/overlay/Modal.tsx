@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 // 공통 모달의 오버레이, 컨테이너, 바깥 영역 닫기 동작을 제공합니다.
 interface ModalProps {
@@ -8,6 +11,7 @@ interface ModalProps {
   isOpen?: boolean;
   overlay?: "default" | "strong";
   onClose?: () => void;
+  onEscape?: () => void;
 }
 
 export function Modal({
@@ -17,12 +21,15 @@ export function Modal({
   isOpen = true,
   overlay = "default",
   onClose,
+  onEscape,
 }: ModalProps) {
-  if (!isOpen) {
+  const portalElement = typeof document === "undefined" ? null : document.body;
+
+  if (!isOpen || !portalElement) {
     return null;
   }
 
-  return (
+  return createPortal(
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center px-4 ${
         overlay === "strong" ? "bg-(--overlay-strong)" : "bg-(--overlay)"
@@ -32,8 +39,15 @@ export function Modal({
           onClose?.();
         }
       }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && onEscape) {
+          event.stopPropagation();
+          onEscape();
+        }
+      }}
     >
       <div className={contentClassName}>{children}</div>
-    </div>
+    </div>,
+    portalElement,
   );
 }
