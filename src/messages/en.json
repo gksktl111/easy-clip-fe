@@ -1,4 +1,11 @@
 {
+  "notFound": {
+    "title": "Page not found",
+    "description": "The address may be incorrect, or the page may have moved or been deleted.",
+    "navigation": "Go to another page",
+    "home": "Go home",
+    "clips": "Go to clips"
+  },
   "landing": {
     "themeToggle": "Toggle dark mode",
     "start": "Get Started",

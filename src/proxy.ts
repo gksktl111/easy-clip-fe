@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_COOKIE_NAMES } from "@/features/auth/model/authCookie";
 
+import { isProtectedPath } from "@/shared/config/protectedRoutes";
+
 const MAIN_APP_PATH = "/favorites";
 const LOGIN_PATH = "/login";
 
-const PUBLIC_PATHS = new Set(["/", LOGIN_PATH, "/pricing"]);
 const AUTH_REDIRECT_PATHS = new Set(["/"]);
 
 const hasAuthCookie = (request: NextRequest) =>
@@ -20,7 +21,6 @@ const redirectTo = (request: NextRequest, path: string) => {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublicPath = PUBLIC_PATHS.has(pathname);
   const hasAuthenticationCookie = hasAuthCookie(request);
 
   if (hasAuthenticationCookie && AUTH_REDIRECT_PATHS.has(pathname)) {
@@ -28,7 +28,7 @@ export function proxy(request: NextRequest) {
     return redirectTo(request, MAIN_APP_PATH);
   }
 
-  if (!hasAuthenticationCookie && !isPublicPath) {
+  if (!hasAuthenticationCookie && isProtectedPath(pathname)) {
     // 쿠키가 전혀 없으면 앱 라우트 진입 전에 로그인 화면으로 보낸다.
     return redirectTo(request, LOGIN_PATH);
   }

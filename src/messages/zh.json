@@ -1,4 +1,11 @@
 {
+  "notFound": {
+    "title": "找不到页面",
+    "description": "地址可能有误，或页面已被移动或删除。",
+    "navigation": "前往其他页面",
+    "home": "返回首页",
+    "clips": "前往剪辑"
+  },
   "landing": {
     "themeToggle": "切换深色模式",
     "start": "开始使用",
