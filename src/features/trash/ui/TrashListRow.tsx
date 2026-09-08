@@ -7,11 +7,8 @@ import {
   HiOutlineFolder,
   HiOutlinePhotograph,
 } from "react-icons/hi";
-import {
-  formatDeletedAt,
-} from "@/features/trash/ui/trashRow";
+import { formatDeletedAt } from "@/features/trash/ui/trashRow";
 import type { TrashItemRow } from "@/features/trash/model/trashRow";
-import { Badge } from "@/shared/ui/badge/Badge";
 import { Button } from "@/shared/ui/button/Button";
 import { Checkbox } from "@/shared/ui/input/Checkbox";
 import { Text } from "@/shared/ui/typography/Text";
@@ -64,9 +61,16 @@ export function TrashListRow({
   const areActionsDisabled = pendingActionKey !== null;
 
   return (
-    <article className="px-4 py-4 transition-colors hover:bg-(--surface-elevated) min-[1200px]:px-6">
-      <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 min-[1200px]:grid-cols-[2rem_minmax(0,1.5fr)_180px_220px_220px] min-[1200px]:items-center min-[1200px]:gap-4">
-        <div className="flex items-start pt-3 min-[1200px]:items-center min-[1200px]:pt-0">
+    <article
+      data-selected={isSelected}
+      aria-busy={
+        pendingActionKey === restoreActionKey ||
+        pendingActionKey === deleteActionKey
+      }
+      className="px-4 py-4 transition-colors hover:bg-(--surface-muted) data-[selected=true]:bg-(--surface-muted) min-[1200px]:px-6"
+    >
+      <div className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-3 min-[1200px]:grid-cols-[1.5rem_minmax(0,1fr)_minmax(8rem,0.45fr)_minmax(10rem,0.6fr)] min-[1200px]:items-center min-[1200px]:gap-4">
+        <div className="flex items-start pt-1 min-[1200px]:items-center min-[1200px]:pt-0">
           <Checkbox
             checked={isSelected}
             disabled={areActionsDisabled}
@@ -74,41 +78,39 @@ export function TrashListRow({
             aria-label={t("selectItem", { name: row.name })}
           />
         </div>
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-(--icon-chip) text-(--icon-chip-text)">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
             <TrashRowIcon row={row} />
           </div>
 
           <div className="min-w-0">
-            <Text variant="bodyStrong" className="truncate">
+            <Text
+              variant="bodyStrong"
+              className="[overflow-wrap:anywhere] break-words"
+            >
               {row.name}
             </Text>
-            {row.kind === "clip" ? (
-              <Text variant="caption" className="mt-1 truncate">
-                {t("parentFolder")}: {row.parentFolderName}
-              </Text>
-            ) : null}
-            <Text variant="caption" className="mt-1 min-[1200px]:hidden">
-              {row.typeLabel}
-            </Text>
+            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-(--muted)">
+              <span>{row.typeLabel}</span>
+              {row.kind === "clip" ? (
+                <span className="min-w-0 [overflow-wrap:anywhere] break-words">
+                  <span aria-hidden>· </span>
+                  {t("parentFolder")}: {row.parentFolderName}
+                </span>
+              ) : null}
+            </div>
           </div>
-        </div>
-
-        <div className="col-start-2 min-[1200px]:col-start-auto">
-          <Badge variant="elevated" className="font-medium">
-            {row.typeLabel}
-          </Badge>
         </div>
 
         <Text
           variant="caption"
-          className="col-start-2 min-[1200px]:col-start-auto min-[1200px]:text-sm"
+          className="col-start-2 min-[1200px]:col-start-auto min-[1200px]:text-xs"
         >
           <span className="mr-2 min-[1200px]:hidden">{t("deletedAt")}:</span>
           {formatDeletedAt(row.deletedAt)}
         </Text>
 
-        <div className="col-start-2 flex flex-wrap justify-end gap-2 min-[1200px]:col-start-auto min-[1200px]:justify-start">
+        <div className="col-start-2 flex flex-wrap justify-start gap-2 min-[1200px]:col-start-auto min-[1200px]:justify-start">
           <Button
             disabled={
               areActionsDisabled || pendingActionKey === restoreActionKey
@@ -124,7 +126,9 @@ export function TrashListRow({
             variant="secondary"
             size="xs"
           >
-            {t("restore")}
+            {pendingActionKey === restoreActionKey
+              ? t("restoringSelectedAction")
+              : t("restore")}
           </Button>
           <Button
             disabled={
@@ -138,10 +142,12 @@ export function TrashListRow({
 
               onDeleteClip(row.id);
             }}
-            variant="dangerSoft"
+            variant="dangerOutline"
             size="xs"
           >
-            {t("deleteForever")}
+            {pendingActionKey === deleteActionKey
+              ? t("deletingSelectedAction")
+              : t("deleteForever")}
           </Button>
         </div>
       </div>

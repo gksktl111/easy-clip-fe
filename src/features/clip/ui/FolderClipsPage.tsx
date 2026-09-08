@@ -6,6 +6,7 @@ import { useFolderClipsPage } from "@/features/clip/hooks/useFolderClipsPage";
 import { isFolderNotFoundError } from "@/features/clip/service/folderClipQueryState";
 import { ClipDeleteActionBar } from "@/features/clip/ui/ClipDeleteActionBar";
 import { ClipContextMenu } from "@/features/clip/ui/ClipContextMenu";
+import { ClipRenameModal } from "@/features/clip/ui/ClipRenameModal";
 import { ClipCopyToast } from "@/features/clip/ui/ClipCopyToast";
 import { ClipResultsSection } from "@/features/clip/ui/ClipResultsSection";
 import { ClipTagEditorModal } from "@/features/clip/ui/ClipTagEditorModal";
@@ -27,7 +28,7 @@ export function FolderClipsPage({
   onClipsDeleted,
 }: FolderClipsPageProps) {
   const t = useTranslations("clips");
-  const { capture, collection, contextMenu, deletion, feedback, tags } =
+  const { capture, collection, contextMenu, deletion, feedback, tags, rename } =
     useFolderClipsPage({ folderId, onClipsDeleted });
   const { commands, filter, results } = collection;
   const isFolderNotFound = isFolderNotFoundError(results.error);
@@ -116,14 +117,15 @@ export function FolderClipsPage({
         <ClipContextMenu
           clips={results.clips}
           contextMenu={contextMenu.state}
-          copyLabel={t("actions.copy")}
-          editTagsLabel={t("tags.editAction")}
+          renameLabel={t("actions.rename")}
+          onRename={rename.open}
           deleteLabel={t("actions.delete")}
-          onCopy={contextMenu.copyClip}
+          editTagsLabel={t("tags.editAction")}
           onEditTags={tags.openClipEditor}
           onDelete={contextMenu.deleteClip}
         />
       ) : null}
+      {rename.isOpen ? <ClipRenameModal {...rename} /> : null}
       <ClipCopyToast label={t("copyToast")} position={feedback.copyToast} />
       {tags.state ? (
         <ClipTagEditorModal

@@ -243,6 +243,7 @@
     "closeButton": "Close"
   },
   "trash": {
+    "selectionHint": "Select items to restore.",
     "title": "Trash",
     "retentionNotice": "Kept for up to 30 days",
     "description": "Review deleted clips and folders, then restore or permanently remove them.",
@@ -340,7 +341,8 @@
       "toggleFavorite": "Toggle favorite",
       "selectForDelete": "Select {name} for deletion",
       "noTags": "No tags",
-      "editTags": "Edit tags for {name}"
+      "editTags": "Edit tags for {name}",
+      "openOptions": "Open options for {name}"
     },
     "tags": {
       "manage": "Manage tags",
@@ -421,9 +423,14 @@
       "description": "Are you sure you want to delete every clip in the current folder?"
     },
     "renameModal": {
-      "title": "Rename",
-      "label": "Clip name",
-      "placeholder": "e.g. Clip"
+      "title": "Rename clip",
+      "close": "Close rename clip",
+      "field": "Clip name",
+      "placeholder": "Enter a new name",
+      "error": "Could not rename the clip. Please try again.",
+      "hint": "Up to {max} characters, excluding leading and trailing spaces.",
+      "tooLong": "Enter a name of {max} characters or fewer after trimming spaces.",
+      "count": "{count}/{max} characters"
     }
   }
 }

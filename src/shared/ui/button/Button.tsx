@@ -41,7 +41,8 @@ const variantClassName: Record<ButtonVariant, string> = {
   surfaceGhost: "bg-(--surface) text-(--muted) hover:bg-(--surface-muted)",
   danger: "bg-(--danger) text-danger-foreground hover:bg-(--danger-hover)",
   dangerSoft: "bg-red-500/15 text-red-500 hover:bg-red-500/25",
-  dangerOutline: "border border-red-500/25 text-red-500 hover:bg-red-500/10",
+  dangerOutline:
+    "border border-(--danger-border) bg-(--danger-surface) text-(--danger-text) hover:bg-(--danger-border)",
   ghost: "text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground)",
 };
 
@@ -70,7 +71,7 @@ export function Button({
     <button
       type={type}
       className={classNames(
-        "inline-flex cursor-pointer items-center justify-center gap-2 font-medium transition disabled:cursor-default disabled:opacity-50",
+        "inline-flex cursor-pointer items-center justify-center gap-2 font-medium transition disabled:cursor-default disabled:opacity-50 [&>svg]:shrink-0",
         variantClassName[variant],
         sizeClassName[size],
         fullWidth && "w-full",

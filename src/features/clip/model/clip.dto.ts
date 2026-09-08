@@ -68,3 +68,7 @@ export interface DeleteClipsResponseDto {
 export interface LikeClipResponseDto {
   likeByMe: boolean;
 }
+
+export interface RenameClipRequestDto {
+  title: string;
+}

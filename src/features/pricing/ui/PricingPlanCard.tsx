@@ -115,17 +115,9 @@ export function PricingPlanCard({
         {content.features.map((feature) => (
           <li key={feature} className="flex items-start gap-3">
             <span
-              className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-                plan.highlight ? "bg-white/12 text-white" : ""
+              className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center ${
+                plan.highlight ? "text-white" : "text-(--pricing-check-fg)"
               }`}
-              style={
-                plan.highlight
-                  ? { backgroundColor: "var(--pricing-featured-badge)" }
-                  : {
-                      backgroundColor: "var(--pricing-check-bg)",
-                      color: "var(--pricing-check-fg)",
-                    }
-              }
             >
               <HiCheck className="h-4 w-4" aria-hidden />
             </span>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import type { Clip } from "@/features/clip/model/clip";
 import {
   type ContextMenuState,
@@ -21,11 +22,29 @@ export const useClipContextMenu = ({
     isDisabled,
   });
 
+  const { menu, closeMenu } = contextMenu;
+  useEffect(() => {
+    if (!menu) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeMenu();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [menu, closeMenu]);
+
   const openClipContextMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
     clip: Clip,
   ) => {
-    contextMenu.openContextMenu(event, clip.id);
+    event.preventDefault();
+    event.stopPropagation();
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.type === "contextmenu" ? event.clientX : rect.right;
+    const y = event.type === "contextmenu" ? event.clientY : rect.bottom;
+    contextMenu.toggleMenu(clip.id, {
+      x: Math.max(8, Math.min(x, window.innerWidth - 144)),
+      y: Math.max(8, Math.min(y, window.innerHeight - 128)),
+    });
   };
 
   return {

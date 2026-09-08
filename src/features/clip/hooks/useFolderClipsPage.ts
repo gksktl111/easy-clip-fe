@@ -1,5 +1,6 @@
 "use client";
 
+import { useClipRename } from "@/features/clip/hooks/useClipRename";
 import { useCallback } from "react";
 import { useClipCollectionFilter } from "@/features/clip/hooks/useClipCollectionFilter";
 import { useClipContextMenu } from "@/features/clip/hooks/useClipContextMenu";
@@ -38,8 +39,12 @@ export const useFolderClipsPage = ({
     folderId,
     isAuthenticated: query.isAuthenticated,
   });
+  const rename = useClipRename(query.isAuthenticated);
   const isInteractionDisabled =
-    deletion.isDeleteMode || deletion.isDeleting || tagWorkspace.isOpen;
+    deletion.isDeleteMode ||
+    deletion.isDeleting ||
+    tagWorkspace.isOpen ||
+    rename.isOpen;
   const capture = useFolderClipCapture({
     folderId,
     isAuthenticated: query.isAuthenticated,
@@ -103,14 +108,6 @@ export const useFolderClipsPage = ({
     [copyClipAction],
   );
 
-  const copyClipFromMenu = useCallback(
-    async (clip: Clip) => {
-      await copyClipAction(clip);
-      closeContextMenu();
-    },
-    [closeContextMenu, copyClipAction],
-  );
-
   const deleteClipFromMenu = useCallback(
     (clipId: string) => {
       closeContextMenu();
@@ -135,6 +132,14 @@ export const useFolderClipsPage = ({
   }, [closeContextMenu, deactivate, tagWorkspace]);
 
   return {
+    rename: {
+      ...rename,
+      open: (clip: Clip) => {
+        closeContextMenu();
+        deactivate();
+        rename.open(clip);
+      },
+    },
     capture: {
       activatePage,
       isActive,
@@ -166,7 +171,6 @@ export const useFolderClipsPage = ({
     },
     contextMenu: {
       close: closeContextMenu,
-      copyClip: copyClipFromMenu,
       deleteClip: deleteClipFromMenu,
       open: openContextMenu,
       state: contextMenuState,

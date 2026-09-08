@@ -8,7 +8,7 @@ import {
   HiOutlineDocumentText,
   HiOutlinePhotograph,
   HiOutlineStar,
-  HiOutlineTag,
+  HiOutlineDotsVertical,
   HiStar,
 } from "react-icons/hi";
 import type { Clip } from "@/features/clip/model/clip";
@@ -35,11 +35,11 @@ interface ClipItemProps {
 function ClipTypeIcon({ type }: { type: Clip["type"] }) {
   switch (type) {
     case "text":
-      return <HiOutlineDocumentText className="h-5 w-5" aria-hidden />;
+      return <HiOutlineDocumentText className="h-4 w-4 shrink-0" aria-hidden />;
     case "color":
-      return <HiOutlineColorSwatch className="h-5 w-5" aria-hidden />;
+      return <HiOutlineColorSwatch className="h-4 w-4 shrink-0" aria-hidden />;
     case "image":
-      return <HiOutlinePhotograph className="h-5 w-5" aria-hidden />;
+      return <HiOutlinePhotograph className="h-4 w-4 shrink-0" aria-hidden />;
     default:
       return null;
   }
@@ -134,11 +134,13 @@ export function ClipItem({
         }}
         className="flex min-h-0 w-full flex-1 cursor-pointer flex-col overflow-hidden text-left transition focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-(--focus-ring) disabled:cursor-wait"
       >
-        <span className="flex-1 overflow-hidden px-4 py-3">
+        <span
+          className={`flex-1 overflow-hidden px-4 py-3 ${clip.type === "text" ? "pr-12" : ""}`}
+        >
           <ClipContentPreview clip={clip} />
         </span>
         <span className="flex items-center gap-2 border-t border-(--border) px-4 py-2.5 text-xs text-(--muted)">
-          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-(--icon-chip) text-(--icon-chip-text)">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center text-(--muted)">
             <ClipTypeIcon type={clip.type} />
           </span>
           <span className="text-foreground truncate font-medium">
@@ -147,7 +149,16 @@ export function ClipItem({
         </span>
       </button>
       <div className="flex min-h-10 items-center gap-1.5 border-t border-(--border) px-3 py-2">
-        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+        <button
+          type="button"
+          disabled={isDisabled || isDeleteMode || !onEditTags}
+          onClick={(event) => {
+            event.stopPropagation();
+            onEditTags?.(clip);
+          }}
+          aria-label={t("editTags", { name: clip.name })}
+          className="flex min-h-8 min-w-0 flex-1 cursor-pointer items-center gap-1 overflow-hidden rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) disabled:cursor-default"
+        >
           {visibleTags.map((tag) => (
             <TagChip
               key={tag.id}
@@ -165,19 +176,20 @@ export function ClipItem({
               {t("noTags")}
             </span>
           ) : null}
-        </div>
-        {onEditTags && !isDeleteMode ? (
+        </button>
+        {onContextMenu && !isDeleteMode ? (
           <button
             type="button"
             disabled={isDisabled}
             onClick={(event) => {
               event.stopPropagation();
-              onEditTags(clip);
+              onContextMenu(event, clip);
             }}
-            className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-(--muted) transition hover:bg-(--surface-muted) hover:text-(--foreground) focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) disabled:cursor-default disabled:opacity-50"
-            aria-label={t("editTags", { name: clip.name })}
+            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-(--muted) transition hover:bg-(--surface-muted) hover:text-(--foreground) focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) disabled:cursor-default disabled:opacity-50"
+            aria-label={t("openOptions", { name: clip.name })}
+            data-clip-menu
           >
-            <HiOutlineTag className="h-4 w-4" aria-hidden />
+            <HiOutlineDotsVertical className="h-4 w-4" aria-hidden />
           </button>
         ) : null}
       </div>
@@ -211,7 +223,7 @@ export function ClipItem({
           }
         }}
         disabled={isFavoriteDisabled}
-        className="absolute top-3 right-3 z-10 cursor-pointer rounded-full border border-transparent bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-colors duration-150 hover:bg-(--favorite-btn-bg-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) disabled:cursor-default aria-pressed:border-(--favorite-btn-selected-border) aria-pressed:bg-(--favorite-btn-selected-bg) motion-reduce:transition-none"
+        className="absolute top-3 right-3 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-transparent bg-(--favorite-btn-bg) p-1.5 backdrop-blur-sm transition-colors duration-150 hover:bg-(--favorite-btn-bg-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) disabled:cursor-default aria-pressed:border-(--favorite-btn-selected-border) aria-pressed:bg-(--favorite-btn-selected-bg) motion-reduce:transition-none"
         style={{ boxShadow: "var(--favorite-btn-shadow)" }}
         aria-label={t("toggleFavorite")}
         aria-pressed={Boolean(clip.isFavorite)}

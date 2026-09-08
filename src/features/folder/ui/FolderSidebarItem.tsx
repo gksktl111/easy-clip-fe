@@ -72,7 +72,10 @@ export function FolderSidebarItem({
   const isDropTarget = dropIndicatorEdge !== null;
   const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
     // 링크나 옵션 버튼에 포커스가 있어도 폴더 항목 단위 단축키로 순서를 바꿀 수 있게 버블링을 받습니다.
-    if (!event.ctrlKey || (event.key !== "ArrowUp" && event.key !== "ArrowDown")) {
+    if (
+      !event.ctrlKey ||
+      (event.key !== "ArrowUp" && event.key !== "ArrowDown")
+    ) {
       return;
     }
 
@@ -99,7 +102,7 @@ export function FolderSidebarItem({
     >
       <div
         onContextMenu={onOpenOptionsMenu}
-        className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium ${
+        className={`flex items-center gap-1 rounded-lg px-1 py-1 text-sm font-medium ${
           isDragging ? "transition-colors duration-150" : "transition-colors"
         } ${
           isDropTarget
@@ -116,7 +119,7 @@ export function FolderSidebarItem({
           draggable
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
-          className={`text-muted cursor-grab rounded p-1 ${
+          className={`text-muted flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) ${
             isDragging ? "" : "hover:text-foreground"
           }`}
           aria-label={reorderFolderLabel}
@@ -127,17 +130,17 @@ export function FolderSidebarItem({
         <Link
           href={getFolderPath(folder.id)}
           onClick={onNavigate}
-          className="flex flex-1 items-center gap-2 truncate"
+          className="flex min-h-8 min-w-0 flex-1 items-center gap-2 rounded-md focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring)"
           aria-current={isActiveFolder ? "page" : undefined}
         >
-          <HiOutlineFolder className="h-5 w-5" aria-hidden />
+          <HiOutlineFolder className="h-5 w-5 shrink-0" aria-hidden />
           <span className="truncate">{folder.name}</span>
         </Link>
 
         <button
           type="button"
           onClick={onToggleOptions}
-          className={`text-muted cursor-pointer rounded p-1 ${
+          className={`text-muted flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) ${
             isDragging ? "" : "hover:text-foreground transition"
           }`}
           aria-label={openFolderOptionsLabel}
