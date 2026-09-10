@@ -314,7 +314,12 @@
     "captureErrors": {
       "textSaveFailed": "无法保存剪贴内容，请稍后重试。",
       "imageSaveFailed": "无法保存图片剪贴内容，请稍后重试。",
-      "unsupportedImage": "不支持此图片格式。请使用 JPEG、PNG、WebP、GIF 或 AVIF 文件。"
+      "unsupportedImage": "不支持此图片格式。请使用 JPEG、PNG、WebP、GIF 或 AVIF 文件。",
+      "clipboardEmpty": "没有可粘贴的内容。请先复制文本或图片。",
+      "clipboardUnavailable": "此浏览器不支持粘贴按钮。请使用最新版Safari或Chrome重试。",
+      "clipboardDenied": "未获准访问剪贴板。请在浏览器中允许粘贴后重试。",
+      "clipboardUnsupported": "不支持此剪贴板格式。请复制文本或图片。",
+      "clipboardReadFailed": "无法读取剪贴板。请重新复制内容后重试。"
     },
     "filter": {
       "all": "全部",
@@ -437,10 +442,9 @@
       "tooLong": "去除首尾空格后，名称不能超过{max}个字符。",
       "count": "{count}/{max}字"
     },
-    "captureTextLabel": "粘贴或输入要保存的文本。",
-    "captureTextPlaceholder": "粘贴或输入要保存的文本。",
-    "captureTextAction": "保存文本",
-    "captureImageAction": "选择图片"
+    "pasteAction": "粘贴",
+    "pastePending": "保存中…",
+    "pasteHint": "将复制的文本或图片保存为剪辑。"
   },
   "access": {
     "checkingTitle": "正在检查访问权限",

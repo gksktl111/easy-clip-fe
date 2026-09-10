@@ -90,11 +90,10 @@ function FolderClipsContent({
       ) : null}
       {!hasClipLoadError ? (
         <FolderClipCaptureHint
-          message={`${t("captureHint")} ${a("clipLimit", { limit: access.isPro ? 300 : 50 })}`}
-          onTextSubmit={capture.submitText}
-          onImageSelect={capture.submitImage}
-          pending={capture.isCreating}
-          hasDraft={Boolean(capture.draft)}
+          message={`${t("pasteHint")} ${a("clipLimit", { limit: access.isPro ? 300 : 50 })}`}
+          onPaste={capture.pasteFromClipboard}
+          pending={capture.isCreating || capture.isReadingClipboard}
+          disabled={capture.isDisabled || Boolean(capture.draft)}
         />
       ) : null}
       <ClipCaptureDraftPanel

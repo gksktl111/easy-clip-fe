@@ -314,7 +314,12 @@
     "captureErrors": {
       "textSaveFailed": "クリップを保存できませんでした。しばらくしてからもう一度お試しください。",
       "imageSaveFailed": "画像クリップを保存できませんでした。しばらくしてからもう一度お試しください。",
-      "unsupportedImage": "対応していない画像形式です。JPEG、PNG、WebP、GIF、AVIFのいずれかのファイルを使用してください。"
+      "unsupportedImage": "対応していない画像形式です。JPEG、PNG、WebP、GIF、AVIFのいずれかのファイルを使用してください。",
+      "clipboardEmpty": "貼り付ける内容がありません。先にテキストや画像をコピーしてください。",
+      "clipboardUnavailable": "このブラウザーでは貼り付けボタンを利用できません。最新版のSafariまたはChromeでお試しください。",
+      "clipboardDenied": "クリップボードへのアクセスが許可されていません。ブラウザーで貼り付けを許可してから再試行してください。",
+      "clipboardUnsupported": "この形式には対応していません。テキストや画像をコピーしてください。",
+      "clipboardReadFailed": "クリップボードを読み取れませんでした。もう一度コピーしてからお試しください。"
     },
     "filter": {
       "all": "すべて",
@@ -437,10 +442,9 @@
       "tooLong": "前後の空白を除いて{max}文字以内で入力してください。",
       "count": "{count}/{max}文字"
     },
-    "captureTextLabel": "保存するテキストを貼り付けるか入力してください。",
-    "captureTextPlaceholder": "保存するテキストを貼り付けるか入力してください。",
-    "captureTextAction": "テキストを保存",
-    "captureImageAction": "画像を選択"
+    "pasteAction": "貼り付け",
+    "pastePending": "保存中…",
+    "pasteHint": "コピーしたテキストや画像をクリップに保存します。"
   },
   "access": {
     "checkingTitle": "アクセス権を確認中",
