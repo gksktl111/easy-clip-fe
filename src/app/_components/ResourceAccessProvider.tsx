@@ -39,76 +39,106 @@ export function ResourceAccessProvider({
     status: ResourceAccessState["status"];
     revision: number;
   }>({ userId: null, status: "checking", revision: 0 });
-  const run = useRef<{ userId: string; promise: Promise<void> } | null>(null);
+  const run = useRef<{
+    userId: string;
+    promise: Promise<void>;
+    blocking: boolean;
+  } | null>(null);
   const version = useRef(0);
   const signature = useRef("");
   const policyRechecked = useRef(false);
 
-  const refresh = useCallback(async () => {
-    if (!userId) return;
-    if (run.current?.userId === userId) return run.current.promise;
-    const token = ++version.current;
-    advanceAccessGeneration();
-    setVerification((state) => ({ ...state, userId, status: "checking" }));
-    const promise = (async () => {
-      await queryClient.cancelQueries({ predicate: isContentQuery });
-      try {
-        const session = await queryClient.fetchQuery({
-          ...currentUserQueryOptions(),
-          staleTime: 0,
-        });
-        // 다른 탭에서 계정이 바뀌었다면 새 계정의 effect가 검증을 이어갑니다.
-        if (session.user.id !== userId || version.current !== token) return;
-        const [nextFolders, nextSubscription] = await Promise.all([
-          queryClient.fetchQuery({
-            ...folderQueryOptions(userId),
-            staleTime: 0,
-            retry: false,
-          }),
-          queryClient.fetchQuery({
-            ...mySubscriptionQueryOptions(userId),
-            staleTime: 0,
-            retry: false,
-          }),
-        ]);
-        if (version.current !== token) return;
-        if (
-          nextFolders.some((folder) => typeof folder.isLocked !== "boolean")
-        ) {
-          queryClient.removeQueries({ predicate: isContentQuery });
+  const refresh = useCallback(
+    async ({ blocking = true }: { blocking?: boolean } = {}) => {
+      if (!userId) return;
+      if (run.current?.userId === userId) {
+        if (blocking && !run.current.blocking) {
+          run.current.blocking = true;
+          advanceAccessGeneration();
+          void queryClient.cancelQueries({ predicate: isContentQuery });
           setVerification((state) => ({
             ...state,
             userId,
-            status: "incompatible",
+            status: "checking",
           }));
-          return;
         }
-        const nextSignature = JSON.stringify([
-          userId,
-          hasEstimatedProAccess(nextSubscription),
-          nextFolders.map(({ id, isLocked }) => [id, isLocked]).sort(),
-        ]);
-        const changed = signature.current !== nextSignature;
-        if (changed) {
-          queryClient.removeQueries({ predicate: isContentQuery });
-          signature.current = nextSignature;
-        }
-        setVerification((state) => ({
-          userId,
-          status: "ready",
-          revision: state.revision + (changed ? 1 : 0),
-        }));
-      } catch {
-        if (version.current === token) {
-          setVerification((state) => ({ ...state, userId, status: "error" }));
-        }
-      } finally {
-        if (version.current === token) run.current = null;
+        return run.current.promise;
       }
-    })();
-    run.current = { userId, promise };
-    return promise;
-  }, [queryClient, userId]);
+      const token = ++version.current;
+      if (blocking) advanceAccessGeneration();
+      if (blocking) {
+        setVerification((state) => ({ ...state, userId, status: "checking" }));
+      }
+      const promise = (async () => {
+        if (blocking) {
+          await queryClient.cancelQueries({ predicate: isContentQuery });
+        }
+        try {
+          const session = await queryClient.fetchQuery({
+            ...currentUserQueryOptions(),
+            staleTime: 0,
+          });
+          // 다른 탭에서 계정이 바뀌었다면 새 계정의 effect가 검증을 이어갑니다.
+          if (session.user.id !== userId || version.current !== token) return;
+          const [nextFolders, nextSubscription] = await Promise.all([
+            queryClient.fetchQuery({
+              ...folderQueryOptions(userId),
+              staleTime: 0,
+              retry: false,
+            }),
+            queryClient.fetchQuery({
+              ...mySubscriptionQueryOptions(userId),
+              staleTime: 0,
+              retry: false,
+            }),
+          ]);
+          if (version.current !== token) return;
+          if (
+            nextFolders.some((folder) => typeof folder.isLocked !== "boolean")
+          ) {
+            advanceAccessGeneration();
+            void queryClient.cancelQueries({ predicate: isContentQuery });
+            queryClient.removeQueries({ predicate: isContentQuery });
+            setVerification((state) => ({
+              ...state,
+              userId,
+              status: "incompatible",
+            }));
+            return;
+          }
+          const nextSignature = JSON.stringify([
+            userId,
+            hasEstimatedProAccess(nextSubscription),
+            nextFolders.map(({ id, isLocked }) => [id, isLocked]).sort(),
+          ]);
+          const changed = signature.current !== nextSignature;
+          if (changed) {
+            advanceAccessGeneration();
+            void queryClient.cancelQueries({ predicate: isContentQuery });
+            queryClient.removeQueries({ predicate: isContentQuery });
+            signature.current = nextSignature;
+          }
+          setVerification((state) => ({
+            userId,
+            status: "ready",
+            revision: state.revision + (changed ? 1 : 0),
+          }));
+        } catch {
+          if (version.current === token) {
+            advanceAccessGeneration();
+            void queryClient.cancelQueries({ predicate: isContentQuery });
+            queryClient.removeQueries({ predicate: isContentQuery });
+            setVerification((state) => ({ ...state, userId, status: "error" }));
+          }
+        } finally {
+          if (version.current === token) run.current = null;
+        }
+      })();
+      run.current = { userId, promise, blocking };
+      return promise;
+    },
+    [queryClient, userId],
+  );
 
   useEffect(() => {
     policyRechecked.current = false;
@@ -127,7 +157,7 @@ export function ResourceAccessProvider({
     const onReturn = () => {
       if (document.visibilityState === "hidden") return;
       policyRechecked.current = false;
-      void refresh();
+      void refresh({ blocking: false });
     };
     window.addEventListener("focus", onReturn);
     document.addEventListener("visibilitychange", onReturn);

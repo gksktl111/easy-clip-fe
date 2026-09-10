@@ -80,13 +80,13 @@ export function WorkspaceSidebar({
       ) : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex h-screen w-72 max-w-[86vw] flex-col border-r border-(--border) bg-(--surface-muted) transition-transform duration-300 md:static md:z-auto md:w-64 md:max-w-none ${
+        className={`fixed inset-y-0 left-0 z-40 flex h-dvh min-h-0 w-72 max-w-[86vw] flex-col border-r border-(--border) bg-(--surface-muted) transition-transform duration-300 md:static md:z-auto md:w-64 md:max-w-none ${
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
         <WorkspaceSidebarHeader onCloseMobile={closeMobile} />
 
-        <nav className="flex-1 overflow-y-auto py-4">
+        <nav className="min-h-0 flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
             <WorkspaceSidebarNav
               items={topNavs}

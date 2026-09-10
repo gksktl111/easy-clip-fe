@@ -241,7 +241,10 @@
     "about": "정보",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "디자이너와 개발자를 위한 현대적인 클립보드 매니저",
-    "closeButton": "닫기"
+    "closeButton": "닫기",
+    "subscriptionFreeStatus": "무료 플랜 이용 중",
+    "subscriptionUnavailableStatus": "구독 상태를 확인할 수 없음",
+    "subscriptionCanceledUntil": "해지 예약 / {date}까지 이용 가능"
   },
   "trash": {
     "selectionHint": "복구할 항목을 선택하세요.",
@@ -433,7 +436,11 @@
       "hint": "앞뒤 공백 제외, 최대 {max}자까지 입력할 수 있습니다.",
       "tooLong": "이름은 앞뒤 공백을 제외하고 {max}자 이내로 입력해주세요.",
       "count": "{count}/{max}자"
-    }
+    },
+    "captureTextLabel": "저장할 텍스트를 붙여넣거나 입력하세요.",
+    "captureTextPlaceholder": "저장할 텍스트를 붙여넣거나 입력하세요.",
+    "captureTextAction": "텍스트 저장",
+    "captureImageAction": "이미지 선택"
   },
   "access": {
     "checkingTitle": "권한을 확인하고 있습니다",

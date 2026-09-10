@@ -241,7 +241,10 @@
     "about": "关于",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "面向设计师和开发者的现代剪贴板管理器",
-    "closeButton": "关闭"
+    "closeButton": "关闭",
+    "subscriptionFreeStatus": "正在使用免费版",
+    "subscriptionUnavailableStatus": "无法确认订阅状态",
+    "subscriptionCanceledUntil": "已预约取消 / 可使用至 {date}"
   },
   "trash": {
     "selectionHint": "选择要恢复的项目。",
@@ -433,7 +436,11 @@
       "hint": "去除首尾空格后，最多可输入{max}个字符。",
       "tooLong": "去除首尾空格后，名称不能超过{max}个字符。",
       "count": "{count}/{max}字"
-    }
+    },
+    "captureTextLabel": "粘贴或输入要保存的文本。",
+    "captureTextPlaceholder": "粘贴或输入要保存的文本。",
+    "captureTextAction": "保存文本",
+    "captureImageAction": "选择图片"
   },
   "access": {
     "checkingTitle": "正在检查访问权限",
