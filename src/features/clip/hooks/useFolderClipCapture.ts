@@ -65,15 +65,19 @@ export const useFolderClipCapture = ({
   }, [isAuthenticated, router]);
 
   const submitInput = useCallback(
-    async (input: CaptureInput) => {
+    async (
+      input: CaptureInput,
+      allowExistingDraft = false,
+    ): Promise<boolean> => {
       if (
         isDisabled ||
         submitting.current ||
+        (draft && !allowExistingDraft) ||
         !folderId ||
         !user ||
         !isAuthenticated
       )
-        return;
+        return false;
       const id = crypto.randomUUID();
       drafts.save(user.id, folderId, { id, input });
       submitting.current = true;
@@ -82,6 +86,7 @@ export const useFolderClipCapture = ({
         else await createImage(folderId, input.file);
         drafts.remove(user.id, folderId, id);
         notifySuccess(feedback("saveSuccess"));
+        return true;
       } catch (error) {
         drafts.fail(user.id, folderId, id, error);
         if (!isPolicyError(error))
@@ -92,6 +97,7 @@ export const useFolderClipCapture = ({
                 ? t("unsupportedImage")
                 : t("imageSaveFailed"),
           );
+        return false;
       } finally {
         submitting.current = false;
       }
@@ -100,6 +106,7 @@ export const useFolderClipCapture = ({
       feedback,
       createText,
       createImage,
+      draft,
       drafts,
       folderId,
       isAuthenticated,
@@ -110,20 +117,20 @@ export const useFolderClipCapture = ({
   );
 
   const createTextClipFromPaste = useCallback(
-    async (content: string) => {
+    async (content: string): Promise<boolean> => {
       const text = content.trim();
-      if (text) await submitInput({ type: "text", text });
+      return text ? submitInput({ type: "text", text }) : false;
     },
     [submitInput],
   );
 
   const createImageClipFromPaste = useCallback(
-    async (file: File) => {
+    async (file: File): Promise<boolean> => {
       if (!isAllowedImageClipFile(file)) {
         notifyError(t("unsupportedImage"));
-        return;
+        return false;
       }
-      await submitInput({ type: "image", file });
+      return submitInput({ type: "image", file });
     },
     [submitInput, t],
   );
@@ -184,11 +191,13 @@ export const useFolderClipCapture = ({
   return {
     activate,
     deactivate,
+    submitText: createTextClipFromPaste,
+    submitImage: createImageClipFromPaste,
     isActive,
     isCreating,
     draft,
     retryDraft: () => {
-      if (draft) void submitInput(draft.input);
+      if (draft) void submitInput(draft.input, true);
     },
     discardDraft: () => {
       if (user && draft) drafts.remove(user.id, folderId, draft.id);

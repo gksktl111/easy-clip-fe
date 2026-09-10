@@ -146,6 +146,8 @@ export const useFolderClipsPage = ({
     capture: {
       activatePage,
       draft: capture.draft,
+      submitText: capture.submitText,
+      submitImage: capture.submitImage,
       retryDraft: capture.retryDraft,
       discardDraft: capture.discardDraft,
       isActive,

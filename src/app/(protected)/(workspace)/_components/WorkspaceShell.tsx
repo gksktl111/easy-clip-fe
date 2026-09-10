@@ -15,7 +15,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const closeSettings = () => setIsSettingsOpen(false);
 
   return (
-    <div className="bg-background text-foreground flex h-screen flex-col overflow-hidden">
+    <div className="bg-background text-foreground flex h-dvh min-h-0 flex-col overflow-hidden">
       {/* 모바일 헤더 */}
       <header className="bg-background border-b border-(--border) md:hidden">
         <div className="flex items-center justify-between px-4 py-3">

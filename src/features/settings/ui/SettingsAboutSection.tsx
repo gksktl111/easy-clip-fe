@@ -2,7 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import { HiOutlineCreditCard } from "react-icons/hi";
-import type { MySubscriptionResponseDto } from "@/features/subscription";
+import {
+  mapSubscriptionStatus,
+  type MySubscriptionResponseDto,
+  type SubscriptionStatus,
+} from "@/features/subscription";
 import type { AppLocale } from "@/shared/config/locale";
 import { Text } from "@/shared/ui/typography/Text";
 
@@ -12,6 +16,32 @@ interface SettingsAboutSectionProps {
   isLoading: boolean;
   language: AppLocale;
   subscription: MySubscriptionResponseDto | null | undefined;
+}
+
+function SubscriptionStatusLabel({
+  status,
+  language,
+}: {
+  status: SubscriptionStatus;
+  language: AppLocale;
+}) {
+  const t = useTranslations("settings");
+
+  switch (status.kind) {
+    case "free":
+      return t("subscriptionFreeStatus");
+    case "active":
+      return t("subscriptionStatusValues.ACTIVE");
+    case "canceled":
+      return t("subscriptionCanceledUntil", {
+        date: new Intl.DateTimeFormat(language, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(new Date(status.currentPeriodEnd)),
+      });
+    case "unavailable":
+      return t("subscriptionUnavailableStatus");
+  }
 }
 
 export function SettingsAboutSection({
@@ -33,15 +63,11 @@ export function SettingsAboutSection({
     }).format(new Date(value));
   };
 
-  const formatSubscriptionStatus = (
-    status: MySubscriptionResponseDto["status"] | null | undefined,
-  ) => {
-    if (!status) {
-      return t("subscriptionEmptyValue");
-    }
-
-    return t(`subscriptionStatusValues.${status}`);
-  };
+  const mappedStatus = mapSubscriptionStatus(subscription);
+  const hasScheduledBilling =
+    !isLoading &&
+    mappedStatus.kind === "active" &&
+    mappedStatus.nextBillingAt !== null;
 
   return (
     <section>
@@ -67,7 +93,7 @@ export function SettingsAboutSection({
                 <dd className="mt-1 font-semibold">
                   {isLoading
                     ? t("subscriptionLoading")
-                    : (subscription?.plan ?? t("subscriptionEmptyValue"))}
+                    : (mappedStatus.plan ?? t("subscriptionEmptyValue"))}
                 </dd>
               </div>
               <div>
@@ -75,19 +101,26 @@ export function SettingsAboutSection({
                   {t("subscriptionStatus")}
                 </Text>
                 <dd className="mt-1 font-semibold">
-                  {isLoading
-                    ? t("subscriptionLoading")
-                    : formatSubscriptionStatus(subscription?.status)}
+                  {isLoading ? (
+                    t("subscriptionLoading")
+                  ) : (
+                    <SubscriptionStatusLabel
+                      status={mappedStatus}
+                      language={language}
+                    />
+                  )}
                 </dd>
               </div>
-              <div>
-                <Text as="dt" variant="caption">
-                  {t("subscriptionNextBillingAt")}
-                </Text>
-                <dd className="mt-1 font-semibold">
-                  {formatNullableDate(subscription?.nextBillingAt ?? null)}
-                </dd>
-              </div>
+              {hasScheduledBilling ? (
+                <div>
+                  <Text as="dt" variant="caption">
+                    {t("subscriptionNextBillingAt")}
+                  </Text>
+                  <dd className="mt-1 font-semibold">
+                    {formatNullableDate(mappedStatus.nextBillingAt)}
+                  </dd>
+                </div>
+              ) : null}
             </dl>
             {errorMessage ? (
               <Text variant="caption" className="mt-3">

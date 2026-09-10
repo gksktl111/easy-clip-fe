@@ -22,7 +22,7 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   webServer: {
-    command: `npm run start -- -p ${port}`,
+    command: `npm run start -- --hostname 127.0.0.1 -p ${port}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     url: baseURL,
