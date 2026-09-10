@@ -88,9 +88,13 @@ function FolderClipsContent({
           }
         />
       ) : null}
-      {!hasClipLoadError && !capture.isActive ? (
+      {!hasClipLoadError ? (
         <FolderClipCaptureHint
           message={`${t("captureHint")} ${a("clipLimit", { limit: access.isPro ? 300 : 50 })}`}
+          onTextSubmit={capture.submitText}
+          onImageSelect={capture.submitImage}
+          pending={capture.isCreating}
+          hasDraft={Boolean(capture.draft)}
         />
       ) : null}
       <ClipCaptureDraftPanel

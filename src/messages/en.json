@@ -241,7 +241,10 @@
     "about": "About",
     "aboutTitle": "Clipboard Studio v1.0.0",
     "aboutDescription": "A modern clipboard manager for designers and developers",
-    "closeButton": "Close"
+    "closeButton": "Close",
+    "subscriptionFreeStatus": "Using free plan",
+    "subscriptionUnavailableStatus": "Subscription unavailable",
+    "subscriptionCanceledUntil": "Canceled; available until {date}"
   },
   "trash": {
     "selectionHint": "Select items to restore.",
@@ -433,7 +436,11 @@
       "hint": "Up to {max} characters, excluding leading and trailing spaces.",
       "tooLong": "Enter a name of {max} characters or fewer after trimming spaces.",
       "count": "{count}/{max} characters"
-    }
+    },
+    "captureTextLabel": "Paste text or type a clip to save it.",
+    "captureTextPlaceholder": "Paste text or type a clip to save it.",
+    "captureTextAction": "Save text",
+    "captureImageAction": "Choose image"
   },
   "access": {
     "checkingTitle": "Checking access",
