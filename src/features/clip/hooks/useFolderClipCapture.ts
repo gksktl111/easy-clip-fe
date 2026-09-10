@@ -15,6 +15,7 @@ import {
   isUnsupportedImageClipError,
 } from "@/features/clip/service/imageClipValidation";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
+import { readCurrentClipboard } from "@/features/clip/service/readCurrentClipboard";
 
 interface UseFolderClipCaptureOptions {
   folderId: string;
@@ -42,6 +43,16 @@ export const useFolderClipCapture = ({
     isPending: isCreating,
   } = useCreateClipMutation();
   const [isActive, setIsActive] = useState(false);
+  const [isReadingClipboard, setIsReadingClipboard] = useState(false);
+  const readingClipboard = useRef(false);
+  const captureGeneration = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      // 읽기 권한 대기 중 계정·폴더·접근 상태 변경 시 저장을 취소합니다.
+      captureGeneration.current += 1;
+    };
+  }, [folderId, user?.id, isDisabled]);
 
   const activate = useCallback(() => {
     if (!isDisabled) {
@@ -135,6 +146,50 @@ export const useFolderClipCapture = ({
     [submitInput, t],
   );
 
+  const pasteFromClipboard = useCallback(async (): Promise<boolean> => {
+    if (isDisabled || draft || submitting.current || readingClipboard.current)
+      return false;
+    if (!ensureAuthenticated()) return false;
+    readingClipboard.current = true;
+    setIsReadingClipboard(true);
+    const generation = captureGeneration.current;
+    try {
+      const result = await readCurrentClipboard();
+      if (generation !== captureGeneration.current) return false;
+      switch (result.kind) {
+        case "image":
+          return await createImageClipFromPaste(result.file);
+        case "text":
+          return await createTextClipFromPaste(result.text);
+        case "empty":
+          notifyError(t("clipboardEmpty"));
+          break;
+        case "unavailable":
+          notifyError(t("clipboardUnavailable"));
+          break;
+        case "denied":
+          notifyError(t("clipboardDenied"));
+          break;
+        case "unsupported":
+          notifyError(t("clipboardUnsupported"));
+          break;
+        case "failed":
+          notifyError(t("clipboardReadFailed"));
+      }
+      return false;
+    } finally {
+      readingClipboard.current = false;
+      setIsReadingClipboard(false);
+    }
+  }, [
+    isDisabled,
+    draft,
+    ensureAuthenticated,
+    createImageClipFromPaste,
+    createTextClipFromPaste,
+    t,
+  ]);
+
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
       const target = event.target;
@@ -147,6 +202,7 @@ export const useFolderClipCapture = ({
 
       if (
         draft ||
+        readingClipboard.current ||
         isDisabled ||
         !isActive ||
         !folderId ||
@@ -191,8 +247,9 @@ export const useFolderClipCapture = ({
   return {
     activate,
     deactivate,
-    submitText: createTextClipFromPaste,
-    submitImage: createImageClipFromPaste,
+    pasteFromClipboard,
+    isReadingClipboard,
+    isDisabled,
     isActive,
     isCreating,
     draft,

@@ -314,7 +314,12 @@
     "captureErrors": {
       "textSaveFailed": "Could not save the clip. Please try again shortly.",
       "imageSaveFailed": "Could not save the image clip. Please try again shortly.",
-      "unsupportedImage": "Unsupported image format. Use a JPEG, PNG, WebP, GIF, or AVIF file."
+      "unsupportedImage": "Unsupported image format. Use a JPEG, PNG, WebP, GIF, or AVIF file.",
+      "clipboardEmpty": "Nothing to paste. Copy some text or an image first.",
+      "clipboardUnavailable": "This browser does not support the Paste button. Try the latest Safari or Chrome.",
+      "clipboardDenied": "Clipboard access was not allowed. Allow pasting in your browser, then try again.",
+      "clipboardUnsupported": "This clipboard format is not supported. Copy text or an image.",
+      "clipboardReadFailed": "Could not read the clipboard. Copy the content again and retry."
     },
     "filter": {
       "all": "All",
@@ -437,10 +442,9 @@
       "tooLong": "Enter a name of {max} characters or fewer after trimming spaces.",
       "count": "{count}/{max} characters"
     },
-    "captureTextLabel": "Paste text or type a clip to save it.",
-    "captureTextPlaceholder": "Paste text or type a clip to save it.",
-    "captureTextAction": "Save text",
-    "captureImageAction": "Choose image"
+    "pasteAction": "Paste",
+    "pastePending": "Saving…",
+    "pasteHint": "Save copied text or an image as a clip."
   },
   "access": {
     "checkingTitle": "Checking access",

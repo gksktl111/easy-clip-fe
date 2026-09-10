@@ -146,8 +146,9 @@ export const useFolderClipsPage = ({
     capture: {
       activatePage,
       draft: capture.draft,
-      submitText: capture.submitText,
-      submitImage: capture.submitImage,
+      pasteFromClipboard: capture.pasteFromClipboard,
+      isReadingClipboard: capture.isReadingClipboard,
+      isDisabled: capture.isDisabled,
       retryDraft: capture.retryDraft,
       discardDraft: capture.discardDraft,
       isActive,
