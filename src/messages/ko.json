@@ -314,7 +314,12 @@
     "captureErrors": {
       "textSaveFailed": "클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
       "imageSaveFailed": "이미지 클립 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
-      "unsupportedImage": "지원하지 않는 이미지 형식입니다. JPEG, PNG, WebP, GIF 또는 AVIF 파일을 사용해주세요."
+      "unsupportedImage": "지원하지 않는 이미지 형식입니다. JPEG, PNG, WebP, GIF 또는 AVIF 파일을 사용해주세요.",
+      "clipboardEmpty": "붙여넣을 내용이 없어요. 먼저 텍스트나 이미지를 복사해 주세요.",
+      "clipboardUnavailable": "이 브라우저는 버튼 붙여넣기를 지원하지 않아요. 최신 Safari 또는 Chrome에서 다시 시도해 주세요.",
+      "clipboardDenied": "클립보드 접근이 허용되지 않았어요. 브라우저에서 붙여넣기를 허용한 뒤 다시 눌러주세요.",
+      "clipboardUnsupported": "클립보드의 형식을 지원하지 않아요. 텍스트나 이미지를 복사해 주세요.",
+      "clipboardReadFailed": "클립보드를 읽지 못했어요. 내용을 다시 복사한 뒤 시도해 주세요."
     },
     "filter": {
       "all": "전체",
@@ -437,10 +442,9 @@
       "tooLong": "이름은 앞뒤 공백을 제외하고 {max}자 이내로 입력해주세요.",
       "count": "{count}/{max}자"
     },
-    "captureTextLabel": "저장할 텍스트를 붙여넣거나 입력하세요.",
-    "captureTextPlaceholder": "저장할 텍스트를 붙여넣거나 입력하세요.",
-    "captureTextAction": "텍스트 저장",
-    "captureImageAction": "이미지 선택"
+    "pasteAction": "붙여넣기",
+    "pastePending": "저장 중…",
+    "pasteHint": "복사한 텍스트나 이미지를 클립으로 저장하세요."
   },
   "access": {
     "checkingTitle": "권한을 확인하고 있습니다",

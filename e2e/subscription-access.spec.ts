@@ -349,35 +349,3 @@ test("열린 화면에서 Pro가 만료되면 폴더 권한을 다시 확인한�
   ).toBeVisible();
   await expect(page.getByText("비공개 클립", { exact: true })).toHaveCount(0);
 });
-
-test("모바일에서 텍스트 입력과 이미지 선택으로 클립을 추가한다", async ({
-  page,
-}, testInfo) => {
-  await setup(page);
-  let requests = 0;
-  await page.route("**/clips", (route) => {
-    requests += 1;
-    return route.fulfill({ json: clip(`new-${requests}`, "a", "새 클립") });
-  });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/folder/a");
-  await expect(page.getByText("공개 클립", { exact: true })).toBeVisible();
-
-  const textInput = page.getByPlaceholder(
-    "저장할 텍스트를 붙여넣거나 입력하세요.",
-  );
-  await textInput.fill("모바일에서 작성한 클립");
-  await page.getByRole("button", { name: "텍스트 저장", exact: true }).click();
-  await expect(textInput).toHaveValue("");
-
-  await page.locator('input[type="file"]').setInputFiles({
-    name: "mobile.png",
-    mimeType: "image/png",
-    buffer: Buffer.from("image-bytes"),
-  });
-  await expect.poll(() => requests).toBe(2);
-  await testInfo.attach("mobile-clip-capture", {
-    body: await page.screenshot(),
-    contentType: "image/png",
-  });
-});
