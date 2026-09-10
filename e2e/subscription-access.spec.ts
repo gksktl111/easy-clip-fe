@@ -352,7 +352,7 @@ test("열린 화면에서 Pro가 만료되면 폴더 권한을 다시 확인한�
 
 test("모바일에서 텍스트 입력과 이미지 선택으로 클립을 추가한다", async ({
   page,
-}) => {
+}, testInfo) => {
   await setup(page);
   let requests = 0;
   await page.route("**/clips", (route) => {
@@ -376,4 +376,8 @@ test("모바일에서 텍스트 입력과 이미지 선택으로 클립을 추�
     buffer: Buffer.from("image-bytes"),
   });
   await expect.poll(() => requests).toBe(2);
+  await testInfo.attach("mobile-clip-capture", {
+    body: await page.screenshot(),
+    contentType: "image/png",
+  });
 });

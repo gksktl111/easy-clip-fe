@@ -47,7 +47,6 @@ export function ResourceAccessProvider({
   const version = useRef(0);
   const signature = useRef("");
   const policyRechecked = useRef(false);
-  const lastReturnCheck = useRef(0);
 
   const refresh = useCallback(
     async ({ blocking = true }: { blocking?: boolean } = {}) => {
@@ -157,8 +156,6 @@ export function ResourceAccessProvider({
   useEffect(() => {
     const onReturn = () => {
       if (document.visibilityState === "hidden") return;
-      if (Date.now() - lastReturnCheck.current < 1000) return;
-      lastReturnCheck.current = Date.now();
       policyRechecked.current = false;
       void refresh({ blocking: false });
     };
