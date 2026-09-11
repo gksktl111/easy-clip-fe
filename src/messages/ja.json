@@ -50,8 +50,6 @@
         "description": "保存したクリップをキーワードで検索し、すぐにコピーできます。"
       }
     },
-    "reviewsTitle": "作業の流れが変わったユーザーの声",
-    "reviewsDescription": "保存と再利用を繰り返す作業がどう変わるかをご覧ください。",
     "closingTitleLine1": "コピーした情報を、",
     "closingTitleLine2": "ひとつの場所に残しましょう。",
     "closingDescription": "メッセンジャーやメモに散らばったテキストや画像をEasyClipに保存し、必要なときに検索して再びコピーできます。"
@@ -75,9 +73,7 @@
         "features": {
           "projects": "1つのプロジェクトを利用可能",
           "clips": "フォルダーごとに50件まで追加保存",
-          "devices": "デスクトップ1台、モバイル1台を連携可能",
-          "organization": "アクセス可能なフォルダーで検索 + タグ",
-          "ai": ""
+          "organization": "アクセス可能なフォルダーで検索 + タグ"
         }
       },
       "pro": {
@@ -85,14 +81,12 @@
         "badge": "集中作業向け",
         "description": "複数のプロジェクトを運用し、タグで整理したい人のためのプランです。",
         "priceSuffix": "/月",
-        "billingNote": "月額₩3,900でPro機能を利用できます",
+        "billingNote": "毎月自動課金・自動更新は解約可能",
         "cta": "Proにアップグレード",
         "features": {
           "projects": "プロジェクトを無制限に作成可能",
           "clips": "フォルダーごとに300件まで追加保存",
-          "devices": "デバイスを無制限に連携可能",
-          "organization": "アクセス可能なフォルダーで検索 + タグ",
-          "ai": "AI機能は近日追加予定"
+          "organization": "アクセス可能なフォルダーで検索 + タグ"
         }
       }
     },
@@ -137,20 +131,10 @@
           "freeValue": "フォルダーごとに50件まで追加保存",
           "proValue": "フォルダーごとに300件まで追加保存"
         },
-        "devices": {
-          "label": "デバイス連携",
-          "freeValue": "デスクトップ1台 + モバイル1台",
-          "proValue": "無制限のデバイス連携"
-        },
         "organization": {
           "label": "整理方法",
           "freeValue": "アクセス可能なフォルダーで検索 + タグ",
           "proValue": "アクセス可能なフォルダーで検索 + タグ"
-        },
-        "ai": {
-          "label": "AI機能",
-          "freeValue": "未対応",
-          "proValue": "近日追加予定"
         }
       }
     },
@@ -169,11 +153,6 @@
     "configError": "API 接続設定がありません。環境変数を確認してください。",
     "or": "または",
     "backHome": "ホームに戻る",
-    "agreementPrefix": "続行すると、",
-    "agreementMiddle": "および",
-    "terms": "利用規約",
-    "privacy": "プライバシーポリシー",
-    "agreementSuffix": "に同意したものとみなされます。",
     "policiesPending": "利用規約とプライバシーポリシーを準備中です。",
     "contact": "お問い合わせ"
   },
@@ -274,7 +253,6 @@
     "error": "ゴミ箱データを読み込めませんでした。しばらくしてから再試行してください。",
     "actionError": "ゴミ箱の操作を完了できませんでした。しばらくしてから再試行してください。",
     "restoreConflictError": "削除されたフォルダ内のクリップは単独では復元できません。先に親フォルダを復元してください。",
-    "clearAllPartialError": "一部の項目を削除できませんでした。失敗 {failedCount} 件 / 全体 {totalCount} 件",
     "emptyTitle": "表示できるゴミ箱項目はありません",
     "emptyDescription": "ロックされたフォルダの削除項目は非表示の場合があります。全削除には非表示の項目も含まれます。",
     "listTitle": "削除済みアイテム",

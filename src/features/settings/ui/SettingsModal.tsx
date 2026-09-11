@@ -1,19 +1,13 @@
 "use client";
 
-import { notifyError, notifySuccess } from "@/shared/feedback/toast";
-
-import { useRef, useState } from "react";
-import { messagesByLocale } from "@/shared/config/messages";
-import { createTranslator, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { HiOutlineCog, HiOutlineX } from "react-icons/hi";
-import { persistUserSettings } from "@/features/settings/service/settingsService";
 import { SettingsAboutSection } from "@/features/settings/ui/SettingsAboutSection";
 import { SettingsPreferencesSection } from "@/features/settings/ui/SettingsPreferencesSection";
 import { useMySubscription } from "@/features/subscription";
-import type { AppLocale } from "@/shared/config/locale";
 import { useAuth } from "@/features/auth";
-import { useSettingsStore } from "@/shared/store/settingsStore";
 import { Button } from "@/shared/ui/button/Button";
+import { useSettingsMutation } from "@/features/settings/mutations/useSettingsMutation";
 import { Modal } from "@/shared/ui/overlay/Modal";
 
 // 사용자 설정 저장 상태를 관리하고 환경 설정과 구독 정보 섹션을 조합합니다.
@@ -22,79 +16,20 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
-  const pending = useRef(false);
   const t = useTranslations("settings");
   const { user } = useAuth();
   const subscriptionQuery = useMySubscription();
-  const { theme, language, setLanguage, setTheme } = useSettingsStore();
-  const [savingField, setSavingField] = useState<"theme" | "language" | null>(
-    null,
-  );
-  const feedback = useTranslations("feedback");
-  const isDark = theme === "dark";
+  const {
+    isDark,
+    language,
+    savingField,
+    handleThemeToggle,
+    handleLanguageChange,
+  } = useSettingsMutation();
   const isSubscriptionLoading = Boolean(user && subscriptionQuery.isPending);
   const subscriptionError = subscriptionQuery.isError
     ? t("subscriptionLoadError")
     : null;
-
-  const handleThemeToggle = async () => {
-    const previousTheme = theme;
-    const nextTheme = isDark ? "light" : "dark";
-
-    if (pending.current) return;
-    setTheme(nextTheme);
-
-    if (!user) {
-      notifySuccess(feedback("settingsSaved"));
-      return;
-    }
-
-    pending.current = true;
-    setSavingField("theme");
-
-    try {
-      await persistUserSettings({ theme: nextTheme });
-      notifySuccess(feedback("settingsSaved"));
-    } catch {
-      setTheme(previousTheme);
-      notifyError(t("saveError"));
-    } finally {
-      pending.current = false;
-      setSavingField(null);
-    }
-  };
-
-  const handleLanguageChange = async (nextLanguage: AppLocale) => {
-    if (nextLanguage === language) return;
-    const previousLanguage = language;
-    const nextFeedback = createTranslator({
-      locale: nextLanguage,
-      messages: messagesByLocale[nextLanguage],
-      namespace: "feedback",
-    });
-
-    if (pending.current) return;
-    setLanguage(nextLanguage);
-
-    if (!user) {
-      notifySuccess(nextFeedback("settingsSaved"));
-      return;
-    }
-
-    pending.current = true;
-    setSavingField("language");
-
-    try {
-      await persistUserSettings({ language: nextLanguage });
-      notifySuccess(nextFeedback("settingsSaved"));
-    } catch {
-      setLanguage(previousLanguage);
-      notifyError(t("saveError"));
-    } finally {
-      pending.current = false;
-      setSavingField(null);
-    }
-  };
 
   return (
     <Modal

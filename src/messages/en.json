@@ -50,8 +50,6 @@
         "description": "Search saved clips by keyword and copy the one you need right away."
       }
     },
-    "reviewsTitle": "Why users changed their workflow",
-    "reviewsDescription": "See how saving and reusing content makes everyday work simpler.",
     "closingTitleLine1": "Do not lose copied information.",
     "closingTitleLine2": "Keep it in one place.",
     "closingDescription": "Save text and images scattered across chats and notes in EasyClip. Search for them and copy them again whenever you need them."
@@ -75,9 +73,7 @@
         "features": {
           "projects": "Use 1 project",
           "clips": "Add clips up to 50 per folder",
-          "devices": "Connect 1 desktop and 1 mobile device",
-          "organization": "Search + tags in accessible folders",
-          "ai": ""
+          "organization": "Search + tags in accessible folders"
         }
       },
       "pro": {
@@ -85,14 +81,12 @@
         "badge": "For focused work",
         "description": "For managing multiple projects with tag-based organization.",
         "priceSuffix": "/ month",
-        "billingNote": "Unlock Pro features for ₩3,900 per month",
+        "billingNote": "Billed monthly · Cancel renewal anytime",
         "cta": "Upgrade to Pro",
         "features": {
           "projects": "Create unlimited projects",
           "clips": "Add clips up to 300 per folder",
-          "devices": "Connect unlimited devices",
-          "organization": "Search + tags in accessible folders",
-          "ai": "AI features coming soon"
+          "organization": "Search + tags in accessible folders"
         }
       }
     },
@@ -137,20 +131,10 @@
           "freeValue": "Add clips up to 50 per folder",
           "proValue": "Add clips up to 300 per folder"
         },
-        "devices": {
-          "label": "Devices",
-          "freeValue": "1 desktop + 1 mobile",
-          "proValue": "Unlimited devices"
-        },
         "organization": {
           "label": "Organization",
           "freeValue": "Search + tags in accessible folders",
           "proValue": "Search + tags in accessible folders"
-        },
-        "ai": {
-          "label": "AI features",
-          "freeValue": "Not available",
-          "proValue": "Coming soon"
         }
       }
     },
@@ -169,11 +153,6 @@
     "configError": "API connection settings are missing. Check your environment variables.",
     "or": "or",
     "backHome": "Back to home",
-    "agreementPrefix": "By continuing, you agree to the",
-    "agreementMiddle": "and",
-    "terms": "Terms of Service",
-    "privacy": "Privacy Policy",
-    "agreementSuffix": ".",
     "policiesPending": "Our terms of service and privacy policy are being prepared.",
     "contact": "Contact us"
   },
@@ -274,7 +253,6 @@
     "error": "Failed to load trash data. Please try again shortly.",
     "actionError": "Could not complete the trash action. Please try again shortly.",
     "restoreConflictError": "Clips inside a deleted folder cannot be restored on their own. Restore the parent folder first.",
-    "clearAllPartialError": "Some items could not be deleted. Failed {failedCount} of {totalCount}.",
     "emptyTitle": "No trash items to display",
     "emptyDescription": "Deleted items in locked folders may be hidden. Empty trash also deletes hidden items.",
     "listTitle": "Deleted items",

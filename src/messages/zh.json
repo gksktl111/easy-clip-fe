@@ -50,8 +50,6 @@
         "description": "通过关键词搜索已保存的剪贴内容，并立即复制所需内容。"
       }
     },
-    "reviewsTitle": "用户为何改变了工作方式",
-    "reviewsDescription": "看看保存和复用内容如何让日常工作变得更简单。",
     "closingTitleLine1": "别让复制过的信息丢失。",
     "closingTitleLine2": "把它们集中保存到一处。",
     "closingDescription": "将散落在聊天和笔记中的文本与图片保存到 EasyClip，需要时搜索并再次复制。"
@@ -75,9 +73,7 @@
         "features": {
           "projects": "可使用 1 个项目",
           "clips": "每个文件夹可追加保存至50条",
-          "devices": "可连接 1 台桌面设备和 1 台移动设备",
-          "organization": "在可访问的文件夹中搜索 + 标签",
-          "ai": ""
+          "organization": "在可访问的文件夹中搜索 + 标签"
         }
       },
       "pro": {
@@ -85,14 +81,12 @@
         "badge": "适合专注工作",
         "description": "适合管理多个项目并使用标签整理内容的用户。",
         "priceSuffix": "/月",
-        "billingNote": "每月 ₩3,900，解锁 Pro 功能",
+        "billingNote": "每月自动扣款 · 可取消自动续订",
         "cta": "升级到 Pro",
         "features": {
           "projects": "可创建无限项目",
           "clips": "每个文件夹可追加保存至300条",
-          "devices": "可连接无限设备",
-          "organization": "在可访问的文件夹中搜索 + 标签",
-          "ai": "AI 功能即将推出"
+          "organization": "在可访问的文件夹中搜索 + 标签"
         }
       }
     },
@@ -137,20 +131,10 @@
           "freeValue": "每个文件夹可追加保存至50条",
           "proValue": "每个文件夹可追加保存至300条"
         },
-        "devices": {
-          "label": "设备连接",
-          "freeValue": "1 台桌面设备 + 1 台移动设备",
-          "proValue": "无限设备连接"
-        },
         "organization": {
           "label": "整理方式",
           "freeValue": "在可访问的文件夹中搜索 + 标签",
           "proValue": "在可访问的文件夹中搜索 + 标签"
-        },
-        "ai": {
-          "label": "AI 功能",
-          "freeValue": "暂不支持",
-          "proValue": "即将推出"
         }
       }
     },
@@ -169,11 +153,6 @@
     "configError": "缺少 API 连接配置，请检查环境变量。",
     "or": "或",
     "backHome": "返回首页",
-    "agreementPrefix": "继续即表示你同意",
-    "agreementMiddle": "以及",
-    "terms": "服务条款",
-    "privacy": "隐私政策",
-    "agreementSuffix": "。",
     "policiesPending": "服务条款和隐私政策正在准备中。",
     "contact": "联系我们"
   },
@@ -274,7 +253,6 @@
     "error": "无法加载回收站数据。请稍后再试。",
     "actionError": "无法完成回收站操作。请稍后再试。",
     "restoreConflictError": "已删除文件夹中的剪贴内容不能单独恢复。请先恢复父级文件夹。",
-    "clearAllPartialError": "部分项目未能删除。失败 {failedCount} 个 / 共 {totalCount} 个。",
     "emptyTitle": "没有可显示的回收站项目",
     "emptyDescription": "锁定文件夹中的已删除项目可能被隐藏。清空回收站也会删除隐藏项目。",
     "listTitle": "已删除项目",

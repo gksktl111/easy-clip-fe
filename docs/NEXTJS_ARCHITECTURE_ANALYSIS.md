@@ -1,5 +1,7 @@
 # Next.js App Router 아키텍처 개선 제안서
 
+> 과거 기록 — 2026-09-11 현재 구현 상태의 판단에는 [최신 검수 문서](project-review/README.md)를 우선합니다. 아래 제안과 미구현 표시는 작성 당시 기록입니다.
+
 > 작성일: 2026-08-26
 >
 > 대상: `next@16.1.1`, React 19, TanStack Query 5

@@ -78,13 +78,10 @@ for (const [locale, messages] of Object.entries({ ko, en, ja, zh })) {
     await expect(
       page.getByText(messages.billing.renewal, { exact: true }),
     ).toBeVisible();
-    await expect(
-      page.getByText(messages.pricing.plans.pro.features.devices, {
-        exact: true,
-      }),
-    ).toHaveCount(0);
-    await expect(
-      page.getByText(messages.pricing.plans.pro.features.ai, { exact: true }),
-    ).toHaveCount(0);
+    const benefits = page.locator("main li");
+    await expect(benefits).toHaveCount(3);
+    for (const benefit of Object.values(messages.pricing.plans.pro.features)) {
+      await expect(benefits.filter({ hasText: benefit })).toHaveCount(1);
+    }
   });
 }

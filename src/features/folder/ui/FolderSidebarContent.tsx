@@ -9,7 +9,7 @@ import { ConfirmActionModal } from "@/shared/ui/overlay/ConfirmActionModal";
 
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { useFolderActions } from "@/features/folder/hooks/useFolderActions";
+import { useFolderActions } from "@/features/folder/mutations/useFolderActions";
 import type {
   FolderDropPosition,
   FolderItem,

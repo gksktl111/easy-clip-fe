@@ -50,8 +50,6 @@
         "description": "키워드로 저장한 클립을 검색해 바로 복사할 수 있습니다."
       }
     },
-    "reviewsTitle": "작업 흐름을 바꾼 사용자들의 이야기",
-    "reviewsDescription": "저장과 재사용을 반복하는 일이 어떻게 달라졌는지 확인해 보세요.",
     "closingTitleLine1": "복사한 정보,",
     "closingTitleLine2": "이제는 한곳에 저장하세요.",
     "closingDescription": "메신저나 메모에 흩어 둔 텍스트와 이미지를 EasyClip에 저장하세요. 필요할 때 검색해 다시 복사할 수 있습니다."
@@ -75,9 +73,7 @@
         "features": {
           "projects": "프로젝트 1개 사용 가능",
           "clips": "폴더당 50개까지 추가 저장",
-          "devices": "데스크톱 1개, 모바일 1개 연동 가능",
-          "organization": "접근 가능한 폴더에서 검색 + 태그",
-          "ai": ""
+          "organization": "접근 가능한 폴더에서 검색 + 태그"
         }
       },
       "pro": {
@@ -85,14 +81,12 @@
         "badge": "집중 작업용",
         "description": "프로젝트를 여러 개 운영하고 태그 기반 정리가 필요한 플랜",
         "priceSuffix": "/월",
-        "billingNote": "월 3,900원으로 Pro 기능 사용",
+        "billingNote": "매월 자동결제 · 자동갱신 해지 가능",
         "cta": "Pro로 업그레이드",
         "features": {
           "projects": "무제한 프로젝트 생성 가능",
           "clips": "폴더당 300개까지 추가 저장",
-          "devices": "무제한 기기 연동",
-          "organization": "접근 가능한 폴더에서 검색 + 태그",
-          "ai": "AI 기능 추가 예정"
+          "organization": "접근 가능한 폴더에서 검색 + 태그"
         }
       }
     },
@@ -137,20 +131,10 @@
           "freeValue": "폴더당 50개까지 추가 저장",
           "proValue": "폴더당 300개까지 추가 저장"
         },
-        "devices": {
-          "label": "기기 연동",
-          "freeValue": "데스크톱 1개 + 모바일 1개",
-          "proValue": "무제한 기기 연동"
-        },
         "organization": {
           "label": "정리 방식",
           "freeValue": "접근 가능한 폴더에서 검색 + 태그",
           "proValue": "접근 가능한 폴더에서 검색 + 태그"
-        },
-        "ai": {
-          "label": "AI 기능",
-          "freeValue": "미지원",
-          "proValue": "추가 예정"
         }
       }
     },
@@ -169,11 +153,6 @@
     "configError": "API 연결 정보가 설정되지 않았습니다. 환경변수를 확인해주세요.",
     "or": "또는",
     "backHome": "홈으로 돌아가기",
-    "agreementPrefix": "계속하면",
-    "agreementMiddle": "및",
-    "terms": "이용약관",
-    "privacy": "개인정보처리방침",
-    "agreementSuffix": "에 동의하게 됩니다.",
     "policiesPending": "이용약관과 개인정보 처리방침을 준비 중입니다.",
     "contact": "문의하기"
   },
@@ -274,7 +253,6 @@
     "error": "휴지통 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
     "actionError": "휴지통 작업을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.",
     "restoreConflictError": "삭제된 폴더에 속한 클립은 단독으로 복구할 수 없습니다. 먼저 부모 폴더를 복구해주세요.",
-    "clearAllPartialError": "일부 항목을 삭제하지 못했습니다. 실패 {failedCount}개 / 전체 {totalCount}개",
     "emptyTitle": "표시할 휴지통 항목이 없습니다",
     "emptyDescription": "잠긴 폴더의 삭제 항목은 표시되지 않을 수 있습니다. 전체 비우기는 숨겨진 항목도 삭제합니다.",
     "listTitle": "삭제 항목",

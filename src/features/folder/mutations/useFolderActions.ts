@@ -119,9 +119,12 @@ export const useFolderActions = () => {
 
   const { mutateAsync: reorderFolder, isPending: isReorderingFolder } =
     useMutation({
-      mutationFn: async (
-        payload: Parameters<typeof reorderFolderRequest>[0],
-      ) => {
+      mutationFn: async ({
+        payload,
+      }: {
+        payload: Parameters<typeof reorderFolderRequest>[0];
+        nextFolders: FolderItem[];
+      }) => {
         if (!isAuthenticated) {
           throw createAuthRequiredError();
         }
@@ -134,7 +137,16 @@ export const useFolderActions = () => {
           );
         return reorderFolderRequest(payload);
       },
-      onSuccess: () => {
+      onMutate: async ({ nextFolders }) => {
+        await queryClient.cancelQueries({ queryKey: folderQueryKey });
+        const previous = queryClient.getQueryData<FolderItem[]>(folderQueryKey);
+        queryClient.setQueryData(folderQueryKey, nextFolders);
+        return previous;
+      },
+      onError: (_error, _variables, previous) => {
+        if (previous) queryClient.setQueryData(folderQueryKey, previous);
+      },
+      onSettled: () => {
         void queryClient.invalidateQueries({ queryKey: folderQueryKey });
       },
     });
@@ -173,16 +185,8 @@ export const useFolderActions = () => {
           ? { targetId: sourceId, afterId: targetId }
           : { targetId: sourceId, beforeId: targetId };
 
-      try {
-        await queryClient.cancelQueries({ queryKey: folderQueryKey });
-        queryClient.setQueryData(folderQueryKey, nextFolders);
-        await reorderFolder(payload);
-        return true;
-      } catch (error) {
-        queryClient.setQueryData(folderQueryKey, currentFolders);
-        void queryClient.invalidateQueries({ queryKey: folderQueryKey });
-        throw error;
-      }
+      await reorderFolder({ payload, nextFolders });
+      return true;
     },
     [folderQueryKey, isAuthenticated, queryClient, reorderFolder],
   );

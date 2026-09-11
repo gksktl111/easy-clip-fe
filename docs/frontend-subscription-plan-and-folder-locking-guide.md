@@ -25,7 +25,7 @@
 
 ### 공개 API
 
-경로는 서버 기준 상대 경로이며 코드에는 `/api` 전역 접두사가 없다. 실제 서비스의 게이트웨이 base URL을 사용한다. 아래 API는 모두 `Authorization: Bearer <accessToken>` 인증이 필요하다.
+경로는 서버 기준 상대 경로이며 코드에는 `/api` 전역 접두사가 없다. 실제 서비스의 게이트웨이 base URL을 사용한다. 현재 웹 FE는 HttpOnly 쿠키와 `credentials: include`로 인증한다. 서버가 지원하는 앱의 `Authorization: Bearer <accessToken>` 방식과 혼동하지 않는다.
 
 | API                                           | 요청                                               | 성공 응답                                                          |
 | --------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------ |
@@ -246,5 +246,5 @@ Swagger에서 POST 결제 인증 API가 200으로 설명되어 있어도 현재 
 - [현재 폴더 접근 정책](free-folder-access.md), [클립 추가 저장 한도](clip-plan-limits.md)
 - [해지·청구 경계](auto-renewal-cancellation-policy.md), [자동갱신 결과 대사](auto-renewal-payment-reconciliation.md), [배치 진행 보장](auto-renewal-batch-progress.md)
 - [클립 수정 계약](clip-content-update-policy.md), [정책 검수와 미채택 대안 기록](subscription-plan-limits-and-folder-locking.md)
-- [구독 API](../src/subscriptions/presentation/subscriptions.controller.ts), [폴더 API](../src/folders/presentation/folders.controller.ts), [클립 API](../src/clips/presentation/clips.controller.ts), [휴지통 API](../src/trash/presentation/trash.controller.ts)
-- [폴더 응답 DTO](../src/folders/presentation/dtos/folder-response.dto.ts), [클립 응답 DTO](../src/clips/presentation/dtos/clip-response.dto.ts), [휴지통 응답 DTO](../src/trash/presentation/dtos/trash-response.dto.ts)
+- [구독 API](https://github.com/gksktl111/easy-clip-be/blob/dev/src/subscriptions/presentation/subscriptions.controller.ts), [폴더 API](https://github.com/gksktl111/easy-clip-be/blob/dev/src/folders/presentation/folders.controller.ts), [클립 API](https://github.com/gksktl111/easy-clip-be/blob/dev/src/clips/presentation/clips.controller.ts), [휴지통 API](https://github.com/gksktl111/easy-clip-be/blob/dev/src/trash/presentation/trash.controller.ts)
+- [폴더 응답 DTO](https://github.com/gksktl111/easy-clip-be/blob/dev/src/folders/presentation/dtos/folder-response.dto.ts), [클립 응답 DTO](https://github.com/gksktl111/easy-clip-be/blob/dev/src/clips/presentation/dtos/clip-response.dto.ts), [휴지통 응답 DTO](https://github.com/gksktl111/easy-clip-be/blob/dev/src/trash/presentation/dtos/trash-response.dto.ts)
