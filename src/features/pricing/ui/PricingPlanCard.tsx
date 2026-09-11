@@ -31,20 +31,15 @@ export function PricingPlanCard({
 }: PricingPlanCardProps) {
   return (
     <article
-      className={`relative overflow-hidden rounded-2xl border px-5 py-6 transition-transform duration-300 hover:-translate-y-1 sm:rounded-[2rem] sm:px-8 sm:py-8 ${
+      className={`relative overflow-hidden rounded-2xl border px-5 py-6 sm:px-8 sm:py-8 ${
         plan.highlight
           ? "border-transparent text-white"
           : "border-(--border) bg-(--surface)"
       }`}
       style={{
-        boxShadow: "var(--pricing-card-shadow)",
         background: plan.highlight ? "var(--pricing-featured-bg)" : undefined,
       }}
     >
-      {plan.highlight ? (
-        <div className="absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,0.92),rgba(255,255,255,0))]" />
-      ) : null}
-
       <div className="flex items-start justify-between gap-4">
         <div>
           <p

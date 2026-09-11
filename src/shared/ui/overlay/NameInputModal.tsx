@@ -50,15 +50,11 @@ export function NameInputModal({
     isSubmitting || !value.trim() || Boolean(errorMessage);
   return (
     <Modal
+      labelledBy={titleId}
       contentClassName="w-full max-w-sm"
       onEscape={isSubmitting ? undefined : onClose}
     >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        className="rounded-xl bg-(--surface-elevated) shadow-xl"
-      >
+      <div className="rounded-xl bg-(--surface-elevated) shadow-xl">
         <div className="flex items-center border-b border-(--border) px-5 py-4">
           <Button
             disabled={isSubmitting}

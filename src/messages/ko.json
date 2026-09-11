@@ -18,16 +18,16 @@
     "workflowDescription": "작업 중인 폴더에 붙여넣어 저장한 뒤, 정리하고 검색해 필요할 때 다시 복사하세요.",
     "workflow": {
       "capture": {
-        "title": "붙여넣어 저장",
-        "description": "작업 중인 폴더에서 텍스트나 이미지를 붙여넣으면 하나의 클립으로 보관됩니다."
+        "title": "필요한 부분 저장",
+        "description": "코드 조각이나 이미지를 복사한 뒤 폴더의 붙여넣기로 저장하세요."
       },
       "organize": {
-        "title": "폴더와 즐겨찾기로 정리",
-        "description": "프로젝트별 폴더에 모으고, 자주 쓰는 내용은 즐겨찾기에 표시하세요."
+        "title": "폴더와 태그로 찾기",
+        "description": "폴더 안에서 태그를 붙이고 검색어로 필요한 클립을 좁혀보세요."
       },
       "reuse": {
-        "title": "검색해 다시 복사",
-        "description": "키워드로 원하는 클립을 찾아 한 번 클릭하면 클립보드에 다시 복사됩니다."
+        "title": "다시 읽고 복사",
+        "description": "미리보기로 내용을 확인한 뒤 복사해 작업에 사용하세요."
       }
     },
     "sectionTitle": "필요한 내용을 바로 찾는 클립 보관함",
@@ -56,7 +56,6 @@
   },
   "pricing": {
     "hero": {
-      "eyebrow": "집중해서 일하는 사용자를 위한 간단한 요금제",
       "titleLine1": "작업 방식에 맞는",
       "titleLine2": "EasyClip 플랜을 선택하세요."
     },
@@ -112,7 +111,6 @@
       "pendingRenewalPayment": "이미 시작된 이번 청구가 완료되어 이용 기간이 연장될 수 있습니다."
     },
     "comparison": {
-      "eyebrow": "빠른 비교",
       "title": "핵심 비교",
       "description": "주요 차이를 항목별로 바로 비교할 수 있도록 정리했습니다.",
       "columns": {
@@ -196,7 +194,8 @@
     "create": "생성",
     "closeRenameFolder": "폴더 이름 변경 닫기",
     "renameFolder": "폴더 이름 변경",
-    "change": "변경"
+    "change": "변경",
+    "open": "사이드바 열기"
   },
   "settings": {
     "title": "설정",
@@ -223,8 +222,8 @@
     "subscriptionEmptyValue": "-",
     "subscriptionLoadError": "구독 정보를 불러오지 못했습니다.",
     "about": "정보",
-    "aboutTitle": "Clipboard Studio v1.0.0",
-    "aboutDescription": "디자이너와 개발자를 위한 현대적인 클립보드 매니저",
+    "aboutTitle": "Easy Clip",
+    "aboutDescription": "텍스트·색상·이미지를 폴더와 태그로 정리합니다.",
     "closeButton": "닫기",
     "subscriptionFreeStatus": "무료 플랜 이용 중",
     "subscriptionUnavailableStatus": "구독 상태를 확인할 수 없음",
@@ -335,7 +334,11 @@
       "noTags": "태그 없음",
       "editTags": "{name} 태그 편집",
       "openOptions": "{name} 옵션 열기",
-      "copying": "복사 중…"
+      "copying": "복사 중…",
+      "preview": "미리보기: {name}",
+      "closePreview": "미리보기 닫기",
+      "previewTitle": "클립 미리보기",
+      "copyAction": "복사"
     },
     "tags": {
       "manage": "태그 관리",
@@ -468,7 +471,9 @@
     "clipLimit": "폴더당 추가 저장 한도: {limit}개.",
     "closeFolderLimit": "폴더 추가 안내 닫기",
     "clipLimitExplanation": "기존 클립은 한도를 초과해도 보존됩니다. 한도는 새 클립 추가에 적용됩니다.",
-    "proFeaturesTitle": "Pro에서 사용할 수 있는 기능"
+    "proFeaturesTitle": "Pro에서 사용할 수 있는 기능",
+    "billingCompleteTitle": "결제 완료",
+    "billingUncertainTitle": "결제 결과 확인 필요"
   },
   "feedback": {
     "close": "알림 닫기",

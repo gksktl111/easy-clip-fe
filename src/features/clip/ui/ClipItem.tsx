@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import {
   HiCheck,
+  HiOutlineEye,
   HiOutlineColorSwatch,
   HiOutlineDocumentText,
   HiOutlinePhotograph,
@@ -20,6 +21,7 @@ interface ClipItemProps {
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
   onEditTags?: (clip: Clip) => void;
+  onPreview?: (clip: Clip) => void;
   onContextMenu?: (
     event: React.MouseEvent<HTMLButtonElement>,
     clip: Clip,
@@ -83,6 +85,7 @@ export function ClipItem({
   onCopy,
   onToggleFavorite,
   onEditTags,
+  onPreview,
   onContextMenu,
   isDeleteMode = false,
   isFavoriteMutationPending = false,
@@ -186,6 +189,20 @@ export function ClipItem({
             </span>
           ) : null}
         </button>
+        {onPreview && !isDeleteMode ? (
+          <button
+            type="button"
+            disabled={isDisabled}
+            onClick={(event) => {
+              event.stopPropagation();
+              onPreview(clip);
+            }}
+            aria-label={t("preview", { name: clip.name })}
+            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md text-(--muted) hover:bg-(--surface-muted) focus-visible:outline-2 focus-visible:outline-(--focus-ring) disabled:cursor-default"
+          >
+            <HiOutlineEye className="h-4 w-4" aria-hidden />
+          </button>
+        ) : null}
         {onContextMenu && !isDeleteMode ? (
           <button
             type="button"

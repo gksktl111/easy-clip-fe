@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 // 작은 작업 목록을 표시하는 공통 액션 메뉴입니다.
@@ -36,6 +36,12 @@ export function ActionMenu({
   style,
   dataAttribute,
 }: ActionMenuProps) {
+  const [returnFocus] = useState(() =>
+    typeof document !== "undefined" &&
+    document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null,
+  );
   const dataProps = dataAttribute ? { [dataAttribute]: true } : {};
   const portalElement = typeof document === "undefined" ? null : document.body;
 
@@ -54,7 +60,10 @@ export function ActionMenu({
           key={item.label}
           type="button"
           disabled={item.disabled}
-          onClick={item.onClick}
+          onClick={() => {
+            if (returnFocus?.isConnected) returnFocus.focus();
+            item.onClick();
+          }}
           className={classNames(
             "flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm hover:bg-(--surface-muted) disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent",
             item.tone === "danger"

@@ -25,16 +25,12 @@ export function PricingCancelModal({
 }: PricingCancelModalProps) {
   return (
     <Modal
+      ariaLabel={title}
       overlay="strong"
       contentClassName="w-full max-w-sm"
       onEscape={isCanceling ? undefined : onCancel}
     >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className="rounded-2xl border border-(--border) bg-(--surface-elevated) p-5 shadow-xl"
-      >
+      <div className="rounded-2xl border border-(--border) bg-(--surface-elevated) p-5 shadow-xl">
         <h2 className="text-lg font-semibold">{title}</h2>
         <p className="mt-3 text-sm leading-6 text-(--muted)">{description}</p>
         <div className="mt-6 flex gap-2">

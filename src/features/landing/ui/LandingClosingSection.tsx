@@ -13,7 +13,7 @@ export function LandingClosingSection({
   return (
     <section className="border-t border-(--border) bg-[var(--landing-brand-bg)] py-24 text-[color:var(--landing-brand-fg)]">
       <div className="mx-auto max-w-5xl px-6 text-center">
-        <h2 className="mt-5 text-3xl font-bold tracking-tight md:text-5xl">
+        <h2 className="mt-5 text-3xl font-bold tracking-tight text-balance break-keep-ko md:text-5xl">
           {titleLine1}
           <br />
           {titleLine2}

@@ -2,6 +2,29 @@
 
 [전체 요약](README.md)
 
+## FE 적용 결과 · 2026-09-11
+
+- **A1~A6 적용:** 배경 광원·반복 배지·큰 그림자·카드 이동·중첩 박스를 정리하고 사용 흐름을 저장→검색→복사 예시로 바꿨습니다. 출처 미확인 후기는 01/02 작업에서 제거했습니다. 실제 기기 프레임·상태색·태그는 유지했습니다.
+- **D1 적용:** 공통 모달에 이름, 초기 포커스, Tab 순환, Esc, 배경 비활성화, 닫기 후 포커스 복귀를 추가했습니다. 중첩 모달과 알림 닫기를 유지하고, 모바일 설정을 닫으면 열린 사이드바로 돌아옵니다. 모달 안 붙여넣기는 뒤쪽 클립 생성으로 전달하지 않습니다.
+- **D2/D3 적용:** 네 언어 결제 안내는 01에서 반영했습니다. 이번에는 결제 확인 중·완료·실패·결과 불명확의 제목과 아이콘을 구분하고 모션 최소화 설정을 적용했습니다. 랜딩 제목은 단어 단위 줄바꿈과 균형 배치를 사용합니다. 모바일 사이드바 버튼 이름도 번역했습니다.
+- **D4 부분 적용:** 긴 본문·제목·전체 태그·이미지를 읽고 복사하는 미리보기를 추가했습니다. 현재 접근 가능한 목록에서만 열리며 폴더 잠금 시 닫힙니다. 별도 촘촘한 목록 모드는 실제 사용량·선호를 확인한 뒤 결정할 후속 항목입니다.
+
+검증: 4개 언어 × 2개 테마 × 390/768/1440px에서 랜딩·요금·결제·설정의 가로 넘침과 키보드 조작을 확인했습니다. 미리보기 복사·모달 종류별 Esc·결제 상태 테스트를 추가했습니다. overflow 수정 후 전체 CI도 lint·typecheck·Webpack production build·단위 테스트 123개·E2E 114개와 Storybook build를 통과했습니다. 자동 스캔은 **234개 파일·14종·99개 기록**으로 줄었지만, 이를 결함 개수나 접근성 인증으로 해석하지 않습니다. 전체 대비 수치·모든 보조기술은 미검증입니다.
+
+### 화면 비교
+
+| 화면 | 수정 전 | 수정 후 |
+| --- | --- | --- |
+| 랜딩 · 데스크톱 라이트 | [최초 검수](assets/landing-desktop.png) | [후](assets/after-landing-light.png) |
+| 랜딩 · 모바일 다크 | 최초 검수 캡처 없음 | [후](assets/after-landing-mobile-dark.png) |
+| 요금 · 데스크톱 다크 | [전](assets/before-pricing-dark.png) | [후](assets/after-pricing-dark.png) |
+| 결제 · 모바일 영어 | [전](assets/before-billing-mobile-en.png) | [후](assets/after-billing-mobile-en.png) |
+| 설정 · 모바일 다크 | [전](assets/before-settings-mobile-dark.png) | [후](assets/after-settings-mobile-dark.png) |
+
+랜딩의 수정 전 이미지는 최초 검수 자료이며 나머지 전후 이미지는 동일 화면 폭·테마·언어로 촬영했습니다. 랜딩은 비로그인, 결제·설정은 가짜 로그인 상태입니다.
+
+아래는 **수정 전 검수 기록**입니다. 현재 상태는 위 적용 결과를 기준으로 읽습니다.
+
 2026-09-11 재검수. 앞선 검수에는 `kill-ai-slop`을 사용하지 않았으며, 이번에는 해당 스킬의 스캐너·35개 분류 기준·오탐 판별 지침을 적용했습니다.
 
 **핵심 판단: 제품 작업 화면보다 랜딩·요금제·결제 화면에 장식이 집중돼 있습니다. 배경 광원, 반복 배지, 큰 그림자와 중첩 박스를 줄이면 제품 내용이 더 잘 드러납니다.** 기존의 모달 접근성·번역 문제도 함께 해결해야 합니다.
@@ -59,7 +82,7 @@
 
 **완료 기준:** 390/768/1440px 및 4개 언어에서 단어가 어색하게 잘리지 않음. 움직임 최소화 설정에서는 배너 정지. [검수한 랜딩 화면](assets/landing-desktop.png).
 
-근거: [사용 흐름](../../src/features/landing/ui/LandingWorkflowSection.tsx), [후기 배너](../../src/features/landing/ui/LandingReviewsBanner.tsx).
+근거: [사용 흐름](../../src/features/landing/ui/LandingWorkflowSection.tsx), [후기 배너](https://github.com/gksktl111/easy-clip-fe/blob/2a8a16a/src/features/landing/ui/LandingReviewsBanner.tsx).
 
 ## D4 · P2 — 클립 카드의 본문 확인과 밀도 [제안]
 

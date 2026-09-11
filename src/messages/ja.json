@@ -18,16 +18,16 @@
     "workflowDescription": "作業中のフォルダに貼り付けて保存し、整理してから、必要なときに検索・コピーできます。",
     "workflow": {
       "capture": {
-        "title": "貼り付けて保存",
-        "description": "作業中のフォルダにテキストや画像を貼り付けると、ひとつのクリップとして保存されます。"
+        "title": "必要な部分を保存",
+        "description": "コードや画像をコピーし、フォルダーの貼り付けボタンで保存します。"
       },
       "organize": {
-        "title": "フォルダとお気に入りで整理",
-        "description": "プロジェクトごとにまとめ、よく使う内容はお気に入りに登録しましょう。"
+        "title": "タグで見つける",
+        "description": "フォルダー内でタグを付け、検索して必要なクリップを絞り込みます。"
       },
       "reuse": {
-        "title": "検索してもう一度コピー",
-        "description": "キーワードで必要なクリップを探し、1回クリックするとクリップボードに再コピーされます。"
+        "title": "確認してコピー",
+        "description": "プレビューで全文を確認してからコピーし、作業に使えます。"
       }
     },
     "sectionTitle": "必要な情報をすぐに見つけられるクリップ保管庫",
@@ -56,7 +56,6 @@
   },
   "pricing": {
     "hero": {
-      "eyebrow": "集中して作業する人のためのシンプルなプラン",
       "titleLine1": "あなたの働き方に合う",
       "titleLine2": "EasyClipプランを選びましょう。"
     },
@@ -112,7 +111,6 @@
       "pendingRenewalPayment": "開始済みの更新請求が完了し、利用期間が延長される場合があります。"
     },
     "comparison": {
-      "eyebrow": "クイック比較",
       "title": "主な違いを比較",
       "description": "主な違いを項目ごとにすぐ比較できます。",
       "columns": {
@@ -196,7 +194,8 @@
     "create": "作成",
     "closeRenameFolder": "フォルダ名変更を閉じる",
     "renameFolder": "フォルダ名を変更",
-    "change": "変更"
+    "change": "変更",
+    "open": "サイドバーを開く"
   },
   "settings": {
     "title": "設定",
@@ -223,8 +222,8 @@
     "subscriptionEmptyValue": "-",
     "subscriptionLoadError": "サブスクリプション情報を読み込めませんでした。",
     "about": "情報",
-    "aboutTitle": "Clipboard Studio v1.0.0",
-    "aboutDescription": "デザイナーと開発者のためのモダンなクリップボードマネージャー",
+    "aboutTitle": "Easy Clip",
+    "aboutDescription": "テキスト・色・画像をフォルダーとタグで整理できます。",
     "closeButton": "閉じる",
     "subscriptionFreeStatus": "無料プランを利用中",
     "subscriptionUnavailableStatus": "購読状態を確認できません",
@@ -335,7 +334,11 @@
       "noTags": "タグなし",
       "editTags": "{name}のタグを編集",
       "openOptions": "{name}のオプションを開く",
-      "copying": "コピー中…"
+      "copying": "コピー中…",
+      "preview": "プレビュー: {name}",
+      "closePreview": "プレビューを閉じる",
+      "previewTitle": "クリップのプレビュー",
+      "copyAction": "コピー"
     },
     "tags": {
       "manage": "タグを管理",
@@ -468,7 +471,9 @@
     "clipLimit": "フォルダごとの追加保存上限：{limit}件。",
     "closeFolderLimit": "フォルダ追加の案内を閉じる",
     "clipLimitExplanation": "上限を超えた既存のクリップも保持されます。上限は新しいクリップの追加に適用されます。",
-    "proFeaturesTitle": "Proで利用できる機能"
+    "proFeaturesTitle": "Proで利用できる機能",
+    "billingCompleteTitle": "お支払い完了",
+    "billingUncertainTitle": "お支払い状況の確認が必要です"
   },
   "feedback": {
     "close": "通知を閉じる",

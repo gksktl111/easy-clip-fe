@@ -10,6 +10,7 @@ const meta = {
   },
   args: {
     isOpen: true,
+    ariaLabel: "모달 제목",
     overlay: "default",
   },
   argTypes: {

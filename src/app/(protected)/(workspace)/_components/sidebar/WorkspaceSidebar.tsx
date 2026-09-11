@@ -111,10 +111,7 @@ export function WorkspaceSidebar({
 
         <WorkspaceSidebarFooter
           onCloseMobile={closeMobile}
-          onOpenSettings={() => {
-            closeMobile();
-            onOpenSettings();
-          }}
+          onOpenSettings={onOpenSettings}
           onUpgradePlan={() => {
             closeMobile();
             router.push("/pricing");

@@ -72,11 +72,11 @@ export function SettingsAboutSection({
   return (
     <section>
       <Text variant="sectionLabel">{t("about")}</Text>
-      <div className="mt-3 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
+      <div className="mt-3 border-t border-(--border) py-4">
         <Text variant="itemTitle">{t("aboutTitle")}</Text>
         <Text variant="caption">{t("aboutDescription")}</Text>
       </div>
-      <div className="mt-3 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
+      <div className="mt-3 border-t border-(--border) py-4">
         <div className="flex items-start gap-3">
           <div className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
             <HiOutlineCreditCard className="h-5 w-5" aria-hidden />

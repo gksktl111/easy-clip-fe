@@ -18,16 +18,16 @@
     "workflowDescription": "Paste content into the folder you are working in, organize it, then search and copy it whenever you need it.",
     "workflow": {
       "capture": {
-        "title": "Paste to save",
-        "description": "Paste text or an image into the current folder to save it as a clip."
+        "title": "Save what you need",
+        "description": "Copy a code snippet or image, then use Paste in a folder to save it."
       },
       "organize": {
-        "title": "Organize with folders and favorites",
-        "description": "Group clips by project, and favorite the content you use often."
+        "title": "Find it with tags",
+        "description": "Add tags in a folder and search to narrow down your clips."
       },
       "reuse": {
-        "title": "Search and copy again",
-        "description": "Find the clip you need by keyword and click it once to copy it back to your clipboard."
+        "title": "Read and copy again",
+        "description": "Check the full content in a preview, then copy it into your work."
       }
     },
     "sectionTitle": "Find saved content in seconds",
@@ -56,7 +56,6 @@
   },
   "pricing": {
     "hero": {
-      "eyebrow": "Simple plans for focused work",
       "titleLine1": "Choose the EasyClip plan",
       "titleLine2": "that fits how you work."
     },
@@ -112,7 +111,6 @@
       "pendingRenewalPayment": "An already-started renewal charge may complete and extend your access."
     },
     "comparison": {
-      "eyebrow": "Quick comparison",
       "title": "Compare the essentials",
       "description": "Compare the main differences side by side.",
       "columns": {
@@ -196,7 +194,8 @@
     "create": "Create",
     "closeRenameFolder": "Close rename folder",
     "renameFolder": "Rename folder",
-    "change": "Save"
+    "change": "Save",
+    "open": "Open sidebar"
   },
   "settings": {
     "title": "Settings",
@@ -223,8 +222,8 @@
     "subscriptionEmptyValue": "-",
     "subscriptionLoadError": "Failed to load subscription information.",
     "about": "About",
-    "aboutTitle": "Clipboard Studio v1.0.0",
-    "aboutDescription": "A modern clipboard manager for designers and developers",
+    "aboutTitle": "Easy Clip",
+    "aboutDescription": "Organize text, colors, and images with folders and tags.",
     "closeButton": "Close",
     "subscriptionFreeStatus": "Using free plan",
     "subscriptionUnavailableStatus": "Subscription unavailable",
@@ -335,7 +334,11 @@
       "noTags": "No tags",
       "editTags": "Edit tags for {name}",
       "openOptions": "Open options for {name}",
-      "copying": "Copying…"
+      "copying": "Copying…",
+      "preview": "Preview: {name}",
+      "closePreview": "Close preview",
+      "previewTitle": "Clip preview",
+      "copyAction": "Copy"
     },
     "tags": {
       "manage": "Manage tags",
@@ -468,7 +471,9 @@
     "clipLimit": "New clips can be added up to {limit} per folder.",
     "closeFolderLimit": "Close folder limit notice",
     "clipLimitExplanation": "Existing clips are preserved even above the limit. Limits apply to adding new clips.",
-    "proFeaturesTitle": "Features available with Pro"
+    "proFeaturesTitle": "Features available with Pro",
+    "billingCompleteTitle": "Payment complete",
+    "billingUncertainTitle": "Check payment status"
   },
   "feedback": {
     "close": "Dismiss notification",

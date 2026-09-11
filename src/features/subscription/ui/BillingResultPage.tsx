@@ -140,7 +140,7 @@ function BillingResultContent({
           height={viewportSize.height}
           recycle={false}
           numberOfPieces={220}
-          className="pointer-events-none"
+          className="pointer-events-none motion-reduce:hidden"
         />
       ) : null}
       <BillingResultCard

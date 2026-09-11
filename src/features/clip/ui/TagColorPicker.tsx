@@ -29,7 +29,7 @@ export function TagColorPicker({
           type="button"
           disabled={disabled}
           onClick={() => onChange(color)}
-          className="tag-color flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-black/5 transition hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) disabled:cursor-default disabled:opacity-50"
+          className="tag-color flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-black/5 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) disabled:cursor-default disabled:opacity-50"
           data-tag-color={color}
           role="radio"
           aria-checked={value === color}

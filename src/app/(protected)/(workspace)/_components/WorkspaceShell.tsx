@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { HiOutlineMenuAlt4, HiOutlinePaperClip } from "react-icons/hi";
 import { WorkspaceSidebar } from "@/app/(protected)/(workspace)/_components/sidebar/WorkspaceSidebar";
@@ -8,6 +9,7 @@ import { Button } from "@/shared/ui/button/Button";
 
 // 워크스페이스 화면의 전역 탐색과 설정 진입점을 조합합니다.
 export function WorkspaceShell({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("sidebar");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const openSidebar = () => setIsSidebarOpen(true);
@@ -24,7 +26,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             variant="ghost"
             size="icon"
             className="rounded-full"
-            aria-label="사이드바 열기"
+            aria-label={t("open")}
           >
             <HiOutlineMenuAlt4 className="h-5 w-5" aria-hidden />
           </Button>

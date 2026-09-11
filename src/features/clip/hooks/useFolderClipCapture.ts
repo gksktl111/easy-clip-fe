@@ -195,7 +195,7 @@ export const useFolderClipCapture = ({
       const target = event.target;
       if (
         target instanceof HTMLElement &&
-        (target.closest("input, textarea") || target.isContentEditable)
+        (target.closest('input, textarea, [role="dialog"]') || target.isContentEditable)
       ) {
         return;
       }

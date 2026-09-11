@@ -23,7 +23,7 @@ export function BillingCheckoutCard({
   const format = useFormatter();
 
   return (
-    <div className="w-full rounded-2xl border border-(--border) bg-(--surface-elevated) p-4 shadow-xl">
+    <div className="w-full rounded-2xl border border-(--border) bg-(--surface-elevated) p-5">
       <div className="flex items-start justify-between gap-4 border-b border-(--border) pb-5">
         <div>
           <p className="text-sm font-medium text-(--muted)">EasyClip Pro</p>

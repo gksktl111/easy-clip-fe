@@ -33,6 +33,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
   return (
     <Modal
+      ariaLabel={t("title")}
       overlay="strong"
       onClose={onClose}
       contentClassName="w-full max-w-2xl"

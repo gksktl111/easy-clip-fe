@@ -122,15 +122,9 @@ export function LandingHeroSection({
 
   return (
     <section className="relative isolate overflow-hidden border-b border-(--border)">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-90"
-        style={{ backgroundImage: "var(--landing-hero-glow)" }}
-      />
-
       <div className="relative mx-auto flex max-w-7xl flex-col items-center px-6 pt-20 pb-6 text-center sm:pt-28 sm:pb-8">
         <div className="max-w-4xl">
-          <h1 className="text-4xl leading-[1.08] font-bold tracking-[-0.045em] sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="text-4xl leading-[1.08] font-bold tracking-[-0.045em] text-balance break-keep-ko sm:text-5xl md:text-6xl lg:text-7xl">
             {titleLine1}
             <span className="block text-[var(--landing-workspace-accent)]">
               {titleLine2}
@@ -146,8 +140,6 @@ export function LandingHeroSection({
           aria-hidden
           className="relative mt-12 w-full max-w-[20rem] sm:mt-16 sm:max-w-[50rem]"
         >
-          <div className="absolute -inset-x-4 bottom-0 h-2/3 rounded-[3rem] bg-[var(--landing-workspace-accent)] opacity-12 blur-3xl" />
-
           <div className="relative">
             <div className="mx-auto w-4/5">
               <LaptopProductPreview image={screenshot.desktop} />

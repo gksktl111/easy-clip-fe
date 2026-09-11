@@ -19,26 +19,15 @@ function LandingWorkflowStepCard({
   step: LandingWorkflowStep;
 }) {
   return (
-    <article className="relative overflow-hidden rounded-[2rem] border border-(--border) bg-(--background) p-7">
-      <div className="absolute top-0 right-0 h-28 w-28 rounded-full bg-(--surface-muted) blur-2xl" />
-      <div className="relative">
-        <div className="flex items-center justify-between">
-          <span className="rounded-full bg-(--surface-muted) px-3 py-1 text-xs font-semibold tracking-[0.16em] text-(--muted) uppercase">
-            {step.step}
-          </span>
-          <span className="text-4xl font-semibold tracking-tight text-(--border)">
-            0{index + 1}
-          </span>
-        </div>
-
-        <h3 className="mt-10 text-2xl font-semibold tracking-tight">
-          {step.title}
-        </h3>
-        <p className="mt-4 text-sm leading-7 text-(--muted) md:text-base">
-          {step.description}
-        </p>
-      </div>
-    </article>
+    <li className="border-t border-(--border) py-6">
+      <span className="text-sm font-medium text-(--muted)">{index + 1}</span>
+      <h3 className="mt-3 text-2xl font-semibold tracking-tight break-keep-ko">
+        {step.title}
+      </h3>
+      <p className="mt-4 text-sm leading-7 text-(--muted) md:text-base">
+        {step.description}
+      </p>
+    </li>
   );
 }
 
@@ -51,7 +40,7 @@ export function LandingWorkflowSection({
     <section className="border-t border-(--border) bg-(--surface) py-24">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
+          <h2 className="mt-4 text-3xl font-bold tracking-tight text-balance break-keep-ko md:text-5xl">
             {title}
           </h2>
           <p className="mt-5 text-base leading-7 text-(--muted) md:text-lg">
@@ -59,7 +48,7 @@ export function LandingWorkflowSection({
           </p>
         </div>
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
+        <ol className="mt-14 grid gap-8 lg:grid-cols-3">
           {steps.map((step, index) => (
             <LandingWorkflowStepCard
               key={step.step}
@@ -67,7 +56,7 @@ export function LandingWorkflowSection({
               step={step}
             />
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

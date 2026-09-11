@@ -14,13 +14,6 @@ export function ClipErrorState({ onRetry }: ClipErrorStateProps) {
   return (
     <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-(--background) px-5 py-10">
       <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,var(--background)_0%,var(--surface)_52%,rgba(239,68,68,0.08)_100%)]"
-        aria-hidden
-      />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-(--border)" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-(--border)" />
-
-      <div
         role="alert"
         className="relative flex w-full max-w-lg flex-col items-center gap-4 px-1 py-2 text-center"
       >

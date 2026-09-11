@@ -198,17 +198,13 @@ export function ClipTagEditorModal({
 
   return (
     <Modal
+      labelledBy="clip-tag-modal-title"
       onClose={close}
       onEscape={close}
       contentClassName="w-full max-w-lg"
       className="py-4"
     >
-      <section
-        className="flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-2xl"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="clip-tag-modal-title"
-      >
+      <section className="flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-2xl">
         <header className="flex items-center gap-2 border-b border-(--border) px-4 py-3">
           {view === "manage" && clip ? (
             <Button
