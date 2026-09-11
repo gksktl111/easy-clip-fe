@@ -2,6 +2,8 @@
 
 import { ClipCaptureDraftPanel } from "@/features/clip/ui/ClipCaptureDraftPanel";
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { ResourceAccessLoading } from "@/shared/access/ResourceAccessLoading";
+import { ClipListSkeleton } from "@/features/clip/ui/ClipListSkeleton";
 import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
 import { ApiError } from "@/shared/lib/apiClient";
 import { useTranslations } from "next-intl";
@@ -46,6 +48,12 @@ function FolderClipsContent({
   const isFolderNotFound = isFolderNotFoundError(results.error);
   const hasClipLoadError = results.isError && results.clips.length === 0;
 
+  if (access.status === "checking")
+    return (
+      <ResourceAccessLoading>
+        <ClipListSkeleton />
+      </ResourceAccessLoading>
+    );
   if (access.status !== "ready") return <ResourceAccessNotice />;
   if (
     access.folderLocks[folderId] === true ||

@@ -1,12 +1,16 @@
 "use client";
 
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { ResourceAccessLoading } from "@/shared/access/ResourceAccessLoading";
 import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useTrashPage } from "@/features/trash/hooks/useTrashPage";
 import { useTrashSelection } from "@/features/trash/hooks/useTrashSelection";
-import { TrashListSection } from "@/features/trash/ui/TrashListSection";
+import {
+  TrashListSection,
+  TrashListSkeleton,
+} from "@/features/trash/ui/TrashListSection";
 import { TrashPageEmptyState } from "@/features/trash/ui/TrashPageEmptyState";
 import { TrashPageHeader } from "@/features/trash/ui/TrashPageHeader";
 import type { TrashFolderReference } from "@/features/trash/service/trashRowMapper";
@@ -70,6 +74,12 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
     }
   };
 
+  if (access.status === "checking")
+    return (
+      <ResourceAccessLoading>
+        <TrashListSkeleton />
+      </ResourceAccessLoading>
+    );
   if (access.status !== "ready") return <ResourceAccessNotice />;
 
   return (

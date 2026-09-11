@@ -1,6 +1,8 @@
 "use client";
 
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { ResourceAccessLoading } from "@/shared/access/ResourceAccessLoading";
+import { ClipListSkeleton } from "@/features/clip/ui/ClipListSkeleton";
 import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
 import { useTranslations } from "next-intl";
 import type { Clip } from "@/features/clip/model/clip";
@@ -47,6 +49,12 @@ export function ClipCollectionPage({
 }: ClipCollectionPageProps) {
   const t = useTranslations("clips");
   const access = useResourceAccess();
+  if (access.status === "checking")
+    return (
+      <ResourceAccessLoading>
+        <ClipListSkeleton />
+      </ResourceAccessLoading>
+    );
   if (access.status !== "ready") return <ResourceAccessNotice />;
   const hasClipLoadError = isError && clips.length === 0;
 

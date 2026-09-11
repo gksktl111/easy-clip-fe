@@ -487,7 +487,7 @@ test("활성 폴더가 없는 Free는 폴더를 생성하고 최신 isLocked를 
   });
   await page.goto("/recent");
   await expect(
-    page.getByRole("heading", { name: ko.access.checkingTitle }),
+    page.getByRole("status", { name: ko.access.checkingTitle }),
   ).toHaveCount(0);
   await page
     .getByRole("button", { name: ko.sidebar.addFolder, exact: true })

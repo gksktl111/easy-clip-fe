@@ -137,7 +137,7 @@ test("접근 폴더 삭제 후 다른 폴더를 개방하지 않고 빈 목록�
   );
   await page.goto("/recent");
   await expect(
-    page.getByRole("heading", { name: "권한을 확인하고 있습니다" }),
+    page.getByRole("status", { name: "권한을 확인하고 있습니다" }),
   ).toHaveCount(0);
   await page.getByRole("button", { name: "폴더 추가", exact: true }).click();
   const dialog = page.getByRole("dialog");

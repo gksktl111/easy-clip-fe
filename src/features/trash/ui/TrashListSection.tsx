@@ -99,21 +99,23 @@ export function TrashListSection({
       </div>
 
       <div className="clip-scrollbar min-h-0 flex-1 divide-y divide-(--border) overflow-y-auto">
-        {isLoading
-          ? SKELETON_ROWS.map((row) => <TrashListSkeletonRow key={row} />)
-          : rows.map((row) => (
-              <TrashListRow
-                key={getTrashRowKey(row)}
-                row={row}
-                isSelected={selectedRowKeys.has(getTrashRowKey(row))}
-                pendingActionKey={pendingActionKey}
-                onToggleSelected={onToggleRow}
-                onRestoreFolder={onRestoreFolder}
-                onDeleteFolder={onDeleteFolder}
-                onRestoreClip={onRestoreClip}
-                onDeleteClip={onDeleteClip}
-              />
-            ))}
+        {isLoading ? (
+          <TrashListSkeleton />
+        ) : (
+          rows.map((row) => (
+            <TrashListRow
+              key={getTrashRowKey(row)}
+              row={row}
+              isSelected={selectedRowKeys.has(getTrashRowKey(row))}
+              pendingActionKey={pendingActionKey}
+              onToggleSelected={onToggleRow}
+              onRestoreFolder={onRestoreFolder}
+              onDeleteFolder={onDeleteFolder}
+              onRestoreClip={onRestoreClip}
+              onDeleteClip={onDeleteClip}
+            />
+          ))
+        )}
 
         {!isLoading ? (
           <div ref={loadMoreRef}>
@@ -145,5 +147,18 @@ function TrashListSkeletonRow() {
         </div>
       </div>
     </article>
+  );
+}
+
+export function TrashListSkeleton() {
+  return (
+    <div
+      className="clip-scrollbar min-h-0 flex-1 divide-y divide-(--border) overflow-y-auto"
+      aria-hidden
+    >
+      {SKELETON_ROWS.map((row) => (
+        <TrashListSkeletonRow key={row} />
+      ))}
+    </div>
   );
 }

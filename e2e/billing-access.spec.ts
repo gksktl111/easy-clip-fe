@@ -89,7 +89,7 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
   );
   await page.getByRole("link", { name: ko.access.openApp }).click();
   await expect(
-    page.getByRole("heading", { name: ko.access.checkingTitle }),
+    page.getByRole("status", { name: ko.access.checkingTitle }),
   ).toBeVisible();
   await expect(page.getByText("비공개 클립", { exact: true })).toHaveCount(0);
   release();
