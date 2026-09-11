@@ -12,6 +12,7 @@ import {
   TrashListSkeleton,
 } from "@/features/trash/ui/TrashListSection";
 import { TrashPageEmptyState } from "@/features/trash/ui/TrashPageEmptyState";
+import { TrashSelectionBar } from "@/features/trash/ui/TrashSelectionBar";
 import { TrashPageHeader } from "@/features/trash/ui/TrashPageHeader";
 import type { TrashFolderReference } from "@/features/trash/service/trashRowMapper";
 import { ConfirmActionModal } from "@/shared/ui/overlay/ConfirmActionModal";
@@ -86,20 +87,13 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
     <div className="bg-background flex h-full min-h-0 flex-col overflow-hidden">
       <TrashPageHeader
         count={rows.length}
-        selectedCount={selectedRows.length}
         isLoading={results.isLoading}
         isActionPending={isActionPending}
         isClearingAll={isClearingAll}
-        isRestoringSelected={isRestoringSelected}
-        isDeletingSelected={isDeletingSelected}
         onReload={() => {
           void actions.reload();
         }}
         onRequestClearAll={() => setDeleteModal("clearAll")}
-        onRestoreSelected={() => {
-          void handleRestoreSelected();
-        }}
-        onRequestDeleteSelected={() => setDeleteModal("selected")}
       />
 
       {results.error ? (
@@ -142,6 +136,18 @@ export function TrashPage({ activeFolders, onItemsChanged }: TrashPageProps) {
           onDeleteClip={(clipId) => {
             void actions.deleteClip(clipId);
           }}
+        />
+      ) : null}
+
+      {selectedRows.length > 0 ? (
+        <TrashSelectionBar
+          count={selectedRows.length}
+          pending={isActionPending}
+          restoring={isRestoringSelected}
+          deleting={isDeletingSelected}
+          onCancel={clearSelection}
+          onRestore={() => void handleRestoreSelected()}
+          onDelete={() => setDeleteModal("selected")}
         />
       ) : null}
 

@@ -230,6 +230,17 @@
     "subscriptionCanceledUntil": "已预约取消 / 可使用至 {date}"
   },
   "trash": {
+    "details": "详细信息",
+    "closeDetails": "关闭详情",
+    "type": "类型",
+    "folderDetails": "恢复文件夹后可查看其中的剪贴内容。",
+    "contentUnavailable": "无法加载原始内容。恢复后可在文件夹中查看。",
+    "imageUnavailable": "无法加载图片。",
+    "viewDetails": "查看{name}的详情",
+    "deleteItemTitle": "永久删除？",
+    "deleteItemDescription": "永久删除“{name}”。文件夹内的剪贴内容也会删除，且无法撤销。",
+
+    "cancelSelection": "取消选择",
     "selectionHint": "选择要恢复的项目。",
     "title": "回收站",
     "retentionNotice": "最多保留 30 天",
@@ -287,7 +298,7 @@
     "foldersEmpty": "没有已删除的文件夹。",
     "deletedAt": "删除时间",
     "restore": "恢复",
-    "deleteForever": "删除",
+    "deleteForever": "永久删除",
     "deletedResult": "已永久删除{count}个项目。"
   },
   "clips": {

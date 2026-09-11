@@ -230,6 +230,17 @@
     "subscriptionCanceledUntil": "解約予約 / {date}まで利用可能"
   },
   "trash": {
+    "details": "詳細情報",
+    "closeDetails": "詳細を閉じる",
+    "type": "種類",
+    "folderDetails": "フォルダーを復元すると、中のクリップを確認できます。",
+    "contentUnavailable": "元の内容を読み込めません。復元後にフォルダーで確認できます。",
+    "imageUnavailable": "画像を読み込めませんでした。",
+    "viewDetails": "{name}の詳細を表示",
+    "deleteItemTitle": "完全に削除しますか？",
+    "deleteItemDescription": "「{name}」を完全に削除します。フォルダー内のクリップも削除され、元に戻せません。",
+
+    "cancelSelection": "選択を解除",
     "selectionHint": "復元する項目を選択してください。",
     "title": "ゴミ箱",
     "retentionNotice": "最大30日間保管されます",
@@ -287,7 +298,7 @@
     "foldersEmpty": "削除済みフォルダはありません。",
     "deletedAt": "削除日時",
     "restore": "復元",
-    "deleteForever": "削除",
+    "deleteForever": "完全に削除",
     "deletedResult": "{count}件を完全に削除しました。"
   },
   "clips": {

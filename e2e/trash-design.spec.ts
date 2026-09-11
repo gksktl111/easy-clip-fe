@@ -63,7 +63,9 @@ async function setup(page: Page, locale: keyof typeof messages = "ko") {
     }),
   );
   await page.route("**/folders", (r) =>
-    r.fulfill({ json: [{ id: "folder-1", name: "프로젝트", order: 0, isLocked: false }] }),
+    r.fulfill({
+      json: [{ id: "folder-1", name: "프로젝트", order: 0, isLocked: false }],
+    }),
   );
   await page.route("**/trash?**", (r) =>
     state.failLoad
@@ -117,10 +119,15 @@ for (const locale of ["ko", "en", "ja", "zh"] as const) {
       await expect(
         page.getByRole("button", { name: t.restoreSelected, exact: true }),
       ).toBeVisible();
-      await row.getByRole("button", { name: t.restore, exact: true }).focus();
+      await expect(row.getByRole("button")).toHaveCount(1);
       await expect(
         row.getByRole("button", { name: t.restore, exact: true }),
-      ).toBeFocused();
+      ).toHaveCount(0);
+      await expect(
+        row.getByRole("button", { name: t.deleteForever, exact: true }),
+      ).toHaveCount(0);
+      await row.getByRole("button").focus();
+      await expect(row.getByRole("button")).toBeFocused();
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -140,7 +147,11 @@ test("휴지통 복구와 선택 삭제 취소·확정, 전체 비우기를 유�
   const state = await setup(page);
   await page.goto("/trash");
   const clipRow = page.locator("article").filter({ hasText: "Long title" });
-  await clipRow.getByRole("button", { name: "복구", exact: true }).click();
+  await clipRow.getByRole("button").click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "복구", exact: true })
+    .click();
   await expect(clipRow).toHaveCount(0);
   expect(state.requests[0]).toMatchObject({
     method: "PATCH",
@@ -211,4 +222,187 @@ test("휴지통 조회 오류에서 빈 상태를 함께 표시하지 않고 재
   await expect(
     page.getByText("프로젝트 아카이브", { exact: true }),
   ).toBeVisible();
+});
+
+test("모바일 상세 화면에서 전체 텍스트·이미지·색상을 보고 닫을 수 있다", async ({
+  page,
+}) => {
+  const state = await setup(page);
+  const longText = "첫 줄\n" + "전체 본문 확인 ".repeat(150) + "\n마지막 줄";
+  state.items = [
+    {
+      itemType: "CLIP",
+      id: "text",
+      title: "긴 메모",
+      type: "TEXT",
+      folderId: "folder-1",
+      deletedAt: null,
+      textContent: longText,
+      imageUrl: null,
+      colorHex: null,
+    },
+    {
+      itemType: "CLIP",
+      id: "image",
+      title: "참고 이미지",
+      type: "IMAGE",
+      folderId: "folder-1",
+      deletedAt: null,
+      textContent: null,
+      imageUrl: "https://cdn.easy-clip.app/preview.png",
+      colorHex: null,
+    },
+    {
+      itemType: "CLIP",
+      id: "color",
+      title: "브랜드 색상",
+      type: "COLOR",
+      folderId: "folder-1",
+      deletedAt: null,
+      textContent: null,
+      imageUrl: null,
+      colorHex: "#246A73",
+    },
+  ];
+  await page.route("**/_next/image**", (route) =>
+    route.fulfill({
+      contentType: "image/png",
+      path: "public/landing/white_main_desktop.png",
+    }),
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/trash");
+  for (const name of ["긴 메모", "참고 이미지", "브랜드 색상"]) {
+    const trigger = page.getByRole("button", {
+      name: ko.trash.viewDetails.replace("{name}", name),
+      exact: true,
+    });
+    await trigger.click();
+    const dialog = page.getByRole("dialog", { name: ko.trash.details });
+    await expect(dialog).toBeVisible();
+    if (name === "긴 메모")
+      await expect(dialog.locator("pre")).toHaveText(longText);
+    if (name === "참고 이미지") {
+      const image = dialog.getByRole("img", { name });
+      await expect(image).toBeVisible();
+      await expect
+        .poll(() =>
+          image.evaluate((node: HTMLImageElement) => node.naturalWidth),
+        )
+        .toBeGreaterThan(0);
+    }
+    if (name === "브랜드 색상")
+      await expect(dialog.locator("pre")).toHaveText("#246A73");
+    await expect(
+      dialog.getByRole("button", { name: ko.trash.restore, exact: true }),
+    ).toBeInViewport();
+    expect(
+      await dialog.evaluate((node) => node.scrollWidth <= node.clientWidth),
+    ).toBe(true);
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(trigger).toBeFocused();
+  }
+  expect(state.requests).toHaveLength(0);
+});
+
+test("모바일 하단 선택 작업은 목록을 가리지 않고 스크롤 후에도 접근할 수 있다", async ({
+  page,
+}) => {
+  const state = await setup(page);
+  state.items = Array.from({ length: 12 }, (_, index) => ({
+    itemType: "CLIP",
+    id: String(index),
+    title: `메모 ${index}`,
+    type: "TEXT",
+    folderId: "folder-1",
+    deletedAt: null,
+    textContent: "다시 확인할 내용",
+    imageUrl: null,
+    colorHex: null,
+  }));
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto("/trash");
+  await page.locator("article").first().getByRole("checkbox").check();
+  const footer = page.locator("main footer");
+  await expect(
+    footer.getByRole("button", { name: ko.trash.restoreSelected, exact: true }),
+  ).toBeInViewport();
+  await page.locator("article").last().scrollIntoViewIfNeeded();
+  const lastRow = await page.locator("article").last().boundingBox();
+  const bar = await footer.boundingBox();
+  expect(lastRow!.y + lastRow!.height).toBeLessThanOrEqual(bar!.y + 1);
+  await footer.getByRole("button", { name: ko.trash.cancelSelection }).click();
+  await expect(footer).toHaveCount(0);
+  expect(state.requests).toHaveLength(0);
+});
+
+test("상세 화면의 영구 삭제는 확인 후에만 요청한다", async ({ page }) => {
+  const state = await setup(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/trash");
+  await page
+    .getByRole("button", {
+      name: ko.trash.viewDetails.replace("{name}", "프로젝트 아카이브"),
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: ko.trash.deleteForever })
+    .click();
+  await expect(
+    page.getByRole("dialog", { name: ko.trash.deleteItemTitle }),
+  ).toBeVisible();
+  expect(state.requests).toHaveLength(0);
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: ko.trash.cancel, exact: true })
+    .click();
+  expect(state.requests).toHaveLength(0);
+  await page
+    .getByRole("button", {
+      name: ko.trash.viewDetails.replace("{name}", "프로젝트 아카이브"),
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: ko.trash.deleteForever })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: ko.trash.deleteForever })
+    .click();
+  await expect.poll(() => state.requests.length).toBe(1);
+  expect(state.requests[0]).toMatchObject({
+    method: "DELETE",
+    path: "/trash/items",
+    body: { items: [{ itemType: "FOLDER", id: "old-folder" }] },
+  });
+});
+
+test("구버전 응답은 원본 없음 안내를 표시하고 복구 실패 후 선택을 유지한다", async ({
+  page,
+}) => {
+  const state = await setup(page);
+  state.failRestore = true;
+  await page.goto("/trash");
+  const row = page.locator("article").filter({ hasText: "Long title" });
+  await row.getByRole("button", { name: /상세 보기/ }).click();
+  await expect(
+    page.getByRole("dialog").getByText(ko.trash.contentUnavailable),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await row.getByRole("checkbox").check();
+  await page
+    .getByRole("button", { name: ko.trash.restoreSelected, exact: true })
+    .click();
+  await expect(
+    page.getByText(ko.trash.restoreConflictError, { exact: true }),
+  ).toBeVisible();
+  await expect(row.getByRole("checkbox")).toBeChecked();
+  await expect(
+    page.getByRole("button", { name: ko.trash.restoreSelected, exact: true }),
+  ).toBeEnabled();
 });

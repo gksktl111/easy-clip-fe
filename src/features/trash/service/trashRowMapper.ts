@@ -74,6 +74,12 @@ export const mapTrashItemsToRows = (
       deletedAt: item.deletedAt,
       typeLabel: `${labels.fileType} · ${labels.clipTypes[item.type]}`,
       clipType: item.type,
+      content:
+        item.type === "IMAGE"
+          ? item.imageUrl
+          : item.type === "COLOR"
+            ? item.colorHex
+            : item.textContent,
       parentFolderName:
         folderNameById.get(item.folderId) ?? labels.unknownParentFolder,
     });

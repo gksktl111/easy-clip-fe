@@ -25,6 +25,8 @@ const meta = {
       id: "clip-1",
       name: "프로젝트 회의에서 정리한 디자인 검토 자료",
       clipType: "TEXT",
+      content:
+        "목록에서 내용을 확인하고 상세 화면에서 전체 본문을 읽을 수 있습니다.",
       parentFolderName: "프로젝트",
       deletedAt: "2026-09-08T00:00:00Z",
       typeLabel: "파일 · 텍스트",

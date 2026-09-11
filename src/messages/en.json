@@ -230,6 +230,17 @@
     "subscriptionCanceledUntil": "Canceled; available until {date}"
   },
   "trash": {
+    "details": "Details",
+    "closeDetails": "Close details",
+    "type": "Type",
+    "folderDetails": "Restore this folder to view its clips.",
+    "contentUnavailable": "The original content is unavailable. Restore this item to view it in its folder.",
+    "imageUnavailable": "Unable to load the image.",
+    "viewDetails": "View details for {name}",
+    "deleteItemTitle": "Delete permanently?",
+    "deleteItemDescription": "Permanently delete “{name}”. Clips inside a folder will also be deleted. This cannot be undone.",
+
+    "cancelSelection": "Clear selection",
     "selectionHint": "Select items to restore.",
     "title": "Trash",
     "retentionNotice": "Kept for up to 30 days",
@@ -287,7 +298,7 @@
     "foldersEmpty": "No deleted folders.",
     "deletedAt": "Deleted at",
     "restore": "Restore",
-    "deleteForever": "Delete",
+    "deleteForever": "Delete permanently",
     "deletedResult": "Permanently deleted {count} items."
   },
   "clips": {

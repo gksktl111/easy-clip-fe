@@ -91,9 +91,11 @@ test("휴지통 실제 개수, 복원 충돌, 후속 조회 실패를 구분한�
     return r.fulfill({ json: { restoredCount: 3 } });
   });
   await page.goto("/trash");
+  const details = page.locator("article").getByRole("button");
   const restore = page
-    .locator("article")
+    .getByRole("dialog")
     .getByRole("button", { name: ko.trash.restore, exact: true });
+  await details.click();
   await restore.click();
   const toasts = page.locator('[data-sonner-toast][data-removed="false"]');
   await expect(toasts).toContainText(ko.trash.restoreConflictError);
@@ -102,6 +104,7 @@ test("휴지통 실제 개수, 복원 충돌, 후속 조회 실패를 구분한�
   ).toHaveCount(0);
   await toasts.getByRole("button", { name: ko.feedback.close }).click();
   conflict = false;
+  await details.click();
   await restore.click();
   await expect(toasts).toContainText("항목 3개를 복원했습니다.");
   await expect(page.getByText(ko.trash.error, { exact: true })).toBeVisible();

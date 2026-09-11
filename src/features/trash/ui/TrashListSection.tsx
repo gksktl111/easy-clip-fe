@@ -73,8 +73,8 @@ export function TrashListSection({
 
   return (
     <section className="flex min-h-0 flex-1 flex-col overflow-hidden bg-(--surface)">
-      <div className="flex items-center justify-between border-y border-(--border) bg-(--surface-muted) px-4 py-3 min-[1200px]:hidden">
-        <label className="flex min-w-0 items-center gap-3 text-sm font-medium text-(--foreground)">
+      <div className="flex items-center justify-between border-b border-(--border) px-4 py-1 min-[1200px]:hidden">
+        <label className="flex min-h-11 min-w-0 items-center gap-3 text-sm font-medium text-(--foreground)">
           <Checkbox
             checked={allRowsSelected}
             disabled={
@@ -86,7 +86,7 @@ export function TrashListSection({
         </label>
       </div>
 
-      <div className="hidden grid-cols-[1.5rem_minmax(0,1fr)_minmax(8rem,0.45fr)_minmax(10rem,0.6fr)] items-center gap-4 border-y border-(--border) bg-(--surface-muted) px-4 py-3 text-xs font-semibold tracking-wide text-(--muted) uppercase min-[1200px]:grid min-[1200px]:px-6">
+      <div className="hidden grid-cols-[1.5rem_minmax(0,1fr)_minmax(8rem,0.45fr)_minmax(10rem,0.6fr)] items-center gap-4 border-b border-(--border) px-4 py-1 text-xs font-semibold text-(--muted) min-[1200px]:grid min-[1200px]:px-6">
         <Checkbox
           checked={allRowsSelected}
           disabled={isLoading || rows.length === 0 || pendingActionKey !== null}
@@ -132,7 +132,7 @@ function TrashListSkeletonRow() {
     <article className="px-4 py-4 min-[1200px]:px-6" aria-hidden>
       <div className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-3 min-[1200px]:grid-cols-[1.5rem_minmax(0,1fr)_minmax(8rem,0.45fr)_minmax(10rem,0.6fr)] min-[1200px]:items-center min-[1200px]:gap-4">
         <div className="mt-3 h-4 w-4 rounded border border-(--border) min-[1200px]:mt-0" />
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-h-11 min-w-0 items-center gap-3">
           <div className="skeleton-shimmer h-6 w-6 shrink-0 rounded-md" />
           <div className="min-w-0 flex-1 space-y-2">
             <div className="skeleton-shimmer h-4 w-2/3 rounded-md" />

@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { TrashDetailModal } from "@/features/trash/ui/TrashDetailModal";
+import { ConfirmActionModal } from "@/shared/ui/overlay/ConfirmActionModal";
 import { useTranslations } from "next-intl";
 import {
   HiOutlineColorSwatch,
@@ -51,6 +54,8 @@ export function TrashListRow({
   onRestoreClip,
   onDeleteClip,
 }: TrashListRowProps) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const t = useTranslations("trash");
   const restoreActionKey =
     row.kind === "folder"
@@ -61,96 +66,104 @@ export function TrashListRow({
   const areActionsDisabled = pendingActionKey !== null;
 
   return (
-    <article
-      data-selected={isSelected}
-      aria-busy={
-        pendingActionKey === restoreActionKey ||
-        pendingActionKey === deleteActionKey
-      }
-      className="px-4 py-4 transition-colors hover:bg-(--surface-muted) data-[selected=true]:bg-(--surface-muted) min-[1200px]:px-6"
-    >
-      <div className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-3 min-[1200px]:grid-cols-[1.5rem_minmax(0,1fr)_minmax(8rem,0.45fr)_minmax(10rem,0.6fr)] min-[1200px]:items-center min-[1200px]:gap-4">
-        <div className="flex items-start pt-1 min-[1200px]:items-center min-[1200px]:pt-0">
-          <Checkbox
-            checked={isSelected}
-            disabled={areActionsDisabled}
-            onChange={() => onToggleSelected(row)}
-            aria-label={t("selectItem", { name: row.name })}
-          />
-        </div>
-        <div className="flex min-w-0 items-start gap-3">
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
-            <TrashRowIcon row={row} />
-          </div>
+    <>
+      <article
+        data-selected={isSelected}
+        aria-busy={
+          pendingActionKey === restoreActionKey ||
+          pendingActionKey === deleteActionKey
+        }
+        className="px-4 py-4 transition-colors hover:bg-(--surface-muted) data-[selected=true]:bg-(--surface-muted) min-[1200px]:px-6"
+      >
+        <div className="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-3 min-[1200px]:grid-cols-[1.5rem_minmax(0,1fr)_minmax(8rem,0.45fr)_minmax(10rem,0.6fr)] min-[1200px]:items-center min-[1200px]:gap-4">
+          <label className="flex h-11 w-11 cursor-pointer items-center justify-center min-[1200px]:w-auto">
+            <Checkbox
+              checked={isSelected}
+              disabled={areActionsDisabled}
+              onChange={() => onToggleSelected(row)}
+              aria-label={t("selectItem", { name: row.name })}
+            />
+          </label>
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
+              <TrashRowIcon row={row} />
+            </div>
 
-          <div className="min-w-0">
-            <Text
-              variant="bodyStrong"
-              className="[overflow-wrap:anywhere] break-words"
-            >
-              {row.name}
-            </Text>
-            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-(--muted)">
-              <span>{row.typeLabel}</span>
-              {row.kind === "clip" ? (
-                <span className="min-w-0 [overflow-wrap:anywhere] break-words">
-                  <span aria-hidden>· </span>
-                  {t("parentFolder")}: {row.parentFolderName}
-                </span>
+            <div className="min-w-0">
+              <Text
+                variant="bodyStrong"
+                className="line-clamp-2 [overflow-wrap:anywhere] break-words"
+              >
+                {row.name}
+              </Text>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-(--muted)">
+                <span>{row.typeLabel}</span>
+                {row.kind === "clip" ? (
+                  <span className="min-w-0 [overflow-wrap:anywhere] break-words">
+                    <span aria-hidden>· </span>
+                    {t("parentFolder")}: {row.parentFolderName}
+                  </span>
+                ) : null}
+              </div>
+              {row.kind === "clip" && row.content && row.clipType === "TEXT" ? (
+                <p className="mt-2 line-clamp-2 text-sm leading-5 wrap-anywhere whitespace-pre-wrap text-(--muted)">
+                  {row.content}
+                </p>
               ) : null}
             </div>
           </div>
-        </div>
 
-        <Text
-          variant="caption"
-          className="col-start-2 min-[1200px]:col-start-auto min-[1200px]:text-xs"
-        >
-          <span className="mr-2 min-[1200px]:hidden">{t("deletedAt")}:</span>
-          {formatDeletedAt(row.deletedAt)}
-        </Text>
-
-        <div className="col-start-2 flex flex-wrap justify-start gap-2 min-[1200px]:col-start-auto min-[1200px]:justify-start">
-          <Button
-            disabled={
-              areActionsDisabled || pendingActionKey === restoreActionKey
-            }
-            onClick={() => {
-              if (row.kind === "folder") {
-                onRestoreFolder(row.id);
-                return;
-              }
-
-              onRestoreClip(row.id);
-            }}
-            variant="secondary"
-            size="xs"
+          <Text
+            variant="caption"
+            className="col-start-2 min-[1200px]:col-start-auto min-[1200px]:text-xs"
           >
-            {pendingActionKey === restoreActionKey
-              ? t("restoringSelectedAction")
-              : t("restore")}
-          </Button>
-          <Button
-            disabled={
-              areActionsDisabled || pendingActionKey === deleteActionKey
-            }
-            onClick={() => {
-              if (row.kind === "folder") {
-                onDeleteFolder(row.id);
-                return;
-              }
+            <span className="mr-2 min-[1200px]:hidden">{t("deletedAt")}:</span>
+            {formatDeletedAt(row.deletedAt)}
+          </Text>
 
-              onDeleteClip(row.id);
-            }}
-            variant="dangerOutline"
-            size="xs"
-          >
-            {pendingActionKey === deleteActionKey
-              ? t("deletingSelectedAction")
-              : t("deleteForever")}
-          </Button>
+          <div className="col-start-2 min-[1200px]:col-start-auto">
+            <Button
+              onClick={() => setDetailsOpen(true)}
+              variant="secondary"
+              size="sm"
+              className="min-h-11"
+              aria-label={t("viewDetails", { name: row.name })}
+            >
+              {t("details")}
+            </Button>
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+      {detailsOpen ? (
+        <TrashDetailModal
+          row={row}
+          pending={areActionsDisabled}
+          onClose={() => setDetailsOpen(false)}
+          onRestore={() => {
+            setDetailsOpen(false);
+            if (row.kind === "folder") onRestoreFolder(row.id);
+            else onRestoreClip(row.id);
+          }}
+          onDelete={() => {
+            setDetailsOpen(false);
+            setDeleteOpen(true);
+          }}
+        />
+      ) : null}
+      <ConfirmActionModal
+        isOpen={deleteOpen}
+        title={t("deleteItemTitle")}
+        description={t("deleteItemDescription", { name: row.name })}
+        cancelLabel={t("cancel")}
+        confirmLabel={t("deleteForever")}
+        isConfirming={areActionsDisabled}
+        onCancel={() => setDeleteOpen(false)}
+        onConfirm={() => {
+          setDeleteOpen(false);
+          if (row.kind === "folder") onDeleteFolder(row.id);
+          else onDeleteClip(row.id);
+        }}
+      />
+    </>
   );
 }
