@@ -6,6 +6,8 @@
 
 ## S1 · P0 — Next.js 이미지 최적화 취약 버전
 
+**FE 적용 상태 (2026-09-11):** `next`와 `eslint-config-next`를 npm 배포가 확인된 `16.3.3`으로 갱신했습니다. 호환 범위의 취약 의존성도 갱신하고 Vitest는 `^4.1.11`로 올렸습니다. `npm audit --omit=dev` 결과 취약점 0개입니다. 전체 검사에는 Storybook의 `elliptic` 연쇄 의존성 6개(low)가 남아 있습니다. 제안된 자동 수정은 Storybook 7로의 하위 메이저 변경이라 적용하지 않았으며 후속 도구체인 검토 대상으로 남깁니다. 패키지 갱신 후 lint·typecheck·Webpack production build·단위 테스트·E2E(93개)와 Storybook build를 통과했습니다. 운영 배포·아티팩트 확인은 미완료입니다.
+
 lockfile은 `next 16.1.1`, `sharp 0.34.5`입니다. Next.js 공식 GHSA는 16.3.3 미만의 영향 범위를 명시합니다. 프로젝트는 AVIF 업로드를 허용하고, 허용 CDN 이미지를 `next/image`로 최적화하므로 공격자가 제공한 AVIF를 처리할 수 있는 코드 경로가 있습니다. 실제 운영의 최적화 실행 환경은 추가 확인이 필요합니다.
 
 **개선:** 공식 수정 버전인 16.3.3 이상에서 적용할 안전한 버전을 확인해 Next.js·관련 의존성과 lockfile을 함께 갱신하고 재배포합니다. 즉시 갱신이 어렵다면 서버 이미지 최적화 경로를 차단하는 임시 대응을 검토합니다. 업로드 확장자만 차단하면 기존 CDN 객체 경로가 남습니다.
@@ -14,7 +16,11 @@ lockfile은 `next 16.1.1`, `sharp 0.34.5`입니다. Next.js 공식 GHSA는 16.3.
 
 근거: [lockfile](../../package-lock.json), [이미지 설정](../../next.config.ts), [클립 이미지 표시](../../src/features/clip/ui/ClipItem.tsx), BE [허용 MIME](https://github.com/gksktl111/easy-clip-be/blob/dev/src/shared/application/helpers/clip-image-mime-type.helper.ts).
 
+**빌드 호환성:** 패치 후 이 실행 환경에서 Turbopack의 PostCSS 작업 프로세스가 임시 포트 생성 `EPERM`으로 실패했습니다. 같은 소스의 공식 지원 Webpack 빌드와 Storybook 빌드는 통과하여 프로덕션 `build` 스크립트를 `next build --webpack`으로 명시했습니다. CI도 동일 스크립트를 사용합니다. 보안 패치를 유지하며 빌드를 재현하기 위한 선택이고 성능 향상으로 계산하지 않습니다. 개발 서버 명령은 유지했습니다.
+
 ## S2 · P1 — 쿠키 인증의 CSRF 방어 누락
+
+**범위:** S2~S6은 BE 수정이 필요합니다. 사용자 선택에 따라 이번 FE 브랜치에서는 수정하지 않고 미완료로 추적합니다.
 
 운영 기본 쿠키가 `SameSite=None; Secure`이고, CORS는 불허 출처에 응답 허용 헤더를 주지 않는 방식입니다. 상태 변경 요청의 Origin/CSRF 토큰 검사는 찾지 못했습니다. CORS만으로 단순 POST 실행을 막을 수 없으므로, 쿠키를 보내는 브라우저에서는 `/auth/logout` 같은 요청이 외부 사이트에서 유도될 위험이 있습니다. 브라우저의 타사 쿠키 정책·운영 게이트웨이에 따라 실제 노출은 달라집니다.
 
