@@ -1,6 +1,8 @@
 import { expect, test } from "./fixtures";
 import { setup, clip } from "./access-fixture";
 
+test.use({ viewport: { width: 390, height: 844 } });
+
 const pasteButton = (page: import("./fixtures").Page) =>
   page.getByRole("button", { name: "붙여넣기", exact: true });
 
@@ -123,6 +125,9 @@ test("클립보드를 읽는 동안 중복 요청을 막고 화면 이동 후에
       () => (window as Window & { readCount?: number }).readCount,
     ),
   ).toBe(1);
+  await page
+    .getByRole("button", { name: "사이드바 열기", exact: true })
+    .click();
   await page.getByRole("link", { name: "최근 항목", exact: true }).click();
   await expect(page).toHaveURL(/\/recent$/);
   await page.evaluate(async () => {
