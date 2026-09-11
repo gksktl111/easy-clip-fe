@@ -310,6 +310,7 @@
       "image": "Image",
       "readyToPaste": "Ready to paste",
       "notActive": "Not active",
+      "closeSearch": "Close search",
       "searchPlaceholder": "Search clips..."
     },
     "emptyState": {

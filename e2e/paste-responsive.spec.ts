@@ -38,6 +38,50 @@ for (const [locale, messages] of Object.entries({ ko, en, ja, zh })) {
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(hint).toBeHidden();
     await expect(button).toBeVisible();
+    const searchToggle = page.getByRole("button", {
+      name: messages.clips.filter.searchPlaceholder,
+      exact: true,
+    });
+    await expect(
+      page
+        .getByText(messages.clips.filter.notActive, { exact: true })
+        .filter({ visible: true }),
+    ).toBeHidden();
+    await expect(
+      page.getByRole("textbox", {
+        name: messages.clips.filter.searchPlaceholder,
+      }),
+    ).toBeHidden();
+    const firstClip = page.locator("main article").first();
+    await expect
+      .poll(async () => (await firstClip.boundingBox())?.y ?? 999)
+      .toBeLessThan(140);
+    await searchToggle.click();
+    const search = page.getByRole("textbox", {
+      name: messages.clips.filter.searchPlaceholder,
+    });
+    await expect(search).toBeFocused();
+    await search.fill("공개");
+    await search.press("Escape");
+    await expect(search).toBeHidden();
+    await expect(searchToggle).toBeFocused();
+    await searchToggle.click();
+    await expect(search).toHaveValue("공개");
+    await search.fill("");
+    await page
+      .getByRole("button", { name: messages.clips.filter.closeSearch })
+      .click();
+    await page.setViewportSize({ width: 320, height: 740 });
+    await expect(button).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBe(320);
+    const pasteBox = await button.boundingBox();
+    expect(pasteBox?.height).toBeGreaterThanOrEqual(44);
+    expect((pasteBox?.x ?? 0) + (pasteBox?.width ?? 0)).toBeLessThanOrEqual(
+      320,
+    );
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.getByText("공개 클립", { exact: true }).click();
     await expect(button).toBeVisible();
     await page.evaluate(() => navigator.clipboard.writeText("모바일 저장"));

@@ -310,6 +310,7 @@
       "image": "画像",
       "readyToPaste": "貼り付け準備完了",
       "notActive": "非アクティブ",
+      "closeSearch": "検索を閉じる",
       "searchPlaceholder": "クリップを検索..."
     },
     "emptyState": {

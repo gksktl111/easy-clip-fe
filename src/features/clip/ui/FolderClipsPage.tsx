@@ -7,7 +7,7 @@ import { ClipListSkeleton } from "@/features/clip/ui/ClipListSkeleton";
 import { ResourceAccessNotice } from "@/shared/access/ResourceAccessNotice";
 import { ApiError } from "@/shared/lib/apiClient";
 import { useTranslations } from "next-intl";
-import { HiOutlineTag } from "react-icons/hi";
+import { HiOutlineClipboardCopy, HiOutlineTag } from "react-icons/hi";
 import { useFolderClipsPage } from "@/features/clip/hooks/useFolderClipsPage";
 import { isFolderNotFoundError } from "@/features/clip/service/folderClipQueryState";
 import { ClipDeleteActionBar } from "@/features/clip/ui/ClipDeleteActionBar";
@@ -25,6 +25,7 @@ import { Button } from "@/shared/ui/button/Button";
 // 폴더 클립의 조회, 복사, 즐겨찾기, 컨텍스트 메뉴와 삭제 UI를 조합합니다.
 interface FolderClipsPageProps {
   folderId: string;
+  folderName?: string;
   onClipsDeleted?: () => void | Promise<void>;
 }
 
@@ -37,11 +38,11 @@ export function FolderClipsPage(props: FolderClipsPageProps) {
 
 function FolderClipsContent({
   folderId,
+  folderName,
   onClipsDeleted,
 }: FolderClipsPageProps) {
   const t = useTranslations("clips");
   const access = useResourceAccess();
-  const a = useTranslations("access");
   const { capture, collection, contextMenu, deletion, tags, rename } =
     useFolderClipsPage({ folderId, onClipsDeleted });
   const { commands, filter, results } = collection;
@@ -73,6 +74,29 @@ function FolderClipsContent({
     >
       {!hasClipLoadError ? (
         <FilterBar
+          mobileTitle={folderName ?? ""}
+          mobileActions={
+            <Button
+              size="sm"
+              className="min-h-11 shrink-0 px-3"
+              disabled={
+                capture.isDisabled ||
+                Boolean(capture.draft) ||
+                capture.isCreating ||
+                capture.isReadingClipboard
+              }
+              aria-busy={capture.isCreating || capture.isReadingClipboard}
+              onClick={(event) => {
+                event.stopPropagation();
+                void capture.pasteFromClipboard();
+              }}
+            >
+              <HiOutlineClipboardCopy className="h-4 w-4" aria-hidden />
+              {capture.isCreating || capture.isReadingClipboard
+                ? t("pastePending")
+                : t("pasteAction")}
+            </Button>
+          }
           activeFilter={filter.activeFilter}
           onFilterChange={filter.changeFilter}
           searchQuery={filter.searchQuery}
@@ -89,21 +113,17 @@ function FolderClipsContent({
               }}
               variant="surfaceGhost"
               size="sm"
+              aria-label={t("tags.manage")}
+              className="min-h-11 min-w-11 px-3 md:min-h-9 md:px-4"
             >
               <HiOutlineTag className="h-4 w-4" aria-hidden />
-              {t("tags.manage")}
+              <span className="hidden md:inline">{t("tags.manage")}</span>
             </Button>
           }
         />
       ) : null}
       {!hasClipLoadError ? (
-        <FolderClipCaptureHint
-          isActive={capture.isActive}
-          message={`${t("pasteHint")} ${a("clipLimit", { limit: access.isPro ? 300 : 50 })}`}
-          onPaste={capture.pasteFromClipboard}
-          pending={capture.isCreating || capture.isReadingClipboard}
-          disabled={capture.isDisabled || Boolean(capture.draft)}
-        />
+        <FolderClipCaptureHint isActive={capture.isActive} />
       ) : null}
       <ClipCaptureDraftPanel
         draft={capture.draft}

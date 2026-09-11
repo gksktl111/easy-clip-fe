@@ -1,12 +1,14 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
+import { MobileHeaderPortal } from "@/shared/layout/MobileHeaderPortal";
 import { useTranslations } from "next-intl";
 import {
   HiOutlineColorSwatch,
   HiOutlineDocumentText,
   HiOutlinePhotograph,
   HiOutlineSearch,
+  HiOutlineX,
 } from "react-icons/hi";
 import type { ClipFilter } from "@/features/clip/model/clip";
 import { Badge } from "@/shared/ui/badge/Badge";
@@ -27,6 +29,8 @@ interface FilterBarProps {
   showStatus?: boolean;
   countLabel?: string;
   actions?: ReactNode;
+  mobileTitle?: string;
+  mobileActions?: ReactNode;
 }
 
 export function FilterBar({
@@ -39,7 +43,12 @@ export function FilterBar({
   showStatus = true,
   countLabel,
   actions,
+  mobileTitle,
+  mobileActions,
 }: FilterBarProps) {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchId = useId();
+  const searchToggle = useRef<HTMLButtonElement>(null);
   const t = useTranslations("clips.filter");
   const tItem = useTranslations("clips.item");
   const filters = [
@@ -101,43 +110,126 @@ export function FilterBar({
   );
 
   return (
-    <div className="border-b border-(--border) px-4 py-4 min-[1200px]:px-6">
-      <div className="flex flex-col gap-3 min-[1200px]:flex-row min-[1200px]:items-center min-[1200px]:justify-between">
-        <div className="min-[1200px]:hidden">
-          <Select
-            value={activeFilter}
-            onChange={(value) => onFilterChange(value as FilterType)}
-            options={filters.map((filter) => ({
-              value: filter.id,
-              label: filter.label,
-            }))}
-          />
-        </div>
+    <>
+      {mobileTitle !== undefined ? (
+        <>
+          <MobileHeaderPortal>
+            <div className="flex min-w-0 items-center gap-2">
+              <h1
+                className="min-w-0 flex-1 truncate text-sm font-semibold"
+                title={mobileTitle}
+              >
+                {mobileTitle}
+              </h1>
+              <span className="shrink-0 text-xs text-(--muted)">
+                {countLabel}
+              </span>
+              <button
+                ref={searchToggle}
+                type="button"
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${searchQuery ? "bg-(--icon-chip) text-(--icon-chip-text)" : "text-(--muted) hover:bg-(--surface-muted)"}`}
+                aria-label={t("searchPlaceholder")}
+                aria-expanded={searchOpen}
+                aria-controls={searchId}
+                onClick={() => setSearchOpen((open) => !open)}
+              >
+                <HiOutlineSearch className="h-5 w-5" aria-hidden />
+              </button>
+            </div>
+          </MobileHeaderPortal>
+          <div className="shrink-0 border-b border-(--border) px-3 py-2 md:hidden">
+            <div className="flex items-center gap-2">
+              <Select
+                className="min-w-0 flex-1"
+                value={activeFilter}
+                onChange={(value) => onFilterChange(value as FilterType)}
+                options={filters.map((filter) => ({
+                  value: filter.id,
+                  label: filter.label,
+                }))}
+              />
+              {actions}
+              {mobileActions}
+            </div>
+            <div id={searchId} hidden={!searchOpen}>
+              {searchOpen ? (
+                <div className="mt-2 flex items-center gap-2">
+                  <TextInput
+                    autoFocus
+                    aria-label={t("searchPlaceholder")}
+                    placeholder={t("searchPlaceholder")}
+                    value={searchQuery}
+                    onChange={(event) => onSearchChange?.(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Escape") {
+                        setSearchOpen(false);
+                        searchToggle.current?.focus();
+                      }
+                    }}
+                    className="min-w-0 flex-1"
+                    inputClassName="h-11"
+                    leftIcon={
+                      <HiOutlineSearch className="h-4 w-4" aria-hidden />
+                    }
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-11 w-11 shrink-0"
+                    aria-label={t("closeSearch")}
+                    onClick={() => {
+                      setSearchOpen(false);
+                      searchToggle.current?.focus();
+                    }}
+                  >
+                    <HiOutlineX className="h-5 w-5" aria-hidden />
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </>
+      ) : null}
+      <div
+        className={`${mobileTitle !== undefined ? "hidden md:block" : ""} border-b border-(--border) px-4 py-4 min-[1200px]:px-6`}
+      >
+        <div className="flex flex-col gap-3 min-[1200px]:flex-row min-[1200px]:items-center min-[1200px]:justify-between">
+          <div className="min-[1200px]:hidden">
+            <Select
+              value={activeFilter}
+              onChange={(value) => onFilterChange(value as FilterType)}
+              options={filters.map((filter) => ({
+                value: filter.id,
+                label: filter.label,
+              }))}
+            />
+          </div>
 
-        <div className="hidden gap-2 min-[1200px]:flex">
-          {filters.map((filter) => (
-            <Button
-              key={filter.id}
-              onClick={() => onFilterChange(filter.id)}
-              variant={activeFilter === filter.id ? "chip" : "surfaceGhost"}
-              size="sm"
-              className="px-4"
-            >
-              {filter.icon}
-              {filter.label}
-            </Button>
-          ))}
-        </div>
+          <div className="hidden gap-2 min-[1200px]:flex">
+            {filters.map((filter) => (
+              <Button
+                key={filter.id}
+                onClick={() => onFilterChange(filter.id)}
+                variant={activeFilter === filter.id ? "chip" : "surfaceGhost"}
+                size="sm"
+                className="px-4"
+              >
+                {filter.icon}
+                {filter.label}
+              </Button>
+            ))}
+          </div>
 
-        <div className="order-2 min-[1200px]:hidden">{searchField}</div>
+          <div className="order-2 min-[1200px]:hidden">{searchField}</div>
 
-        <div className="order-3 min-[1200px]:hidden">{statusGroup}</div>
+          <div className="order-3 min-[1200px]:hidden">{statusGroup}</div>
 
-        <div className="hidden items-center gap-3 min-[1200px]:flex">
-          {statusGroup}
-          {searchField}
+          <div className="hidden items-center gap-3 min-[1200px]:flex">
+            {statusGroup}
+            {searchField}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

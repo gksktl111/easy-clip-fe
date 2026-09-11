@@ -310,6 +310,7 @@
       "image": "이미지",
       "readyToPaste": "붙여넣기 준비됨",
       "notActive": "비활성 상태",
+      "closeSearch": "검색창 닫기",
       "searchPlaceholder": "클립 검색..."
     },
     "emptyState": {

@@ -310,6 +310,7 @@
       "image": "图片",
       "readyToPaste": "可粘贴",
       "notActive": "未激活",
+      "closeSearch": "关闭搜索",
       "searchPlaceholder": "搜索剪贴内容..."
     },
     "emptyState": {
