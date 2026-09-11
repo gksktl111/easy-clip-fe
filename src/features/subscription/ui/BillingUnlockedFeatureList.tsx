@@ -1,13 +1,7 @@
 import { HiCheck } from "react-icons/hi";
 import { useTranslations } from "next-intl";
 
-const PRO_UNLOCKED_FEATURES = [
-  "projects",
-  "clips",
-  "devices",
-  "organization",
-  "ai",
-] as const;
+const PRO_UNLOCKED_FEATURES = ["projects", "clips", "organization"] as const;
 
 // Pro 구독으로 사용할 수 있는 기능을 체크 목록으로 안내합니다.
 export function BillingUnlockedFeatureList() {

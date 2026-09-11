@@ -2,6 +2,20 @@
 
 [전체 요약](README.md)
 
+## FE 적용 결과
+
+| 항목 | 상태와 변경 |
+| --- | --- |
+| F1 | **서버 의존·미완료.** FE 표시 가격은 공통 설정으로 모았지만 서버 청구액과 일치한다고 간주하지 않습니다. |
+| F2 | 종료 요청 실패 시 성공 안내 대신 재시도 화면을 표시하고 자료를 숨깁니다. 같은 탭의 새로고침에도 종료 의도를 유지합니다. 서버 응답 성공 후에만 상태를 해제합니다. |
+| F3 | `#` 링크와 근거 없는 동의 문구를 제거하고 정책 준비 안내·기존 공개 문의 주소를 표시했습니다. 정책 초안의 확인 가능한 정보는 채웠으며 **정책 확정·공개 연결은 미완료**입니다. |
+| F4 | 기기 수 제한과 예정 AI 기능을 현재 요금 혜택에서 제외했습니다. 출처가 확인되지 않은 후기 배너도 화면에서 제외했습니다. |
+| F5 | 결제 제목·설명·버튼·금액 표시·자동갱신 안내를 4개 언어로 정리했습니다. |
+
+검증: 로그아웃 정상·네트워크/서버 실패·새로고침·재시도와 네 언어 결제 화면의 브라우저 검증을 추가했습니다. lint, typecheck, Webpack production build, 단위 테스트 120개, E2E 100개를 통과했습니다.
+
+로그아웃 보호는 서버 세션 폐기를 대신하지 않습니다. 서버 오류가 지속되면 다른 탭/기기에는 세션이 남을 수 있습니다. sessionStorage가 차단된 환경에서는 현재 문서에서만 실패 상태를 유지합니다.
+
 ## 구현된 핵심 흐름
 
 | 기능 | 확인 결과 |
@@ -46,7 +60,7 @@
 
 ### F5 · P2 — 결제 화면 다국어 미완성
 
-영어 설정에서도 제목·설명·버튼은 한국어, 혜택 목록은 영어로 표시됩니다. [BillingPage](../../src/features/subscription/ui/BillingPage.tsx), [BillingHeroSection](../../src/features/subscription/ui/BillingHeroSection.tsx), [BillingCheckoutCard](../../src/features/subscription/ui/BillingCheckoutCard.tsx)의 문구를 메시지로 옮기고 4개 언어의 결제 화면을 확인해야 합니다.
+결제 제목·설명·버튼·혜택·월간 갱신 안내를 메시지로 옮겼고 4개 언어의 결제 화면 브라우저 검증을 통과했습니다. [BillingPage](../../src/features/subscription/ui/BillingPage.tsx), [BillingHeroSection](../../src/features/subscription/ui/BillingHeroSection.tsx), [BillingCheckoutCard](../../src/features/subscription/ui/BillingCheckoutCard.tsx).
 
 ## 범위를 먼저 정할 기능
 

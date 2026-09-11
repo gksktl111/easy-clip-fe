@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useBillingAuthFlow } from "@/features/subscription/hooks/useBillingAuthFlow";
 import { BillingCheckoutCard } from "@/features/subscription/ui/BillingCheckoutCard";
 import { BillingHeroSection } from "@/features/subscription/ui/BillingHeroSection";
@@ -7,6 +9,7 @@ import { BillingHeroSection } from "@/features/subscription/ui/BillingHeroSectio
 // 구독 상태를 확인하고 Toss 카드 인증 진입과 오류 복구 UI를 조합합니다.
 export function BillingPage() {
   const { startBilling, step } = useBillingAuthFlow();
+  const t = useTranslations("billing");
 
   return (
     <main className="bg-background text-foreground min-h-screen">
@@ -15,10 +18,10 @@ export function BillingPage() {
         <BillingCheckoutCard
           actionLabel={
             step === "loading"
-              ? "결제 정보 준비 중"
+              ? t("loading")
               : step === "redirecting"
-                ? "결제 인증 이동 중"
-                : "카드 인증하고 Pro 시작"
+                ? t("redirecting")
+                : t("start")
           }
           onStartBilling={() => {
             void startBilling();

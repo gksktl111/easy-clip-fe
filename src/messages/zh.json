@@ -173,13 +173,18 @@
     "agreementMiddle": "以及",
     "terms": "服务条款",
     "privacy": "隐私政策",
-    "agreementSuffix": "。"
+    "agreementSuffix": "。",
+    "policiesPending": "服务条款和隐私政策正在准备中。",
+    "contact": "联系我们"
   },
   "authGuard": {
     "loading": "正在验证身份信息。",
     "error": "无法验证身份信息，请稍后重试。",
     "retry": "重试",
-    "backHome": "前往首页"
+    "backHome": "前往首页",
+    "logoutFailed": "未能完成退出登录，账户可能仍处于登录状态。内容已隐藏，请检查网络连接后重试。",
+    "retryLogout": "重试退出登录",
+    "loggingOut": "正在退出登录。"
   },
   "sidebar": {
     "favorites": "收藏",
@@ -515,6 +520,18 @@
     "billingConfirmed": "订阅付款已获批准。",
     "billingFailed": "未能完成付款，请检查付款状态。",
     "loggedOut": "已退出登录。",
-    "policyResolution": "请检查可访问的文件夹和套餐限额后重试。"
+    "policyResolution": "请检查可访问的文件夹和套餐限额后重试。",
+    "logoutFailed": "退出登录失败，请重试。"
+  },
+  "billing": {
+    "title": "升级至 Pro",
+    "description": "保存并整理更多文件夹和剪辑。付款完成后即可使用 Pro。",
+    "back": "返回套餐",
+    "loading": "正在准备付款信息",
+    "redirecting": "正在前往银行卡验证",
+    "start": "验证银行卡并开通 Pro",
+    "monthly": "按月",
+    "perMonth": "/ 月",
+    "renewal": "每月自动扣款。取消自动续订后，仍可使用至已付费期限结束。"
   }
 }

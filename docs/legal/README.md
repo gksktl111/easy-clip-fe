@@ -10,10 +10,12 @@
 
 ## 공개 전 확정할 사항
 
+공개 화면에 이미 기재된 문의 이메일 `medic6655@gmail.com`을 초안에 반영했습니다. 개인정보·환불·탈퇴 전용 창구로도 운영하는지와 실제 수신 여부는 별도 확인 대상입니다. 서버 메일 템플릿의 `support@easy-clip.app`은 환경변수로 바뀔 수 있는 기본값이므로 공식 연락처로 채택하지 않았습니다.
+
 | 항목 | 필요한 결정·확인 |
 | --- | --- |
 | 운영 주체 | 상호 또는 성명, 대표자, 사업장 주소, 사업자등록번호·통신판매업 신고정보(해당 시), 연락처 |
-| 문의·권리 행사 | 실제 수신 가능한 고객지원 이메일, 개인정보 보호책임자와 연락처, 탈퇴·삭제 요청 처리 담당 |
+| 문의·권리 행사 | 기존 공개 문의 이메일 반영 완료. 개인정보·환불·탈퇴 접수 용도와 보호책임자·처리 담당 확정 필요 |
 | 유료 상품 | 실제 청구 금액·세금·주기, 자동갱신 고지, 환불 신청 경로·산정 기준·처리 기간 |
 | 보유·파기 | 항목별 기간과 처리 근거, 휴지통 보관 기간, 탈퇴 시 DB·이미지·로그·백업 삭제, 법정 보관의 분리 보존 |
 | 외부 업체 | 실제 호스팅·DB·스토리지·결제·메일 업체의 법인명, 역할, 계약, 처리 국가·보유 기간 |
@@ -22,10 +24,18 @@
 
 ## 코드에서 확인했지만 운영 확정이 필요한 부분
 
+| 초안에 반영한 사실 | 근거 |
+| --- | --- |
+| 공개 문의 이메일 | [LandingFooter](../../src/features/landing/ui/LandingFooter.tsx) |
+| 테마·언어 쿠키 이름과 365일 만료 | [설정 상수](../../src/shared/config/settings.ts), [설정 저장](../../src/shared/store/settingsStore.ts) |
+| 인증 쿠키 기본 이름, 접근 30분·갱신 14일 | [BE 쿠키 처리](https://github.com/gksktl111/easy-clip-be/blob/dev/src/shared/presentation/helpers/auth-cookie.helper.ts) |
+| 월 단위 구독, 자동갱신 해지·재개, 이미 시작된 갱신 처리 | [BE 구독 변경](https://github.com/gksktl111/easy-clip-be/blob/dev/src/subscriptions/application/usecases/update-my-subscription.usecase.ts), [기간 계산](https://github.com/gksktl111/easy-clip-be/blob/dev/src/subscriptions/application/helpers/subscription-period.helper.ts) |
+
 - Google/GitHub 로그인, 프로필·이메일, 텍스트·색상·이미지 클립, 태그·즐겨찾기·최근 조회, 테마·언어 설정을 처리합니다.
 - Toss Payments 결제, Cloudflare R2 이미지 저장, Resend 안내 메일 연동 코드가 있습니다. 실제 활성화 여부·계약·처리 지역은 확인하지 않았습니다.
 - 서버에는 탈퇴 API가 있지만 FE 탈퇴 화면은 없습니다. 문의 경로를 확정하기 전 “설정에서 탈퇴 가능”이라고 안내하지 않습니다.
 - 탈퇴 시 거래기록의 연쇄 삭제 가능성, 이미지 저장소·백업 삭제와 법정 보관 분리 여부는 서버 확인이 필요합니다. **이번 FE 작업에서 해결한 것으로 처리하지 않습니다.**
+- DB 스키마는 PostgreSQL을 사용하지만 제공 업체·저장 국가는 코드만으로 특정할 수 없습니다. 인증 쿠키의 만료 시간도 서버 DB 기록의 파기 주기를 의미하지 않습니다.
 - 정책의 게시와 개인정보 수집·이용 동의는 별개입니다. 동의가 필요한 처리에는 항목·목적·기간·거부권 등을 별도로 안내하고 기록하는 절차가 필요합니다.
 
 ## 참고한 공식 자료

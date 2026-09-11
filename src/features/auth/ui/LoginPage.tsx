@@ -39,13 +39,7 @@ export function LoginPage({ isLoading, onLogin }: LoginPageProps) {
           {t("backHome")}
         </Link>
 
-        <LoginAgreementNotice
-          prefix={t("agreementPrefix")}
-          middle={t("agreementMiddle")}
-          suffix={t("agreementSuffix")}
-          termsLabel={t("terms")}
-          privacyLabel={t("privacy")}
-        />
+        <LoginAgreementNotice />
       </div>
     </main>
   );

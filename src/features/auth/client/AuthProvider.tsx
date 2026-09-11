@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { logout as requestLogout } from "@/features/auth/api/authApi";
 import { useCurrentUserQuery } from "@/features/auth/queries/useCurrentUserQuery";
@@ -14,6 +20,12 @@ import {
   type AuthContextValue,
 } from "@/features/auth/client/AuthContext";
 import { ApiError, subscribeToAuthExpired } from "@/shared/lib/apiClient";
+import {
+  getLogoutIntent,
+  getServerLogoutIntent,
+  setLogoutIntent,
+  subscribeLogoutIntent,
+} from "@/features/auth/service/logoutIntent";
 
 // 앱 전체에서 하나의 사용자 인증 상태와 만료·로그아웃 생명주기를 관리합니다.
 export function AuthProvider({
@@ -24,6 +36,13 @@ export function AuthProvider({
   shouldRestoreSession: boolean;
 }) {
   const queryClient = useQueryClient();
+  const logoutIntent = useSyncExternalStore(
+    subscribeLogoutIntent,
+    getLogoutIntent,
+    getServerLogoutIntent,
+  );
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const logoutRequest = useRef<Promise<void> | null>(null);
 
   // 접속후 토근 존재시 로그인 유지 시도
   const [isAuthQueryEnabled, setIsAuthQueryEnabled] = useState(
@@ -32,21 +51,25 @@ export function AuthProvider({
 
   // 유저 정보 호출
   const currentUserQuery = useCurrentUserQuery({
-    enabled: isAuthQueryEnabled,
+    enabled: isAuthQueryEnabled && !logoutIntent,
   });
 
   // 별칭
   const session = currentUserQuery.data;
 
   // 현재 auth상태
-  const status = getAuthStatus({
-    error: currentUserQuery.error,
-    isError: currentUserQuery.isError,
-    isFetching: currentUserQuery.isFetching,
-    isPending: currentUserQuery.isPending,
-    isAuthQueryEnabled,
-    session,
-  });
+  const status = logoutIntent
+    ? isLoggingOut
+      ? "logging-out"
+      : "logout-error"
+    : getAuthStatus({
+        error: currentUserQuery.error,
+        isError: currentUserQuery.isError,
+        isFetching: currentUserQuery.isFetching,
+        isPending: currentUserQuery.isPending,
+        isAuthQueryEnabled,
+        session,
+      });
 
   const shouldClearClientSession =
     isAuthQueryEnabled && status === "unauthenticated";
@@ -62,6 +85,7 @@ export function AuthProvider({
   }, [queryClient]);
 
   const restoreSession = async () => {
+    if (getLogoutIntent()) return null;
     try {
       return await queryClient.fetchQuery(currentUserQueryOptions());
     } catch {
@@ -69,15 +93,20 @@ export function AuthProvider({
     }
   };
 
-  const logout = async () => {
-    try {
-      await requestLogout();
-    } catch {
-      // 서버 세션 상태와 무관하게 클라이언트 사용자 상태는 정리합니다.
-    } finally {
-      clearClientSession();
-    }
-  };
+  const logout = useCallback(() => {
+    if (logoutRequest.current) return logoutRequest.current;
+    setIsLoggingOut(true);
+    setLogoutIntent(true);
+    clearClientSession();
+    const request = requestLogout()
+      .then(() => setLogoutIntent(false))
+      .finally(() => {
+        setIsLoggingOut(false);
+        logoutRequest.current = null;
+      });
+    logoutRequest.current = request;
+    return request;
+  }, [clearClientSession]);
 
   // user/me 조회 결과 감시
   useEffect(() => {
@@ -93,6 +122,8 @@ export function AuthProvider({
       void requestLogout().catch(() => undefined);
     }
 
+    // 인증 실패 시 조회를 끈 뒤 외부 Query 캐시를 폐기해야 재조회 루프를 막습니다.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     clearClientSession();
   }, [clearClientSession, currentUserQuery.error, shouldClearClientSession]);
 
@@ -107,7 +138,7 @@ export function AuthProvider({
   );
 
   const value: AuthContextValue = {
-    user: session?.user ?? null,
+    user: logoutIntent ? null : (session?.user ?? null),
     status,
     error,
     restoreSession,

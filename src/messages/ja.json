@@ -173,13 +173,18 @@
     "agreementMiddle": "および",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
-    "agreementSuffix": "に同意したものとみなされます。"
+    "agreementSuffix": "に同意したものとみなされます。",
+    "policiesPending": "利用規約とプライバシーポリシーを準備中です。",
+    "contact": "お問い合わせ"
   },
   "authGuard": {
     "loading": "認証情報を確認しています。",
     "error": "認証情報を確認できませんでした。しばらくしてから再試行してください。",
     "retry": "再試行",
-    "backHome": "ホームへ移動"
+    "backHome": "ホームへ移動",
+    "logoutFailed": "ログアウトを完了できませんでした。ログイン状態が残っている可能性があります。データは非表示にしました。接続を確認して再試行してください。",
+    "retryLogout": "ログアウトを再試行",
+    "loggingOut": "ログアウト中です。"
   },
   "sidebar": {
     "favorites": "お気に入り",
@@ -515,6 +520,18 @@
     "billingConfirmed": "サブスクリプションの決済が承認されました。",
     "billingFailed": "決済を完了できませんでした。決済状況をご確認ください。",
     "loggedOut": "ログアウトしました。",
-    "policyResolution": "利用可能なフォルダーとプランの上限を確認して再試行してください。"
+    "policyResolution": "利用可能なフォルダーとプランの上限を確認して再試行してください。",
+    "logoutFailed": "ログアウトに失敗しました。再試行してください。"
+  },
+  "billing": {
+    "title": "Proにアップグレード",
+    "description": "より多くのフォルダーとクリップを保存・整理できます。お支払い完了後にProをご利用いただけます。",
+    "back": "プランに戻る",
+    "loading": "お支払い情報を準備中",
+    "redirecting": "カード認証に移動中",
+    "start": "カードを認証してProを開始",
+    "monthly": "月額",
+    "perMonth": "/ 月",
+    "renewal": "毎月自動で課金されます。自動更新を解約しても、お支払い済みの期間はご利用いただけます。"
   }
 }

@@ -16,4 +16,6 @@ export type AuthStatus =
   | "initializing"
   | "authenticated"
   | "unauthenticated"
+  | "logging-out"
+  | "logout-error"
   | "error";

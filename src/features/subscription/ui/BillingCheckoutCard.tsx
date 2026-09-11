@@ -1,4 +1,6 @@
 import { HiOutlineRefresh } from "react-icons/hi";
+import { useFormatter, useTranslations } from "next-intl";
+import { PRO_MONTHLY_DISPLAY_AMOUNT } from "@/shared/config/planDisplay";
 import type { BillingStep } from "@/features/subscription/model/billing";
 import { BillingUnlockedFeatureList } from "@/features/subscription/ui/BillingUnlockedFeatureList";
 import { Badge } from "@/shared/ui/badge/Badge";
@@ -17,6 +19,8 @@ export function BillingCheckoutCard({
   step,
 }: BillingCheckoutCardProps) {
   const isProcessing = step === "loading" || step === "redirecting";
+  const t = useTranslations("billing");
+  const format = useFormatter();
 
   return (
     <div className="w-full rounded-2xl border border-(--border) bg-(--surface-elevated) p-4 shadow-xl">
@@ -24,16 +28,23 @@ export function BillingCheckoutCard({
         <div>
           <p className="text-sm font-medium text-(--muted)">EasyClip Pro</p>
           <div className="mt-3 flex items-end gap-2">
-            <span className="text-3xl font-semibold">₩3,900</span>
-            <span className="pb-1 text-sm text-(--muted)">/ month</span>
+            <span className="text-3xl font-semibold">
+              {format.number(PRO_MONTHLY_DISPLAY_AMOUNT, {
+                style: "currency",
+                currency: "KRW",
+                maximumFractionDigits: 0,
+              })}
+            </span>
+            <span className="pb-1 text-sm text-(--muted)">{t("perMonth")}</span>
           </div>
         </div>
         <Badge variant="muted" size="sm">
-          월간
+          {t("monthly")}
         </Badge>
       </div>
 
       <BillingUnlockedFeatureList />
+      <p className="mt-5 text-sm leading-6 text-(--muted)">{t("renewal")}</p>
 
       <Button
         onClick={onStartBilling}

@@ -173,13 +173,18 @@
     "agreementMiddle": "and",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "agreementSuffix": "."
+    "agreementSuffix": ".",
+    "policiesPending": "Our terms of service and privacy policy are being prepared.",
+    "contact": "Contact us"
   },
   "authGuard": {
     "loading": "Checking your session.",
     "error": "We could not verify your session. Please try again shortly.",
     "retry": "Try again",
-    "backHome": "Go to home"
+    "backHome": "Go to home",
+    "logoutFailed": "Sign-out could not be completed. Your account may still be signed in. Your content is hidden; check your connection and try again.",
+    "retryLogout": "Retry sign-out",
+    "loggingOut": "Signing out."
   },
   "sidebar": {
     "favorites": "Favorites",
@@ -515,6 +520,18 @@
     "billingConfirmed": "Subscription payment approved.",
     "billingFailed": "Payment could not be completed. Check your payment status.",
     "loggedOut": "Signed out.",
-    "policyResolution": "Check accessible folders and plan limits, then try again."
+    "policyResolution": "Check accessible folders and plan limits, then try again.",
+    "logoutFailed": "Sign-out failed. Please try again."
+  },
+  "billing": {
+    "title": "Upgrade to Pro",
+    "description": "Save and organize more folders and clips. Pro is available once payment is complete.",
+    "back": "Back to plans",
+    "loading": "Preparing payment",
+    "redirecting": "Opening card verification",
+    "start": "Verify card and start Pro",
+    "monthly": "Monthly",
+    "perMonth": "/ month",
+    "renewal": "Billed automatically each month. Cancel renewal to stop future billing and keep access through your paid period."
   }
 }

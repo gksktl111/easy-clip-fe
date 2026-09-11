@@ -5,11 +5,9 @@ import { LandingFeaturesSection } from "@/features/landing/ui/LandingFeaturesSec
 import { LandingClosingSection } from "@/features/landing/ui/LandingClosingSection";
 import { LandingHeroSection } from "@/features/landing/ui/LandingHeroSection";
 import { MarketingShell } from "@/features/landing/ui/MarketingShell";
-import { LandingReviewsBanner } from "@/features/landing/ui/LandingReviewsBanner";
 import { LandingWorkflowSection } from "@/features/landing/ui/LandingWorkflowSection";
 import {
   LANDING_FEATURES,
-  LANDING_REVIEWS,
   LANDING_WORKFLOW_STEPS,
 } from "../const/landingContent";
 
@@ -43,11 +41,6 @@ export function LandingPage() {
         title={t("sectionTitle")}
         description={t("sectionDescription")}
         features={features}
-      />
-      <LandingReviewsBanner
-        title={t("reviewsTitle")}
-        description={t("reviewsDescription")}
-        reviews={LANDING_REVIEWS}
       />
       <LandingClosingSection
         titleLine1={t("closingTitleLine1")}

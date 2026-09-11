@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { notifySuccess } from "@/shared/feedback/toast";
+import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -26,6 +26,8 @@ export function useLogout() {
       await logout();
       notifySuccess(t("loggedOut"));
       router.replace("/login");
+    } catch {
+      notifyError(t("logoutFailed"));
     } finally {
       isPendingRef.current = false;
       setIsPending(false);
