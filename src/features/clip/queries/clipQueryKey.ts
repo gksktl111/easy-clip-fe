@@ -11,6 +11,7 @@ export interface ClipQueryOptions {
 
 export const clipQueryKeys = {
   all: ["clips"] as const,
+  recent: ["clips", { recent: true }] as const,
   list: (options: ClipQueryOptions = {}) =>
     [
       "clips",

@@ -4,7 +4,6 @@ import type { ClipFilter } from "@/features/clip/model/clip";
 import type { FetchClipsQueryDto } from "@/features/clip/model/clip.dto";
 import { clipQueryKeys } from "@/features/clip/queries/clipQueryKey";
 import { shouldRetryFolderClipsQuery } from "@/features/clip/service/folderClipQueryState";
-import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 const mapFilterToApiType = (filter: ClipFilter): FetchClipsQueryDto["type"] => {
   if (filter === "all") {
@@ -48,25 +47,11 @@ export const clipInfiniteQueryOptions = ({
     }),
     enabled,
     initialPageParam: null as string | null,
-    queryFn: async ({ pageParam, signal }) => {
-      const loadingStartedAt = Date.now();
-
-      try {
-        return await fetchClips(
-          {
-            folderId,
-            favorite,
-            recent,
-            type,
-            q,
-            cursor: pageParam,
-          },
-          signal,
-        );
-      } finally {
-        await waitForMinimumLoading(loadingStartedAt);
-      }
-    },
+    queryFn: ({ pageParam, signal }) =>
+      fetchClips(
+        { folderId, favorite, recent, type, q, cursor: pageParam },
+        signal,
+      ),
     getNextPageParam: (lastPage) =>
       lastPage.hasMore ? lastPage.nextCursor : undefined,
     retry: shouldRetryFolderClipsQuery,

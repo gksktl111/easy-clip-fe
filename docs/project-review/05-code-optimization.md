@@ -2,7 +2,28 @@
 
 [전체 요약](README.md) · [기존 코드 정리 검수](02-code-quality.md)
 
-2026-09-11 · Ponytail MCP의 `full` 지침 적용. **불필요한 작업과 중복을 먼저 줄이고, 성능 개선은 측정으로 확인합니다.** 이번에는 최적화 후보와 방법을 문서화했으며 제품 코드는 수정하지 않았습니다.
+2026-09-11 · Ponytail MCP의 `full` 지침 적용. **불필요한 작업과 중복을 먼저 줄이고, 성능 개선은 측정으로 확인합니다.**
+
+## FE 적용 결과
+
+| 항목 | 결과 |
+| --- | --- |
+| O1 | 02 커밋에서 미사용 상수·번역·출처 미확인 후기와 데이터를 제거했습니다. 폴더·휴지통·설정 변경 요청의 책임도 정리했습니다. |
+| O2 | 클립·휴지통 조회의 최소 300ms 대기와 미사용 loading 유틸을 제거했습니다. API 응답·오류를 추가 타이머 없이 전달하고 취소 signal, cursor, 재시도 정책은 유지합니다. |
+| O3 | 열람 기록 후 `recent: true`인 query만 무효화합니다. 성공·응답 유실 모두 최근 목록을 재확인하고, 일반 폴더·즐겨찾기를 불필요하게 stale로 만들지 않습니다. BE 코드에서 열람은 viewedAt만 변경하고 일반 목록은 updatedAt 순서임을 확인했습니다. |
+| O4 | 현재 계정·폴더의 임시 입력과 필요한 save/remove/fail 액션만 구독합니다. 계정·권한 세대 검사, 실패 입력 보존·재시도는 유지합니다. |
+| O5 | **서버 의존·미완료.** 01에서 FE 표시 상수를 모았지만 서버 가격 계약·실제 청구액 일치까지 해결한 것은 아닙니다. |
+
+### 측정과 검증
+
+- 강제 대기: 응답 후 남은 대기 `max(0, 300ms − 요청 경과 시간)` → **0**. 성공·403 오류 모두 타이머를 진행하지 않고 끝나는 단위 테스트를 통과했습니다. 실제 네트워크 자체가 빨라졌다는 뜻은 아닙니다.
+- 캐시 비교: 동일한 활성 폴더·즐겨찾기·최근 query 3개에서 열람 후 **3개 재조회 → 최근 1개만 재조회**. 다른 접근 범위·검색 조건의 비활성 최근 query는 다음 진입 때 갱신되도록 stale로 유지됩니다.
+- 실제 화면 요청 비교: 로컬 production build, 가짜 API, 폴더 1개·클립 1개에서 동일 클립을 500ms 간격으로 5회 복사. 추가 목록 GET **5회 → 0회**를 최종 빌드에서 확인했습니다. 최근 목록 갱신과 기록 실패 시 복사 성공 유지도 E2E로 검증합니다.
+- 렌더 비교: 실제 captureDraftStore를 사용한 작은 React Profiler 하네스에서 동일 계정의 다른 폴더 draft를 10회 변경(`flushSync`, 초기 mount 제외). 전체 구독 **10회 → 선택 구독 0회**. 앱 전체 렌더·FPS 수치가 아닌 해당 구독 방식의 분리 측정입니다.
+
+최종 검증: lint·typecheck·Webpack production build, 단위 테스트 **26개 파일·123개**, E2E **114개**, Storybook build를 모두 통과했습니다. 기존 권한 변경·입력 보존·결제 중복 방지 회귀와 새 최적화 테스트를 포함합니다. 메시지 로딩 분리·권한 재확인 범위 축소는 사용자 체감 이득 근거가 부족해 후속 측정 후보로 유지합니다. SQL·서버 프로파일링은 FE 범위 밖입니다.
+
+아래는 **수정 전 후보와 판단 근거**입니다.
 
 ## 적용 원칙
 
@@ -20,7 +41,7 @@
 | O4 · P2 — 넓은 상태 구독 | `useFolderClipCapture`가 draft store 전체를 구독 | 현재 계정·폴더의 draft와 필요한 액션만 구독. 기존 store 유지 | 다른 폴더 draft 변경에 불필요한 렌더 감소, 계정 전환·입력 보존 유지 |
 | O5 · P1 — 가격 정책 중복 | FE 상수·결제 문구·BE 기본 청구액이 따로 존재 | [F1](01-functionality.md)의 서버 가격 계약으로 단일화 | 표시·최초 청구·갱신 금액 일치. 단순 상수 이동으로 끝내지 않음 |
 
-근거: [이미지 검증](../../src/features/clip/service/imageClipValidation.ts), [한국어 메시지](../../src/messages/ko.json), [후기 데이터](../../src/features/landing/const/landingContent.ts), [로딩 지연](../../src/shared/lib/loading.ts), [클립 query](../../src/features/clip/queries/clipInfiniteQueryOptions.ts), [휴지통 query](../../src/features/trash/hooks/useTrashItemsQuery.ts), [열람 기록 mutation](../../src/features/clip/mutations/useRecordClipViewMutation.ts), [query key](../../src/features/clip/queries/clipQueryKey.ts), [draft 구독](../../src/features/clip/hooks/useFolderClipCapture.ts).
+근거: [이미지 검증](../../src/features/clip/service/imageClipValidation.ts), [한국어 메시지](../../src/messages/ko.json), [후기 데이터](../../src/features/landing/const/landingContent.ts), [로딩 지연](https://github.com/gksktl111/easy-clip-fe/blob/169226a/src/shared/lib/loading.ts), [클립 query](../../src/features/clip/queries/clipInfiniteQueryOptions.ts), [휴지통 query](../../src/features/trash/hooks/useTrashItemsQuery.ts), [열람 기록 mutation](../../src/features/clip/mutations/useRecordClipViewMutation.ts), [query key](../../src/features/clip/queries/clipQueryKey.ts), [draft 구독](../../src/features/clip/hooks/useFolderClipCapture.ts).
 
 O3의 전체 무효화가 모든 캐시를 즉시 네트워크 요청한다는 뜻은 아닙니다. 활성 query의 재조회와 비활성 캐시의 stale 처리가 넓어지는 문제입니다. 요청 개수와 발생 시점으로 효과를 확인해야 합니다.
 

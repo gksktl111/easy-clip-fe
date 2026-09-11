@@ -23,7 +23,7 @@ Ponytail MCP 기준의 구체적인 최적화 후보·적용 순서·측정 기�
 | P2 | 클립 조회 성공·실패 응답을 최소 300ms까지 강제로 지연 | 데이터 응답은 즉시 반영. 깜빡임이 문제면 로딩 표시를 늦게 시작하거나 기존 콘텐츠 유지 | 빠른 API를 고의로 늦추지 않고 오류도 즉시 표시 |
 | P2 | 폴더/휴지통의 요청·캐시·알림 책임이 `hooks`에 집중. 설정 UI도 저장을 직접 수행 | 변경 시점에 도메인별 `mutations`로 이동하고 UI 훅은 상태와 이벤트 조합에 집중 | 기존 캐시 갱신·중복 실행 방지·실패 복구 유지 |
 
-근거: [이미지 검증](../../src/features/clip/service/imageClipValidation.ts), [메시지](../../src/messages/ko.json), [랜딩 데이터](../../src/features/landing/const/landingContent.ts), [삭제 전 배너](https://github.com/gksktl111/easy-clip-fe/blob/2a8a16a/src/features/landing/ui/LandingReviewsBanner.tsx), [로딩 지연](../../src/shared/lib/loading.ts), [클립 조회](../../src/features/clip/queries/clipInfiniteQueryOptions.ts), [폴더 액션](../../src/features/folder/mutations/useFolderActions.ts), [휴지통 액션](../../src/features/trash/mutations/useTrashActions.ts), [설정 mutation](../../src/features/settings/mutations/useSettingsMutation.ts).
+근거: [이미지 검증](../../src/features/clip/service/imageClipValidation.ts), [메시지](../../src/messages/ko.json), [랜딩 데이터](../../src/features/landing/const/landingContent.ts), [삭제 전 배너](https://github.com/gksktl111/easy-clip-fe/blob/2a8a16a/src/features/landing/ui/LandingReviewsBanner.tsx), [로딩 지연](https://github.com/gksktl111/easy-clip-fe/blob/169226a/src/shared/lib/loading.ts), [클립 조회](../../src/features/clip/queries/clipInfiniteQueryOptions.ts), [폴더 액션](../../src/features/folder/mutations/useFolderActions.ts), [휴지통 액션](../../src/features/trash/mutations/useTrashActions.ts), [설정 mutation](../../src/features/settings/mutations/useSettingsMutation.ts).
 
 ## 문서도 현재 코드에 맞춰 정리
 

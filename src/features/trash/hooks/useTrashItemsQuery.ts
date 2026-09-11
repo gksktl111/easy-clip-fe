@@ -8,7 +8,6 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchTrashItems } from "@/features/trash/api/trashApi";
 import { TRASH_QUERY_KEYS } from "@/features/trash/service/trashQueryCache";
 import { useAuth } from "@/features/auth";
-import { waitForMinimumLoading } from "@/shared/lib/loading";
 
 // 인증 사용자의 휴지통 항목을 cursor 기반으로 조회하고 평탄화된 목록을 제공합니다.
 export const useTrashItemsQuery = () => {
@@ -24,15 +23,8 @@ export const useTrashItemsQuery = () => {
     queryKey,
     enabled: isAuthenticated && canRead,
     initialPageParam: null as string | null,
-    queryFn: async ({ pageParam, signal }) => {
-      const loadingStartedAt = Date.now();
-
-      try {
-        return await fetchTrashItems({ cursor: pageParam }, signal);
-      } finally {
-        await waitForMinimumLoading(loadingStartedAt);
-      }
-    },
+    queryFn: ({ pageParam, signal }) =>
+      fetchTrashItems({ cursor: pageParam }, signal),
     getNextPageParam: (lastPage) =>
       lastPage.hasNextPage ? lastPage.nextCursor : undefined,
     retry: (count, error) =>
