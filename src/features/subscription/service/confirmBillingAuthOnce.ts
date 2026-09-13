@@ -17,6 +17,7 @@ import {
   readActiveBillingAttempt,
   clearActiveBillingAttempt,
   markBillingAttemptRetryable,
+  markBillingAttemptRejected,
   withBillingConfirmationLock,
 } from "./billingAttempt";
 
@@ -74,6 +75,7 @@ export const confirmBillingAuthOnce = (
       payload.customerKey,
       payload.idempotencyKey,
     );
+    if (attempt.rejected) throw new BillingPaymentFailedError();
     if (attempt.resumedWithoutPayment) return fetchMySubscription();
     if (attempt.submitted) {
       let recovered: InitialPaymentResponseDto | undefined;
@@ -106,7 +108,7 @@ export const confirmBillingAuthOnce = (
       } catch (lookupError) {
         if (isNotFound(lookupError)) {
           if (error instanceof ApiError && [400, 409].includes(error.status)) {
-            await clearActiveBillingAttempt(userId, attempt.idempotencyKey);
+            await markBillingAttemptRejected(userId, attempt);
             throw new BillingPaymentFailedError();
           }
           await markBillingAttemptRetryable(userId, attempt);

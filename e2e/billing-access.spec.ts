@@ -114,7 +114,7 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
 });
 
 for (const failure of ["network", "conflict"] as const) {
-  test(`confirm ${failure} 오류는 서버 메시지·불명확 안내를 표시하고 자동 재전송하지 않는다`, async ({
+  test(`confirm ${failure} 오류와 조회 404는 상태별 안내를 유지하고 자동 재전송하지 않는다`, async ({
     page,
   }) => {
     await setup(page);
@@ -140,25 +140,42 @@ for (const failure of ["network", "conflict"] as const) {
     await page.goto(
       "/billing/success?paymentAttempt=12345678-1234-4123-8123-123456789012&authKey=mock-failure&customerKey=mock-customer",
     );
+    const message =
+      failure === "network"
+        ? ko.billingResult.retryable
+        : ko.billingResult.failed;
     await expect(
-      page
-        .getByRole("main")
-        .getByText(ko.access.billingUncertain, { exact: false }),
+      page.getByRole("main").getByText(message, { exact: true }),
     ).toBeVisible();
-    await expect(page.locator("[data-sonner-toast]")).toContainText(
-      ko.access.billingUncertain,
-    );
-    if (failure === "conflict")
+    if (failure === "network") {
       await expect(
-        page.getByText("이전 결제 결과 확인 중", { exact: false }),
-      ).toBeVisible();
+        page.getByRole("button", {
+          name: ko.billingResult.retry,
+          exact: true,
+        }),
+      ).toBeEnabled();
+      await expect(page.locator("[data-sonner-toast]")).toHaveCount(0);
+    } else {
+      await expect(
+        page.getByRole("link", {
+          name: ko.billingResult.backToBilling,
+        }),
+      ).toHaveAttribute("href", "/billing");
+      await expect(page.locator("[data-sonner-toast]")).toContainText(
+        ko.feedback.billingFailed,
+      );
+    }
     await expect.poll(() => subscriptionReads).toBeGreaterThan(0);
     await page.reload();
     await expect(
-      page
-        .getByRole("main")
-        .getByText(ko.access.billingUncertain, { exact: false }),
+      page.getByRole("main").getByText(message, { exact: true }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: ko.billingResult.retry,
+        exact: true,
+      }),
+    ).toHaveCount(failure === "network" ? 1 : 0);
 
     expect(confirms).toBe(1);
   });

@@ -6,6 +6,7 @@ export interface BillingAttempt {
   customerHash: string;
   submitted: boolean;
   retryable?: boolean;
+  rejected?: boolean;
   resumedWithoutPayment?: boolean;
 }
 const digest = async (value: string) => {
@@ -133,5 +134,23 @@ export const markBillingAttemptRetryable = async (
     const key = `${prefix}:${attempt.idempotencyKey}`;
     const current = parseAttempt(localStorage.getItem(key));
     localStorage.setItem(key, JSON.stringify({ ...current, retryable: true }));
+  });
+};
+
+// 미접수로 확인된 승인 거부는 새로고침 후에도 실패 상태를 유지합니다.
+export const markBillingAttemptRejected = async (
+  userId: string,
+  attempt: BillingAttempt,
+) => {
+  const prefix = await userKey(userId);
+  await navigator.locks.request(prefix, async () => {
+    const key = `${prefix}:${attempt.idempotencyKey}`;
+    const current = parseAttempt(localStorage.getItem(key));
+    localStorage.setItem(
+      key,
+      JSON.stringify({ ...current, rejected: true, retryable: false }),
+    );
+    if (localStorage.getItem(`${prefix}:active`) === attempt.idempotencyKey)
+      localStorage.removeItem(`${prefix}:active`);
   });
 };
