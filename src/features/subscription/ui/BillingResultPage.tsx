@@ -1,6 +1,5 @@
 "use client";
 
-import { ApiError } from "@/shared/lib/apiClient";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { useAuth } from "@/features/auth";
 import { useTranslations } from "next-intl";
@@ -12,6 +11,8 @@ import {
   confirmBillingAuthOnce,
   BillingConfirmationAlreadySubmittedError,
   BillingPaymentFailedError,
+  BillingPaymentRetryableError,
+  type BillingConfirmationAction,
 } from "@/features/subscription/service/confirmBillingAuthOnce";
 import type { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 import { syncMySubscriptionQueryData } from "@/features/subscription/service/subscriptionQueryCache";
@@ -44,12 +45,19 @@ function BillingResultContent({
   const { user } = useAuth();
   const t = useTranslations("access");
   const feedback = useTranslations("feedback");
+  const resultText = useTranslations("billingResult");
   const notified = useRef(false);
   const isMissingSuccessParams =
     status === "success" && (!authKey || !customerKey || !paymentAttempt);
   const [subscription, setSubscription] =
     useState<MySubscriptionResponseDto | null>(null);
   const [paymentFailed, setPaymentFailed] = useState(false);
+  const [canRetry, setCanRetry] = useState(false);
+  const [request, setRequest] = useState<{
+    action: BillingConfirmationAction;
+    count: number;
+  }>({ action: "initial", count: 0 });
+  const startedRequest = useRef(-1);
   const [message, setMessage] = useState<string | null>(errorMessage ?? null);
   const [isConfirming, setIsConfirming] = useState(
     status === "success" && !isMissingSuccessParams,
@@ -87,14 +95,19 @@ function BillingResultContent({
 
     let active = true;
     // Toss 성공 리다이렉트의 authKey/customerKey를 서버에 전달해 최종 구독 승인을 완료한다.
-    const confirmation = confirmBillingAuthOnce(user.id, {
-      authKey,
-      customerKey,
-      idempotencyKey: paymentAttempt,
-    });
+    const action =
+      startedRequest.current === request.count ? "initial" : request.action;
+    startedRequest.current = request.count;
+    const confirmation = confirmBillingAuthOnce(
+      user.id,
+      { authKey, customerKey, idempotencyKey: paymentAttempt },
+      action,
+    );
     confirmation
       .then((nextSubscription) => {
         if (!active) return;
+        setCanRetry(false);
+        setPaymentFailed(false);
         syncMySubscriptionQueryData(queryClient, nextSubscription, user.id);
         setSubscription(nextSubscription);
         setMessage(
@@ -113,9 +126,12 @@ function BillingResultContent({
       })
       .catch((error) => {
         if (!active) return;
+        const retryable = error instanceof BillingPaymentRetryableError;
+        setCanRetry(retryable);
         if (
           !notifiedConfirmations.has(confirmation) &&
-          !(error instanceof BillingConfirmationAlreadySubmittedError)
+          !(error instanceof BillingConfirmationAlreadySubmittedError) &&
+          !retryable
         ) {
           notifiedConfirmations.add(confirmation);
           notifyError(
@@ -128,8 +144,10 @@ function BillingResultContent({
         requestAccessRefresh();
         setMessage(
           error instanceof BillingPaymentFailedError
-            ? t("billingFailed")
-            : `${error instanceof ApiError && !(error instanceof BillingConfirmationAlreadySubmittedError) ? error.message : ""} ${t("billingUncertain")}`,
+            ? resultText("failed")
+            : retryable
+              ? resultText("retryable")
+              : resultText("pending"),
         );
       })
       .finally(() => {
@@ -148,6 +166,8 @@ function BillingResultContent({
     t,
     feedback,
     isMissingSuccessParams,
+    request,
+    resultText,
   ]);
 
   const isSuccess = status === "success" && subscription?.plan === "PRO";
@@ -164,6 +184,16 @@ function BillingResultContent({
         />
       ) : null}
       <BillingResultCard
+        canRetry={canRetry}
+        onRetry={() => {
+          if (isConfirming) return;
+          setIsConfirming(true);
+          setRequest((previous) => ({
+            action: canRetry ? "retry" : "check",
+            count: previous.count + 1,
+          }));
+        }}
+        isRetrying={request.action === "retry"}
         isConfirming={isConfirming}
         isMissingSuccessParams={isMissingSuccessParams}
         isSuccess={isSuccess}

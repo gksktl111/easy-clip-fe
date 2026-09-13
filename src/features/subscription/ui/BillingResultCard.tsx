@@ -10,6 +10,9 @@ import {
 
 // 결제 승인 진행, 성공 또는 실패 상태와 다음 이동 액션을 표시합니다.
 interface BillingResultCardProps {
+  canRetry: boolean;
+  onRetry: () => void;
+  isRetrying: boolean;
   isConfirming: boolean;
   isMissingSuccessParams: boolean;
   isSuccess: boolean;
@@ -18,6 +21,9 @@ interface BillingResultCardProps {
 }
 
 export function BillingResultCard({
+  canRetry,
+  onRetry,
+  isRetrying,
   isConfirming,
   isMissingSuccessParams,
   isSuccess,
@@ -25,7 +31,7 @@ export function BillingResultCard({
   status,
 }: BillingResultCardProps) {
   const t = useTranslations("access");
-  const priceText = useTranslations("subscriptionPrice");
+  const resultText = useTranslations("billingResult");
   const isFailure = status === "fail" || isMissingSuccessParams;
   return (
     <section
@@ -60,33 +66,40 @@ export function BillingResultCard({
                 : "billingUncertainTitle",
         )}
       </h1>
-      <p className="mt-3 text-sm leading-6 text-(--muted)">
+      <p className="mt-3 text-sm leading-6 text-(--muted)" aria-live="polite">
         {isConfirming
-          ? t("billingLoading")
+          ? isRetrying
+            ? resultText("processing")
+            : t("billingLoading")
           : (message ??
             (isMissingSuccessParams
               ? t("billingMissing")
-              : t("billingUncertain")))}
+              : isFailure
+                ? resultText("failed")
+                : resultText("pending")))}
       </p>
 
-      {!isConfirming && !isSuccess && !isFailure ? (
+      {!isSuccess && !isFailure ? (
         <Button
           className="mt-5"
           variant="secondary"
-          onClick={() => window.location.reload()}
+          onClick={onRetry}
+          disabled={isConfirming}
         >
-          {priceText("retry")}
+          {isConfirming && isRetrying
+            ? resultText("processing")
+            : resultText(canRetry ? "retry" : "check")}
         </Button>
       ) : null}
       <Link
-        href={isSuccess ? "/recent" : "/pricing"}
+        href={isSuccess ? "/recent" : isFailure ? "/billing" : "/pricing"}
         className="mt-6 flex cursor-pointer items-center justify-center rounded-xl bg-(--primary) px-4 py-3 text-sm font-semibold transition hover:bg-(--primary-hover)"
       >
         {isSuccess ? (
           <span className="text-primary-foreground">{t("openApp")}</span>
         ) : (
           <span className="text-primary-foreground">
-            {t("checkSubscription")}
+            {isFailure ? resultText("backToBilling") : t("checkSubscription")}
           </span>
         )}
       </Link>

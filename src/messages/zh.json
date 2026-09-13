@@ -545,5 +545,14 @@
     "retry": "重试",
     "changed": "价格已更改。请确认新金额后重新开始。",
     "pending": "正在确认上次付款结果。请勿开始新的付款，请稍后重新查询。"
+  },
+  "billingResult": {
+    "retryable": "未能找到您的付款请求，请重试。",
+    "pending": "正在确认付款结果。",
+    "processing": "正在处理付款请求。",
+    "failed": "付款未完成。",
+    "retry": "重试付款",
+    "check": "重新确认付款结果",
+    "backToBilling": "前往付款页面"
   }
 }

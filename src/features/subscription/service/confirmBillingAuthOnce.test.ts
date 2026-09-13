@@ -39,10 +39,17 @@ beforeEach(async () => {
     setItem: (key: string, value: string) => stored.set(key, value),
     removeItem: (key: string) => stored.delete(key),
   });
+  const locks = new Map<string, Promise<unknown>>();
   vi.stubGlobal("navigator", {
     locks: {
-      request: async (_key: string, callback: () => Promise<unknown>) =>
-        callback(),
+      request: (key: string, callback: () => Promise<unknown>) => {
+        const next = (locks.get(key) ?? Promise.resolve()).then(callback);
+        locks.set(
+          key,
+          next.catch(() => undefined),
+        );
+        return next;
+      },
     },
   });
   const { prepareBillingAttempt } = await import("./billingAttempt");
@@ -179,4 +186,153 @@ it("즉시 청구 없는 재개는 새로고침에도 결제 시도 조회 없�
   expect(confirm).toHaveBeenCalledTimes(1);
   expect(lookup).not.toHaveBeenCalled();
   expect(subscription).toHaveBeenCalledTimes(2);
+});
+
+it("네트워크 실패와 404 이후 새로고침은 조회만 하고 명시적 재시도는 같은 키로 승인한다", async () => {
+  const { ApiError } = await import("@/shared/lib/apiClient");
+  const { confirmBillingAuthOnce, BillingPaymentRetryableError } =
+    await import("./confirmBillingAuthOnce");
+  const { readActiveBillingAttempt } = await import("./billingAttempt");
+  confirm.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+  lookup.mockRejectedValue(new ApiError("Not found", 404));
+  await expect(confirmBillingAuthOnce("user", payload)).rejects.toBeInstanceOf(
+    BillingPaymentRetryableError,
+  );
+  await expect(readActiveBillingAttempt("user")).resolves.toMatchObject({
+    submitted: true,
+    retryable: true,
+    idempotencyKey: payload.idempotencyKey,
+  });
+  vi.resetModules();
+  const reloaded = await import("./confirmBillingAuthOnce");
+  const { ApiError: ReloadedApiError } = await import("@/shared/lib/apiClient");
+  lookup.mockRejectedValue(new ReloadedApiError("Not found", 404));
+  await expect(
+    reloaded.confirmBillingAuthOnce("user", payload),
+  ).rejects.toThrow("BILLING_PAYMENT_RETRYABLE");
+  expect(confirm).toHaveBeenCalledTimes(1);
+  confirm.mockResolvedValue({ status: "DONE", attemptId: "attempt" });
+  await expect(
+    reloaded.confirmBillingAuthOnce("user", payload, "retry"),
+  ).resolves.toEqual(pro);
+  expect(confirm).toHaveBeenCalledTimes(2);
+  expect(confirm.mock.calls[1][0]).toEqual(confirm.mock.calls[0][0]);
+});
+
+it("실패 Promise를 교체하고 중복 클릭은 진행 중인 재시도 하나를 공유한다", async () => {
+  const { ApiError } = await import("@/shared/lib/apiClient");
+  const { confirmBillingAuthOnce } = await import("./confirmBillingAuthOnce");
+  confirm.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+  lookup.mockRejectedValue(new ApiError("Not found", 404));
+  const first = confirmBillingAuthOnce("user", payload);
+  await expect(first).rejects.toThrow("BILLING_PAYMENT_RETRYABLE");
+  confirm.mockResolvedValue({ status: "DONE", attemptId: "attempt" });
+  const retry = confirmBillingAuthOnce("user", payload, "retry");
+  expect(retry).not.toBe(first);
+  expect(confirmBillingAuthOnce("user", payload, "retry")).toBe(retry);
+  await expect(retry).resolves.toEqual(pro);
+  expect(confirm).toHaveBeenCalledTimes(2);
+});
+
+it("결제 시작 시 404인 기존 시도를 새 키로 바꾸지 않고 재사용한다", async () => {
+  const { ApiError } = await import("@/shared/lib/apiClient");
+  const { recoverActiveBilling } = await import("./confirmBillingAuthOnce");
+  const {
+    prepareBillingAttempt,
+    readBillingAttempt,
+    markBillingAttemptSubmitted,
+  } = await import("./billingAttempt");
+  const attempt = await readBillingAttempt(
+    "user",
+    payload.customerKey,
+    payload.idempotencyKey,
+  );
+  await markBillingAttemptSubmitted("user", attempt);
+  lookup.mockRejectedValue(new ApiError("Not found", 404));
+  await expect(recoverActiveBilling("user")).resolves.toBeNull();
+  await expect(
+    prepareBillingAttempt("user", payload.customerKey, price),
+  ).resolves.toMatchObject({
+    idempotencyKey: payload.idempotencyKey,
+    retryable: true,
+  });
+  expect(confirm).not.toHaveBeenCalled();
+});
+
+it.each(["PENDING", "DONE"])(
+  "재시도 직전 조회가 %s이면 승인 POST를 재전송하지 않는다",
+  async (status) => {
+    const { ApiError } = await import("@/shared/lib/apiClient");
+    const { confirmBillingAuthOnce } = await import("./confirmBillingAuthOnce");
+    confirm.mockRejectedValue(new TypeError("Failed to fetch"));
+    lookup.mockRejectedValueOnce(new ApiError("Not found", 404));
+    await expect(confirmBillingAuthOnce("user", payload)).rejects.toThrow(
+      "BILLING_PAYMENT_RETRYABLE",
+    );
+    lookup.mockResolvedValue({ status });
+    const retry = confirmBillingAuthOnce("user", payload, "retry");
+    if (status === "PENDING")
+      await expect(retry).rejects.toThrow(
+        "BILLING_CONFIRMATION_ALREADY_SUBMITTED",
+      );
+    else await expect(retry).resolves.toEqual(pro);
+    expect(confirm).toHaveBeenCalledTimes(1);
+  },
+);
+
+it("조회 503은 재시도를 허용하지 않고 결과 다시 확인으로 복구한다", async () => {
+  const { ApiError } = await import("@/shared/lib/apiClient");
+  const { confirmBillingAuthOnce, recoverActiveBilling } =
+    await import("./confirmBillingAuthOnce");
+  const { readActiveBillingAttempt } = await import("./billingAttempt");
+  confirm.mockRejectedValue(new TypeError("Failed to fetch"));
+  lookup.mockRejectedValue(new ApiError("Unavailable", 503));
+  await expect(confirmBillingAuthOnce("user", payload)).rejects.toThrow(
+    "Failed to fetch",
+  );
+  await expect(recoverActiveBilling("user")).rejects.toMatchObject({
+    status: 503,
+  });
+  await expect(readActiveBillingAttempt("user")).resolves.toMatchObject({
+    submitted: true,
+    retryable: false,
+  });
+  lookup.mockResolvedValue({ status: "DONE" });
+  await expect(
+    confirmBillingAuthOnce("user", payload, "check"),
+  ).resolves.toEqual(pro);
+  expect(confirm).toHaveBeenCalledTimes(1);
+});
+
+it("재시도 승인에서 확정 거부 후 404면 실패로 전환하고 새 결제 진입을 허용한다", async () => {
+  const { ApiError } = await import("@/shared/lib/apiClient");
+  const { confirmBillingAuthOnce, BillingPaymentFailedError } =
+    await import("./confirmBillingAuthOnce");
+  const { readActiveBillingAttempt } = await import("./billingAttempt");
+  confirm.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+  lookup.mockRejectedValue(new ApiError("Not found", 404));
+  await expect(confirmBillingAuthOnce("user", payload)).rejects.toThrow(
+    "BILLING_PAYMENT_RETRYABLE",
+  );
+  confirm.mockRejectedValue(new ApiError("Expired auth", 400));
+  await expect(
+    confirmBillingAuthOnce("user", payload, "retry"),
+  ).rejects.toBeInstanceOf(BillingPaymentFailedError);
+  await expect(readActiveBillingAttempt("user")).resolves.toBeNull();
+});
+
+it("다른 탭의 동시 요청도 잠금 안에서 제출 상태를 재확인해 승인 한 번만 보낸다", async () => {
+  confirm.mockResolvedValue({ status: "DONE", attemptId: "attempt" });
+  lookup.mockResolvedValue({ status: "DONE", attemptId: "attempt" });
+  const firstTab = await import("./confirmBillingAuthOnce");
+  vi.resetModules();
+  const secondTab = await import("./confirmBillingAuthOnce");
+  await expect(
+    Promise.all([
+      firstTab.confirmBillingAuthOnce("user", payload),
+      secondTab.confirmBillingAuthOnce("user", payload),
+    ]),
+  ).resolves.toEqual([pro, pro]);
+  expect(confirm).toHaveBeenCalledTimes(1);
+  expect(lookup).toHaveBeenCalledTimes(1);
 });

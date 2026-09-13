@@ -16,9 +16,16 @@ import {
   readBillingAttempt,
   readActiveBillingAttempt,
   clearActiveBillingAttempt,
+  markBillingAttemptRetryable,
+  withBillingConfirmationLock,
 } from "./billingAttempt";
 
-const confirmations = new Map<string, Promise<MySubscriptionResponseDto>>();
+export type BillingConfirmationAction = "initial" | "check" | "retry";
+
+const confirmations = new Map<
+  string,
+  { promise: Promise<MySubscriptionResponseDto>; settled: boolean }
+>();
 
 export class BillingConfirmationAlreadySubmittedError extends Error {
   constructor() {
@@ -26,6 +33,14 @@ export class BillingConfirmationAlreadySubmittedError extends Error {
   }
 }
 export class BillingPaymentFailedError extends Error {}
+export class BillingPaymentRetryableError extends Error {
+  constructor() {
+    super("BILLING_PAYMENT_RETRYABLE");
+  }
+}
+
+const isNotFound = (error: unknown) =>
+  error instanceof ApiError && error.status === 404;
 
 const confirmedSubscription = async (result: InitialPaymentResponseDto) => {
   if (result.status === "FAILED" || result.status === "CANCELED")
@@ -42,6 +57,7 @@ export const confirmBillingAuthOnce = (
     ConfirmBillingAuthDto,
     "authKey" | "customerKey" | "idempotencyKey"
   >,
+  action: BillingConfirmationAction = "initial",
 ) => {
   const identity = JSON.stringify([
     userId,
@@ -50,18 +66,31 @@ export const confirmBillingAuthOnce = (
     payload.idempotencyKey,
   ]);
   const existing = confirmations.get(identity);
-  if (existing) return existing;
-  const promise = (async () => {
+  if (existing && (action === "initial" || !existing.settled))
+    return existing.promise;
+  const promise = withBillingConfirmationLock(userId, async () => {
     const attempt = await readBillingAttempt(
       userId,
       payload.customerKey,
       payload.idempotencyKey,
     );
     if (attempt.resumedWithoutPayment) return fetchMySubscription();
-    if (attempt.submitted)
+    if (attempt.submitted) {
+      let recovered: InitialPaymentResponseDto | undefined;
+      try {
+        recovered = await recoverInitialPayment(attempt.idempotencyKey);
+      } catch (error) {
+        if (!isNotFound(error)) throw error;
+        await markBillingAttemptRetryable(userId, attempt);
+        // 새로고침·결과 확인은 조회만 수행하고 명시적인 재시도만 승인합니다.
+        if (action !== "retry") throw new BillingPaymentRetryableError();
+      }
+      if (recovered) return confirmedSubscription(recovered);
+    } else if (action === "check") {
       return confirmedSubscription(
         await recoverInitialPayment(attempt.idempotencyKey),
       );
+    }
     await markBillingAttemptSubmitted(userId, attempt);
     let result: InitialPaymentResponseDto;
     try {
@@ -75,13 +104,13 @@ export const confirmBillingAuthOnce = (
       try {
         result = await recoverInitialPayment(attempt.idempotencyKey);
       } catch (lookupError) {
-        if (
-          error instanceof ApiError &&
-          [400, 409].includes(error.status) &&
-          lookupError instanceof ApiError &&
-          lookupError.status === 404
-        ) {
-          await clearActiveBillingAttempt(userId, attempt.idempotencyKey);
+        if (isNotFound(lookupError)) {
+          if (error instanceof ApiError && [400, 409].includes(error.status)) {
+            await clearActiveBillingAttempt(userId, attempt.idempotencyKey);
+            throw new BillingPaymentFailedError();
+          }
+          await markBillingAttemptRetryable(userId, attempt);
+          throw new BillingPaymentRetryableError();
         }
         throw error;
       }
@@ -93,8 +122,18 @@ export const confirmBillingAuthOnce = (
       });
     }
     return confirmedSubscription(result);
-  })();
-  confirmations.set(identity, promise);
+  });
+  const entry = { promise, settled: false };
+  confirmations.set(identity, entry);
+  // 성공 결과는 재사용하고, 명시적인 재확인·재시도는 완료된 Promise를 교체합니다.
+  void promise.then(
+    () => {
+      entry.settled = true;
+    },
+    () => {
+      entry.settled = true;
+    },
+  );
   return promise;
 };
 
@@ -105,23 +144,31 @@ export const recoverInitialPayment = async (idempotencyKey: string) => {
 };
 
 // 다른 탭이나 이전 리다이렉트에서 제출한 결제가 미확정이면 새 결제 인증을 만들지 않습니다.
-export const recoverActiveBilling = async (userId: string) => {
-  const attempt = await readActiveBillingAttempt(userId);
-  if (!attempt?.submitted) return null;
-  const result = attempt.resumedWithoutPayment
-    ? { status: "DONE" }
-    : await recoverInitialPayment(attempt.idempotencyKey);
-  if (result.status === "PENDING")
+export const recoverActiveBilling = (userId: string) =>
+  withBillingConfirmationLock(userId, async () => {
+    const attempt = await readActiveBillingAttempt(userId);
+    if (!attempt?.submitted) return null;
+    let result: Pick<InitialPaymentResponseDto, "status">;
+    try {
+      result = attempt.resumedWithoutPayment
+        ? { status: "DONE" }
+        : await recoverInitialPayment(attempt.idempotencyKey);
+    } catch (error) {
+      if (!isNotFound(error)) throw error;
+      await markBillingAttemptRetryable(userId, attempt);
+      return null;
+    }
+    if (result.status === "PENDING")
+      throw new BillingConfirmationAlreadySubmittedError();
+    if (result.status === "DONE") {
+      const current = await fetchMySubscription();
+      if (hasEstimatedProAccess(current)) return current;
+      await clearActiveBillingAttempt(userId, attempt.idempotencyKey);
+      return null;
+    }
+    if (result.status === "FAILED" || result.status === "CANCELED") {
+      await clearActiveBillingAttempt(userId, attempt.idempotencyKey);
+      return null;
+    }
     throw new BillingConfirmationAlreadySubmittedError();
-  if (result.status === "DONE") {
-    const current = await fetchMySubscription();
-    if (hasEstimatedProAccess(current)) return current;
-    await clearActiveBillingAttempt(userId, attempt.idempotencyKey);
-    return null;
-  }
-  if (result.status === "FAILED" || result.status === "CANCELED") {
-    await clearActiveBillingAttempt(userId, attempt.idempotencyKey);
-    return null;
-  }
-  throw new BillingConfirmationAlreadySubmittedError();
-};
+  });

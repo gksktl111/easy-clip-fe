@@ -545,5 +545,14 @@
     "retry": "Retry",
     "changed": "The price has changed. Review the updated amount and start again.",
     "pending": "Your previous payment is still being checked. Please check again shortly before starting another payment."
+  },
+  "billingResult": {
+    "retryable": "We could not find your payment request. Please try again.",
+    "pending": "We are checking your payment result.",
+    "processing": "Your payment request is being processed.",
+    "failed": "Your payment was not completed.",
+    "retry": "Retry payment",
+    "check": "Check payment result",
+    "backToBilling": "Go to payment"
   }
 }

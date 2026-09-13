@@ -5,6 +5,7 @@ export interface BillingAttempt {
   priceVersion: string;
   customerHash: string;
   submitted: boolean;
+  retryable?: boolean;
   resumedWithoutPayment?: boolean;
 }
 const digest = async (value: string) => {
@@ -44,7 +45,11 @@ export const prepareBillingAttempt = async (
   // 같은 사용자·흐름을 여러 탭에서 시작해도 하나의 멱등키를 공유합니다.
   return navigator.locks.request(prefix, async () => {
     const active = await readActiveBillingAttempt(userId);
-    if (active?.submitted) throw new Error("BILLING_ATTEMPT_PENDING");
+    if (active?.submitted) {
+      if (active.retryable && active.customerHash === customerHash)
+        return active;
+      throw new Error("BILLING_ATTEMPT_PENDING");
+    }
     if (
       active &&
       active.customerHash === customerHash &&
@@ -91,7 +96,7 @@ export const markBillingAttemptSubmitted = async (
       throw new Error("BILLING_ATTEMPT_PENDING");
     localStorage.setItem(
       `${prefix}:${attempt.idempotencyKey}`,
-      JSON.stringify({ ...attempt, submitted: true }),
+      JSON.stringify({ ...attempt, submitted: true, retryable: false }),
     );
     localStorage.setItem(`${prefix}:active`, attempt.idempotencyKey);
   });
@@ -110,4 +115,23 @@ export const clearActiveBillingAttempt = async (
   const key = `${await userKey(userId)}:active`;
   if (localStorage.getItem(key) === idempotencyKey)
     localStorage.removeItem(key);
+};
+
+// 승인·조회·404 복구를 탭 사이에서도 순서대로 처리합니다.
+export const withBillingConfirmationLock = async <T>(
+  userId: string,
+  callback: () => Promise<T>,
+): Promise<T> =>
+  navigator.locks.request(`${await userKey(userId)}:confirmation`, callback);
+
+export const markBillingAttemptRetryable = async (
+  userId: string,
+  attempt: BillingAttempt,
+) => {
+  const prefix = await userKey(userId);
+  await navigator.locks.request(prefix, async () => {
+    const key = `${prefix}:${attempt.idempotencyKey}`;
+    const current = parseAttempt(localStorage.getItem(key));
+    localStorage.setItem(key, JSON.stringify({ ...current, retryable: true }));
+  });
 };
