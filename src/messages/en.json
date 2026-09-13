@@ -238,13 +238,14 @@
     "subscriptionLoading": "Loading",
     "subscriptionEmptyValue": "-",
     "subscriptionLoadError": "Failed to load subscription information.",
-    "about": "About",
-    "aboutTitle": "Clipboard Studio v1.0.0",
-    "aboutDescription": "A modern clipboard manager for designers and developers",
+    "about": "Version",
+    "aboutTitle": "Easy Clip",
+    "aboutDescription": "Organize text, colors, and images with folders and tags.",
     "closeButton": "Close",
     "subscriptionFreeStatus": "Using free plan",
     "subscriptionUnavailableStatus": "Subscription unavailable",
-    "subscriptionCanceledUntil": "Canceled; available until {date}"
+    "subscriptionCanceledUntil": "Canceled; available until {date}",
+    "appVersion": "Version {version}"
   },
   "trash": {
     "selectionHint": "Select items to restore.",

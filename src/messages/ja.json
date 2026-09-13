@@ -238,13 +238,14 @@
     "subscriptionLoading": "確認中",
     "subscriptionEmptyValue": "-",
     "subscriptionLoadError": "サブスクリプション情報を読み込めませんでした。",
-    "about": "情報",
-    "aboutTitle": "Clipboard Studio v1.0.0",
-    "aboutDescription": "デザイナーと開発者のためのモダンなクリップボードマネージャー",
+    "about": "バージョン",
+    "aboutTitle": "Easy Clip",
+    "aboutDescription": "テキスト・色・画像をフォルダーとタグで整理できます。",
     "closeButton": "閉じる",
     "subscriptionFreeStatus": "無料プランを利用中",
     "subscriptionUnavailableStatus": "購読状態を確認できません",
-    "subscriptionCanceledUntil": "解約予約 / {date}まで利用可能"
+    "subscriptionCanceledUntil": "解約予約 / {date}まで利用可能",
+    "appVersion": "バージョン {version}"
   },
   "trash": {
     "selectionHint": "復元する項目を選択してください。",
