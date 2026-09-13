@@ -1,5 +1,6 @@
 "use client";
 
+import { canUseClipOrganization } from "@/features/clip/service/clipOrganizationAccess";
 import { ClipCaptureDraftPanel } from "@/features/clip/ui/ClipCaptureDraftPanel";
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { ResourceAccessLoading } from "@/shared/access/ResourceAccessLoading";
@@ -43,6 +44,7 @@ function FolderClipsContent({
 }: FolderClipsPageProps) {
   const t = useTranslations("clips");
   const access = useResourceAccess();
+  const canManageTags = canUseClipOrganization(access, folderId);
   const { capture, collection, contextMenu, deletion, tags, rename } =
     useFolderClipsPage({ folderId, onClipsDeleted });
   const { commands, filter, results } = collection;
@@ -105,20 +107,22 @@ function FolderClipsContent({
           isSaving={capture.isCreating}
           countLabel={t("count", { count: results.clips.length })}
           actions={
-            <Button
-              disabled={deletion.isDeleteMode || deletion.isDeleting}
-              onClick={(event) => {
-                event.stopPropagation();
-                tags.openManager();
-              }}
-              variant="surfaceGhost"
-              size="sm"
-              aria-label={t("tags.manage")}
-              className="min-h-11 min-w-11 px-3 md:min-h-9 md:px-4"
-            >
-              <HiOutlineTag className="h-4 w-4" aria-hidden />
-              <span className="hidden md:inline">{t("tags.manage")}</span>
-            </Button>
+            canManageTags ? (
+              <Button
+                disabled={deletion.isDeleteMode || deletion.isDeleting}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  tags.openManager();
+                }}
+                variant="surfaceGhost"
+                size="sm"
+                aria-label={t("tags.manage")}
+                className="min-h-11 min-w-11 px-3 md:min-h-9 md:px-4"
+              >
+                <HiOutlineTag className="h-4 w-4" aria-hidden />
+                <span className="hidden md:inline">{t("tags.manage")}</span>
+              </Button>
+            ) : null
           }
         />
       ) : null}
@@ -135,6 +139,7 @@ function FolderClipsContent({
         clips={results.clips}
         hasNextPage={results.hasNextPage}
         isError={results.isError}
+        error={results.error}
         isFetchingNextPage={results.isFetchingNextPage}
         isLoading={results.isLoading}
         isCreatingClip={capture.isCreating}
@@ -146,7 +151,7 @@ function FolderClipsContent({
         }}
         onCopy={commands.copyClip}
         onToggleFavorite={commands.toggleFavorite}
-        onEditTags={tags.openClipEditor}
+        onEditTags={canManageTags ? tags.openClipEditor : undefined}
         onContextMenu={contextMenu.open}
         isDeleteMode={deletion.isDeleteMode}
         isInteractionDisabled={deletion.isDeleting}
@@ -182,12 +187,12 @@ function FolderClipsContent({
           onRename={rename.open}
           deleteLabel={t("actions.delete")}
           editTagsLabel={t("tags.editAction")}
-          onEditTags={tags.openClipEditor}
+          onEditTags={canManageTags ? tags.openClipEditor : undefined}
           onDelete={contextMenu.deleteClip}
         />
       ) : null}
       {rename.isOpen ? <ClipRenameModal {...rename} /> : null}
-      {tags.state ? (
+      {canManageTags && tags.state ? (
         <ClipTagEditorModal
           key={
             tags.state.mode === "clip" ? `clip-${tags.state.clip.id}` : "manage"
@@ -197,6 +202,7 @@ function FolderClipsContent({
           tags={tags.query.tags}
           isLoading={tags.query.isLoading}
           isQueryError={tags.query.isError}
+          queryError={tags.query.error}
           isSavingClipTags={tags.isSavingClipTags}
           isTagActionPending={tags.isTagActionPending}
           onClose={tags.close}

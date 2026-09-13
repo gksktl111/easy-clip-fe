@@ -1,5 +1,8 @@
 "use client";
 
+import { PolicyErrorNotice } from "@/shared/access/PolicyErrorNotice";
+import { isPolicyError } from "@/shared/access/policyError";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import type { Clip } from "@/features/clip/model/clip";
@@ -14,6 +17,7 @@ const EMPTY_SELECTED_CLIP_IDS = new Set<string>();
 interface ClipResultsSectionProps {
   clips: Clip[];
   isError?: boolean;
+  error?: unknown;
   isLoading?: boolean;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
@@ -39,6 +43,7 @@ interface ClipResultsSectionProps {
 export function ClipResultsSection({
   clips,
   isError = false,
+  error,
   isLoading = false,
   hasNextPage = false,
   isFetchingNextPage = false,
@@ -57,6 +62,7 @@ export function ClipResultsSection({
   selectedClipIds = EMPTY_SELECTED_CLIP_IDS,
   onToggleSelected,
 }: ClipResultsSectionProps) {
+  const accessText = useTranslations("access.proRequired");
   const hasTriggeredInViewRef = useRef(false);
   const { ref, inView } = useInView({
     rootMargin: "240px 0px",
@@ -83,6 +89,14 @@ export function ClipResultsSection({
   if (isLoading) {
     return <ClipListSkeleton />;
   }
+
+  if (isError && isPolicyError(error))
+    return (
+      <PolicyErrorNotice
+        error={error}
+        featureUnavailableMessage={accessText("search")}
+      />
+    );
 
   if (isError && !clips.length) {
     return <ClipErrorState onRetry={onRetry} />;

@@ -10,10 +10,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCreateClipMutation } from "@/features/clip/mutations/useCreateClipMutation";
+import { isAllowedImageClipFile } from "@/features/clip/service/imageClipValidation";
 import {
-  isAllowedImageClipFile,
-  isUnsupportedImageClipError,
-} from "@/features/clip/service/imageClipValidation";
+  clipCaptureErrorKey,
+  uploadRetrySeconds,
+} from "../service/clipCaptureError";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { readCurrentClipboard } from "@/features/clip/service/readCurrentClipboard";
 
@@ -92,6 +93,11 @@ export const useFolderClipCapture = ({
         !isAuthenticated
       )
         return false;
+      const retrySeconds = uploadRetrySeconds(draft?.error);
+      if (retrySeconds > 0) {
+        notifyError(t("uploadRetryAfter", { seconds: retrySeconds }));
+        return false;
+      }
       const id = crypto.randomUUID();
       saveDraft(user.id, folderId, { id, input });
       submitting.current = true;
@@ -105,11 +111,9 @@ export const useFolderClipCapture = ({
         failDraft(user.id, folderId, id, error);
         if (!isPolicyError(error))
           notifyError(
-            input.type === "text"
-              ? t("textSaveFailed")
-              : isUnsupportedImageClipError(error)
-                ? t("unsupportedImage")
-                : t("imageSaveFailed"),
+            uploadRetrySeconds(error) > 0
+              ? t("uploadRetryAfter", { seconds: uploadRetrySeconds(error) })
+              : t(clipCaptureErrorKey(error, input.type)),
           );
         return false;
       } finally {

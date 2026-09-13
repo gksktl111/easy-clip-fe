@@ -42,7 +42,7 @@ test("잠긴 폴더 관리 메뉴는 이름·순서 변경을 막고 폴더 삭�
   expect(deleted).toBe(1);
 });
 
-test("Free 검색과 태그는 접근 폴더에서 작동하고 잠긴 폴더의 캐시를 노출하지 않는다", async ({
+test("Free 전환 시 검색·태그 진입과 잠긴 폴더의 캐시를 노출하지 않는다", async ({
   page,
 }) => {
   const state = await setup(page, true);
@@ -78,20 +78,20 @@ test("Free 검색과 태그는 접근 폴더에서 작동하고 잠긴 폴더의
   ).toBeVisible();
   expect(tagReads).toHaveLength(tagCount);
   await page.locator('a[href="/favorites"]').click();
-  await page.getByRole("textbox").fill("비공개");
-  await expect
-    .poll(() =>
-      state.reads.some(
-        (url) => new URL(url).searchParams.get("q") === "비공개",
-      ),
-    )
-    .toBe(true);
+  await expect(page.getByText("공개 클립", { exact: true })).toBeVisible();
+  await expect(
+    page.getByPlaceholder(ko.clips.filter.searchPlaceholder),
+  ).toHaveCount(0);
   await expect(page.getByText("비공개 클립", { exact: true })).toHaveCount(0);
   await page.locator('a[href="/folder/a"]').click();
-  await page.getByRole("button", { name: "태그 관리", exact: true }).click();
-  await expect
-    .poll(() => tagReads.some((url) => url.includes("/folders/a/tags")))
-    .toBe(true);
+  await expect(page.getByText("공개 클립", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "태그 관리", exact: true }),
+  ).toHaveCount(0);
+  expect(tagReads).toHaveLength(tagCount);
+  expect(state.reads.some((url) => new URL(url).searchParams.has("q"))).toBe(
+    false,
+  );
 });
 
 test("반복 PROJECT_LOCKED 응답은 권한 재확인 루프와 쓰기 재전송을 만들지 않는다", async ({

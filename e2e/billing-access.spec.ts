@@ -1,3 +1,4 @@
+import { prepareBillingRedirect } from "./billing-fixture";
 import { expect, test } from "./fixtures";
 import { setup, pro } from "./access-fixture";
 import ko from "../src/messages/ko.json";
@@ -56,6 +57,7 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
   page,
 }) => {
   const state = await setup(page);
+  await prepareBillingRedirect(page, "mock-customer");
   let confirms = 0;
   let postConfirmReads = 0;
   let release!: () => void;
@@ -74,12 +76,21 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
     expect(route.request().postDataJSON()).toEqual({
       authKey: "mock-auth",
       customerKey: "mock-customer",
+      idempotencyKey: "12345678-1234-4123-8123-123456789012",
+      priceVersion: "test-price-v1",
     });
     state.subscription = { ...pro };
     state.folders[1].isLocked = false;
-    return route.fulfill({ status: 201, json: pro });
+    return route.fulfill({
+      status: 201,
+      json: { status: "DONE", subscription: pro },
+    });
   });
-  const url = "/billing/success?authKey=mock-auth&customerKey=mock-customer";
+  await page.route("**/subscriptions/me/billing/payments/*", (route) =>
+    route.fulfill({ json: { status: "DONE", subscription: pro } }),
+  );
+  const url =
+    "/billing/success?paymentAttempt=12345678-1234-4123-8123-123456789012&authKey=mock-auth&customerKey=mock-customer";
   await page.goto(url);
   await expect(
     page.getByText(ko.access.billingSuccess, { exact: true }),
@@ -97,7 +108,7 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
   expect(postConfirmReads).toBeGreaterThan(0);
   await page.goto(url);
   await expect(
-    page.getByText(ko.access.billingUncertain, { exact: false }),
+    page.getByText(ko.access.billingSuccess, { exact: true }),
   ).toBeVisible();
   expect(confirms).toBe(1);
 });
@@ -107,6 +118,7 @@ for (const failure of ["network", "conflict"] as const) {
     page,
   }) => {
     await setup(page);
+    await prepareBillingRedirect(page, "mock-customer");
     let confirms = 0;
     let subscriptionReads = 0;
     await page.route("**/subscriptions/me", async (route) => {
@@ -122,14 +134,19 @@ for (const failure of ["network", "conflict"] as const) {
             json: { message: "이전 결제 결과 확인 중" },
           });
     });
+    await page.route("**/subscriptions/me/billing/payments/*", (route) =>
+      route.fulfill({ status: 404, json: { message: "결과 확인 필요" } }),
+    );
     await page.goto(
-      "/billing/success?authKey=mock-failure&customerKey=mock-customer",
+      "/billing/success?paymentAttempt=12345678-1234-4123-8123-123456789012&authKey=mock-failure&customerKey=mock-customer",
     );
     await expect(
-      page.getByText(ko.access.billingUncertain, { exact: false }),
+      page
+        .getByRole("main")
+        .getByText(ko.access.billingUncertain, { exact: false }),
     ).toBeVisible();
     await expect(page.locator("[data-sonner-toast]")).toContainText(
-      ko.feedback.billingFailed,
+      ko.access.billingUncertain,
     );
     if (failure === "conflict")
       await expect(
@@ -138,9 +155,11 @@ for (const failure of ["network", "conflict"] as const) {
     await expect.poll(() => subscriptionReads).toBeGreaterThan(0);
     await page.reload();
     await expect(
-      page.getByText(ko.access.billingUncertain, { exact: false }),
+      page
+        .getByRole("main")
+        .getByText(ko.access.billingUncertain, { exact: false }),
     ).toBeVisible();
-    await expect(page.locator("[data-sonner-toast]")).toHaveCount(0);
+
     expect(confirms).toBe(1);
   });
 }

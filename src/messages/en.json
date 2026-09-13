@@ -23,7 +23,7 @@
       },
       "organize": {
         "title": "Find it with tags",
-        "description": "Add tags in a folder and search to narrow down your clips."
+        "description": "With Pro, add tags in folders and narrow down clips with search."
       },
       "reuse": {
         "title": "Read and copy again",
@@ -47,7 +47,7 @@
       },
       "search": {
         "title": "Fast search",
-        "description": "Search saved clips by keyword and copy the one you need right away."
+        "description": "With Pro, search saved clips by keyword and copy them immediately."
       }
     },
     "closingTitleLine1": "Do not lose copied information.",
@@ -65,14 +65,14 @@
       "free": {
         "name": "Free",
         "badge": "For getting started",
-        "description": "A simple plan for organizing clips with the essentials and fast search.",
+        "description": "A basic plan for saving clips and finding them in favorites.",
         "priceSuffix": "/ month",
         "billingNote": "Start right away with no monthly fee",
         "cta": "Start for free",
         "features": {
           "projects": "Use 1 project",
           "clips": "Add clips up to 50 per folder",
-          "organization": "Search + tags in accessible folders"
+          "organization": "Folders + favorites"
         }
       },
       "pro": {
@@ -85,7 +85,7 @@
         "features": {
           "projects": "Create unlimited projects",
           "clips": "Add clips up to 300 per folder",
-          "organization": "Search + tags in accessible folders"
+          "organization": "Search + tag management"
         }
       }
     },
@@ -131,8 +131,8 @@
         },
         "organization": {
           "label": "Organization",
-          "freeValue": "Search + tags in accessible folders",
-          "proValue": "Search + tags in accessible folders"
+          "freeValue": "Folders + favorites",
+          "proValue": "Search + tag management"
         }
       }
     },
@@ -221,13 +221,14 @@
     "subscriptionLoading": "Loading",
     "subscriptionEmptyValue": "-",
     "subscriptionLoadError": "Failed to load subscription information.",
-    "about": "About",
+    "about": "Version",
     "aboutTitle": "Easy Clip",
     "aboutDescription": "Organize text, colors, and images with folders and tags.",
     "closeButton": "Close",
     "subscriptionFreeStatus": "Using free plan",
     "subscriptionUnavailableStatus": "Subscription unavailable",
-    "subscriptionCanceledUntil": "Canceled; available until {date}"
+    "subscriptionCanceledUntil": "Canceled; available until {date}",
+    "appVersion": "Version {version}"
   },
   "trash": {
     "details": "Details",
@@ -239,7 +240,6 @@
     "viewDetails": "View details for {name}",
     "deleteItemTitle": "Delete permanently?",
     "deleteItemDescription": "Permanently delete “{name}”. Clips inside a folder will also be deleted. This cannot be undone.",
-
     "cancelSelection": "Clear selection",
     "selectionHint": "Select items to restore.",
     "title": "Trash",
@@ -312,7 +312,11 @@
       "clipboardUnavailable": "This browser does not support the Paste button. Try the latest Safari or Chrome.",
       "clipboardDenied": "Clipboard access was not allowed. Allow pasting in your browser, then try again.",
       "clipboardUnsupported": "This clipboard format is not supported. Copy text or an image.",
-      "clipboardReadFailed": "Could not read the clipboard. Copy the content again and retry."
+      "clipboardReadFailed": "Could not read the clipboard. Copy the content again and retry.",
+      "uploadTooLarge": "The file exceeds the server upload limit.",
+      "uploadRateLimited": "Too many uploads. Please try again shortly.",
+      "uploadUnavailable": "Uploads are currently unavailable. Please try again later.",
+      "uploadRetryAfter": "Please retry the upload in {seconds} seconds."
     },
     "filter": {
       "all": "All",
@@ -474,7 +478,7 @@
       "PROJECT_LOCKED": "This folder is locked.",
       "CLIP_LIMIT_EXCEEDED": "This folder has reached its clip creation limit. Existing clips are preserved.",
       "PLAN_LIMIT_EXCEEDED": "Your plan restricts folder creation or restoration. Restore your accessible folder if it is in trash.",
-      "FEATURE_NOT_AVAILABLE": "Folder reordering requires Pro."
+      "FEATURE_NOT_AVAILABLE": "This feature is available with Pro."
     },
     "draftTitle": "Unsaved clip",
     "draftDescription": "Your input is retained. After a network error, check whether it was saved before retrying.",
@@ -485,7 +489,12 @@
     "clipLimitExplanation": "Existing clips are preserved even above the limit. Limits apply to adding new clips.",
     "proFeaturesTitle": "Features available with Pro",
     "billingCompleteTitle": "Payment complete",
-    "billingUncertainTitle": "Check payment status"
+    "billingUncertainTitle": "Check payment status",
+    "proRequired": {
+      "search": "Clip search is available with Pro.",
+      "tags": "Tag management is available with Pro.",
+      "reorder": "Folder reordering is available with Pro."
+    }
   },
   "feedback": {
     "close": "Dismiss notification",
@@ -528,5 +537,13 @@
     "monthly": "Monthly",
     "perMonth": "/ month",
     "renewal": "Billed automatically each month. Cancel renewal to stop future billing and keep access through your paid period."
+  },
+  "subscriptionPrice": {
+    "loading": "Loading price",
+    "unavailable": "Price unavailable",
+    "error": "We could not load the price. Please retry before proceeding to payment.",
+    "retry": "Retry",
+    "changed": "The price has changed. Review the updated amount and start again.",
+    "pending": "Your previous payment is still being checked. Please check again shortly before starting another payment."
   }
 }

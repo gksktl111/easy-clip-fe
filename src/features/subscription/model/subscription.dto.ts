@@ -23,6 +23,7 @@ export interface UpdateMySubscriptionDto {
 }
 
 export interface BillingAuthRequestResponseDto {
+  price: SubscriptionPriceResponseDto;
   clientKey: string;
   customerKey: string;
   method: BillingAuthMethodDto;
@@ -31,6 +32,26 @@ export interface BillingAuthRequestResponseDto {
 }
 
 export interface ConfirmBillingAuthDto {
+  idempotencyKey: string;
+  priceVersion: string;
   authKey: string;
   customerKey: string;
+}
+
+export interface SubscriptionPriceResponseDto {
+  plan: "PRO";
+  amount: number;
+  currency: "KRW";
+  interval: "MONTH";
+  intervalCount: 1;
+  priceVersion: string;
+}
+
+export interface InitialPaymentResponseDto {
+  attemptId: string | null;
+  status: "PENDING" | "DONE" | "FAILED" | "CANCELED";
+  amount?: number;
+  currency?: string;
+  priceVersion?: string;
+  subscription?: MySubscriptionResponseDto;
 }

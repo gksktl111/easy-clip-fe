@@ -34,6 +34,28 @@ for (const [locale, messages] of Object.entries({ ko, en, ja, zh })) {
     const box = await toast.boundingBox();
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+    for (const width of [320, 390, 430, 480, 600, 601, 768, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      await copy.click();
+      const card = toast
+        .getByRole("button", { name: messages.feedback.close })
+        .locator("..");
+      await expect
+        .poll(
+          async () => {
+            const bounds = await card.boundingBox();
+            return bounds
+              ? Math.abs(bounds.x + bounds.width / 2 - width / 2)
+              : Infinity;
+          },
+          {
+            message: `${locale} ${width}px에서 실제 알림 카드가 화면 중앙에 위치해야 한다`,
+          },
+        )
+        .toBeLessThanOrEqual(0.5);
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await copy.click();
     await page.screenshot({
       path: testInfo.outputPath("copy-toast.png"),
       animations: "disabled",

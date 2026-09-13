@@ -13,6 +13,7 @@ type ApiRequestOptions = Omit<RequestInit, "headers"> & {
 
 export class ApiError extends Error {
   status: number;
+  retryAt?: number;
 
   code?: string;
   details?: Record<string, unknown>;
@@ -81,7 +82,14 @@ const readApiError = async (response: Response) => {
   } catch {
     // HTML/빈 오류 응답도 HTTP 상태 기반으로 처리합니다.
   }
-  return new ApiError(message, response.status, code, details);
+  const error = new ApiError(message, response.status, code, details);
+  const retryAfter = response.headers.get("Retry-After");
+  if (response.status === 429 && retryAfter && /^\d+$/.test(retryAfter)) {
+    const seconds = Number(retryAfter);
+    if (Number.isSafeInteger(seconds))
+      error.retryAt = Date.now() + seconds * 1000;
+  }
+  return error;
 };
 
 const wait = (delayMs: number) =>
@@ -151,11 +159,17 @@ export const apiRequest = async <T>(
   const isContentRequest =
     /^\/(clips|trash)(?:[/?]|$)/.test(path) ||
     /^\/folders\/[^/]+\/tags(?:[/?]|$)/.test(path);
+  const requestHeaders = new Headers(headers);
+  if (
+    !["GET", "HEAD", "OPTIONS"].includes((init.method ?? "GET").toUpperCase())
+  ) {
+    requestHeaders.set("X-CSRF-Protection", "1");
+  }
   const response = await fetch(buildApiUrl(path), {
     ...init,
     // httpOnly 쿠키 기반 인증이므로 모든 API 요청에 쿠키를 포함한다.
     credentials: credentials ?? "include",
-    headers: new Headers(headers),
+    headers: requestHeaders,
   });
 
   if (isContentRequest && requestGeneration !== getAccessGeneration())

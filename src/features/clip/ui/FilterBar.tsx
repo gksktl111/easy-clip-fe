@@ -1,5 +1,7 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { canUseClipOrganization } from "@/features/clip/service/clipOrganizationAccess";
 import { useId, useRef, useState, type ReactNode } from "react";
 import { MobileHeaderPortal } from "@/shared/layout/MobileHeaderPortal";
 import { useTranslations } from "next-intl";
@@ -46,6 +48,7 @@ export function FilterBar({
   mobileTitle,
   mobileActions,
 }: FilterBarProps) {
+  const canSearch = canUseClipOrganization(useResourceAccess());
   const [searchOpen, setSearchOpen] = useState(false);
   const searchId = useId();
   const searchToggle = useRef<HTMLButtonElement>(null);
@@ -70,7 +73,7 @@ export function FilterBar({
     },
   ];
 
-  const searchField = (
+  const searchField = canSearch ? (
     <TextInput
       placeholder={t("searchPlaceholder")}
       value={searchQuery}
@@ -79,7 +82,7 @@ export function FilterBar({
       inputClassName="h-11 pr-4 min-[1200px]:h-9 min-[1200px]:rounded-lg"
       leftIcon={<HiOutlineSearch className="h-4 w-4" aria-hidden />}
     />
-  );
+  ) : null;
 
   const statusGroup = (
     <div className="flex w-full flex-wrap items-center justify-end gap-3 min-[1200px]:w-auto">
@@ -124,17 +127,19 @@ export function FilterBar({
               <span className="shrink-0 text-xs text-(--muted)">
                 {countLabel}
               </span>
-              <button
-                ref={searchToggle}
-                type="button"
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${searchQuery ? "bg-(--icon-chip) text-(--icon-chip-text)" : "text-(--muted) hover:bg-(--surface-muted)"}`}
-                aria-label={t("searchPlaceholder")}
-                aria-expanded={searchOpen}
-                aria-controls={searchId}
-                onClick={() => setSearchOpen((open) => !open)}
-              >
-                <HiOutlineSearch className="h-5 w-5" aria-hidden />
-              </button>
+              {canSearch ? (
+                <button
+                  ref={searchToggle}
+                  type="button"
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${searchQuery ? "bg-(--icon-chip) text-(--icon-chip-text)" : "text-(--muted) hover:bg-(--surface-muted)"}`}
+                  aria-label={t("searchPlaceholder")}
+                  aria-expanded={searchOpen}
+                  aria-controls={searchId}
+                  onClick={() => setSearchOpen((open) => !open)}
+                >
+                  <HiOutlineSearch className="h-5 w-5" aria-hidden />
+                </button>
+              ) : null}
             </div>
           </MobileHeaderPortal>
           <div className="shrink-0 border-b border-(--border) px-3 py-2 md:hidden">
@@ -151,8 +156,8 @@ export function FilterBar({
               {actions}
               {mobileActions}
             </div>
-            <div id={searchId} hidden={!searchOpen}>
-              {searchOpen ? (
+            <div id={searchId} hidden={!canSearch || !searchOpen}>
+              {canSearch && searchOpen ? (
                 <div className="mt-2 flex items-center gap-2">
                   <TextInput
                     autoFocus

@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  AccessChangedError,
+  getAccessGeneration,
+} from "@/shared/access/accessEvents";
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { assertClipOrganizationAccess } from "@/features/clip/service/clipOrganizationAccess";
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { replaceClipTags } from "@/features/clip/api/tagApi";
@@ -24,10 +30,15 @@ export const useClipTagsMutation = ({
   folderId,
   isAuthenticated,
 }: UseClipTagsMutationOptions) => {
+  const access = useResourceAccess();
+  const generation = getAccessGeneration();
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: ({ clipId, tagNames }: ReplaceTagsVariables) =>
-      replaceClipTags(clipId, { tags: tagNames }),
+    mutationFn: async ({ clipId, tagNames }: ReplaceTagsVariables) => {
+      if (generation !== getAccessGeneration()) throw new AccessChangedError();
+      assertClipOrganizationAccess(access, folderId);
+      return replaceClipTags(clipId, { tags: tagNames });
+    },
     onSuccess: (response, variables) => {
       updateClipTagsInCache(queryClient, variables.clipId, response.tags);
       void queryClient.invalidateQueries({

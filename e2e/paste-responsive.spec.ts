@@ -6,10 +6,10 @@ import ja from "../src/messages/ja.json";
 import zh from "../src/messages/zh.json";
 
 for (const [locale, messages] of Object.entries({ ko, en, ja, zh })) {
-  test(`${locale} 데스크톱 비활성 안내와 모바일 붙여넣기 버튼을 분리한다`, async ({
+  test(`${locale} Pro 데스크톱 비활성 안내와 모바일 붙여넣기 버튼을 분리한다`, async ({
     page,
   }) => {
-    await setup(page, false, locale);
+    await setup(page, true, locale);
     await page
       .context()
       .grantPermissions(["clipboard-read", "clipboard-write"]);

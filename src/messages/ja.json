@@ -23,7 +23,7 @@
       },
       "organize": {
         "title": "タグで見つける",
-        "description": "フォルダー内でタグを付け、検索して必要なクリップを絞り込みます。"
+        "description": "Proではフォルダ内でタグを付け、検索で必要なクリップを絞り込めます。"
       },
       "reuse": {
         "title": "確認してコピー",
@@ -47,7 +47,7 @@
       },
       "search": {
         "title": "すばやく検索",
-        "description": "保存したクリップをキーワードで検索し、すぐにコピーできます。"
+        "description": "Proでは保存したクリップをキーワードで検索し、すぐにコピーできます。"
       }
     },
     "closingTitleLine1": "コピーした情報を、",
@@ -65,14 +65,14 @@
       "free": {
         "name": "Free",
         "badge": "個人のスタート向け",
-        "description": "基本機能と検索でクリップを整理できるシンプルなプランです。",
+        "description": "クリップを保存し、お気に入りから見つけられる基本プラン",
         "priceSuffix": "/月",
         "billingNote": "月額料金なしですぐに利用できます",
         "cta": "無料で始める",
         "features": {
           "projects": "1つのプロジェクトを利用可能",
           "clips": "フォルダーごとに50件まで追加保存",
-          "organization": "アクセス可能なフォルダーで検索 + タグ"
+          "organization": "フォルダ + お気に入り"
         }
       },
       "pro": {
@@ -85,7 +85,7 @@
         "features": {
           "projects": "プロジェクトを無制限に作成可能",
           "clips": "フォルダーごとに300件まで追加保存",
-          "organization": "アクセス可能なフォルダーで検索 + タグ"
+          "organization": "検索 + タグ管理"
         }
       }
     },
@@ -131,8 +131,8 @@
         },
         "organization": {
           "label": "整理方法",
-          "freeValue": "アクセス可能なフォルダーで検索 + タグ",
-          "proValue": "アクセス可能なフォルダーで検索 + タグ"
+          "freeValue": "フォルダ + お気に入り",
+          "proValue": "検索 + タグ管理"
         }
       }
     },
@@ -221,13 +221,14 @@
     "subscriptionLoading": "確認中",
     "subscriptionEmptyValue": "-",
     "subscriptionLoadError": "サブスクリプション情報を読み込めませんでした。",
-    "about": "情報",
+    "about": "バージョン",
     "aboutTitle": "Easy Clip",
     "aboutDescription": "テキスト・色・画像をフォルダーとタグで整理できます。",
     "closeButton": "閉じる",
     "subscriptionFreeStatus": "無料プランを利用中",
     "subscriptionUnavailableStatus": "購読状態を確認できません",
-    "subscriptionCanceledUntil": "解約予約 / {date}まで利用可能"
+    "subscriptionCanceledUntil": "解約予約 / {date}まで利用可能",
+    "appVersion": "バージョン {version}"
   },
   "trash": {
     "details": "詳細情報",
@@ -239,7 +240,6 @@
     "viewDetails": "{name}の詳細を表示",
     "deleteItemTitle": "完全に削除しますか？",
     "deleteItemDescription": "「{name}」を完全に削除します。フォルダー内のクリップも削除され、元に戻せません。",
-
     "cancelSelection": "選択を解除",
     "selectionHint": "復元する項目を選択してください。",
     "title": "ゴミ箱",
@@ -312,7 +312,11 @@
       "clipboardUnavailable": "このブラウザーでは貼り付けボタンを利用できません。最新版のSafariまたはChromeでお試しください。",
       "clipboardDenied": "クリップボードへのアクセスが許可されていません。ブラウザーで貼り付けを許可してから再試行してください。",
       "clipboardUnsupported": "この形式には対応していません。テキストや画像をコピーしてください。",
-      "clipboardReadFailed": "クリップボードを読み取れませんでした。もう一度コピーしてからお試しください。"
+      "clipboardReadFailed": "クリップボードを読み取れませんでした。もう一度コピーしてからお試しください。",
+      "uploadTooLarge": "ファイルがサーバーの容量制限を超えています。",
+      "uploadRateLimited": "アップロード回数が多すぎます。しばらくしてから再試行してください。",
+      "uploadUnavailable": "現在アップロードできません。しばらくしてから再試行してください。",
+      "uploadRetryAfter": "{seconds}秒後にアップロードを再試行してください。"
     },
     "filter": {
       "all": "すべて",
@@ -474,7 +478,7 @@
       "PROJECT_LOCKED": "ロックされたフォルダにはアクセスできません。",
       "CLIP_LIMIT_EXCEEDED": "フォルダのクリップ追加上限に達しました。既存のクリップは保持されます。",
       "PLAN_LIMIT_EXCEEDED": "現在のプランではフォルダの作成・復元が制限されています。利用可能なフォルダがゴミ箱にあれば復元してください。",
-      "FEATURE_NOT_AVAILABLE": "フォルダの並べ替えにはProが必要です。"
+      "FEATURE_NOT_AVAILABLE": "この機能はProで利用できます。"
     },
     "draftTitle": "未保存のクリップ",
     "draftDescription": "入力を保持しています。通信エラーの場合は保存済みか確認してから再試行してください。",
@@ -485,7 +489,12 @@
     "clipLimitExplanation": "上限を超えた既存のクリップも保持されます。上限は新しいクリップの追加に適用されます。",
     "proFeaturesTitle": "Proで利用できる機能",
     "billingCompleteTitle": "お支払い完了",
-    "billingUncertainTitle": "お支払い状況の確認が必要です"
+    "billingUncertainTitle": "お支払い状況の確認が必要です",
+    "proRequired": {
+      "search": "クリップ検索はProで利用できます。",
+      "tags": "タグ管理はProで利用できます。",
+      "reorder": "フォルダの並べ替えはProで利用できます。"
+    }
   },
   "feedback": {
     "close": "通知を閉じる",
@@ -528,5 +537,13 @@
     "monthly": "月額",
     "perMonth": "/ 月",
     "renewal": "毎月自動で課金されます。自動更新を解約しても、お支払い済みの期間はご利用いただけます。"
+  },
+  "subscriptionPrice": {
+    "loading": "料金を確認中",
+    "unavailable": "料金を確認してください",
+    "error": "料金を取得できませんでした。再確認してからお支払いに進んでください。",
+    "retry": "再確認",
+    "changed": "料金が変更されました。新しい金額を確認して、もう一度開始してください。",
+    "pending": "前回のお支払い結果を確認中です。新しいお支払いを開始せず、しばらくしてから再確認してください。"
   }
 }

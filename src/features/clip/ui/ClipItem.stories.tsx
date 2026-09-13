@@ -71,3 +71,13 @@ export const Copying: Story = {
 export const WaitingForOtherCopy: Story = {
   args: { pendingCopyClipId: "clip-2" },
 };
+
+export const ReadOnlyTags: Story = {
+  args: {
+    onEditTags: undefined,
+    clip: {
+      ...meta.args.clip,
+      tags: [{ id: "tag-1", name: "보존 태그", backgroundColor: "GRAY" }],
+    },
+  },
+};

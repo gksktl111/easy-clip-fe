@@ -15,6 +15,7 @@ interface ClipCollectionPageProps {
   clips: Clip[];
   hasNextPage?: boolean;
   isError?: boolean;
+  error?: unknown;
   isFetchingNextPage?: boolean;
   isFavoriteMutationPending?: boolean;
   isLoading?: boolean;
@@ -34,6 +35,7 @@ export function ClipCollectionPage({
   clips,
   hasNextPage,
   isError,
+  error,
   isFetchingNextPage,
   isFavoriteMutationPending,
   isLoading,
@@ -74,6 +76,7 @@ export function ClipCollectionPage({
         clips={clips}
         hasNextPage={hasNextPage}
         isError={isError}
+        error={error}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
         onFetchNextPage={onFetchNextPage}

@@ -1,5 +1,6 @@
 "use client";
 
+import { ApiError } from "@/shared/lib/apiClient";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { useAuth } from "@/features/auth";
 import { useTranslations } from "next-intl";
@@ -10,6 +11,7 @@ import Confetti from "react-confetti";
 import {
   confirmBillingAuthOnce,
   BillingConfirmationAlreadySubmittedError,
+  BillingPaymentFailedError,
 } from "@/features/subscription/service/confirmBillingAuthOnce";
 import type { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 import { syncMySubscriptionQueryData } from "@/features/subscription/service/subscriptionQueryCache";
@@ -19,6 +21,7 @@ const notifiedConfirmations = new WeakSet<Promise<MySubscriptionResponseDto>>();
 
 // 결제 리다이렉트 결과를 서버에서 확정하고 성공 또는 실패 화면을 표시합니다.
 interface BillingResultPageProps {
+  paymentAttempt?: string;
   authKey?: string;
   customerKey?: string;
   errorMessage?: string;
@@ -31,6 +34,7 @@ export function BillingResultPage(props: BillingResultPageProps) {
 }
 
 function BillingResultContent({
+  paymentAttempt,
   authKey,
   customerKey,
   errorMessage,
@@ -42,9 +46,10 @@ function BillingResultContent({
   const feedback = useTranslations("feedback");
   const notified = useRef(false);
   const isMissingSuccessParams =
-    status === "success" && (!authKey || !customerKey);
+    status === "success" && (!authKey || !customerKey || !paymentAttempt);
   const [subscription, setSubscription] =
     useState<MySubscriptionResponseDto | null>(null);
+  const [paymentFailed, setPaymentFailed] = useState(false);
   const [message, setMessage] = useState<string | null>(errorMessage ?? null);
   const [isConfirming, setIsConfirming] = useState(
     status === "success" && !isMissingSuccessParams,
@@ -70,7 +75,13 @@ function BillingResultContent({
       notified.current = true;
       notifyError(feedback("billingFailed"));
     }
-    if (status !== "success" || !authKey || !customerKey || !user) {
+    if (
+      status !== "success" ||
+      !authKey ||
+      !customerKey ||
+      !paymentAttempt ||
+      !user
+    ) {
       return;
     }
 
@@ -79,6 +90,7 @@ function BillingResultContent({
     const confirmation = confirmBillingAuthOnce(user.id, {
       authKey,
       customerKey,
+      idempotencyKey: paymentAttempt,
     });
     confirmation
       .then((nextSubscription) => {
@@ -96,7 +108,7 @@ function BillingResultContent({
           notifiedConfirmations.add(confirmation);
           if (nextSubscription.plan === "PRO")
             notifySuccess(feedback("billingConfirmed"));
-          else notifyError(feedback("billingFailed"));
+          else notifyError(t("billingUncertain"));
         }
       })
       .catch((error) => {
@@ -106,11 +118,18 @@ function BillingResultContent({
           !(error instanceof BillingConfirmationAlreadySubmittedError)
         ) {
           notifiedConfirmations.add(confirmation);
-          notifyError(feedback("billingFailed"));
+          notifyError(
+            error instanceof BillingPaymentFailedError
+              ? feedback("billingFailed")
+              : t("billingUncertain"),
+          );
         }
+        if (error instanceof BillingPaymentFailedError) setPaymentFailed(true);
         requestAccessRefresh();
         setMessage(
-          `${error instanceof Error && !(error instanceof BillingConfirmationAlreadySubmittedError) ? error.message : ""} ${t("billingUncertain")}`,
+          error instanceof BillingPaymentFailedError
+            ? t("billingFailed")
+            : `${error instanceof ApiError && !(error instanceof BillingConfirmationAlreadySubmittedError) ? error.message : ""} ${t("billingUncertain")}`,
         );
       })
       .finally(() => {
@@ -120,6 +139,7 @@ function BillingResultContent({
       active = false;
     };
   }, [
+    paymentAttempt,
     authKey,
     customerKey,
     queryClient,
@@ -148,7 +168,7 @@ function BillingResultContent({
         isMissingSuccessParams={isMissingSuccessParams}
         isSuccess={isSuccess}
         message={message}
-        status={status}
+        status={paymentFailed ? "fail" : status}
       />
     </main>
   );

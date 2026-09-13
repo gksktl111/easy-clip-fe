@@ -183,3 +183,59 @@ describe("정책 오류와 오래된 권한 응답", () => {
     await expect(request).rejects.toBeInstanceOf(AccessChangedError);
   });
 });
+
+describe("쿠키 인증 CSRF 계약", () => {
+  it("JSON과 multipart 변경 요청 및 refresh 재시도에 헤더를 유지한다", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(createErrorResponse())
+      .mockResolvedValueOnce(new Response(null, { status: 204 }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const { apiRequest } = await import("./apiClient");
+    const body = new FormData();
+    body.set("text", "clip");
+    await apiRequest("/clips", { method: "POST", body });
+    for (const [, options] of fetchMock.mock.calls) {
+      expect(options.headers.get("X-CSRF-Protection")).toBe("1");
+      expect(options.headers.has("Content-Type")).toBe(false);
+      expect(options.credentials).toBe("include");
+    }
+    expect(fetchMock.mock.calls[2][1].body).toBe(body);
+  });
+
+  it("GET 요청에 CSRF 헤더를 붙이지 않는다", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const { apiRequest } = await import("./apiClient");
+    await apiRequest("/subscriptions/pricing", { credentials: "omit" });
+    expect(fetchMock.mock.calls[0][1].headers.has("X-CSRF-Protection")).toBe(
+      false,
+    );
+  });
+});
+
+it("업로드 429의 Retry-After를 다음 허용 시각으로 보존한다", async () => {
+  const now = Date.now();
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ code: "UPLOAD_RATE_LIMIT_EXCEEDED" }), {
+        status: 429,
+        headers: { "Retry-After": "60" },
+      }),
+    ),
+  );
+  const { apiRequest } = await import("./apiClient");
+  const error = await apiRequest("/clips", { method: "POST" }).catch(
+    (error) => error,
+  );
+  const { ApiError } = await import("./apiClient");
+  expect(error).toBeInstanceOf(ApiError);
+  if (!(error instanceof ApiError)) throw new Error("Expected ApiError");
+  expect(error.code).toBe("UPLOAD_RATE_LIMIT_EXCEEDED");
+  expect(error.retryAt).toBeGreaterThanOrEqual(now + 60000);
+  expect(error.retryAt).toBeLessThanOrEqual(Date.now() + 60000);
+});

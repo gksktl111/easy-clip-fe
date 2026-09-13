@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Button } from "@/shared/ui/button/Button";
 import Link from "next/link";
 import {
   HiCheckCircle,
@@ -24,6 +25,7 @@ export function BillingResultCard({
   status,
 }: BillingResultCardProps) {
   const t = useTranslations("access");
+  const priceText = useTranslations("subscriptionPrice");
   const isFailure = status === "fail" || isMissingSuccessParams;
   return (
     <section
@@ -67,6 +69,15 @@ export function BillingResultCard({
               : t("billingUncertain")))}
       </p>
 
+      {!isConfirming && !isSuccess && !isFailure ? (
+        <Button
+          className="mt-5"
+          variant="secondary"
+          onClick={() => window.location.reload()}
+        >
+          {priceText("retry")}
+        </Button>
+      ) : null}
       <Link
         href={isSuccess ? "/recent" : "/pricing"}
         className="mt-6 flex cursor-pointer items-center justify-center rounded-xl bg-(--primary) px-4 py-3 text-sm font-semibold transition hover:bg-(--primary-hover)"

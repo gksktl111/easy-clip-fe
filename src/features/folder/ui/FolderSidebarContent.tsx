@@ -57,6 +57,16 @@ export function FolderSidebarContent({
 }: FolderSidebarContentProps) {
   const feedback = useTranslations("feedback");
   const t = useTranslations("sidebar");
+  const accessText = useTranslations("access");
+  const reorderErrorMessage = (error: unknown) => {
+    if (error instanceof ApiError && error.status === 403) {
+      if (error.code === "FEATURE_NOT_AVAILABLE")
+        return accessText("proRequired.reorder");
+      if (error.code === "PROJECT_LOCKED")
+        return accessText("errors.PROJECT_LOCKED");
+    }
+    return t("folderActionError");
+  };
   const a = useTranslations("access");
   const access = useResourceAccess();
   const [showCreateLimit, setShowCreateLimit] = useState(false);
@@ -119,8 +129,8 @@ export function FolderSidebarContent({
       .then((changed) => {
         if (changed) notifySuccess(t("folderOrderChanged"));
       })
-      .catch(() => {
-        notifyError(t("folderActionError"));
+      .catch((error: unknown) => {
+        notifyError(reorderErrorMessage(error));
       });
   };
 
@@ -262,8 +272,8 @@ export function FolderSidebarContent({
           }),
         );
       })
-      .catch(() => {
-        notifyError(t("folderActionError"));
+      .catch((error: unknown) => {
+        notifyError(reorderErrorMessage(error));
       });
   };
 

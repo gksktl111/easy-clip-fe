@@ -1,3 +1,4 @@
+import { prepareBillingRedirect } from "./billing-fixture";
 import { test, expect } from "./fixtures";
 import { setup, clip } from "./access-fixture";
 import ko from "../src/messages/ko.json";
@@ -211,25 +212,42 @@ test("이름 입력·삭제 확인·구독 해지 모달을 키보드로 닫는�
 });
 
 test("결제 확인 중·완료·결과 불명확·실패 제목을 구분한다", async ({ page }) => {
-  await setup(page);
+  const state = await setup(page);
+  await prepareBillingRedirect(page, "design-customer");
+  await page.route(
+    "**/subscriptions/me/billing/payments/*/reconcile",
+    (route) => route.fulfill({ json: { status: "PENDING" } }),
+  );
+  await page.route("**/subscriptions/me/billing/payments/*", (route) =>
+    route.fulfill({ json: { status: "PENDING" } }),
+  );
   let release!: () => void;
   const gate = new Promise<void>((resolve) => {
     release = resolve;
   });
   await page.route("**/subscriptions/me/billing-auth/confirm", async (r) => {
     await gate;
+    state.subscription = {
+      ...state.subscription,
+      plan: "PRO",
+      status: "ACTIVE",
+      currentPeriodEnd: "2099-01-01T00:00:00Z",
+    };
     await r.fulfill({
       status: 201,
       json: {
-        plan: "PRO",
-        status: "ACTIVE",
-        autoRenew: true,
-        currentPeriodEnd: "2099-01-01T00:00:00Z",
+        status: "DONE",
+        subscription: {
+          plan: "PRO",
+          status: "ACTIVE",
+          autoRenew: true,
+          currentPeriodEnd: "2099-01-01T00:00:00Z",
+        },
       },
     });
   });
   const url =
-    "/billing/success?authKey=design-auth&customerKey=design-customer";
+    "/billing/success?paymentAttempt=12345678-1234-4123-8123-123456789012&authKey=design-auth&customerKey=design-customer";
   await page.goto(url);
   await expect(
     page.getByRole("heading", { name: ko.access.billingChecking, exact: true }),

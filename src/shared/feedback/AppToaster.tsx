@@ -9,11 +9,12 @@ export function AppToaster() {
   return (
     <div data-modal-notification-root>
       <Toaster
-        position="top-center"
+        position="bottom-center"
+        offset={{ bottom: 96 }}
         containerAriaLabel={t("region")}
         hotkey={["altKey", "KeyT"]}
         visibleToasts={3}
-        mobileOffset={16}
+        mobileOffset={{ bottom: 96, left: 16, right: 16 }}
         closeButton={false}
         duration={TOAST_DURATION_MS}
         toastOptions={{

@@ -20,6 +20,7 @@ export function FavoriteClipsPage() {
       clips={results.clips}
       hasNextPage={results.hasNextPage}
       isError={results.isError}
+      error={results.error}
       isFetchingNextPage={results.isFetchingNextPage}
       isLoading={results.isLoading}
       onCopy={(clip) => {

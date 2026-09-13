@@ -1,6 +1,6 @@
 import { HiOutlineRefresh } from "react-icons/hi";
 import { useFormatter, useTranslations } from "next-intl";
-import { PRO_MONTHLY_DISPLAY_AMOUNT } from "@/shared/config/planDisplay";
+import type { SubscriptionPriceResponseDto } from "../model/subscription.dto";
 import type { BillingStep } from "@/features/subscription/model/billing";
 import { BillingUnlockedFeatureList } from "@/features/subscription/ui/BillingUnlockedFeatureList";
 import { Badge } from "@/shared/ui/badge/Badge";
@@ -8,12 +8,16 @@ import { Button } from "@/shared/ui/button/Button";
 
 // Pro 요금, 제공 기능과 결제 시작 상태를 하나의 카드로 표시합니다.
 interface BillingCheckoutCardProps {
+  price?: SubscriptionPriceResponseDto;
+  pricePending: boolean;
   actionLabel: string;
   onStartBilling: () => void;
   step: BillingStep;
 }
 
 export function BillingCheckoutCard({
+  price,
+  pricePending,
   actionLabel,
   onStartBilling,
   step,
@@ -21,6 +25,7 @@ export function BillingCheckoutCard({
   const isProcessing = step === "loading" || step === "redirecting";
   const t = useTranslations("billing");
   const format = useFormatter();
+  const priceText = useTranslations("subscriptionPrice");
 
   return (
     <div className="w-full rounded-2xl border border-(--border) bg-(--surface-elevated) p-5">
@@ -29,13 +34,19 @@ export function BillingCheckoutCard({
           <p className="text-sm font-medium text-(--muted)">EasyClip Pro</p>
           <div className="mt-3 flex items-end gap-2">
             <span className="text-3xl font-semibold">
-              {format.number(PRO_MONTHLY_DISPLAY_AMOUNT, {
-                style: "currency",
-                currency: "KRW",
-                maximumFractionDigits: 0,
-              })}
+              {price
+                ? format.number(price.amount, {
+                    style: "currency",
+                    currency: price.currency,
+                    maximumFractionDigits: 0,
+                  })
+                : priceText(pricePending ? "loading" : "unavailable")}
             </span>
-            <span className="pb-1 text-sm text-(--muted)">{t("perMonth")}</span>
+            {price ? (
+              <span className="pb-1 text-sm text-(--muted)">
+                {t("perMonth")}
+              </span>
+            ) : null}
           </div>
         </div>
         <Badge variant="muted" size="sm">
@@ -48,7 +59,7 @@ export function BillingCheckoutCard({
 
       <Button
         onClick={onStartBilling}
-        disabled={isProcessing}
+        disabled={isProcessing || !price}
         variant="primary"
         size="lg"
         fullWidth
