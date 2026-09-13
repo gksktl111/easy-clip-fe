@@ -3,6 +3,18 @@ export * from "@playwright/test";
 
 export const test = base.extend({
   page: async ({ page }, provide) => {
+    await page.route("**/subscriptions/pricing", (route) =>
+      route.fulfill({
+        json: {
+          plan: "PRO",
+          amount: 3900,
+          currency: "KRW",
+          interval: "MONTH",
+          intervalCount: 1,
+          priceVersion: "test-price-v1",
+        },
+      }),
+    );
     await page.route("**/subscriptions/me", (route) =>
       route.fulfill({
         json: {

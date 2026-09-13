@@ -1,5 +1,6 @@
 "use client";
 
+import { canUseClipOrganization } from "@/features/clip/service/clipOrganizationAccess";
 import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
 import { ApiError } from "@/shared/lib/apiClient";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
@@ -41,7 +42,7 @@ export const useInfiniteClipsQuery = ({
     favorite,
     recent,
     filter,
-    searchQuery,
+    searchQuery: canUseClipOrganization(access, folderId) ? searchQuery : "",
     enabled: isQueryEnabled,
   });
   const query = useInfiniteQuery(options);

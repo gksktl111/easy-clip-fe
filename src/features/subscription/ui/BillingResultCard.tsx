@@ -1,9 +1,18 @@
 import { useTranslations } from "next-intl";
+import { Button } from "@/shared/ui/button/Button";
 import Link from "next/link";
-import { HiCheckCircle, HiExclamationCircle } from "react-icons/hi";
+import {
+  HiCheckCircle,
+  HiExclamationCircle,
+  HiOutlineClock,
+  HiOutlineRefresh,
+} from "react-icons/hi";
 
 // 결제 승인 진행, 성공 또는 실패 상태와 다음 이동 액션을 표시합니다.
 interface BillingResultCardProps {
+  canRetry: boolean;
+  onRetry: () => void;
+  isRetrying: boolean;
   isConfirming: boolean;
   isMissingSuccessParams: boolean;
   isSuccess: boolean;
@@ -12,6 +21,9 @@ interface BillingResultCardProps {
 }
 
 export function BillingResultCard({
+  canRetry,
+  onRetry,
+  isRetrying,
   isConfirming,
   isMissingSuccessParams,
   isSuccess,
@@ -19,39 +31,75 @@ export function BillingResultCard({
   status,
 }: BillingResultCardProps) {
   const t = useTranslations("access");
+  const resultText = useTranslations("billingResult");
+  const isFailure = status === "fail" || isMissingSuccessParams;
   return (
-    <section className="w-full max-w-md rounded-2xl border border-(--border) bg-(--surface-elevated) p-6 text-center shadow-xl">
+    <section
+      className="w-full max-w-md rounded-xl border border-(--border) bg-(--surface-elevated) p-6 text-center"
+      aria-busy={isConfirming}
+    >
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-(--surface-muted)">
-        {isSuccess ? (
+        {isConfirming ? (
+          <HiOutlineRefresh
+            className="h-7 w-7 animate-spin text-(--muted) motion-reduce:animate-none"
+            aria-hidden
+          />
+        ) : isSuccess ? (
           <HiCheckCircle className="h-7 w-7 text-(--success)" aria-hidden />
-        ) : (
+        ) : isFailure ? (
           <HiExclamationCircle
             className="h-7 w-7 text-(--danger)"
             aria-hidden
           />
+        ) : (
+          <HiOutlineClock className="h-7 w-7 text-(--muted)" aria-hidden />
         )}
       </div>
       <h1 className="mt-5 text-2xl font-semibold">
-        {status === "success" ? t("billingChecking") : t("billingFailed")}
+        {t(
+          isConfirming
+            ? "billingChecking"
+            : isSuccess
+              ? "billingCompleteTitle"
+              : isFailure
+                ? "billingFailed"
+                : "billingUncertainTitle",
+        )}
       </h1>
-      <p className="mt-3 text-sm leading-6 text-(--muted)">
+      <p className="mt-3 text-sm leading-6 text-(--muted)" aria-live="polite">
         {isConfirming
-          ? t("billingLoading")
+          ? isRetrying
+            ? resultText("processing")
+            : t("billingLoading")
           : (message ??
             (isMissingSuccessParams
               ? t("billingMissing")
-              : t("billingUncertain")))}
+              : isFailure
+                ? resultText("failed")
+                : resultText("pending")))}
       </p>
 
+      {!isSuccess && !isFailure ? (
+        <Button
+          className="mt-5"
+          variant="secondary"
+          onClick={onRetry}
+          disabled={isConfirming}
+        >
+          {isConfirming && isRetrying
+            ? resultText("processing")
+            : resultText(canRetry ? "retry" : "check")}
+        </Button>
+      ) : null}
       <Link
-        href={isSuccess ? "/recent" : "/pricing"}
+        href={isSuccess ? "/recent" : isFailure ? "/billing" : "/pricing"}
         className="mt-6 flex cursor-pointer items-center justify-center rounded-xl bg-(--primary) px-4 py-3 text-sm font-semibold transition hover:bg-(--primary-hover)"
       >
         {isSuccess ? (
           <span className="text-primary-foreground">{t("openApp")}</span>
         ) : (
           <span className="text-primary-foreground">
-            {t("checkSubscription")}
+            {isFailure ? resultText("backToBilling") : t("checkSubscription")}
           </span>
         )}
       </Link>

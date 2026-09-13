@@ -1,12 +1,13 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { HiOutlineCreditCard } from "react-icons/hi";
+import { HiOutlineCreditCard, HiOutlineTag } from "react-icons/hi";
 import {
   mapSubscriptionStatus,
   type MySubscriptionResponseDto,
   type SubscriptionStatus,
 } from "@/features/subscription";
+import { APP_VERSION } from "@/shared/config/appVersion";
 import type { AppLocale } from "@/shared/config/locale";
 import { Text } from "@/shared/ui/typography/Text";
 
@@ -70,22 +71,15 @@ export function SettingsAboutSection({
     mappedStatus.nextBillingAt !== null;
 
   return (
-    <section>
-      <Text variant="sectionLabel">{t("about")}</Text>
-      <div className="mt-3 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
-        <Text variant="itemTitle">{t("aboutTitle")}</Text>
-        <Text variant="caption">{t("aboutDescription")}</Text>
-      </div>
-      <div className="mt-3 rounded-xl border border-(--border) bg-(--modal-section-bg) px-4 py-3">
-        <div className="flex items-start gap-3">
+    <>
+      <section>
+        <Text variant="sectionLabel">{t("subscriptionTitle")}</Text>
+        <div className="mt-3 flex items-start gap-3 border-t border-(--border) py-4">
           <div className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
             <HiOutlineCreditCard className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0 flex-1">
-            <Text variant="itemTitle" className="text-left">
-              {t("subscriptionTitle")}
-            </Text>
-            <dl className="mt-4 grid grid-cols-2 gap-3 text-left text-sm">
+            <dl className="grid grid-cols-2 gap-3 text-left text-sm">
               <div>
                 <Text as="dt" variant="caption">
                   {t("subscriptionPlan")}
@@ -129,7 +123,22 @@ export function SettingsAboutSection({
             ) : null}
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <section>
+        <Text variant="sectionLabel">{t("about")}</Text>
+        <div className="mt-3 flex items-start gap-3 border-t border-(--border) py-4">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center text-(--muted)">
+            <HiOutlineTag className="h-5 w-5" aria-hidden />
+          </div>
+          <div className="min-w-0 flex-1">
+            <Text variant="itemTitle">{t("aboutTitle")}</Text>
+            <Text variant="caption">{t("aboutDescription")}</Text>
+            <Text variant="caption" className="mt-2">
+              {t("appVersion", { version: APP_VERSION })}
+            </Text>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

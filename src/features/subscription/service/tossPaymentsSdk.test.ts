@@ -11,6 +11,14 @@ interface MockScript {
 }
 
 const billingAuthRequest: BillingAuthRequestResponseDto = {
+  price: {
+    plan: "PRO",
+    amount: 4900,
+    currency: "KRW",
+    interval: "MONTH",
+    intervalCount: 1,
+    priceVersion: "v1",
+  },
   clientKey: "test-client-key",
   customerKey: "test-customer-key",
   failUrl: "https://example.com/billing/fail",
@@ -64,9 +72,8 @@ describe("tossPaymentsSdk", () => {
 
     vi.stubGlobal("window", { TossPayments: tossPayments });
 
-    const { requestBillingAuth: requestTossBillingAuth } = await import(
-      "@/features/subscription/service/tossPaymentsSdk"
-    );
+    const { requestBillingAuth: requestTossBillingAuth } =
+      await import("@/features/subscription/service/tossPaymentsSdk");
 
     await requestTossBillingAuth(billingAuthRequest);
 
@@ -84,21 +91,18 @@ describe("tossPaymentsSdk", () => {
     vi.stubGlobal("document", document);
     vi.stubGlobal("window", {});
 
-    const { loadTossPaymentsScript } = await import(
-      "@/features/subscription/service/tossPaymentsSdk"
-    );
+    const { loadTossPaymentsScript } =
+      await import("@/features/subscription/service/tossPaymentsSdk");
     const firstAttempt = loadTossPaymentsScript();
-    const firstRejection = expect(firstAttempt).rejects.toThrow(
-      "결제 모듈을 불러오지 못했습니다.",
-    );
+    const firstRejection =
+      expect(firstAttempt).rejects.toThrow("결제 모듈을 불러오지 못했습니다.");
 
     appendedScripts[0]?.onerror?.();
     await firstRejection;
 
     const retryAttempt = loadTossPaymentsScript();
-    const retryRejection = expect(retryAttempt).rejects.toThrow(
-      "결제 모듈을 불러오지 못했습니다.",
-    );
+    const retryRejection =
+      expect(retryAttempt).rejects.toThrow("결제 모듈을 불러오지 못했습니다.");
 
     expect(appendedScripts).toHaveLength(2);
     expect(appendedScripts[0]?.remove).toHaveBeenCalledOnce();

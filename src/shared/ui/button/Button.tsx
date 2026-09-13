@@ -40,7 +40,8 @@ const variantClassName: Record<ButtonVariant, string> = {
   chip: "bg-(--icon-chip) text-(--icon-chip-text)",
   surfaceGhost: "bg-(--surface) text-(--muted) hover:bg-(--surface-muted)",
   danger: "bg-(--danger) text-danger-foreground hover:bg-(--danger-hover)",
-  dangerSoft: "bg-red-500/15 text-red-500 hover:bg-red-500/25",
+  dangerSoft:
+    "bg-(--danger-surface) text-(--danger-text) hover:bg-(--danger-border)",
   dangerOutline:
     "border border-(--danger-border) bg-(--danger-surface) text-(--danger-text) hover:bg-(--danger-border)",
   ghost: "text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground)",

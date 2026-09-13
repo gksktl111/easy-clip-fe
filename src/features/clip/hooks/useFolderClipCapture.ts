@@ -10,10 +10,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCreateClipMutation } from "@/features/clip/mutations/useCreateClipMutation";
+import { isAllowedImageClipFile } from "@/features/clip/service/imageClipValidation";
 import {
-  isAllowedImageClipFile,
-  isUnsupportedImageClipError,
-} from "@/features/clip/service/imageClipValidation";
+  clipCaptureErrorKey,
+  uploadRetrySeconds,
+} from "../service/clipCaptureError";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { readCurrentClipboard } from "@/features/clip/service/readCurrentClipboard";
 
@@ -32,9 +33,12 @@ export const useFolderClipCapture = ({
   const feedback = useTranslations("feedback");
   const router = useRouter();
   const { user } = useAuth();
-  const drafts = useCaptureDraftStore();
-  const draft =
-    drafts.ownerId === user?.id ? drafts.drafts[folderId] : undefined;
+  const draft = useCaptureDraftStore((state) =>
+    state.ownerId === user?.id ? state.drafts[folderId] : undefined,
+  );
+  const saveDraft = useCaptureDraftStore((state) => state.save);
+  const removeDraft = useCaptureDraftStore((state) => state.remove);
+  const failDraft = useCaptureDraftStore((state) => state.fail);
   const submitting = useRef(false);
   const t = useTranslations("clips.captureErrors");
   const {
@@ -89,24 +93,27 @@ export const useFolderClipCapture = ({
         !isAuthenticated
       )
         return false;
+      const retrySeconds = uploadRetrySeconds(draft?.error);
+      if (retrySeconds > 0) {
+        notifyError(t("uploadRetryAfter", { seconds: retrySeconds }));
+        return false;
+      }
       const id = crypto.randomUUID();
-      drafts.save(user.id, folderId, { id, input });
+      saveDraft(user.id, folderId, { id, input });
       submitting.current = true;
       try {
         if (input.type === "text") await createText(folderId, input.text);
         else await createImage(folderId, input.file);
-        drafts.remove(user.id, folderId, id);
+        removeDraft(user.id, folderId, id);
         notifySuccess(feedback("saveSuccess"));
         return true;
       } catch (error) {
-        drafts.fail(user.id, folderId, id, error);
+        failDraft(user.id, folderId, id, error);
         if (!isPolicyError(error))
           notifyError(
-            input.type === "text"
-              ? t("textSaveFailed")
-              : isUnsupportedImageClipError(error)
-                ? t("unsupportedImage")
-                : t("imageSaveFailed"),
+            uploadRetrySeconds(error) > 0
+              ? t("uploadRetryAfter", { seconds: uploadRetrySeconds(error) })
+              : t(clipCaptureErrorKey(error, input.type)),
           );
         return false;
       } finally {
@@ -118,7 +125,9 @@ export const useFolderClipCapture = ({
       createText,
       createImage,
       draft,
-      drafts,
+      saveDraft,
+      removeDraft,
+      failDraft,
       folderId,
       isAuthenticated,
       isDisabled,
@@ -195,7 +204,8 @@ export const useFolderClipCapture = ({
       const target = event.target;
       if (
         target instanceof HTMLElement &&
-        (target.closest("input, textarea") || target.isContentEditable)
+        (target.closest('input, textarea, [role="dialog"]') ||
+          target.isContentEditable)
       ) {
         return;
       }
@@ -257,7 +267,7 @@ export const useFolderClipCapture = ({
       if (draft) void submitInput(draft.input, true);
     },
     discardDraft: () => {
-      if (user && draft) drafts.remove(user.id, folderId, draft.id);
+      if (user && draft) removeDraft(user.id, folderId, draft.id);
     },
   };
 };

@@ -32,6 +32,7 @@ interface ClipTagEditorModalProps {
   initialView: "clip" | "manage";
   isLoading: boolean;
   isQueryError: boolean;
+  queryError?: unknown;
   isSavingClipTags: boolean;
   isTagActionPending: boolean;
   onClose: () => void;
@@ -54,6 +55,7 @@ export function ClipTagEditorModal({
   initialView,
   isLoading,
   isQueryError,
+  queryError,
   isSavingClipTags,
   isTagActionPending,
   onClose,
@@ -67,6 +69,7 @@ export function ClipTagEditorModal({
   const submitting = useRef(false);
   const feedback = useTranslations("feedback");
   const t = useTranslations("clips.tags");
+  const accessText = useTranslations("access.proRequired");
   const [view, setView] = useState(initialView);
   const [selectedNames, setSelectedNames] = useState<string[]>(
     clip?.tags.map((tag) => tag.name) ?? [],
@@ -100,6 +103,8 @@ export function ClipTagEditorModal({
 
   const getRequestErrorMessage = (error: unknown) => {
     if (error instanceof ApiError) {
+      if (error.status === 403 && error.code === "FEATURE_NOT_AVAILABLE")
+        return accessText("tags");
       if (error.status === 400) {
         return t("errors.invalid");
       }
@@ -198,17 +203,13 @@ export function ClipTagEditorModal({
 
   return (
     <Modal
+      labelledBy="clip-tag-modal-title"
       onClose={close}
       onEscape={close}
       contentClassName="w-full max-w-lg"
       className="py-4"
     >
-      <section
-        className="flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-2xl"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="clip-tag-modal-title"
-      >
+      <section className="flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-2xl border border-(--border) bg-(--surface-elevated) shadow-2xl">
         <header className="flex items-center gap-2 border-b border-(--border) px-4 py-3">
           {view === "manage" && clip ? (
             <Button
@@ -256,7 +257,11 @@ export function ClipTagEditorModal({
           ) : isQueryError ? (
             <div className="rounded-xl bg-(--surface-muted) px-5 py-8 text-center">
               <p className="text-sm text-(--muted)" role="alert">
-                {t("errors.loadFailed")}
+                {queryError instanceof ApiError &&
+                queryError.status === 403 &&
+                queryError.code === "FEATURE_NOT_AVAILABLE"
+                  ? accessText("tags")
+                  : t("errors.loadFailed")}
               </p>
               <Button
                 onClick={onRetry}

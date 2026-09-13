@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
   getAuthStartPath,
+  AuthGuard,
   LoginPage,
   type OAuthProvider,
   useAuth,
@@ -34,6 +35,10 @@ export function LoginPageController() {
       notifyError(t("configError"));
     }
   };
+
+  if (status === "logout-error" || status === "logging-out") {
+    return <AuthGuard>{null}</AuthGuard>;
+  }
 
   return (
     <LoginPage

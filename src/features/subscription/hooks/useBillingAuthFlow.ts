@@ -1,5 +1,12 @@
 "use client";
 
+import { useAuth } from "@/features/auth";
+import {
+  recoverActiveBilling,
+  BillingConfirmationAlreadySubmittedError,
+} from "../service/confirmBillingAuthOnce";
+import { prepareBillingAttempt } from "../service/billingAttempt";
+import { useSubscriptionPrice } from "../queries/useSubscriptionPrice";
 import { useTranslations } from "next-intl";
 
 import { useCallback, useRef, useState } from "react";
@@ -15,6 +22,9 @@ import { ApiError } from "@/shared/lib/apiClient";
 
 // 구독 확인, 재개, SDK 인증과 오류 복구를 결제 페이지의 단일 사용자 흐름으로 조합합니다.
 export const useBillingAuthFlow = () => {
+  const { user } = useAuth();
+  const priceText = useTranslations("subscriptionPrice");
+  const priceQuery = useSubscriptionPrice();
   const pending = useRef(false);
   const t = useTranslations("feedback");
   const pricing = useTranslations("pricing");
@@ -31,7 +41,14 @@ export const useBillingAuthFlow = () => {
   const [step, setStep] = useState<BillingStep>("idle");
 
   const startBilling = useCallback(async () => {
-    if (pending.current || step === "loading" || step === "redirecting") {
+    if (
+      !user ||
+      !priceQuery.data ||
+      priceQuery.isError ||
+      pending.current ||
+      step === "loading" ||
+      step === "redirecting"
+    ) {
       return;
     }
 
@@ -39,6 +56,13 @@ export const useBillingAuthFlow = () => {
     setStep("loading");
 
     try {
+      const recovered = await recoverActiveBilling(user.id);
+      if (recovered) {
+        await invalidateSubscription();
+        setStep("idle");
+        router.push("/pricing");
+        return;
+      }
       const currentSubscription = await refetchSubscription();
 
       if (hasRemainingCanceledProPeriod(currentSubscription)) {
@@ -50,8 +74,32 @@ export const useBillingAuthFlow = () => {
       }
 
       const request = await createBillingAuthRequest();
+      if (
+        !request.price ||
+        request.price.plan !== priceQuery.data.plan ||
+        request.price.priceVersion !== priceQuery.data.priceVersion ||
+        request.price.amount !== priceQuery.data.amount ||
+        request.price.currency !== priceQuery.data.currency ||
+        request.price.interval !== priceQuery.data.interval ||
+        request.price.intervalCount !== priceQuery.data.intervalCount
+      ) {
+        await priceQuery.refetch();
+        setStep("idle");
+        notifyError(priceText("changed"));
+        return;
+      }
+      const attempt = await prepareBillingAttempt(
+        user.id,
+        request.customerKey,
+        priceQuery.data,
+      );
       setStep("redirecting");
-      await requestBillingAuth(request);
+      const successUrl = new URL(request.successUrl);
+      successUrl.searchParams.set("paymentAttempt", attempt.idempotencyKey);
+      await requestBillingAuth({
+        ...request,
+        successUrl: successUrl.toString(),
+      });
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
         router.push("/login");
@@ -69,11 +117,18 @@ export const useBillingAuthFlow = () => {
       }
 
       setStep("error");
-      notifyError(t("billingStartError"));
+      notifyError(
+        error instanceof BillingConfirmationAlreadySubmittedError
+          ? priceText("pending")
+          : t("billingStartError"),
+      );
     } finally {
       pending.current = false;
     }
   }, [
+    user,
+    priceText,
+    priceQuery,
     createBillingAuthRequest,
     invalidateSubscription,
     resumeSubscription,
@@ -84,5 +139,5 @@ export const useBillingAuthFlow = () => {
     pricing,
   ]);
 
-  return { startBilling, step };
+  return { startBilling, step, priceQuery };
 };

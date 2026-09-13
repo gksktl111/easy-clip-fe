@@ -25,7 +25,7 @@ export function ToastMessage({
   const Icon =
     variant === "success" ? HiOutlineCheckCircle : HiOutlineExclamationCircle;
   return (
-    <div className="flex w-[360px] max-w-[calc(100vw-32px)] items-start gap-3 rounded-xl border border-(--border) bg-(--surface-elevated) px-4 py-3 text-(--foreground) shadow-lg shadow-black/10">
+    <div className="mx-auto flex w-(--width) max-w-full items-start gap-3 rounded-xl border border-(--border) bg-(--surface-elevated) px-4 py-3 text-(--foreground) shadow-lg shadow-black/10">
       <Icon
         aria-hidden
         className={`mt-0.5 h-5 w-5 shrink-0 ${variant === "success" ? "text-(--success)" : "text-(--danger-text)"}`}

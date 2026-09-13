@@ -20,6 +20,7 @@ export default async function BillingSuccess({
   return (
     <BillingResultPage
       status="success"
+      paymentAttempt={getStringParam(params, "paymentAttempt")}
       authKey={getStringParam(params, "authKey")}
       customerKey={getStringParam(params, "customerKey")}
     />

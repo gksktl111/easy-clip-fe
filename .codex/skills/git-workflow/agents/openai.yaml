@@ -1,4 +1,4 @@
 interface:
   display_name: "Git/GitHub 워크플로"
-  short_description: "Easy Clip GitHub 운영과 GPT-5.4 고정 규칙"
-  default_prompt: "$git-workflow를 사용해 이 GitHub 작업을 gpt-5.4 에이전트로 진행해 주세요."
+  short_description: "Easy Clip GitHub 운영과 Luna low 고정 규칙"
+  default_prompt: "$git-workflow를 사용해 이 GitHub 작업을 gpt-5.6-luna 전용 에이전트와 low 추론 수준으로 진행해 주세요."

@@ -5,7 +5,13 @@ import { useTranslations } from "next-intl";
 import { ApiError } from "@/shared/lib/apiClient";
 import { getPolicyLimitDetails, isPolicyError } from "./policyError";
 
-export function PolicyErrorNotice({ error }: { error: unknown }) {
+export function PolicyErrorNotice({
+  error,
+  featureUnavailableMessage,
+}: {
+  error: unknown;
+  featureUnavailableMessage?: string;
+}) {
   const t = useTranslations("access");
   if (!error) return null;
   const policy = isPolicyError(error) ? error : null;
@@ -15,7 +21,11 @@ export function PolicyErrorNotice({ error }: { error: unknown }) {
       ? details?.upgradeCanResolve === true
       : Boolean(policy);
   const message = policy
-    ? t(`errors.${policy.code}`)
+    ? policy.status === 403 &&
+      policy.code === "FEATURE_NOT_AVAILABLE" &&
+      featureUnavailableMessage
+      ? featureUnavailableMessage
+      : t(`errors.${policy.code}`)
     : error instanceof ApiError
       ? error.message
       : t("operationError");

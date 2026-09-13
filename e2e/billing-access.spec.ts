@@ -1,3 +1,4 @@
+import { prepareBillingRedirect } from "./billing-fixture";
 import { expect, test } from "./fixtures";
 import { setup, pro } from "./access-fixture";
 import ko from "../src/messages/ko.json";
@@ -56,6 +57,7 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
   page,
 }) => {
   const state = await setup(page);
+  await prepareBillingRedirect(page, "mock-customer");
   let confirms = 0;
   let postConfirmReads = 0;
   let release!: () => void;
@@ -74,12 +76,21 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
     expect(route.request().postDataJSON()).toEqual({
       authKey: "mock-auth",
       customerKey: "mock-customer",
+      idempotencyKey: "12345678-1234-4123-8123-123456789012",
+      priceVersion: "test-price-v1",
     });
     state.subscription = { ...pro };
     state.folders[1].isLocked = false;
-    return route.fulfill({ status: 201, json: pro });
+    return route.fulfill({
+      status: 201,
+      json: { status: "DONE", subscription: pro },
+    });
   });
-  const url = "/billing/success?authKey=mock-auth&customerKey=mock-customer";
+  await page.route("**/subscriptions/me/billing/payments/*", (route) =>
+    route.fulfill({ json: { status: "DONE", subscription: pro } }),
+  );
+  const url =
+    "/billing/success?paymentAttempt=12345678-1234-4123-8123-123456789012&authKey=mock-auth&customerKey=mock-customer";
   await page.goto(url);
   await expect(
     page.getByText(ko.access.billingSuccess, { exact: true }),
@@ -89,7 +100,7 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
   );
   await page.getByRole("link", { name: ko.access.openApp }).click();
   await expect(
-    page.getByRole("heading", { name: ko.access.checkingTitle }),
+    page.getByRole("status", { name: ko.access.checkingTitle }),
   ).toBeVisible();
   await expect(page.getByText("비공개 클립", { exact: true })).toHaveCount(0);
   release();
@@ -97,16 +108,17 @@ test("confirm 완료 후 폴더를 다시 확인해야 콘텐츠가 열리고 �
   expect(postConfirmReads).toBeGreaterThan(0);
   await page.goto(url);
   await expect(
-    page.getByText(ko.access.billingUncertain, { exact: false }),
+    page.getByText(ko.access.billingSuccess, { exact: true }),
   ).toBeVisible();
   expect(confirms).toBe(1);
 });
 
 for (const failure of ["network", "conflict"] as const) {
-  test(`confirm ${failure} 오류는 서버 메시지·불명확 안내를 표시하고 자동 재전송하지 않는다`, async ({
+  test(`confirm ${failure} 오류와 조회 404는 상태별 안내를 유지하고 자동 재전송하지 않는다`, async ({
     page,
   }) => {
     await setup(page);
+    await prepareBillingRedirect(page, "mock-customer");
     let confirms = 0;
     let subscriptionReads = 0;
     await page.route("**/subscriptions/me", async (route) => {
@@ -122,25 +134,49 @@ for (const failure of ["network", "conflict"] as const) {
             json: { message: "이전 결제 결과 확인 중" },
           });
     });
+    await page.route("**/subscriptions/me/billing/payments/*", (route) =>
+      route.fulfill({ status: 404, json: { message: "결과 확인 필요" } }),
+    );
     await page.goto(
-      "/billing/success?authKey=mock-failure&customerKey=mock-customer",
+      "/billing/success?paymentAttempt=12345678-1234-4123-8123-123456789012&authKey=mock-failure&customerKey=mock-customer",
     );
+    const message =
+      failure === "network"
+        ? ko.billingResult.retryable
+        : ko.billingResult.failed;
     await expect(
-      page.getByText(ko.access.billingUncertain, { exact: false }),
+      page.getByRole("main").getByText(message, { exact: true }),
     ).toBeVisible();
-    await expect(page.locator("[data-sonner-toast]")).toContainText(
-      ko.feedback.billingFailed,
-    );
-    if (failure === "conflict")
+    if (failure === "network") {
       await expect(
-        page.getByText("이전 결제 결과 확인 중", { exact: false }),
-      ).toBeVisible();
+        page.getByRole("button", {
+          name: ko.billingResult.retry,
+          exact: true,
+        }),
+      ).toBeEnabled();
+      await expect(page.locator("[data-sonner-toast]")).toHaveCount(0);
+    } else {
+      await expect(
+        page.getByRole("link", {
+          name: ko.billingResult.backToBilling,
+        }),
+      ).toHaveAttribute("href", "/billing");
+      await expect(page.locator("[data-sonner-toast]")).toContainText(
+        ko.feedback.billingFailed,
+      );
+    }
     await expect.poll(() => subscriptionReads).toBeGreaterThan(0);
     await page.reload();
     await expect(
-      page.getByText(ko.access.billingUncertain, { exact: false }),
+      page.getByRole("main").getByText(message, { exact: true }),
     ).toBeVisible();
-    await expect(page.locator("[data-sonner-toast]")).toHaveCount(0);
+    await expect(
+      page.getByRole("button", {
+        name: ko.billingResult.retry,
+        exact: true,
+      }),
+    ).toHaveCount(failure === "network" ? 1 : 0);
+
     expect(confirms).toBe(1);
   });
 }

@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { ClipPreviewModal } from "@/features/clip/ui/ClipPreviewModal";
+
 import { ClipItem } from "@/features/clip/ui/ClipItem";
 import { ClipItemSkeleton } from "@/features/clip/ui/ClipItemSkeleton";
 import type { Clip } from "@/features/clip/model/clip";
@@ -45,6 +48,12 @@ export function ClipList({
   selectedClipIds = EMPTY_SELECTED_CLIP_IDS,
   onToggleSelected,
 }: ClipListProps) {
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  // 현재 접근 가능한 목록에서 매번 찾습니다. 제거·잠금된 클립의 이전 사본을 보관하지 않습니다.
+  const previewClip =
+    !isDeleteMode && !isInteractionDisabled
+      ? clips.find((clip) => clip.id === previewId)
+      : undefined;
   if (clips.length === 0 && !isCreatingClip) {
     return null;
   }
@@ -60,6 +69,7 @@ export function ClipList({
             onCopy={onCopy}
             onToggleFavorite={onToggleFavorite}
             onEditTags={onEditTags}
+            onPreview={(clip) => setPreviewId(clip.id)}
             onContextMenu={onContextMenu}
             isDeleteMode={isDeleteMode}
             isFavoriteMutationPending={isFavoriteMutationPending}
@@ -71,6 +81,15 @@ export function ClipList({
           />
         ))}
       </div>
+      {previewClip ? (
+        <ClipPreviewModal
+          clip={previewClip}
+          onClose={() => setPreviewId(null)}
+          onCopy={onCopy}
+          isCopying={pendingCopyClipId === previewClip.id}
+          isCopyBlocked={Boolean(pendingCopyClipId)}
+        />
+      ) : null}
       <div ref={loadMoreRef} className="h-8" aria-hidden />
       {isFetchingNextPage ? (
         <div className="flex justify-center pb-6">

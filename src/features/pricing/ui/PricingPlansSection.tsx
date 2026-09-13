@@ -23,6 +23,7 @@ import {
   hasRemainingCanceledProPeriod,
   isActiveProSubscription,
   useMySubscription,
+  useSubscriptionPrice,
   useSubscriptionActions,
 } from "@/features/subscription";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
@@ -32,6 +33,9 @@ import { DEFAULT_LOCALE, isAppLocale } from "@/shared/config/locale";
 
 // 구독 상태에 맞는 요금제 카드 액션과 취소 흐름을 조합합니다.
 export function PricingPlansSection() {
+  const priceQuery = useSubscriptionPrice();
+  const price = priceQuery.isError ? undefined : priceQuery.data;
+  const priceText = useTranslations("subscriptionPrice");
   const pending = useRef(false);
   const router = useRouter();
   const access = useResourceAccess();
@@ -136,6 +140,14 @@ export function PricingPlansSection() {
       );
     }
 
+    if (plan.highlight && !price) {
+      return (
+        <PricingPlanAction disabled featured kind="button">
+          {priceText(priceQuery.isPending ? "loading" : "unavailable")}
+        </PricingPlanAction>
+      );
+    }
+
     if (isResumeTargetPlan) {
       return (
         <PricingPlanAction
@@ -222,8 +234,14 @@ export function PricingPlansSection() {
       t(`plans.${plan.id}.features.${featureId}`),
     ),
     name: t(`plans.${plan.id}.name`),
-    price: formatPricingAmount(plan.price, locale),
-    priceSuffix: t(`plans.${plan.id}.priceSuffix`),
+    price:
+      plan.id === "free"
+        ? formatPricingAmount(0, locale)
+        : price
+          ? formatPricingAmount(price.amount, locale)
+          : priceText(priceQuery.isPending ? "loading" : "unavailable"),
+    priceSuffix:
+      plan.id === "pro" && !price ? "" : t(`plans.${plan.id}.priceSuffix`),
   });
 
   return (
@@ -234,6 +252,14 @@ export function PricingPlansSection() {
           <p>{a("errorDescription")}</p>
           <Button variant="secondary" onClick={() => void access.refresh()}>
             {a("retry")}
+          </Button>
+        </div>
+      ) : null}
+      {priceQuery.isError ? (
+        <div className="mt-6" role="status">
+          <p>{priceText("error")}</p>
+          <Button variant="secondary" onClick={() => void priceQuery.refetch()}>
+            {priceText("retry")}
           </Button>
         </div>
       ) : null}

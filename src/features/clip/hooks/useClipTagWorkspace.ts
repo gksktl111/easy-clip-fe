@@ -1,5 +1,7 @@
 "use client";
 
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { canUseClipOrganization } from "@/features/clip/service/clipOrganizationAccess";
 import { useCallback, useState } from "react";
 import type { Clip } from "@/features/clip/model/clip";
 import { useClipTagsMutation } from "@/features/clip/mutations/useClipTagsMutation";
@@ -20,9 +22,13 @@ export const useClipTagWorkspace = ({
   folderId,
   isAuthenticated,
 }: UseClipTagWorkspaceOptions) => {
+  const access = useResourceAccess();
+  const canManageTags =
+    isAuthenticated && canUseClipOrganization(access, folderId);
   const [state, setState] = useState<ClipTagWorkspaceState>(null);
+  if (!canManageTags && state !== null) setState(null);
   const query = useFolderTagsQuery({
-    enabled: state !== null && isAuthenticated,
+    enabled: state !== null && canManageTags,
     folderId,
   });
   const folderTagMutations = useFolderTagMutations({
@@ -37,18 +43,20 @@ export const useClipTagWorkspace = ({
   const close = useCallback(() => setState(null), []);
   const openClipEditor = useCallback(
     (clip: Clip) => {
-      if (clip.folderId === folderId) {
+      if (canManageTags && clip.folderId === folderId) {
         setState({ mode: "clip", clip });
       }
     },
-    [folderId],
+    [canManageTags, folderId],
   );
-  const openManager = useCallback(() => setState({ mode: "manage" }), []);
+  const openManager = useCallback(() => {
+    if (canManageTags) setState({ mode: "manage" });
+  }, [canManageTags]);
 
   return {
     close,
     createTag: folderTagMutations.createTag,
-    isOpen: state !== null,
+    isOpen: canManageTags && state !== null,
     isSavingClipTags: clipTagMutation.isPending,
     isTagActionPending: folderTagMutations.isPending,
     openClipEditor,
@@ -56,7 +64,7 @@ export const useClipTagWorkspace = ({
     query,
     removeTag: folderTagMutations.removeTag,
     saveClipTags: clipTagMutation.saveClipTags,
-    state,
+    state: canManageTags ? state : null,
     updateTag: folderTagMutations.updateTag,
   };
 };

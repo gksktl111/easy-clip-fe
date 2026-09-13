@@ -1,5 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import {
+  clipCaptureErrorKey,
+  uploadRetrySeconds,
+} from "../service/clipCaptureError";
 import { useTranslations } from "next-intl";
 import type { CaptureDraft } from "@/features/clip/store/captureDraftStore";
 import { isPolicyError } from "@/shared/access/policyError";
@@ -18,6 +23,14 @@ export function ClipCaptureDraftPanel({
   onDiscard: () => void;
 }) {
   const t = useTranslations("access");
+  const errors = useTranslations("clips.captureErrors");
+  const [, tick] = useState(0);
+  const retrySeconds = uploadRetrySeconds(draft?.error);
+  useEffect(() => {
+    if (!retrySeconds) return;
+    const timer = window.setTimeout(() => tick((value) => value + 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [retrySeconds]);
   if (!draft || !draft.error) return null;
   return (
     <section
@@ -31,9 +44,19 @@ export function ClipCaptureDraftPanel({
       </p>
       {isPolicyError(draft.error) ? (
         <PolicyErrorNotice error={draft.error} />
-      ) : null}
+      ) : (
+        <p role="status" className="text-sm text-(--muted)">
+          {retrySeconds
+            ? errors("uploadRetryAfter", { seconds: retrySeconds })
+            : errors(clipCaptureErrorKey(draft.error, draft.input.type))}
+        </p>
+      )}
       <div className="flex gap-2">
-        <Button size="sm" disabled={pending} onClick={onRetry}>
+        <Button
+          size="sm"
+          disabled={pending || retrySeconds > 0}
+          onClick={onRetry}
+        >
           {t("retrySave")}
         </Button>
         <Button

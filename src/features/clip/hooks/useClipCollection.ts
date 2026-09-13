@@ -54,6 +54,7 @@ export const useClipCollection = ({
       fetchNextPage: query.fetchNextPage,
       hasNextPage: query.hasNextPage,
       isError: query.isError,
+      error: query.error,
       isFetchingNextPage: query.isFetchingNextPage,
       isLoading: query.isLoading,
       refetch: query.refetch,

@@ -8,19 +8,15 @@ export function PricingComparisonSection() {
   const t = useTranslations("pricing.comparison");
 
   return (
-    <section
-      className="mt-8 rounded-[2rem] border border-(--border) bg-(--surface) p-6"
-      style={{ boxShadow: "var(--pricing-compare-shadow)" }}
-    >
+    <section className="mt-8 rounded-2xl border border-(--border) bg-(--surface) p-6">
       <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-(--muted)">{t("eyebrow")}</p>
         <h2 className="text-2xl font-semibold tracking-tight">{t("title")}</h2>
         <p className="max-w-2xl text-sm leading-6 text-(--muted)">
           {t("description")}
         </p>
       </div>
 
-      <div className="mt-8 overflow-hidden rounded-[1.5rem] border border-(--border)">
+      <div className="mt-8 overflow-hidden rounded-lg border border-(--border)">
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse">
             <thead>
