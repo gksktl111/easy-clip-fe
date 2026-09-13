@@ -1,43 +1,30 @@
 export type PricingPlanId = "free" | "pro";
 
-export type PricingPlanFeatureId =
-  | "projects"
-  | "clips"
-  | "devices"
-  | "organization"
-  | "ai";
+export type PricingPlanFeatureId = "projects" | "clips" | "organization";
 
 export interface PricingPlan {
   id: PricingPlanId;
   featureIds: readonly PricingPlanFeatureId[];
-  price: number;
   ctaHref: string;
   highlight: boolean;
 }
 
-export type PricingComparisonPointId =
-  | "projects"
-  | "clips"
-  | "devices"
-  | "organization"
-  | "ai";
+export type PricingComparisonPointId = "projects" | "clips" | "organization";
 
 export const PRICING_PLANS: readonly PricingPlan[] = [
   {
     id: "free",
-    price: 0,
     ctaHref: "/login",
     highlight: false,
-    featureIds: ["projects", "clips", "devices", "organization"],
+    featureIds: ["projects", "clips", "organization"],
   },
   {
     id: "pro",
-    price: 3_900,
     ctaHref: "/billing",
     highlight: true,
-    featureIds: ["projects", "clips", "devices", "organization", "ai"],
+    featureIds: ["projects", "clips", "organization"],
   },
 ] as const;
 
 export const PRICING_COMPARISON_POINT_IDS: readonly PricingComparisonPointId[] =
-  ["projects", "clips", "devices", "organization", "ai"] as const;
+  ["projects", "clips", "organization"] as const;

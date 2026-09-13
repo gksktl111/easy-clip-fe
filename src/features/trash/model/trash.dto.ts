@@ -6,6 +6,10 @@ export type TrashItemResponseDto =
       title: string;
       type: "TEXT" | "COLOR" | "IMAGE";
       folderId: string;
+      // 본문을 제공하는 서버 응답과 호환하며, 기존 서버에서는 생략됩니다.
+      textContent?: string | null;
+      imageUrl?: string | null;
+      colorHex?: string | null;
     }
   | {
       itemType: "FOLDER";

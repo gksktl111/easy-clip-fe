@@ -12,3 +12,5 @@ export { BillingResultPage } from "@/features/subscription/ui/BillingResultPage"
 
 export { mySubscriptionQueryOptions } from "@/features/subscription/queries/mySubscriptionQueryOptions";
 export { hasEstimatedProAccess } from "@/features/subscription/service/subscriptionPolicy";
+
+export { useSubscriptionPrice } from "./queries/useSubscriptionPrice";

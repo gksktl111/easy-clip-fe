@@ -34,6 +34,28 @@ for (const [locale, messages] of Object.entries({ ko, en, ja, zh })) {
     const box = await toast.boundingBox();
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+    for (const width of [320, 390, 430, 480, 600, 601, 768, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      await copy.click();
+      const card = toast
+        .getByRole("button", { name: messages.feedback.close })
+        .locator("..");
+      await expect
+        .poll(
+          async () => {
+            const bounds = await card.boundingBox();
+            return bounds
+              ? Math.abs(bounds.x + bounds.width / 2 - width / 2)
+              : Infinity;
+          },
+          {
+            message: `${locale} ${width}px에서 실제 알림 카드가 화면 중앙에 위치해야 한다`,
+          },
+        )
+        .toBeLessThanOrEqual(0.5);
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await copy.click();
     await page.screenshot({
       path: testInfo.outputPath("copy-toast.png"),
       animations: "disabled",
@@ -91,9 +113,11 @@ test("휴지통 실제 개수, 복원 충돌, 후속 조회 실패를 구분한�
     return r.fulfill({ json: { restoredCount: 3 } });
   });
   await page.goto("/trash");
+  const details = page.locator("article").getByRole("button");
   const restore = page
-    .locator("article")
+    .getByRole("dialog")
     .getByRole("button", { name: ko.trash.restore, exact: true });
+  await details.click();
   await restore.click();
   const toasts = page.locator('[data-sonner-toast][data-removed="false"]');
   await expect(toasts).toContainText(ko.trash.restoreConflictError);
@@ -102,6 +126,7 @@ test("휴지통 실제 개수, 복원 충돌, 후속 조회 실패를 구분한�
   ).toHaveCount(0);
   await toasts.getByRole("button", { name: ko.feedback.close }).click();
   conflict = false;
+  await details.click();
   await restore.click();
   await expect(toasts).toContainText("항목 3개를 복원했습니다.");
   await expect(page.getByText(ko.trash.error, { exact: true })).toBeVisible();

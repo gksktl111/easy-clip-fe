@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
+import { fetchClips } from "@/features/clip/api/clipApi";
 import { ApiError } from "@/shared/lib/apiClient";
 import { clipInfiniteQueryOptions } from "@/features/clip/queries/clipInfiniteQueryOptions";
 
@@ -33,3 +35,37 @@ describe("clipInfiniteQueryOptions", () => {
     }
   });
 });
+
+vi.mock("@/features/clip/api/clipApi", () => ({ fetchClips: vi.fn() }));
+
+for (const fails of [false, true]) {
+  it(`응답 ${fails ? "실패" : "성공"} 뒤 타이머 대기 없이 조회를 마친다`, async () => {
+    vi.useFakeTimers();
+    const client = new QueryClient({
+      defaultOptions: { queries: { gcTime: Infinity, retry: false } },
+    });
+    const error = new ApiError("조회 거부", 403);
+    const response = { items: [], hasMore: false, nextCursor: null };
+    if (fails) vi.mocked(fetchClips).mockRejectedValue(error);
+    else vi.mocked(fetchClips).mockResolvedValue(response);
+    try {
+      const pending = client.fetchInfiniteQuery(
+        clipInfiniteQueryOptions({
+          enabled: true,
+          filter: "all",
+          folderId: "a",
+        }),
+      );
+      if (fails) await expect(pending).rejects.toBe(error);
+      else await expect(pending).resolves.toMatchObject({ pages: [response] });
+      expect(vi.getTimerCount()).toBe(0);
+      expect(fetchClips).toHaveBeenCalledWith(
+        expect.objectContaining({ folderId: "a", cursor: null }),
+        expect.any(AbortSignal),
+      );
+    } finally {
+      client.clear();
+      vi.useRealTimers();
+    }
+  });
+}

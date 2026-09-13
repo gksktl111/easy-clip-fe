@@ -10,6 +10,9 @@ import Confetti from "react-confetti";
 import {
   confirmBillingAuthOnce,
   BillingConfirmationAlreadySubmittedError,
+  BillingPaymentFailedError,
+  BillingPaymentRetryableError,
+  type BillingConfirmationAction,
 } from "@/features/subscription/service/confirmBillingAuthOnce";
 import type { MySubscriptionResponseDto } from "@/features/subscription/model/subscription.dto";
 import { syncMySubscriptionQueryData } from "@/features/subscription/service/subscriptionQueryCache";
@@ -19,6 +22,7 @@ const notifiedConfirmations = new WeakSet<Promise<MySubscriptionResponseDto>>();
 
 // 결제 리다이렉트 결과를 서버에서 확정하고 성공 또는 실패 화면을 표시합니다.
 interface BillingResultPageProps {
+  paymentAttempt?: string;
   authKey?: string;
   customerKey?: string;
   errorMessage?: string;
@@ -31,6 +35,7 @@ export function BillingResultPage(props: BillingResultPageProps) {
 }
 
 function BillingResultContent({
+  paymentAttempt,
   authKey,
   customerKey,
   errorMessage,
@@ -40,11 +45,19 @@ function BillingResultContent({
   const { user } = useAuth();
   const t = useTranslations("access");
   const feedback = useTranslations("feedback");
+  const resultText = useTranslations("billingResult");
   const notified = useRef(false);
   const isMissingSuccessParams =
-    status === "success" && (!authKey || !customerKey);
+    status === "success" && (!authKey || !customerKey || !paymentAttempt);
   const [subscription, setSubscription] =
     useState<MySubscriptionResponseDto | null>(null);
+  const [paymentFailed, setPaymentFailed] = useState(false);
+  const [canRetry, setCanRetry] = useState(false);
+  const [request, setRequest] = useState<{
+    action: BillingConfirmationAction;
+    count: number;
+  }>({ action: "initial", count: 0 });
+  const startedRequest = useRef(-1);
   const [message, setMessage] = useState<string | null>(errorMessage ?? null);
   const [isConfirming, setIsConfirming] = useState(
     status === "success" && !isMissingSuccessParams,
@@ -70,19 +83,31 @@ function BillingResultContent({
       notified.current = true;
       notifyError(feedback("billingFailed"));
     }
-    if (status !== "success" || !authKey || !customerKey || !user) {
+    if (
+      status !== "success" ||
+      !authKey ||
+      !customerKey ||
+      !paymentAttempt ||
+      !user
+    ) {
       return;
     }
 
     let active = true;
     // Toss 성공 리다이렉트의 authKey/customerKey를 서버에 전달해 최종 구독 승인을 완료한다.
-    const confirmation = confirmBillingAuthOnce(user.id, {
-      authKey,
-      customerKey,
-    });
+    const action =
+      startedRequest.current === request.count ? "initial" : request.action;
+    startedRequest.current = request.count;
+    const confirmation = confirmBillingAuthOnce(
+      user.id,
+      { authKey, customerKey, idempotencyKey: paymentAttempt },
+      action,
+    );
     confirmation
       .then((nextSubscription) => {
         if (!active) return;
+        setCanRetry(false);
+        setPaymentFailed(false);
         syncMySubscriptionQueryData(queryClient, nextSubscription, user.id);
         setSubscription(nextSubscription);
         setMessage(
@@ -96,21 +121,33 @@ function BillingResultContent({
           notifiedConfirmations.add(confirmation);
           if (nextSubscription.plan === "PRO")
             notifySuccess(feedback("billingConfirmed"));
-          else notifyError(feedback("billingFailed"));
+          else notifyError(t("billingUncertain"));
         }
       })
       .catch((error) => {
         if (!active) return;
+        const retryable = error instanceof BillingPaymentRetryableError;
+        setCanRetry(retryable);
         if (
           !notifiedConfirmations.has(confirmation) &&
-          !(error instanceof BillingConfirmationAlreadySubmittedError)
+          !(error instanceof BillingConfirmationAlreadySubmittedError) &&
+          !retryable
         ) {
           notifiedConfirmations.add(confirmation);
-          notifyError(feedback("billingFailed"));
+          notifyError(
+            error instanceof BillingPaymentFailedError
+              ? feedback("billingFailed")
+              : t("billingUncertain"),
+          );
         }
+        if (error instanceof BillingPaymentFailedError) setPaymentFailed(true);
         requestAccessRefresh();
         setMessage(
-          `${error instanceof Error && !(error instanceof BillingConfirmationAlreadySubmittedError) ? error.message : ""} ${t("billingUncertain")}`,
+          error instanceof BillingPaymentFailedError
+            ? resultText("failed")
+            : retryable
+              ? resultText("retryable")
+              : resultText("pending"),
         );
       })
       .finally(() => {
@@ -120,6 +157,7 @@ function BillingResultContent({
       active = false;
     };
   }, [
+    paymentAttempt,
     authKey,
     customerKey,
     queryClient,
@@ -128,6 +166,8 @@ function BillingResultContent({
     t,
     feedback,
     isMissingSuccessParams,
+    request,
+    resultText,
   ]);
 
   const isSuccess = status === "success" && subscription?.plan === "PRO";
@@ -140,15 +180,25 @@ function BillingResultContent({
           height={viewportSize.height}
           recycle={false}
           numberOfPieces={220}
-          className="pointer-events-none"
+          className="pointer-events-none motion-reduce:hidden"
         />
       ) : null}
       <BillingResultCard
+        canRetry={canRetry}
+        onRetry={() => {
+          if (isConfirming) return;
+          setIsConfirming(true);
+          setRequest((previous) => ({
+            action: canRetry ? "retry" : "check",
+            count: previous.count + 1,
+          }));
+        }}
+        isRetrying={request.action === "retry"}
         isConfirming={isConfirming}
         isMissingSuccessParams={isMissingSuccessParams}
         isSuccess={isSuccess}
         message={message}
-        status={status}
+        status={paymentFailed ? "fail" : status}
       />
     </main>
   );

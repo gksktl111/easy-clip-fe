@@ -39,7 +39,7 @@ export function LandingFeaturesSection({
     <section className="py-20">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-balance break-keep-ko md:text-4xl">
             {title}
           </h2>
           <p className="mt-4 text-lg text-(--muted)">{description}</p>

@@ -21,7 +21,7 @@ export type TrashItemRow =
       typeLabel: string;
       clipType: TrashClipType;
       parentFolderName: string;
+      content?: string | null;
     };
 
-export const getTrashRowKey = (row: TrashItemRow) =>
-  `${row.kind}-${row.id}`;
+export const getTrashRowKey = (row: TrashItemRow) => `${row.kind}-${row.id}`;

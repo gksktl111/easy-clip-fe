@@ -19,7 +19,7 @@ test("권한 복귀 확인 중에도 기존 공개 콘텐츠를 유지한다", a
   await expect.poll(() => requested).toBe(true);
   await expect(page.getByText("공개 클립", { exact: true })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "권한을 확인하고 있습니다" }),
+    page.getByRole("status", { name: "권한을 확인하고 있습니다" }),
   ).toHaveCount(0);
   release();
 });

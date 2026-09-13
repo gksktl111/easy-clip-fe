@@ -15,10 +15,10 @@ const jsonRequest = (method: "POST" | "PATCH" | "PUT", payload: unknown) => ({
   body: JSON.stringify(payload),
 });
 
-export const fetchFolderTags = (folderId: string) =>
+export const fetchFolderTags = (folderId: string, signal?: AbortSignal) =>
   apiRequest<FolderTagResponseDto[]>(
     `/folders/${encodeURIComponent(folderId)}/tags`,
-    { cache: "no-store" },
+    { cache: "no-store", signal },
   );
 
 export const createFolderTag = (

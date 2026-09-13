@@ -1,24 +1,42 @@
 "use client";
 
+import { Button } from "@/shared/ui/button/Button";
+import { useTranslations } from "next-intl";
+
 import { useBillingAuthFlow } from "@/features/subscription/hooks/useBillingAuthFlow";
 import { BillingCheckoutCard } from "@/features/subscription/ui/BillingCheckoutCard";
 import { BillingHeroSection } from "@/features/subscription/ui/BillingHeroSection";
 
 // 구독 상태를 확인하고 Toss 카드 인증 진입과 오류 복구 UI를 조합합니다.
 export function BillingPage() {
-  const { startBilling, step } = useBillingAuthFlow();
+  const { startBilling, step, priceQuery } = useBillingAuthFlow();
+  const priceText = useTranslations("subscriptionPrice");
+  const t = useTranslations("billing");
 
   return (
     <main className="bg-background text-foreground min-h-screen">
       <section className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-5 px-4 py-6">
         <BillingHeroSection />
+        {priceQuery.isError ? (
+          <div role="status">
+            <p>{priceText("error")}</p>
+            <Button
+              variant="secondary"
+              onClick={() => void priceQuery.refetch()}
+            >
+              {priceText("retry")}
+            </Button>
+          </div>
+        ) : null}
         <BillingCheckoutCard
+          price={priceQuery.isError ? undefined : priceQuery.data}
+          pricePending={priceQuery.isPending}
           actionLabel={
             step === "loading"
-              ? "결제 정보 준비 중"
+              ? t("loading")
               : step === "redirecting"
-                ? "결제 인증 이동 중"
-                : "카드 인증하고 Pro 시작"
+                ? t("redirecting")
+                : t("start")
           }
           onStartBilling={() => {
             void startBilling();

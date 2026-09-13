@@ -1,6 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { useFoldersQuery } from "@/features/folder";
 import { FolderClipsPage } from "@/features/clip";
 import { invalidateTrashQueries } from "@/features/trash";
 
@@ -10,11 +11,13 @@ interface FolderClipsRouteProps {
 }
 
 export function FolderClipsRoute({ folderId }: FolderClipsRouteProps) {
+  const { folders } = useFoldersQuery();
   const queryClient = useQueryClient();
 
   return (
     <FolderClipsPage
       folderId={folderId}
+      folderName={folders.find((folder) => folder.id === folderId)?.name}
       onClipsDeleted={() => invalidateTrashQueries(queryClient)}
     />
   );

@@ -16,8 +16,12 @@ export const folderTagQueryOptions = ({
   queryOptions({
     queryKey: folderTagQueryKeys.list(folderId),
     enabled: enabled && Boolean(folderId),
-    queryFn: async () =>
-      (await fetchFolderTags(folderId)).map(mapFolderTagResponse),
+    queryFn: async ({ signal }) =>
+      (await fetchFolderTags(folderId, signal)).map(mapFolderTagResponse),
     retry: (failureCount, error) =>
-      !(error instanceof ApiError && error.status >= 400 && error.status < 500) && failureCount < 3,
+      !(
+        error instanceof ApiError &&
+        error.status >= 400 &&
+        error.status < 500
+      ) && failureCount < 3,
   });

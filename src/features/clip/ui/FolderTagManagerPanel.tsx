@@ -54,12 +54,15 @@ export function FolderTagManagerPanel({
   const submitting = useRef(false);
   const feedback = useTranslations("feedback");
   const t = useTranslations("clips.tags");
+  const accessText = useTranslations("access.proRequired");
   const [form, setForm] = useState<TagFormState | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FolderTag | null>(null);
 
   const getRequestErrorMessage = (error: unknown) => {
     if (error instanceof ApiError) {
+      if (error.status === 403 && error.code === "FEATURE_NOT_AVAILABLE")
+        return accessText("tags");
       if (error.status === 400) {
         return t("errors.invalid");
       }

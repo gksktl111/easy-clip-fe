@@ -18,16 +18,16 @@
     "workflowDescription": "작업 중인 폴더에 붙여넣어 저장한 뒤, 정리하고 검색해 필요할 때 다시 복사하세요.",
     "workflow": {
       "capture": {
-        "title": "붙여넣어 저장",
-        "description": "작업 중인 폴더에서 텍스트나 이미지를 붙여넣으면 하나의 클립으로 보관됩니다."
+        "title": "필요한 부분 저장",
+        "description": "코드 조각이나 이미지를 복사한 뒤 폴더의 붙여넣기로 저장하세요."
       },
       "organize": {
-        "title": "폴더와 즐겨찾기로 정리",
-        "description": "프로젝트별 폴더에 모으고, 자주 쓰는 내용은 즐겨찾기에 표시하세요."
+        "title": "폴더와 태그로 찾기",
+        "description": "Pro에서 폴더 안에 태그를 붙이고 검색어로 필요한 클립을 좁혀보세요."
       },
       "reuse": {
-        "title": "검색해 다시 복사",
-        "description": "키워드로 원하는 클립을 찾아 한 번 클릭하면 클립보드에 다시 복사됩니다."
+        "title": "다시 읽고 복사",
+        "description": "미리보기로 내용을 확인한 뒤 복사해 작업에 사용하세요."
       }
     },
     "sectionTitle": "필요한 내용을 바로 찾는 클립 보관함",
@@ -47,18 +47,15 @@
       },
       "search": {
         "title": "빠른 검색",
-        "description": "키워드로 저장한 클립을 검색해 바로 복사할 수 있습니다."
+        "description": "Pro에서 키워드로 저장한 클립을 검색해 바로 복사할 수 있습니다."
       }
     },
-    "reviewsTitle": "작업 흐름을 바꾼 사용자들의 이야기",
-    "reviewsDescription": "저장과 재사용을 반복하는 일이 어떻게 달라졌는지 확인해 보세요.",
     "closingTitleLine1": "복사한 정보,",
     "closingTitleLine2": "이제는 한곳에 저장하세요.",
     "closingDescription": "메신저나 메모에 흩어 둔 텍스트와 이미지를 EasyClip에 저장하세요. 필요할 때 검색해 다시 복사할 수 있습니다."
   },
   "pricing": {
     "hero": {
-      "eyebrow": "집중해서 일하는 사용자를 위한 간단한 요금제",
       "titleLine1": "작업 방식에 맞는",
       "titleLine2": "EasyClip 플랜을 선택하세요."
     },
@@ -68,16 +65,14 @@
       "free": {
         "name": "Free",
         "badge": "개인 시작용",
-        "description": "가볍게 시작하고 검색 중심으로 클립을 정리하는 기본 플랜",
+        "description": "클립을 저장하고 즐겨찾기로 다시 찾는 기본 플랜",
         "priceSuffix": "/월",
         "billingNote": "월간 요금 없이 바로 사용",
         "cta": "무료로 시작하기",
         "features": {
           "projects": "프로젝트 1개 사용 가능",
           "clips": "폴더당 50개까지 추가 저장",
-          "devices": "데스크톱 1개, 모바일 1개 연동 가능",
-          "organization": "접근 가능한 폴더에서 검색 + 태그",
-          "ai": ""
+          "organization": "폴더 + 즐겨찾기"
         }
       },
       "pro": {
@@ -85,14 +80,12 @@
         "badge": "집중 작업용",
         "description": "프로젝트를 여러 개 운영하고 태그 기반 정리가 필요한 플랜",
         "priceSuffix": "/월",
-        "billingNote": "월 3,900원으로 Pro 기능 사용",
+        "billingNote": "매월 자동결제 · 자동갱신 해지 가능",
         "cta": "Pro로 업그레이드",
         "features": {
           "projects": "무제한 프로젝트 생성 가능",
           "clips": "폴더당 300개까지 추가 저장",
-          "devices": "무제한 기기 연동",
-          "organization": "접근 가능한 폴더에서 검색 + 태그",
-          "ai": "AI 기능 추가 예정"
+          "organization": "검색 + 태그 관리"
         }
       }
     },
@@ -118,7 +111,6 @@
       "pendingRenewalPayment": "이미 시작된 이번 청구가 완료되어 이용 기간이 연장될 수 있습니다."
     },
     "comparison": {
-      "eyebrow": "빠른 비교",
       "title": "핵심 비교",
       "description": "주요 차이를 항목별로 바로 비교할 수 있도록 정리했습니다.",
       "columns": {
@@ -137,20 +129,10 @@
           "freeValue": "폴더당 50개까지 추가 저장",
           "proValue": "폴더당 300개까지 추가 저장"
         },
-        "devices": {
-          "label": "기기 연동",
-          "freeValue": "데스크톱 1개 + 모바일 1개",
-          "proValue": "무제한 기기 연동"
-        },
         "organization": {
           "label": "정리 방식",
-          "freeValue": "접근 가능한 폴더에서 검색 + 태그",
-          "proValue": "접근 가능한 폴더에서 검색 + 태그"
-        },
-        "ai": {
-          "label": "AI 기능",
-          "freeValue": "미지원",
-          "proValue": "추가 예정"
+          "freeValue": "폴더 + 즐겨찾기",
+          "proValue": "검색 + 태그 관리"
         }
       }
     },
@@ -169,17 +151,17 @@
     "configError": "API 연결 정보가 설정되지 않았습니다. 환경변수를 확인해주세요.",
     "or": "또는",
     "backHome": "홈으로 돌아가기",
-    "agreementPrefix": "계속하면",
-    "agreementMiddle": "및",
-    "terms": "이용약관",
-    "privacy": "개인정보처리방침",
-    "agreementSuffix": "에 동의하게 됩니다."
+    "policiesPending": "이용약관과 개인정보 처리방침을 준비 중입니다.",
+    "contact": "문의하기"
   },
   "authGuard": {
     "loading": "인증 정보를 확인하는 중입니다.",
     "error": "인증 정보를 확인하지 못했습니다. 잠시 후 다시 시도해주세요.",
     "retry": "다시 시도",
-    "backHome": "홈으로 이동"
+    "backHome": "홈으로 이동",
+    "logoutFailed": "로그아웃을 완료하지 못했습니다. 계정이 아직 로그인 상태일 수 있습니다. 자료는 숨겼으며, 연결을 확인한 뒤 다시 시도해주세요.",
+    "retryLogout": "로그아웃 다시 시도",
+    "loggingOut": "로그아웃 중입니다."
   },
   "sidebar": {
     "favorites": "즐겨찾기",
@@ -212,7 +194,8 @@
     "create": "생성",
     "closeRenameFolder": "폴더 이름 변경 닫기",
     "renameFolder": "폴더 이름 변경",
-    "change": "변경"
+    "change": "변경",
+    "open": "사이드바 열기"
   },
   "settings": {
     "title": "설정",
@@ -238,15 +221,26 @@
     "subscriptionLoading": "확인 중",
     "subscriptionEmptyValue": "-",
     "subscriptionLoadError": "구독 정보를 불러오지 못했습니다.",
-    "about": "정보",
-    "aboutTitle": "Clipboard Studio v1.0.0",
-    "aboutDescription": "디자이너와 개발자를 위한 현대적인 클립보드 매니저",
+    "about": "버전",
+    "aboutTitle": "Easy Clip",
+    "aboutDescription": "텍스트·색상·이미지를 폴더와 태그로 정리합니다.",
     "closeButton": "닫기",
     "subscriptionFreeStatus": "무료 플랜 이용 중",
     "subscriptionUnavailableStatus": "구독 상태를 확인할 수 없음",
-    "subscriptionCanceledUntil": "해지 예약 / {date}까지 이용 가능"
+    "subscriptionCanceledUntil": "해지 예약 / {date}까지 이용 가능",
+    "appVersion": "버전 {version}"
   },
   "trash": {
+    "details": "상세 정보",
+    "closeDetails": "상세 보기 닫기",
+    "type": "유형",
+    "folderDetails": "폴더를 복구하면 포함된 클립을 확인할 수 있습니다.",
+    "contentUnavailable": "이 항목의 원본 내용을 불러올 수 없습니다. 복구 후 폴더에서 확인할 수 있습니다.",
+    "imageUnavailable": "이미지를 불러오지 못했습니다.",
+    "viewDetails": "{name} 상세 보기",
+    "deleteItemTitle": "영구 삭제할까요?",
+    "deleteItemDescription": "“{name}” 항목을 영구 삭제합니다. 폴더에 포함된 클립도 함께 삭제되며 되돌릴 수 없습니다.",
+    "cancelSelection": "선택 해제",
     "selectionHint": "복구할 항목을 선택하세요.",
     "title": "휴지통",
     "retentionNotice": "최대 30일까지 보관됩니다",
@@ -269,7 +263,6 @@
     "error": "휴지통 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
     "actionError": "휴지통 작업을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.",
     "restoreConflictError": "삭제된 폴더에 속한 클립은 단독으로 복구할 수 없습니다. 먼저 부모 폴더를 복구해주세요.",
-    "clearAllPartialError": "일부 항목을 삭제하지 못했습니다. 실패 {failedCount}개 / 전체 {totalCount}개",
     "emptyTitle": "표시할 휴지통 항목이 없습니다",
     "emptyDescription": "잠긴 폴더의 삭제 항목은 표시되지 않을 수 있습니다. 전체 비우기는 숨겨진 항목도 삭제합니다.",
     "listTitle": "삭제 항목",
@@ -305,7 +298,7 @@
     "foldersEmpty": "삭제된 폴더가 없습니다.",
     "deletedAt": "삭제 시각",
     "restore": "복구",
-    "deleteForever": "삭제",
+    "deleteForever": "영구 삭제",
     "deletedResult": "{count}개 항목을 영구 삭제했습니다."
   },
   "clips": {
@@ -319,7 +312,11 @@
       "clipboardUnavailable": "이 브라우저는 버튼 붙여넣기를 지원하지 않아요. 최신 Safari 또는 Chrome에서 다시 시도해 주세요.",
       "clipboardDenied": "클립보드 접근이 허용되지 않았어요. 브라우저에서 붙여넣기를 허용한 뒤 다시 눌러주세요.",
       "clipboardUnsupported": "클립보드의 형식을 지원하지 않아요. 텍스트나 이미지를 복사해 주세요.",
-      "clipboardReadFailed": "클립보드를 읽지 못했어요. 내용을 다시 복사한 뒤 시도해 주세요."
+      "clipboardReadFailed": "클립보드를 읽지 못했어요. 내용을 다시 복사한 뒤 시도해 주세요.",
+      "uploadTooLarge": "업로드할 파일이 서버의 크기 제한을 초과했습니다.",
+      "uploadRateLimited": "업로드 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+      "uploadUnavailable": "현재 업로드할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+      "uploadRetryAfter": "{seconds}초 후에 다시 업로드해 주세요."
     },
     "filter": {
       "all": "전체",
@@ -328,6 +325,7 @@
       "image": "이미지",
       "readyToPaste": "붙여넣기 준비됨",
       "notActive": "비활성 상태",
+      "closeSearch": "검색창 닫기",
       "searchPlaceholder": "클립 검색..."
     },
     "emptyState": {
@@ -352,7 +350,11 @@
       "noTags": "태그 없음",
       "editTags": "{name} 태그 편집",
       "openOptions": "{name} 옵션 열기",
-      "copying": "복사 중…"
+      "copying": "복사 중…",
+      "preview": "미리보기: {name}",
+      "closePreview": "미리보기 닫기",
+      "previewTitle": "클립 미리보기",
+      "copyAction": "복사"
     },
     "tags": {
       "manage": "태그 관리",
@@ -476,7 +478,7 @@
       "PROJECT_LOCKED": "잠긴 폴더에는 접근할 수 없습니다.",
       "CLIP_LIMIT_EXCEEDED": "폴더의 클립 추가 저장 한도에 도달했습니다. 기존 클립은 보존됩니다.",
       "PLAN_LIMIT_EXCEEDED": "현재 플랜에서는 폴더 생성 또는 복구가 제한됩니다. 기존 접근 폴더가 휴지통에 있다면 복구해주세요.",
-      "FEATURE_NOT_AVAILABLE": "폴더 순서 변경은 Pro에서 사용할 수 있습니다."
+      "FEATURE_NOT_AVAILABLE": "이 기능은 Pro에서 사용할 수 있습니다."
     },
     "draftTitle": "저장하지 못한 클립",
     "draftDescription": "입력을 보관했습니다. 네트워크 오류라면 목록에서 저장 여부를 확인한 뒤 재시도해주세요.",
@@ -485,7 +487,14 @@
     "clipLimit": "폴더당 추가 저장 한도: {limit}개.",
     "closeFolderLimit": "폴더 추가 안내 닫기",
     "clipLimitExplanation": "기존 클립은 한도를 초과해도 보존됩니다. 한도는 새 클립 추가에 적용됩니다.",
-    "proFeaturesTitle": "Pro에서 사용할 수 있는 기능"
+    "proFeaturesTitle": "Pro에서 사용할 수 있는 기능",
+    "billingCompleteTitle": "결제 완료",
+    "billingUncertainTitle": "결제 결과 확인 필요",
+    "proRequired": {
+      "search": "클립 검색은 Pro에서 사용할 수 있습니다.",
+      "tags": "태그 관리는 Pro에서 사용할 수 있습니다.",
+      "reorder": "폴더 순서 변경은 Pro에서 사용할 수 있습니다."
+    }
   },
   "feedback": {
     "close": "알림 닫기",
@@ -515,6 +524,35 @@
     "billingConfirmed": "구독 결제가 승인되었습니다.",
     "billingFailed": "결제를 완료하지 못했습니다. 결제 상태를 확인해주세요.",
     "loggedOut": "로그아웃했습니다.",
-    "policyResolution": "사용 가능한 폴더와 요금제 한도를 확인한 후 다시 시도해주세요."
+    "policyResolution": "사용 가능한 폴더와 요금제 한도를 확인한 후 다시 시도해주세요.",
+    "logoutFailed": "로그아웃에 실패했습니다. 다시 시도해주세요."
+  },
+  "billing": {
+    "title": "Pro로 업그레이드",
+    "description": "더 많은 폴더와 클립을 저장하고 정리하세요. 결제가 완료되면 Pro를 이용할 수 있습니다.",
+    "back": "요금제로 돌아가기",
+    "loading": "결제 정보 준비 중",
+    "redirecting": "결제 인증 이동 중",
+    "start": "카드 인증하고 Pro 시작",
+    "monthly": "월간",
+    "perMonth": "/ 월",
+    "renewal": "매월 자동결제됩니다. 자동갱신을 해지해도 이미 결제한 기간까지 이용할 수 있습니다."
+  },
+  "subscriptionPrice": {
+    "loading": "가격 확인 중",
+    "unavailable": "가격 확인 필요",
+    "error": "가격을 불러오지 못했습니다. 다시 확인한 뒤 결제를 진행해 주세요.",
+    "retry": "다시 확인",
+    "changed": "가격이 변경되었습니다. 변경된 금액을 확인하고 다시 시작해 주세요.",
+    "pending": "이전 결제 결과를 확인 중입니다. 새 결제를 시작하지 말고 잠시 후 다시 확인해 주세요."
+  },
+  "billingResult": {
+    "retryable": "결제 요청을 확인하지 못했습니다. 다시 시도해 주세요.",
+    "pending": "결제 결과를 확인 중입니다.",
+    "processing": "결제 요청을 처리하고 있습니다.",
+    "failed": "결제가 완료되지 않았습니다.",
+    "retry": "결제 다시 시도",
+    "check": "결제 결과 다시 확인",
+    "backToBilling": "결제 화면으로 이동"
   }
 }

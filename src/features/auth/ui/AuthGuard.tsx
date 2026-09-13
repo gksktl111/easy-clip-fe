@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { HiOutlineHome, HiOutlineRefresh } from "react-icons/hi";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useLogout } from "@/features/auth/hooks/useLogout";
 import { Button } from "@/shared/ui/button/Button";
 
 // 인증이 필요한 경로에서 검증 결과에 따라 렌더링, redirect와 재시도를 결정합니다.
@@ -12,6 +13,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const t = useTranslations("authGuard");
   const router = useRouter();
   const { status, restoreSession } = useAuth();
+  const { handleLogout, isPending: isLogoutPending } = useLogout();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -23,22 +25,28 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return children;
   }
 
-  if (status === "error") {
+  if (status === "error" || status === "logout-error") {
+    const isLogoutError = status === "logout-error";
     return (
       <main className="flex min-h-screen items-center justify-center bg-(--background) px-4">
         <div
           className="flex max-w-sm flex-col items-center text-center"
           role="alert"
         >
-          <p className="text-sm text-(--muted)">{t("error")}</p>
+          <p className="text-sm text-(--muted)">
+            {t(isLogoutError ? "logoutFailed" : "error")}
+          </p>
           <Button
             type="button"
             variant="secondary"
             className="mt-4"
-            onClick={() => void restoreSession()}
+            disabled={isLogoutPending}
+            onClick={() =>
+              void (isLogoutError ? handleLogout() : restoreSession())
+            }
           >
             <HiOutlineRefresh className="h-4 w-4" aria-hidden />
-            {t("retry")}
+            {t(isLogoutError ? "retryLogout" : "retry")}
           </Button>
           <Button
             type="button"
@@ -62,7 +70,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   return (
     <main
       className="flex min-h-screen items-center justify-center bg-(--background)"
-      aria-label={t("loading")}
+      aria-label={t(status === "logging-out" ? "loggingOut" : "loading")}
       aria-live="polite"
     >
       <span className="h-7 w-7 animate-spin rounded-full border-2 border-(--border) border-t-(--foreground)" />

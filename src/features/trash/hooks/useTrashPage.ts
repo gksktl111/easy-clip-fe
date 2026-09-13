@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { notifyError, notifySuccess } from "@/shared/feedback/toast";
 import { useTranslations } from "next-intl";
-import { useTrashActions } from "@/features/trash/hooks/useTrashActions";
+import { useTrashActions } from "@/features/trash/mutations/useTrashActions";
 import { useTrashItemsQuery } from "@/features/trash/hooks/useTrashItemsQuery";
 import type { TrashFolderReference } from "@/features/trash/service/trashRowMapper";
 import {

@@ -18,16 +18,16 @@
     "workflowDescription": "Paste content into the folder you are working in, organize it, then search and copy it whenever you need it.",
     "workflow": {
       "capture": {
-        "title": "Paste to save",
-        "description": "Paste text or an image into the current folder to save it as a clip."
+        "title": "Save what you need",
+        "description": "Copy a code snippet or image, then use Paste in a folder to save it."
       },
       "organize": {
-        "title": "Organize with folders and favorites",
-        "description": "Group clips by project, and favorite the content you use often."
+        "title": "Find it with tags",
+        "description": "With Pro, add tags in folders and narrow down clips with search."
       },
       "reuse": {
-        "title": "Search and copy again",
-        "description": "Find the clip you need by keyword and click it once to copy it back to your clipboard."
+        "title": "Read and copy again",
+        "description": "Check the full content in a preview, then copy it into your work."
       }
     },
     "sectionTitle": "Find saved content in seconds",
@@ -47,18 +47,15 @@
       },
       "search": {
         "title": "Fast search",
-        "description": "Search saved clips by keyword and copy the one you need right away."
+        "description": "With Pro, search saved clips by keyword and copy them immediately."
       }
     },
-    "reviewsTitle": "Why users changed their workflow",
-    "reviewsDescription": "See how saving and reusing content makes everyday work simpler.",
     "closingTitleLine1": "Do not lose copied information.",
     "closingTitleLine2": "Keep it in one place.",
     "closingDescription": "Save text and images scattered across chats and notes in EasyClip. Search for them and copy them again whenever you need them."
   },
   "pricing": {
     "hero": {
-      "eyebrow": "Simple plans for focused work",
       "titleLine1": "Choose the EasyClip plan",
       "titleLine2": "that fits how you work."
     },
@@ -68,16 +65,14 @@
       "free": {
         "name": "Free",
         "badge": "For getting started",
-        "description": "A simple plan for organizing clips with the essentials and fast search.",
+        "description": "A basic plan for saving clips and finding them in favorites.",
         "priceSuffix": "/ month",
         "billingNote": "Start right away with no monthly fee",
         "cta": "Start for free",
         "features": {
           "projects": "Use 1 project",
           "clips": "Add clips up to 50 per folder",
-          "devices": "Connect 1 desktop and 1 mobile device",
-          "organization": "Search + tags in accessible folders",
-          "ai": ""
+          "organization": "Folders + favorites"
         }
       },
       "pro": {
@@ -85,14 +80,12 @@
         "badge": "For focused work",
         "description": "For managing multiple projects with tag-based organization.",
         "priceSuffix": "/ month",
-        "billingNote": "Unlock Pro features for ₩3,900 per month",
+        "billingNote": "Billed monthly · Cancel renewal anytime",
         "cta": "Upgrade to Pro",
         "features": {
           "projects": "Create unlimited projects",
           "clips": "Add clips up to 300 per folder",
-          "devices": "Connect unlimited devices",
-          "organization": "Search + tags in accessible folders",
-          "ai": "AI features coming soon"
+          "organization": "Search + tag management"
         }
       }
     },
@@ -118,7 +111,6 @@
       "pendingRenewalPayment": "An already-started renewal charge may complete and extend your access."
     },
     "comparison": {
-      "eyebrow": "Quick comparison",
       "title": "Compare the essentials",
       "description": "Compare the main differences side by side.",
       "columns": {
@@ -137,20 +129,10 @@
           "freeValue": "Add clips up to 50 per folder",
           "proValue": "Add clips up to 300 per folder"
         },
-        "devices": {
-          "label": "Devices",
-          "freeValue": "1 desktop + 1 mobile",
-          "proValue": "Unlimited devices"
-        },
         "organization": {
           "label": "Organization",
-          "freeValue": "Search + tags in accessible folders",
-          "proValue": "Search + tags in accessible folders"
-        },
-        "ai": {
-          "label": "AI features",
-          "freeValue": "Not available",
-          "proValue": "Coming soon"
+          "freeValue": "Folders + favorites",
+          "proValue": "Search + tag management"
         }
       }
     },
@@ -169,17 +151,17 @@
     "configError": "API connection settings are missing. Check your environment variables.",
     "or": "or",
     "backHome": "Back to home",
-    "agreementPrefix": "By continuing, you agree to the",
-    "agreementMiddle": "and",
-    "terms": "Terms of Service",
-    "privacy": "Privacy Policy",
-    "agreementSuffix": "."
+    "policiesPending": "Our terms of service and privacy policy are being prepared.",
+    "contact": "Contact us"
   },
   "authGuard": {
     "loading": "Checking your session.",
     "error": "We could not verify your session. Please try again shortly.",
     "retry": "Try again",
-    "backHome": "Go to home"
+    "backHome": "Go to home",
+    "logoutFailed": "Sign-out could not be completed. Your account may still be signed in. Your content is hidden; check your connection and try again.",
+    "retryLogout": "Retry sign-out",
+    "loggingOut": "Signing out."
   },
   "sidebar": {
     "favorites": "Favorites",
@@ -212,7 +194,8 @@
     "create": "Create",
     "closeRenameFolder": "Close rename folder",
     "renameFolder": "Rename folder",
-    "change": "Save"
+    "change": "Save",
+    "open": "Open sidebar"
   },
   "settings": {
     "title": "Settings",
@@ -238,15 +221,26 @@
     "subscriptionLoading": "Loading",
     "subscriptionEmptyValue": "-",
     "subscriptionLoadError": "Failed to load subscription information.",
-    "about": "About",
-    "aboutTitle": "Clipboard Studio v1.0.0",
-    "aboutDescription": "A modern clipboard manager for designers and developers",
+    "about": "Version",
+    "aboutTitle": "Easy Clip",
+    "aboutDescription": "Organize text, colors, and images with folders and tags.",
     "closeButton": "Close",
     "subscriptionFreeStatus": "Using free plan",
     "subscriptionUnavailableStatus": "Subscription unavailable",
-    "subscriptionCanceledUntil": "Canceled; available until {date}"
+    "subscriptionCanceledUntil": "Canceled; available until {date}",
+    "appVersion": "Version {version}"
   },
   "trash": {
+    "details": "Details",
+    "closeDetails": "Close details",
+    "type": "Type",
+    "folderDetails": "Restore this folder to view its clips.",
+    "contentUnavailable": "The original content is unavailable. Restore this item to view it in its folder.",
+    "imageUnavailable": "Unable to load the image.",
+    "viewDetails": "View details for {name}",
+    "deleteItemTitle": "Delete permanently?",
+    "deleteItemDescription": "Permanently delete “{name}”. Clips inside a folder will also be deleted. This cannot be undone.",
+    "cancelSelection": "Clear selection",
     "selectionHint": "Select items to restore.",
     "title": "Trash",
     "retentionNotice": "Kept for up to 30 days",
@@ -269,7 +263,6 @@
     "error": "Failed to load trash data. Please try again shortly.",
     "actionError": "Could not complete the trash action. Please try again shortly.",
     "restoreConflictError": "Clips inside a deleted folder cannot be restored on their own. Restore the parent folder first.",
-    "clearAllPartialError": "Some items could not be deleted. Failed {failedCount} of {totalCount}.",
     "emptyTitle": "No trash items to display",
     "emptyDescription": "Deleted items in locked folders may be hidden. Empty trash also deletes hidden items.",
     "listTitle": "Deleted items",
@@ -305,7 +298,7 @@
     "foldersEmpty": "No deleted folders.",
     "deletedAt": "Deleted at",
     "restore": "Restore",
-    "deleteForever": "Delete",
+    "deleteForever": "Delete permanently",
     "deletedResult": "Permanently deleted {count} items."
   },
   "clips": {
@@ -319,7 +312,11 @@
       "clipboardUnavailable": "This browser does not support the Paste button. Try the latest Safari or Chrome.",
       "clipboardDenied": "Clipboard access was not allowed. Allow pasting in your browser, then try again.",
       "clipboardUnsupported": "This clipboard format is not supported. Copy text or an image.",
-      "clipboardReadFailed": "Could not read the clipboard. Copy the content again and retry."
+      "clipboardReadFailed": "Could not read the clipboard. Copy the content again and retry.",
+      "uploadTooLarge": "The file exceeds the server upload limit.",
+      "uploadRateLimited": "Too many uploads. Please try again shortly.",
+      "uploadUnavailable": "Uploads are currently unavailable. Please try again later.",
+      "uploadRetryAfter": "Please retry the upload in {seconds} seconds."
     },
     "filter": {
       "all": "All",
@@ -328,6 +325,7 @@
       "image": "Image",
       "readyToPaste": "Ready to paste",
       "notActive": "Not active",
+      "closeSearch": "Close search",
       "searchPlaceholder": "Search clips..."
     },
     "emptyState": {
@@ -352,7 +350,11 @@
       "noTags": "No tags",
       "editTags": "Edit tags for {name}",
       "openOptions": "Open options for {name}",
-      "copying": "Copying…"
+      "copying": "Copying…",
+      "preview": "Preview: {name}",
+      "closePreview": "Close preview",
+      "previewTitle": "Clip preview",
+      "copyAction": "Copy"
     },
     "tags": {
       "manage": "Manage tags",
@@ -476,7 +478,7 @@
       "PROJECT_LOCKED": "This folder is locked.",
       "CLIP_LIMIT_EXCEEDED": "This folder has reached its clip creation limit. Existing clips are preserved.",
       "PLAN_LIMIT_EXCEEDED": "Your plan restricts folder creation or restoration. Restore your accessible folder if it is in trash.",
-      "FEATURE_NOT_AVAILABLE": "Folder reordering requires Pro."
+      "FEATURE_NOT_AVAILABLE": "This feature is available with Pro."
     },
     "draftTitle": "Unsaved clip",
     "draftDescription": "Your input is retained. After a network error, check whether it was saved before retrying.",
@@ -485,7 +487,14 @@
     "clipLimit": "New clips can be added up to {limit} per folder.",
     "closeFolderLimit": "Close folder limit notice",
     "clipLimitExplanation": "Existing clips are preserved even above the limit. Limits apply to adding new clips.",
-    "proFeaturesTitle": "Features available with Pro"
+    "proFeaturesTitle": "Features available with Pro",
+    "billingCompleteTitle": "Payment complete",
+    "billingUncertainTitle": "Check payment status",
+    "proRequired": {
+      "search": "Clip search is available with Pro.",
+      "tags": "Tag management is available with Pro.",
+      "reorder": "Folder reordering is available with Pro."
+    }
   },
   "feedback": {
     "close": "Dismiss notification",
@@ -515,6 +524,35 @@
     "billingConfirmed": "Subscription payment approved.",
     "billingFailed": "Payment could not be completed. Check your payment status.",
     "loggedOut": "Signed out.",
-    "policyResolution": "Check accessible folders and plan limits, then try again."
+    "policyResolution": "Check accessible folders and plan limits, then try again.",
+    "logoutFailed": "Sign-out failed. Please try again."
+  },
+  "billing": {
+    "title": "Upgrade to Pro",
+    "description": "Save and organize more folders and clips. Pro is available once payment is complete.",
+    "back": "Back to plans",
+    "loading": "Preparing payment",
+    "redirecting": "Opening card verification",
+    "start": "Verify card and start Pro",
+    "monthly": "Monthly",
+    "perMonth": "/ month",
+    "renewal": "Billed automatically each month. Cancel renewal to stop future billing and keep access through your paid period."
+  },
+  "subscriptionPrice": {
+    "loading": "Loading price",
+    "unavailable": "Price unavailable",
+    "error": "We could not load the price. Please retry before proceeding to payment.",
+    "retry": "Retry",
+    "changed": "The price has changed. Review the updated amount and start again.",
+    "pending": "Your previous payment is still being checked. Please check again shortly before starting another payment."
+  },
+  "billingResult": {
+    "retryable": "We could not find your payment request. Please try again.",
+    "pending": "We are checking your payment result.",
+    "processing": "Your payment request is being processed.",
+    "failed": "Your payment was not completed.",
+    "retry": "Retry payment",
+    "check": "Check payment result",
+    "backToBilling": "Go to payment"
   }
 }

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import {
   HiCheck,
+  HiOutlineEye,
   HiOutlineColorSwatch,
   HiOutlineDocumentText,
   HiOutlinePhotograph,
@@ -20,6 +21,7 @@ interface ClipItemProps {
   onCopy?: (clip: Clip, event: React.MouseEvent<HTMLButtonElement>) => void;
   onToggleFavorite?: (clip: Clip) => void;
   onEditTags?: (clip: Clip) => void;
+  onPreview?: (clip: Clip) => void;
   onContextMenu?: (
     event: React.MouseEvent<HTMLButtonElement>,
     clip: Clip,
@@ -83,6 +85,7 @@ export function ClipItem({
   onCopy,
   onToggleFavorite,
   onEditTags,
+  onPreview,
   onContextMenu,
   isDeleteMode = false,
   isFavoriteMutationPending = false,
@@ -105,6 +108,7 @@ export function ClipItem({
   const primaryActionLabel = isDeleteMode
     ? t("selectForDelete", { name: clip.name })
     : t("copy", { name: clip.name });
+  const TagContainer = onEditTags ? "button" : "div";
   const visibleTags = clip.tags.slice(0, 2);
   const hiddenTagCount = Math.max(clip.tags.length - visibleTags.length, 0);
 
@@ -158,15 +162,19 @@ export function ClipItem({
         </span>
       </button>
       <div className="flex min-h-10 items-center gap-1.5 border-t border-(--border) px-3 py-2">
-        <button
-          type="button"
-          disabled={isDisabled || isDeleteMode || !onEditTags}
+        <TagContainer
+          {...(onEditTags
+            ? {
+                type: "button" as const,
+                disabled: isDisabled || isDeleteMode,
+                "aria-label": t("editTags", { name: clip.name }),
+              }
+            : {})}
           onClick={(event) => {
             event.stopPropagation();
             onEditTags?.(clip);
           }}
-          aria-label={t("editTags", { name: clip.name })}
-          className="flex min-h-8 min-w-0 flex-1 cursor-pointer items-center gap-1 overflow-hidden rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) disabled:cursor-default"
+          className={`${onEditTags ? "cursor-pointer" : ""} flex min-h-8 min-w-0 flex-1 items-center gap-1 overflow-hidden rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-(--focus-ring) disabled:cursor-default`}
         >
           {visibleTags.map((tag) => (
             <TagChip
@@ -185,7 +193,21 @@ export function ClipItem({
               {t("noTags")}
             </span>
           ) : null}
-        </button>
+        </TagContainer>
+        {onPreview && !isDeleteMode ? (
+          <button
+            type="button"
+            disabled={isDisabled}
+            onClick={(event) => {
+              event.stopPropagation();
+              onPreview(clip);
+            }}
+            aria-label={t("preview", { name: clip.name })}
+            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md text-(--muted) hover:bg-(--surface-muted) focus-visible:outline-2 focus-visible:outline-(--focus-ring) disabled:cursor-default"
+          >
+            <HiOutlineEye className="h-4 w-4" aria-hidden />
+          </button>
+        ) : null}
         {onContextMenu && !isDeleteMode ? (
           <button
             type="button"

@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  AccessChangedError,
+  getAccessGeneration,
+} from "@/shared/access/accessEvents";
+import { useResourceAccess } from "@/shared/access/ResourceAccessContext";
+import { assertClipOrganizationAccess } from "@/features/clip/service/clipOrganizationAccess";
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -33,6 +39,8 @@ export const useFolderTagMutations = ({
   folderId,
   isAuthenticated,
 }: UseFolderTagMutationsOptions) => {
+  const access = useResourceAccess();
+  const generation = getAccessGeneration();
   const queryClient = useQueryClient();
 
   const refreshMissingResources = useCallback(
@@ -56,19 +64,29 @@ export const useFolderTagMutations = ({
     }: {
       name: string;
       backgroundColor?: TagBackgroundColor;
-    }) =>
-      mapFolderTagResponse(
+    }) => {
+      if (generation !== getAccessGeneration()) throw new AccessChangedError();
+      assertClipOrganizationAccess(access, folderId);
+      return mapFolderTagResponse(
         await createFolderTag(folderId, { name, backgroundColor }),
-      ),
+      );
+    },
     onSuccess: (tag) => addFolderTagToCache(queryClient, tag),
     onError: refreshMissingResources,
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ tagId, name, backgroundColor }: UpdateTagVariables) =>
-      mapFolderTagResponse(
+    mutationFn: async ({
+      tagId,
+      name,
+      backgroundColor,
+    }: UpdateTagVariables) => {
+      if (generation !== getAccessGeneration()) throw new AccessChangedError();
+      assertClipOrganizationAccess(access, folderId);
+      return mapFolderTagResponse(
         await updateFolderTag(folderId, tagId, { name, backgroundColor }),
-      ),
+      );
+    },
     onSuccess: (tag) => updateFolderTagInCache(queryClient, tag),
     onError: refreshMissingResources,
     onSettled: () =>
@@ -79,6 +97,8 @@ export const useFolderTagMutations = ({
 
   const deleteMutation = useMutation({
     mutationFn: async (tagId: string) => {
+      if (generation !== getAccessGeneration()) throw new AccessChangedError();
+      assertClipOrganizationAccess(access, folderId);
       await deleteFolderTag(folderId, tagId);
       return tagId;
     },

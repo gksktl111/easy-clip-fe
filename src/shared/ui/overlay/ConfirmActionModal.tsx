@@ -27,6 +27,7 @@ export function ConfirmActionModal({
 }: ConfirmActionModalProps) {
   return (
     <Modal
+      ariaLabel={title}
       isOpen={isOpen}
       contentClassName="w-full max-w-sm"
       onEscape={() => {
@@ -35,12 +36,7 @@ export function ConfirmActionModal({
         }
       }}
     >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className="rounded-xl bg-(--surface-elevated) shadow-xl"
-      >
+      <div className="rounded-xl bg-(--surface-elevated) shadow-xl">
         <div className="border-b border-(--border) px-5 py-4">
           <p className="text-foreground text-sm font-semibold">{title}</p>
           <p className="text-muted mt-1 text-xs">{description}</p>
